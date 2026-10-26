@@ -1,0 +1,9 @@
+id: bottleneck_flow
+quantity: specific flow through a bottleneck (people per metre width per second)
+value: {specific_flow_pms: 1.9, range: [1.6, 2.2]}
+source: Seyfried, A. et al. (2009). New insights into pedestrian flow through bottlenecks. Transportation Science 43(3), 395-406. Data in the Juelich pedestrian dynamics data archive (DOI prefix 10.34735/ped.), CC BY 4.0.
+license: CC BY 4.0 (data); published values (facts)
+used_by: cages/sim/kinematics.py (t_board, t_alight)
+enforced_by: tests/test_anchors.py::test_boarding_not_faster_than_bottleneck_flow
+tolerance: per-passenger transfer time >= 1 / (specific_flow * door_width) for a 1.1 m door
+status: enforced (published statistic); calibrating to raw archive trajectories is open work

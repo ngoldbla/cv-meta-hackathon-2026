@@ -134,6 +134,7 @@ class Simulation:
         self.trace: list[dict] = []
         self.decision_hook = None  # callable(sim, call) -> None, called before assignment
         self._pending_arrivals = 0
+        self.arrived_by_stream: dict[str, int] = {}
         self.t_end: float | None = None
         self.deadlocked = False
         for i, c in enumerate(self.cars):
@@ -230,6 +231,7 @@ class Simulation:
     def _on_arrive(self, pid: int) -> None:
         p = self.pax[pid]
         self._pending_arrivals -= 1
+        self.arrived_by_stream[p.stream] = self.arrived_by_stream.get(p.stream, 0) + 1
         key = (p.origin, p.direction)
         self.queues.setdefault(key, deque()).append(pid)
         self._note_density(p.origin)
@@ -553,30 +555,40 @@ class Simulation:
             c.asleep = True
 
     # ------------------------------------------------------------------ cloning (counterfactual rollouts)
-    def clone(self) -> Simulation:
-        """Deep copy of the live state; delivered passengers and logs are shared, not copied."""
-        saved = (self.done, self.call_log, self.door_log, self.trace, self.decision_hook)
+    def clone(self, drop_future: bool = False) -> Simulation:
+        """Deep copy of the live state; delivered passengers and logs are not copied.
+
+        ``drop_future`` omits passengers who have not arrived yet (call ``resample_future`` next)."""
+        saved = (self.done, self.call_log, self.door_log, self.trace, self.decision_hook, self.pax, self._heap,
+                 self._pending_arrivals)
         self.done, self.call_log, self.door_log, self.trace, self.decision_hook = [], [], [], [], None
+        if drop_future:
+            future = {pid for pid, p in self.pax.items() if p.t_arrive > self.now}
+            self.pax = {pid: p for pid, p in self.pax.items() if pid not in future}
+            self._heap = [e for e in self._heap if not (e[2] == "arrive" and e[3][0] in future)]
+            self._pending_arrivals -= len(future)
         try:
             other = copy.deepcopy(self)
         finally:
-            self.done, self.call_log, self.door_log, self.trace, self.decision_hook = saved
+            (self.done, self.call_log, self.door_log, self.trace, self.decision_hook, self.pax, self._heap,
+             self._pending_arrivals) = saved
         other.call_log = list(self.call_log)
+        if drop_future:
+            heapq.heapify(other._heap)
         return other
 
     def resample_future(self, seed: int) -> None:
-        """Replace not-yet-arrived passengers with a fresh conditional draw (same for every action)."""
+        """Replace not-yet-arrived passengers with a fresh conditional draw.
+
+        Rollout k uses the same seed for every candidate action (common random numbers)."""
         future = {pid for pid, p in self.pax.items() if p.t_arrive > self.now}
         for pid in future:
             del self.pax[pid]
         self._heap = [e for e in self._heap if not (e[2] == "arrive" and e[3][0] in future)]
         heapq.heapify(self._heap)
         self._pending_arrivals -= len(future)
-        arrived = {}
-        for p in list(self.pax.values()) + self.done:
-            arrived[p.stream] = arrived.get(p.stream, 0) + 1
         rng = np.random.default_rng([self.seed, 99, int(seed)])
-        for p in self.scenario.sample_future(rng, self.now, arrived):
+        for p in self.scenario.sample_future(rng, self.now, self.arrived_by_stream):
             self._add_passenger(p)
 
 
