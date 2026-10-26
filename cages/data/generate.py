@@ -42,9 +42,14 @@ def generate(out: str, n_train: int, n_dev: int, workers: int, cfg: LabelConfig,
         d.mkdir(parents=True, exist_ok=True)
         (d / "specs.jsonl").write_text("".join(json.dumps(s) + "\n" for s in specs))
         t0 = time.time()
+        results = {}
         with Pool(workers) as pool:
-            results = pool.map(_job, [(s, config_dict(cfg)) for s in specs], chunksize=1)
-        records = [r for _, recs in results for r in recs]
+            for k, (sid, recs) in enumerate(pool.imap_unordered(_job, [(s, config_dict(cfg)) for s in specs]), 1):
+                results[sid] = recs
+                if k % max(1, n // 10) == 0 or k == n:
+                    print(f"  {split}: {k}/{n} instances, {sum(map(len, results.values()))} states,"
+                          f" {time.time() - t0:.0f}s", flush=True)
+        records = [r for s in specs for r in results[s["id"]]]  # deterministic order
         arrays = stack(records)
         np.savez_compressed(d / "shard-000.npz", **arrays)
         manifest["splits"][split] = {"instances": n, "states": len(records), "seconds": round(time.time() - t0, 1)}
