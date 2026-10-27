@@ -64,8 +64,9 @@ def test_mcp_tools_end_to_end(tmp_path):
     try:
         res = asyncio.run(mcp_server.mcp.call_tool("ledger_commit", {"kind": "holdout_eval", "payload": {}}))
         assert getattr(res, "isError", getattr(res, "is_error", False)), "holdout_eval must be refused"
-    except Exception as e:  # SDK 1.x raises
-        assert "holdout_eval" in str(e)
+    except Exception as e:  # the SDK raises; the refusal reason is on the exception chain
+        chain = f"{e} {e.__cause__!r}"
+        assert "holdout_eval" in chain and "PermissionError" in chain
 
 
 def test_guard_blocks_frozen_paths():
