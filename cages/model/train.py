@@ -170,12 +170,31 @@ def save_checkpoint(model: DecisionModel, out: str) -> None:
     torch.save(ck, outp / "decision_model.pt")
 
 
-def load_model(path: str, quant: str = "none", device: str = "cpu") -> DecisionModel:
-    ck = torch.load(Path(path) / "decision_model.pt", map_location="cpu", weights_only=False)
+_LOADED: dict = {}  # the last model loaded in this process; evaluator workers reuse it across jobs
+
+
+def trained_quant(path: str, config: dict) -> str:
+    """Precision a checkpoint was trained at (older checkpoints record it only in metrics.json)."""
+    if "quant" in config:
+        return config["quant"]
+    metrics = Path(path) / "metrics.json"
+    return json.loads(metrics.read_text())["final"].get("quant", "none") if metrics.exists() else "none"
+
+
+def load_model(path: str, quant: str | None = None, device: str = "cpu") -> DecisionModel:
+    """Load a checkpoint at the precision it was trained at, unless ``quant`` overrides it.
+
+    The last model loaded is cached per process, so the evaluator does not reload a multi-GB trunk
+    for every instance and threshold; callers must treat the returned model as read-only."""
+    ckpt = Path(path) / "decision_model.pt"
+    key = (str(ckpt.resolve()), ckpt.stat().st_mtime_ns, quant, device)
+    if key in _LOADED:
+        return _LOADED[key]
+    ck = torch.load(ckpt, map_location="cpu", weights_only=False)
     c = ck["config"]
     m = DecisionModel(c["car_dim"], c["floor_dim"], c["glob_dim"], c["n_floors"], c["n_cars"], c["backbone"],
                       c["d_model"], c["n_layers"], hf_dtype=c.get("hf_dtype", "float32"),
-                      lora_rank=c.get("lora_rank", 0), quant=quant)
+                      lora_rank=c.get("lora_rank", 0), quant=quant or trained_quant(path, c))
     if "state_dict" in ck:
         m.load_state_dict(ck["state_dict"])
     else:
@@ -186,6 +205,8 @@ def load_model(path: str, quant: str = "none", device: str = "cpu") -> DecisionM
             m.backbone.load_adapter_state(ck["lora_state"])
     m.to_device(pick_device(device))
     m.eval()
+    _LOADED.clear()
+    _LOADED[key] = m
     return m
 
 

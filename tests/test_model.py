@@ -125,6 +125,19 @@ def test_adapter_checkpoint_roundtrip(tmp_path):
     assert torch.allclose(m2(car, floor, glob, mask), ref, atol=1e-5)
 
 
+def test_load_model_uses_trained_precision_and_reuses_the_model(tmp_path):
+    from cages.model.train import load_model, save_checkpoint, trained_quant
+
+    car, floor, glob, _ = _batch()
+    save_checkpoint(DecisionModel(car.shape[-1], floor.shape[-1], glob.shape[-1], 30, 6, "scratch", 32, 1),
+                    str(tmp_path))
+    assert torch.load(tmp_path / "decision_model.pt", weights_only=False)["config"]["quant"] == "none"
+    assert load_model(str(tmp_path)) is load_model(str(tmp_path))  # one load per evaluator worker
+    # checkpoints saved before the config recorded it: the precision comes from metrics.json
+    (tmp_path / "metrics.json").write_text(json.dumps({"final": {"quant": "nf4"}}))
+    assert trained_quant(str(tmp_path), {}) == "nf4"
+
+
 def test_scratch_training_runs_on_available_device(tmp_path):
     from cages.model.train import train
 

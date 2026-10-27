@@ -95,7 +95,7 @@ class DecisionModel(nn.Module):
         h = self.backbone.hidden_size
         self.config = dict(car_dim=car_dim, floor_dim=floor_dim, glob_dim=glob_dim, n_floors=n_floors,
                            n_cars=n_cars, backbone=backbone, d_model=d_model, n_layers=n_layers, lora_rank=lora_rank,
-                           hf_dtype=hf_dtype)
+                           hf_dtype=hf_dtype, quant=quant)
         self.car_in = nn.Sequential(nn.Linear(car_dim, h), nn.GELU(), nn.Linear(h, h))
         self.floor_in = nn.Sequential(nn.Linear(floor_dim, h), nn.GELU(), nn.Linear(h, h))
         self.glob_in = nn.Sequential(nn.Linear(glob_dim, h), nn.GELU(), nn.Linear(h, h))

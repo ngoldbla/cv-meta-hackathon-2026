@@ -60,6 +60,10 @@ python -m cages.data.card datasets/cages-v0
 
 ## 4. H3 backbones (CUDA)
 
+H3 (ledger entry 2) fixes **identical training data and epoch budget** for every backbone. The H3 arms all use
+`--epochs 6 --batch 16 --lr 2e-4`. Batch 64 runs out of memory for the Glimmer trunks on 16 GB, so batch 16 is the
+shared setting. Any other setting is exploratory and is reported as such, never as an H3 arm.
+
 ```bash
 # decapitate + truncate Glimmer (downloads ~60 GB once; streams tensor by tensor)
 python -m cages.model.decapitate meta-models/Muse-Glimmer-30B runs/glimmer-L8  --keep-layers 8
@@ -67,50 +71,70 @@ python -m cages.model.decapitate meta-models/Muse-Glimmer-30B runs/glimmer-L12 -
 
 # L8 in bf16 + LoRA (~7.4 GB of weights; fits 16 GB)
 python -m cages.model.train --data datasets/cages-v0 --backbone hf:runs/glimmer-L8 --hf-dtype bfloat16 \
-  --lora-rank 16 --epochs 6 --batch 64 --lr 2e-4 --out runs/decision-glimmer-L8-r16
-# L12 as QLoRA (nf4 base, ~2.8 GB)
+  --lora-rank 16 --epochs 6 --batch 16 --lr 2e-4 --out runs/decision-glimmer-L8-r16
+# L12 as QLoRA (nf4 base); the checkpoint records nf4, and evaluation and the edge bench load it that way
 python -m cages.model.train --data datasets/cages-v0 --backbone hf:runs/glimmer-L12 --quant nf4 \
-  --lora-rank 16 --epochs 6 --batch 64 --lr 2e-4 --out runs/decision-glimmer-L12-q16
-# controls, with the same data and epoch budget
-python -m cages.model.train --data datasets/cages-v0 --backbone hf:convaiinnovations/laya --lora-rank 16 \
-  --epochs 6 --batch 64 --lr 2e-4 --out runs/decision-laya-r16
+  --lora-rank 16 --epochs 6 --batch 16 --lr 2e-4 --out runs/decision-glimmer-L12-q16
+# controls, with the same data, epochs, batch and learning rate
+# Laya: the encoder is extracted from convaiinnovations/laya into runs/laya-encoder (scripts/extract_laya_encoder.py)
+python -m cages.model.train --data datasets/cages-v0 --backbone hf:runs/laya-encoder --lora-rank 16 \
+  --epochs 6 --batch 16 --lr 2e-4 --out runs/decision-laya-r16-b16
+python -m cages.model.train --data datasets/cages-v0 --backbone scratch --d-model 512 --n-layers 6 \
+  --epochs 6 --batch 16 --lr 2e-4 --out runs/decision-scratch-20m-e6
+# exploratory only (not an H3 arm): the longer scratch schedule
 python -m cages.model.train --data datasets/cages-v0 --backbone scratch --d-model 512 --n-layers 6 \
   --epochs 40 --batch 256 --out runs/decision-scratch-20m
 ```
 
-- **If out of memory:** lower `--batch`, or use `--quant nf4`.
+- **If out of memory:** lower `--batch` for that run, and record it: the H3 arms must then all be rerun at the same batch.
+- **Seeds:** the scratch runs take minutes, so add `--seed 1` and `--seed 2` to measure seed-to-seed spread.
 - **Commit:** each `runs/*/metrics.json`. Checkpoints stay out of git; they hold only the head and adapters, and the trunk is rebuilt from the decapitated directory.
 
 ## 5. Dev selection (closed loop)
 
-This needs evaluator v1.1 for the GPU.
+This needs evaluator v1.1 for the GPU. Before running it, write the selection rule (which run is each arm, the
+threshold grid, how the threshold is picked, and each arm's precision) into a `protocol_note` ledger entry.
 
 ```bash
+# baselines once, on CPU with all cores (writes experiments/results/dev-baselines/)
+python experiments/seed_experiments.py --n 40 --workers 16
+# each model on the GPU, with only the two reference baselines (writes experiments/results/dev-<run>/)
 export CAGES_EVAL_DEVICE=cuda CAGES_EVAL_GPU_WORKERS=1
-python experiments/seed_experiments.py --n 40 --model runs/decision-glimmer-L8-r16 --thresholds 0.0,0.2,0.35
+python experiments/seed_experiments.py --n 40 --model runs/decision-glimmer-L8-r16 --thresholds 0.0,0.2,0.35 \
+  --baselines esa,esa+schedule
 ```
 
-- Repeat for each backbone.
+- Repeat for each backbone. Each run writes to its own directory, so nothing is overwritten.
+- Models load at the precision they were trained at. The evaluator loads each model once per worker.
 - Choose the checkpoint and threshold **on dev only**.
 - Record the choice with `ledger_commit` (kind `model_choice`, payload: checkpoint, metrics SHA, threshold) **before** any holdout run.
 
 ## 6. Edge latency (H3 gate)
 
 ```bash
-python scripts/edge_bench.py --model runs/decision-glimmer-L8-r16 --data datasets/cages-v0 --device cuda --quant nf4
 python scripts/edge_bench.py --model runs/decision-glimmer-L8-r16 --data datasets/cages-v0 --device cuda
+# informative only: the bf16-trained trunk run in 4-bit
+python scripts/edge_bench.py --model runs/decision-glimmer-L8-r16 --data datasets/cages-v0 --device cuda --quant nf4
 ```
 
 Commit the JSON output. The H3 gate is p99 ≤ 50 ms per decision.
 
+- By default the bench runs the model at the precision it was trained at, which is how the evaluator runs it.
+- `--quant nf4` on a bf16-trained model measures a *different* model. It is informative only, unless that
+  precision is also the one evaluated in closed loop in §5 and recorded in `model_choice`.
+
 ## 7. Confirmatory runs
 
-Dylan runs these in his own shell, with the salt set only there:
+Dylan runs these in his own shell, with the salt set only there. Use exactly the checkpoints and thresholds
+recorded in `model_choice`. For GPU models, also set `CAGES_EVAL_DEVICE=cuda CAGES_EVAL_GPU_WORKERS=1` in that shell.
 
 ```bash
 python scripts/confirm.py --prereg H1 --controllers esa closest_car --n 40
 python scripts/confirm.py --prereg H2 --controllers mixture:runs/<chosen>@<thr> esa+schedule esa \
   --compare mixture:runs/<chosen>@<thr>,esa+schedule --compare mixture:runs/<chosen>@<thr>,esa --n 40
+python scripts/confirm.py --prereg H3 --controllers mixture:runs/<glimmer>@<t1> mixture:runs/<laya>@<t2> \
+  mixture:runs/<scratch>@<t3> --compare mixture:runs/<glimmer>@<t1>,mixture:runs/<laya>@<t2> \
+  --compare mixture:runs/<glimmer>@<t1>,mixture:runs/<scratch>@<t3> --n 40
 ```
 
 Commit `research/holdout/*.json` and `research/ledger.jsonl`, then update `research/results.md` with the outcome exactly as computed.
