@@ -36,3 +36,14 @@
   - So a learned forecaster needs the event schedule as a known-future covariate.
 - Evaluator v1.1 is prepared as a reviewed patch (`maintainer/`). Applying it is the maintainer's call; an agent cannot unfreeze the evaluator.
 - Next: `docs/runbook-gpu.md` §0–7 on the RTX 5060 Ti machine; the loop is driven from Muse Code per `docs/runbook-loop.md`.
+
+## 2026-10-27: gpu-phase — forecaster eval, cages-v0, Glimmer trunks
+- Forecaster eval (n=15 dev, Timestral on CUDA; `experiments/results/forecast_eval.json`):
+  - schedule prior: 11.4% WAPE at 600 s (knows the true release profile);
+  - recent_only (hall calls alone): ~100% (hidden-queue effect, as expected);
+  - timestral blend 0.5: 54.1%; timestral_only: 106.4%.
+  - Timestral alone is clearly worse than the schedule prior, so the prior stands; any pre-positioning claim assumes a published schedule.
+  - Fixed a CUDA bug in `cages/forecast/timestral_adapter.py`: forecast quantiles are now moved to host memory before numpy conversion.
+- Scaled the dataset (`datasets/cages-v0`, committed, 5.4 MB): 600 train instances (15,189 states, ~52 min on 20 workers) and 100 dev (2,546 states); card stats in `datasets/cages-v0/stats.json` (ESA matches best action on ~30% of train states).
+- Downloaded Muse-Glimmer-30B (~56 GB cache) and cut two bf16 trunks: L8 (3.87B params, 97 tensors kept) and L12 (5.81B params, 145 kept). Trunks live in `runs/` (git-ignored); decapitation records copied to `experiments/results/`.
+- No holdout or confirmatory runs were executed in this session.

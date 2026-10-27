@@ -57,7 +57,10 @@ class TimestralDemand:
         h = max(1, int(round(horizon / self.bin_s)))
         ctx = call_series(sim, self.bin_s, self.context_bins).T[None]  # (1, floors, T)
         out = self.fc.forecast(ctx, prediction_length=h, known_covariates=self._known(sim, h))
-        return np.asarray(out.quantiles)[0]  # (floors, H, 21)
+        q = out.quantiles
+        if hasattr(q, "cpu"):  # torch tensor, possibly on CUDA -> move to host first
+            q = q.cpu()
+        return np.asarray(q)[0]  # (floors, H, 21)
 
     def demand(self, sim, horizon: float) -> np.ndarray:
         q = self.quantiles(sim, horizon)

@@ -1,0 +1,14 @@
+{
+ "train": {
+  "states": 15189,
+  "median_rel_action_gap": 0.011648162268102169,
+  "esa_matches_best": 0.30041477384949633,
+  "eta_matches_best": 0.30673513727039303
+ },
+ "dev": {
+  "states": 2546,
+  "median_rel_action_gap": 0.012244090437889099,
+  "esa_matches_best": 0.28397486252945797,
+  "eta_matches_best": 0.29615082482325217
+ }
+}

@@ -1,0 +1,26 @@
+{
+ "version": "0.1",
+ "label_config": {
+  "K": 4,
+  "horizon": 240.0,
+  "p_label": 0.12,
+  "max_states": 30,
+  "epsilon": 0.25,
+  "tau": 60.0
+ },
+ "regime": "inversion",
+ "code_sha": "2c08af0694701d4e37cc1dca517d1ff4742bba52",
+ "created_unix": 1793063868,
+ "splits": {
+  "train": {
+   "instances": 600,
+   "states": 15189,
+   "seconds": 3099.2
+  },
+  "dev": {
+   "instances": 100,
+   "states": 2546,
+   "seconds": 552.7
+  }
+ }
+}
