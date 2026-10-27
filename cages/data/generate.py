@@ -24,8 +24,11 @@ def _job(args):
 
 
 def git_sha() -> str:
+    """HEAD commit, suffixed with -dirty when tracked files have uncommitted changes."""
     try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+        sha = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+        dirty = subprocess.run(["git", "diff", "--quiet", "HEAD", "--", "cages"]).returncode != 0
+        return sha + ("-dirty" if dirty else "")
     except Exception:
         return "unknown"
 
