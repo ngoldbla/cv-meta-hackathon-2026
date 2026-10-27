@@ -142,8 +142,8 @@ def train(data: str, out: str, backbone: str = "scratch", epochs: int = 30, lr: 
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             opt.step()
             tot += float(loss.detach()) * len(idx)
-        dev = evaluate(model, dv, dv_raw)
-        history.append({"epoch": ep, "train_log_score": tot / n, **{f"dev_{k}": v for k, v in dev.items()}})
+        dev_metrics = evaluate(model, dv, dv_raw)
+        history.append({"epoch": ep, "train_log_score": tot / n, **{f"dev_{k}": v for k, v in dev_metrics.items()}})
         if (time.time() - t0) / 60 > max_minutes:
             break
     T = fit_temperature(model, dv)
