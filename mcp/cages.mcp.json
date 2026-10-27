@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "cages": {
+      "command": ".venv/bin/python",
+      "args": ["-m", "cages.harness.mcp_server"],
+      "env": {
+        "CAGES_EVAL_DEVICE": "cuda",
+        "CAGES_TIMESTRAL_DEVICE": "cuda"
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+id: en81_car_area
+quantity: maximum available car area for a rated load (passenger lifts)
+value: {rated_kg_to_area_m2: [[630, 1.66], [800, 2.00], [1000, 2.40], [1275, 2.95], [1600, 3.56], [2000, 4.20], [2500, 5.00]]}
+source: EN 81-20:2020, rated load / available car area table (values transcribed; verify against the standard text)
+license: published values (facts)
+used_by: cages/data/instances.py (car_area_for)
+enforced_by: tests/test_anchors.py::test_car_area_table
+status: enforced; transcription to be verified

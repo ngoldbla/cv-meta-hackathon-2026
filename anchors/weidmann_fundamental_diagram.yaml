@@ -1,0 +1,10 @@
+id: weidmann_fd
+quantity: pedestrian speed vs density (uni-directional, level walkway)
+value: {v0_ms: 1.34, gamma: 1.913, rho_max_pm2: 5.4}
+source: Weidmann, U. (1993). Transporttechnik der Fussgaenger. IVT Schriftenreihe 90, ETH Zurich.
+license: published values (facts)
+used_by: cages/crowd/social_force.py (calibration target)
+enforced_by: tests/test_crowd.py::test_social_force_matches_weidmann
+tolerance: rmse < 0.12 m/s over 0.5-3 p/m^2
+status: enforced
+notes: The social-force model jams to ~0 m/s at 4 p/m^2 where Weidmann gives 0.16 m/s (known model limitation).

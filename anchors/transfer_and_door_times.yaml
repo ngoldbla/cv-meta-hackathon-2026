@@ -1,0 +1,8 @@
+id: transfer_door_times
+quantity: passenger transfer time and door operating times
+value: {transfer_s: [1.0, 1.2], door_open_s: [1.5, 2.5], door_close_s: [2.5, 3.5]}
+source: typical design values in CIBSE Guide D (Transportation systems in buildings) and Barney & Al-Sharif, Elevator Traffic Handbook (2nd ed.); ranges to be verified against the texts
+license: published values (facts)
+used_by: cages/sim/kinematics.py defaults
+enforced_by: tests/test_anchors.py::test_kinematics_defaults_in_design_ranges
+status: enforced; ranges to be verified

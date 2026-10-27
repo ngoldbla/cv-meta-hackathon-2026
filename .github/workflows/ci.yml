@@ -1,0 +1,32 @@
+name: ci
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -e ".[dev,model,hf,mcp]" peft
+      - name: Lint
+        run: ruff check .
+      - name: Name guard (vendor neutrality)
+        run: python scripts/name_guard.py
+      - name: Frozen paths
+        if: github.event_name == 'pull_request'
+        run: |
+          git diff --name-only origin/${{ github.base_ref }}...HEAD > changed.txt
+          python scripts/guard_paths.py $(cat changed.txt) || (echo "frozen paths changed" && exit 1)
+      - name: Ledger chain
+        run: python -c "from cages.harness.ledger import Ledger; assert Ledger().verify()"
+      - name: Tests
+        run: pytest -q

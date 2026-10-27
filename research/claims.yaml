@@ -1,0 +1,30 @@
+- id: tsai-abstract-24pct
+  claim: Standby reduces AWT by more than 24% in both scenarios
+  source: Tsai et al. 2025, abstract
+  verdict: contradicted-by-own-data
+  evidence: Table 2 gives 0.35 -> 0.27 min (-22.9%) for 10 floors / 2 cars
+- id: tsai-energy
+  claim: The strategy does not compromise energy
+  source: Tsai et al. 2025, abstract and section 3.1.2
+  verdict: contradicted-by-own-data
+  evidence: Table 2 energy +23.6% (10F) and +30.3% (20F) vs closest car; Table 3 +3.9% with the cost function
+- id: tsai-eq6
+  claim: Eq. 6 finds the center of gravity of demand
+  source: Tsai et al. 2025, section 2.3.2
+  verdict: mislabelled
+  evidence: argmin of sum |x - f| w(x) is the weighted median; tests/test_sim.py::test_weighted_median_is_eq6_argmin
+- id: tsai-novelty
+  claim: Proactive idle-car repositioning has received little attention
+  source: Tsai et al. 2025, conclusions
+  verdict: overstated
+  evidence: Brand & Nikovski, ICRA 2004 (MERL TR2004-044); US 6,808,049
+- id: merl-esa-assumptions
+  claim: ESA-DP assumes known waiting counts and infinite car capacity
+  source: Nikovski & Brand, ICAPS 2003 (TR2003-61), "Initial Assumptions"
+  verdict: supported
+  evidence: stated explicitly by the authors
+- id: merl-foresight-collapse
+  claim: The value of perfect foresight falls to under 10% AWT savings near 1,000 persons/hour
+  source: Zhang et al., ECC 2022, Fig. 6
+  verdict: supported (as reported; closed simulators, not independently reproduced)
+  evidence: prescient scheduler savings vs arrival rate

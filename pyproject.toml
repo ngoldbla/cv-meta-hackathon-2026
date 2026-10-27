@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cages"
+version = "0.1.0"
+description = "CAGES: Calibrated, Adversarially Generated Elevator Simulation dataset and worst-case-ready elevator group control."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Dylan Goldblatt" }]
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "scipy>=1.10", "pyyaml>=6"]
+
+[project.optional-dependencies]
+gym = ["gymnasium>=1.0"]
+model = ["torch>=2.2", "safetensors", "huggingface_hub"]
+hf = ["transformers>=4.45"]
+mcp = ["mcp>=1.2"]
+jupedsim = ["jupedsim"]
+dev = ["pytest>=8", "ruff>=0.5", "hypothesis>=6", "gymnasium>=1.0"]
+
+[project.scripts]
+cages = "cages.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["cages*"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E501", "B905"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
