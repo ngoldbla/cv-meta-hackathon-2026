@@ -1,6 +1,17 @@
 # Cloud and edge
 
-## Budget (~$200 of CUDA, any provider)
+## Budget ($100 of cloud credit, held in reserve)
+
+Everything in the original plan below now runs on the local RTX 5060 Ti (`docs/runbook-gpu.md`). The credit is
+spent only when a local limit blocks a result, for example:
+- bf16 LoRA on trunks deeper than 12 layers, which does not fit in 16 GB;
+- a multi-seed or depth/rank sweep of Glimmer runs that would take too long one at a time on one card.
+
+If any H3 arm is trained in the cloud, retrain every H3 arm there with identical settings: H3 requires the same
+training budget for all backbones. Holdout runs and the H3 latency gate stay on the local machine, because the
+salt never leaves it and the gate is defined on the RTX 5060 Ti.
+
+### Original cloud plan (superseded: these jobs ran locally)
 
 | Item | Cap | Command |
 |---|---|---|
@@ -12,7 +23,7 @@
 | Reserve | ~$60 | |
 
 `cloud/budget.py` enforces each cap:
-- it refuses a job whose cap would push total spend over $200;
+- it refuses a job whose cap would push total spend over $100;
 - it kills a job when its cap runs out;
 - it logs spend to `runs/spend.jsonl`.
 

@@ -33,4 +33,4 @@ The session does the task, writes `ops/reports/<task>.md`, pushes, and stops at 
 
 ## Budget
 - GPU time is local and free.
-- Any cloud use goes through `cloud/budget.py`, which enforces a hard cap with a $200 program total.
+- Any cloud use goes through `cloud/budget.py`, which enforces a hard cap with a $100 program total (the credit is held in reserve; see `cloud/README.md`).

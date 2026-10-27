@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# The ~$200 plan.  Prices are placeholders: set PRICE_CPU / PRICE_GPU to your provider's hourly rates.
+# The original cloud plan (superseded; see cloud/README.md).  Prices are placeholders: set PRICE_CPU / PRICE_GPU to your provider's hourly rates.
 set -euo pipefail
 PRICE_CPU=${PRICE_CPU:-1.50}   # 64-vCPU spot box, USD/h
 PRICE_GPU=${PRICE_GPU:-2.50}   # 1x H100 80GB, USD/h
