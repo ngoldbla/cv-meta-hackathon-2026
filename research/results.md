@@ -68,4 +68,29 @@ Paired comparisons (Wilcoxon over instances, bootstrap 95% CI of mean relative c
   - **Calibration threshold:** at threshold 0.35, 88% of decisions fall back to ESA, so confidence calibration and the threshold need tuning on dev.
 - **Status:** exploratory only. H2 (mixture vs ESA + forecaster on the holdout) is the confirmatory test.
 
+## Forecasting: what pre-positioning actually needs (GPU machine plus this container, dev, exploratory)
+Sources:
+- `experiments/results/forecast_eval.json` (n=15, RTX 5060 Ti, Timestral-28M zero-shot);
+- `experiments/results/prior_robustness.json` (n=20, closed loop).
+
+| forecaster (per-floor passenger demand) | WAPE @120 s | WAPE @600 s |
+|---|---|---|
+| schedule prior (knows the true release shape) | 0.114 | 0.114 |
+| Timestral, blended 50/50 with the prior | 0.523 | 0.541 |
+| Timestral only (schedule as a known-future covariate) | 1.026 | 1.064 |
+| hall-call history only (persistence) | 1.002 | 1.000 |
+
+**Zero-shot Timestral can't recover crowd demand from hall-call counts.** It does no better than persistence, and blending it in makes the prior worse. This follows from H1: in a crush, calls are decoupled from the number of people waiting, so any forecaster limited to call logs is blind to the crowd. Learned forecasting needs a people-level signal, such as door or turnstile counts or ticketing scans. Calls alone won't do.
+
+| closed loop, P95 wait vs ESA (n=20) | Δ P95 [95% CI] | Δ CVaR95 | Δ peak density | Δ lobby s ≥ 4 p/m² |
+|---|---|---|---|---|
+| ESA + exact schedule prior | −28.7% [−36.5, −21.0] | −28.0% | −6.2% | −14.9% |
+| ESA + flat-profile prior (knows only event time, floor and announced attendance) | −28.4% [−35.9, −20.8] | −27.8% | −6.1% | −14.9% |
+| same, attendance overstated by 43% | −28.5% | −27.9% | −6.3% | −14.7% |
+| same, attendance understated by 30% | −28.4% | −27.7% | −6.2% | −14.8% |
+
+**Pre-positioning is robust to a misspecified prior.** Its benefit depends on knowing *when and where* the surge starts, which any published event schedule provides, not on its exact shape or size. This largely removes the earlier "optimistic forecaster" caveat for the pre-positioning result.
+
+Still open: the decision model was trained with the exact prior's demand features, and has not yet been tested under the misspecified prior.
+
 *Safety scope: simulation research only. Nothing here certifies any building or evacuation strategy.*

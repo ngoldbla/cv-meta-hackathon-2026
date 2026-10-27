@@ -47,3 +47,16 @@
 - Scaled the dataset (`datasets/cages-v0`, committed, 5.4 MB): 600 train instances (15,189 states, ~52 min on 20 workers) and 100 dev (2,546 states); card stats in `datasets/cages-v0/stats.json` (ESA matches best action on ~30% of train states).
 - Downloaded Muse-Glimmer-30B (~56 GB cache) and cut two bf16 trunks: L8 (3.87B params, 97 tensors kept) and L12 (5.81B params, 145 kept). Trunks live in `runs/` (git-ignored); decapitation records copied to `experiments/results/`.
 - No holdout or confirmatory runs were executed in this session.
+
+## 2026-10-27: forecaster verdict and prior robustness (this container)
+- Reviewed the GPU-machine report:
+  - CAGES v0: 15,189 / 2,546 labelled decisions;
+  - Glimmer trunks: L8 3.87B, L12 5.81B parameters;
+  - zero-shot Timestral fails on hall-call series (WAPE ≥ 1.0).
+- Closed loop with a misspecified prior (flat profile, attendance ±30–43%): P95 −28.4 to −28.5% vs ESA, against −28.7% for the exact prior. The pre-positioning gain doesn't depend on the optimistic prior.
+- Fixed `scripts/install_git_hooks.sh` to use the venv.
+- Next:
+  1. Apply evaluator v1.1 (maintainer).
+  2. H3 training runs on the GPU (L8 bf16 LoRA, L12 QLoRA, Laya, scratch-20M on CAGES v0).
+  3. Check that the mixture holds up under the misspecified prior.
+  4. Dev selection and the edge benchmark.
