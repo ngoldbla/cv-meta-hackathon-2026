@@ -34,9 +34,18 @@ class NaiveRecent:
         return ScheduleForecaster().recent_demand(sim, horizon)
 
 
+GENERIC = {"egress": (1.0, 1.0), "ingress": (1.0, 1.0)}  # flat release profile: shape unknown
+
+
 def make(name: str):
     if name == "schedule":
         return ScheduleForecaster()
+    if name == "schedule_generic":  # knows event time and attendance, not the release shape
+        return ScheduleForecaster(a_b=GENERIC)
+    if name == "schedule_generic_under":  # ...and attendance overstated by the venue by ~43% (true = 0.7x)
+        return ScheduleForecaster(a_b=GENERIC, attendance_scale=1 / 0.7)
+    if name == "schedule_generic_over":  # ...and attendance understated by 30%
+        return ScheduleForecaster(a_b=GENERIC, attendance_scale=0.7)
     if name == "recent_only":
         return NaiveRecent()
     if name in ("timestral", "timestral_only"):

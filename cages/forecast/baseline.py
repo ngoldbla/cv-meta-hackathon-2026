@@ -27,9 +27,12 @@ def call_series(sim, bin_s: float = 10.0, n_bins: int = 60) -> np.ndarray:
 class ScheduleForecaster:
     name = "schedule"
 
-    def __init__(self, recent_s: float = 300.0, a_b: dict | None = None):
+    def __init__(self, recent_s: float = 300.0, a_b: dict | None = None, attendance_scale: float = 1.0):
+        """``a_b``: assumed release-profile shape per event kind (default: the generator's true shape,
+        i.e. an optimistic prior).  ``attendance_scale`` misstates the announced attendance."""
         self.recent_s = recent_s
         self.a_b = a_b or {"egress": (1.3, 2.6), "ingress": (2.6, 1.3)}
+        self.attendance_scale = attendance_scale
 
     def reset(self, sim) -> None:
         pass
@@ -41,7 +44,7 @@ class ScheduleForecaster:
         kind = info.get("kind")
         if kind in self.a_b:
             a, b = self.a_b[kind]
-            t0, w, att = info["t_event"], info["window"], info["attendees"]
+            t0, w, att = info["t_event"], info["window"], info["attendees"] * self.attendance_scale
             dist = stats.beta(a, b)
             lo = np.clip((sim.now - t0) / w, 0, 1)
             hi = np.clip((sim.now + horizon - t0) / w, 0, 1)
