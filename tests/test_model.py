@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -100,3 +101,35 @@ def test_lora_on_decapitated_glimmer(tmp_path):
     trainable = [n for n, p in m.backbone.named_parameters() if p.requires_grad]
     assert trainable and all("lora_" in n for n in trainable)
     m(car, floor, glob, mask).sum().backward()
+
+
+def test_adapter_checkpoint_roundtrip(tmp_path):
+    pytest.importorskip("peft")
+    from cages.model.train import load_model, save_checkpoint
+
+    _, src = _tiny_glimmer(tmp_path)
+    out = tmp_path / "trunk"
+    decapitate(str(src), str(out), keep_layers=2, dtype="float32")
+    car, floor, glob, mask = _batch()
+    m = DecisionModel(car.shape[-1], floor.shape[-1], glob.shape[-1], 30, 6, f"hf:{out}", lora_rank=4)
+    with torch.no_grad():
+        for n, p in m.backbone.named_parameters():
+            if "lora_B" in n:
+                p.normal_(0, 0.1)  # make adapters non-trivial
+    m.eval()
+    ref = m(car, floor, glob, mask)
+    save_checkpoint(m, str(tmp_path / "ck"))
+    ck = torch.load(tmp_path / "ck" / "decision_model.pt", weights_only=False)
+    assert "head_state" in ck and ck["lora_state"] and not any(k.startswith("backbone.") for k in ck["head_state"])
+    m2 = load_model(str(tmp_path / "ck"))
+    assert torch.allclose(m2(car, floor, glob, mask), ref, atol=1e-5)
+
+
+def test_scratch_training_runs_on_available_device(tmp_path):
+    from cages.model.train import train
+
+    data = Path(__file__).resolve().parents[1] / "datasets" / "cages-v0-mini"
+    if not (data / "train" / "shard-000.npz").exists():
+        pytest.skip("CAGES v0-mini not present")
+    final = train(str(data), str(tmp_path / "run"), epochs=1, d_model=32, n_layers=1, batch=256)
+    assert final["epochs_run"] == 1 and 0 <= final["dev"]["top1"] <= 1

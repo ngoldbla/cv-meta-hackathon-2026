@@ -39,12 +39,14 @@ class HFBackbone(nn.Module):
         super().__init__()
         from transformers import AutoModel
 
+        self.path, self.lora_rank, self.quant = path, lora_rank, quant
         kw = {"dtype": getattr(torch, dtype)}
-        if quant == "nf4":  # 4-bit weights for edge GPUs (bitsandbytes, CUDA only)
+        if quant == "nf4":  # 4-bit weights (bitsandbytes, CUDA only): QLoRA training and edge inference
             from transformers import BitsAndBytesConfig
 
             kw["quantization_config"] = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4",
                                                            bnb_4bit_compute_dtype=torch.bfloat16)
+            kw["device_map"] = {"": 0}
         self.model = AutoModel.from_pretrained(path, **kw)
         self.hidden_size = int(self.model.config.hidden_size)
         if freeze or lora_rank > 0:
@@ -53,6 +55,10 @@ class HFBackbone(nn.Module):
         if lora_rank > 0:
             from peft import LoraConfig, get_peft_model
 
+            if quant == "nf4":
+                from peft import prepare_model_for_kbit_training
+
+                self.model = prepare_model_for_kbit_training(self.model, use_gradient_checkpointing=False)
             names = {n.split(".")[-1] for n, _ in self.model.named_modules()}
             targets = [t for t in self.LORA_TARGETS if t in names]
             self.model = get_peft_model(self.model, LoraConfig(r=lora_rank, lora_alpha=2 * lora_rank,
@@ -60,8 +66,19 @@ class HFBackbone(nn.Module):
 
     def forward(self, x, mask=None):
         attn = None if mask is None else (~mask).long()
-        out = self.model(inputs_embeds=x.to(self.model.dtype), attention_mask=attn)
+        dtype = torch.bfloat16 if self.quant == "nf4" else self.model.dtype
+        out = self.model(inputs_embeds=x.to(dtype), attention_mask=attn)
         return out.last_hidden_state.float()
+
+    def adapter_state(self) -> dict:
+        from peft import get_peft_model_state_dict
+
+        return {k: v.detach().cpu() for k, v in get_peft_model_state_dict(self.model).items()}
+
+    def load_adapter_state(self, state: dict) -> None:
+        from peft import set_peft_model_state_dict
+
+        set_peft_model_state_dict(self.model, state)
 
 
 class DecisionModel(nn.Module):
@@ -77,7 +94,8 @@ class DecisionModel(nn.Module):
             raise ValueError(backbone)
         h = self.backbone.hidden_size
         self.config = dict(car_dim=car_dim, floor_dim=floor_dim, glob_dim=glob_dim, n_floors=n_floors,
-                           n_cars=n_cars, backbone=backbone, d_model=d_model, n_layers=n_layers, lora_rank=lora_rank)
+                           n_cars=n_cars, backbone=backbone, d_model=d_model, n_layers=n_layers, lora_rank=lora_rank,
+                           hf_dtype=hf_dtype)
         self.car_in = nn.Sequential(nn.Linear(car_dim, h), nn.GELU(), nn.Linear(h, h))
         self.floor_in = nn.Sequential(nn.Linear(floor_dim, h), nn.GELU(), nn.Linear(h, h))
         self.glob_in = nn.Sequential(nn.Linear(glob_dim, h), nn.GELU(), nn.Linear(h, h))
@@ -104,12 +122,30 @@ class DecisionModel(nn.Module):
         logits = self.head(hdn[:, 1 + F:]).squeeze(-1) / self.log_temp.exp()
         return logits.masked_fill(~mask, -1e9)
 
+    def to_device(self, device) -> DecisionModel:
+        """Move to ``device``; a 4-bit trunk is already placed by bitsandbytes and stays put."""
+        if isinstance(self.backbone, HFBackbone) and self.backbone.quant == "nf4":
+            for name, mod in self.named_children():
+                if name != "backbone":
+                    mod.to(device)
+            self.log_temp.data = self.log_temp.data.to(device)
+            return self
+        return self.to(device)
+
+    @property
+    def device(self):
+        return self.head[1].weight.device
+
+    def head_state(self) -> dict:
+        return {k: v.detach().cpu() for k, v in self.state_dict().items() if not k.startswith("backbone.")}
+
     @torch.no_grad()
     def decide(self, car, floor, glob, mask):
         """Deterministic decision + calibrated confidence for a single state (numpy in/out)."""
-        t = lambda a, dt=torch.float32: torch.as_tensor(a, dtype=dt)[None]  # noqa: E731
+        dev = self.device
+        t = lambda a, dt=torch.float32: torch.as_tensor(a, dtype=dt, device=dev)[None]  # noqa: E731
         logits = self(t(car), t(floor), t(glob), t(mask, torch.bool))[0]
-        p = torch.softmax(logits, -1)
+        p = torch.softmax(logits, -1).cpu()
         a = int(torch.argmax(p))
         return a, float(p[a]), p.numpy()
 

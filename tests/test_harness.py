@@ -107,3 +107,10 @@ def test_gym_env_api():
         steps += 1
     assert done and total < 0 and "metrics" in info
     env.close()
+
+
+def test_confirm_refuses_without_salt():
+    env = {k: v for k, v in os.environ.items() if k != "CAGES_HOLDOUT_SALT"}
+    r = subprocess.run([sys.executable, "scripts/confirm.py", "--prereg", "H1", "--controllers", "esa"], cwd=ROOT,
+                       capture_output=True, text=True, env=env)
+    assert r.returncode == 2 and "refusing" in r.stderr

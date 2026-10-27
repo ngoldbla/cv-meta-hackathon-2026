@@ -17,9 +17,7 @@ from cages.model.train import load_model, load_split
 
 
 def bench(model_dir: str, data: str, device: str, quant: str, n: int, warmup: int = 20) -> dict:
-    m = load_model(model_dir, quant=quant)
-    if quant == "none":
-        m = m.to(device)
+    m = load_model(model_dir, quant=quant, device=device)
     d = load_split(data, "dev")
     idx = np.arange(len(d["car"]))
     lat = []

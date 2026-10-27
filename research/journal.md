@@ -24,3 +24,15 @@
   3. Tune the confidence threshold on dev.
   4. Run the decapitated Glimmer, Laya and scratch-20M runs on GPU.
   5. Then the H1/H2 holdout runs, executed by the salt holder.
+
+## 2026-10-27: handoff to the GPU machine
+- Training is now CUDA-ready:
+  - automatic device selection;
+  - QLoRA (nf4) for 16 GB cards;
+  - head-plus-adapter checkpoints, so a trunk can be reloaded in bf16 or 4-bit (round-trip tested).
+- Forecast evaluation (2 dev instances, smoke test only):
+  - schedule prior: weighted error 8.6% at 600 s, because it knows the true profile;
+  - hall-call history alone: about 99%, because calls hide the crowd.
+  - So a learned forecaster needs the event schedule as a known-future covariate.
+- Evaluator v1.1 is prepared as a reviewed patch (`maintainer/`). Applying it is the maintainer's call; an agent cannot unfreeze the evaluator.
+- Next: `docs/runbook-gpu.md` §0–7 on the RTX 5060 Ti machine; the loop is driven from Muse Code per `docs/runbook-loop.md`.

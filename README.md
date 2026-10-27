@@ -66,3 +66,7 @@ python -m cages.harness.mcp_server                 # expose the loop to any agen
 ```
 
 Results so far, with their caveats, are in [`research/results.md`](research/results.md).
+
+Next phase (CUDA, learned forecaster, backbone sweep): [`docs/runbook-gpu.md`](docs/runbook-gpu.md).
+Running the research loop from Muse Code: [`docs/runbook-loop.md`](docs/runbook-loop.md).
+Maintainer-only changes to frozen paths: [`maintainer/README.md`](maintainer/README.md).

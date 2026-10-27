@@ -11,6 +11,8 @@ returning ``quantiles`` of shape (B, V, H, 21)); not exercised in environments w
 
 from __future__ import annotations
 
+import os
+
 import numpy as np
 
 from .baseline import ScheduleForecaster, call_series
@@ -27,10 +29,14 @@ def available() -> bool:
 class TimestralDemand:
     name = "timestral"
 
-    def __init__(self, repo: str = "mistralai/Timestral-28M", bin_s: float = 10.0, context_bins: int = 360,
-                 device: str = "cpu", blend_schedule: float = 0.5):
+    def __init__(self, repo: str | None = None, bin_s: float = 10.0, context_bins: int = 360,
+                 device: str | None = None, blend_schedule: float | None = None):
         from timestral import TimestralForecaster
 
+        repo = repo or os.environ.get("CAGES_TIMESTRAL_REPO", "mistralai/Timestral-28M")
+        device = device or os.environ.get("CAGES_TIMESTRAL_DEVICE", "cpu")
+        if blend_schedule is None:  # weight on the schedule prior; 0 = Timestral only
+            blend_schedule = float(os.environ.get("CAGES_TIMESTRAL_BLEND", "0.5"))
         self.fc = TimestralForecaster.from_pretrained(repo, device=device)
         self.bin_s, self.context_bins = bin_s, context_bins
         self.blend = blend_schedule
