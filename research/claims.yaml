@@ -1,30 +1,32 @@
-- id: tsai-abstract-24pct
-  claim: Standby reduces AWT by more than 24% in both scenarios
-  source: Tsai et al. 2025, abstract
-  verdict: contradicted-by-own-data
-  evidence: Table 2 gives 0.35 -> 0.27 min (-22.9%) for 10 floors / 2 cars
-- id: tsai-energy
-  claim: The strategy does not compromise energy
-  source: Tsai et al. 2025, abstract and section 3.1.2
-  verdict: contradicted-by-own-data
-  evidence: Table 2 energy +23.6% (10F) and +30.3% (20F) vs closest car; Table 3 +3.9% with the cost function
-- id: tsai-eq6
-  claim: Eq. 6 finds the center of gravity of demand
-  source: Tsai et al. 2025, section 2.3.2
-  verdict: mislabelled
-  evidence: argmin of sum |x - f| w(x) is the weighted median; tests/test_sim.py::test_weighted_median_is_eq6_argmin
-- id: tsai-novelty
-  claim: Proactive idle-car repositioning has received little attention
-  source: Tsai et al. 2025, conclusions
-  verdict: overstated
-  evidence: Brand & Nikovski, ICRA 2004 (MERL TR2004-044); US 6,808,049
-- id: merl-esa-assumptions
-  claim: ESA-DP assumes known waiting counts and infinite car capacity
-  source: Nikovski & Brand, ICAPS 2003 (TR2003-61), "Initial Assumptions"
+# Literature claims CAGES relies on, checked against their sources (skills/audit).
+# The elevator-phase entries (Tsai et al. 2025, MERL) are in git history; the project pivoted to transit evacuation.
+- id: gao2016-known-flow
+  claim: Metro rescheduling after disruptions (skip-stop) optimises against a known, time-dependent passenger flow
+  source: Gao, Kroon, Schmidt & Yang, Transp. Res. B 93 (2016) 425-449, doi:10.1016/j.trb.2016.08.011, abstract
+  verdict: supported (abstract; full text not yet checked)
+  evidence: '"Considering an over-crowded and time-dependent passenger flow, this paper proposes an optimization model"; evaluated on Beijing Metro data'
+- id: massdot2018-left-behinds
+  claim: There is currently no way to measure people left behind on subway platforms when trains are too full
+  source: Measuring Left-Behinds on Subway, MassDOT research report (2018), https://www.mass.gov/doc/measuring-left-behinds-on-subway/download
   verdict: supported
-  evidence: stated explicitly by the authors
-- id: merl-foresight-collapse
-  claim: The value of perfect foresight falls to under 10% AWT savings near 1,000 persons/hour
-  source: Zhang et al., ECC 2022, Fig. 6
-  verdict: supported (as reported; closed simulators, not independently reproduced)
-  evidence: prescient scheduler savings vs arrival rate
+  evidence: 'stated by the report; it also notes standard models assume passengers board the first train that arrives'
+- id: bish2011-fixed-counts
+  claim: Bus-based evacuation planning routes capacitated buses for evacuee numbers known in advance at fixed pickup points
+  source: Bish, Planning for a bus-based evacuation, OR Spectrum 33(3) (2011) 629-654
+  verdict: supported (via the papers that extend it; the original abstract not yet checked)
+  evidence: 'Goerigk & Gruen (OR Spectrum 2014) add robustness to uncertain evacuee numbers, deciding whether each bus leaves now or waits until the scenario is known'
+- id: kepaptsoglou2009-ad-hoc
+  claim: Bus bridging for metro disruptions is largely done ad hoc rather than by integrated optimisation
+  source: Kepaptsoglou & Karlaftis, Public Transport 1(4) (2009) 275-297, doi:10.1007/s12469-010-0017-6
+  verdict: supported (abstract)
+  evidence: 'the paper proposes a three-step framework (candidate routes, route selection, network design) because practice is ad hoc'
+- id: nfpa130-4-6-min
+  claim: NFPA 130 requires clearing a station platform within 4 minutes and reaching a point of safety within 6
+  source: NFPA 130 (fixed guideway transit), as summarised in station-design papers and Singapore CPFPRTS
+  verdict: supported (secondary sources; edition-dependent)
+  evidence: 'several secondary sources agree; editions 2000 and 2007 are cited; the standard text itself was not checked'
+- id: mets-express-after-games
+  claim: After Mets games, express trains queue outside Mets-Willets Point and leave about every six minutes for about an hour
+  source: MLB, Mets ballpark transportation pages (Willets Point / subway)
+  verdict: supported (operator practice for scheduled events, not emergencies)
+  evidence: 'mlb.com/mets/ballpark/transportation/willets-point'

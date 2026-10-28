@@ -22,14 +22,14 @@ from cages.model.train import load_model, load_split
 def bench(model_dir: str, data: str, device: str, quant: str | None, n: int, warmup: int = 20) -> dict:
     m = load_model(model_dir, quant=quant, device=device)
     d = load_split(data, "dev")
-    idx = np.arange(len(d["car"]))
+    idx = np.arange(len(d["veh"]))
     lat = []
     if device == "cuda":
         torch.cuda.reset_peak_memory_stats()
     with torch.inference_mode():
         for k in range(n + warmup):
             i = idx[k % len(idx)]
-            args = [torch.as_tensor(d[x][i:i + 1], device=device) for x in ("car", "floor", "glob")]
+            args = [torch.as_tensor(d[x][i:i + 1], device=device) for x in ("veh", "stn", "glob")]
             mask = torch.as_tensor(d["mask"][i:i + 1], device=device, dtype=torch.bool)
             if device == "cuda":
                 torch.cuda.synchronize()

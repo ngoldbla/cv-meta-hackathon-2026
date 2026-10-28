@@ -2,10 +2,13 @@ from pathlib import Path
 
 import yaml
 
-from cages.data.instances import car_area_for, load_stock, make_specs
-from cages.sim import FailureModes, Kinematics, venue_building
+from cages.controllers import Timetable
+from cages.data.instances import CITI_FIELD_CAPACITY, make_specs
+from cages.data.stock import load_line_stock
+from cages.sim import Simulation, evacuation_scenario, evaluate, line_from_stock
 
 ANCHORS = {p.stem: yaml.safe_load(p.read_text()) for p in (Path(__file__).parents[1] / "anchors").glob("*.yaml")}
+STOCK = load_line_stock()
 
 
 def test_every_anchor_names_its_enforcing_test():
@@ -13,36 +16,40 @@ def test_every_anchor_names_its_enforcing_test():
         assert {"id", "value", "source", "enforced_by", "status"} <= set(card), name
 
 
+def test_train_capacity_from_r188():
+    v = ANCHORS["r188_train"]["value"]
+    line = line_from_stock(STOCK)
+    n_bc = v["cars_per_train"] - v["a_cars_per_train"]
+    assert line.train_capacity == v["a_cars_per_train"] * v["a_car_capacity"] + n_bc * v["bc_car_capacity"]
+    assert line.n_cars == v["cars_per_train"] and line.doors == v["cars_per_train"] * v["doors_per_side_per_car"]
+
+
 def test_boarding_not_faster_than_bottleneck_flow():
     flow = ANCHORS["bottleneck_specific_flow"]["value"]["specific_flow_pms"]
-    k = Kinematics()
-    assert k.t_board >= 1.0 / (flow * 1.1) and k.t_alight >= 1.0 / (flow * 1.1)
+    line = line_from_stock(STOCK)
+    assert line.t_board >= 1.0 / (flow * 1.27) and line.t_alight >= 1.0 / (flow * 1.27)
 
 
-def test_lobby_exit_flow_within_observed_range():
-    vmax = ANCHORS["stadium_egress_flow"]["value"]["green_guide_max_pmmin"] / 60.0
-    width = 4.0
-    for s in (0.0, 0.5, 1.0):
-        b = venue_building().with_failures(FailureModes(w9_lobby=s))
-        assert b.exit_rate / width <= vmax
+def test_event_station_entry_rate_covers_observed_peak():
+    peak = ANCHORS["mets_willets_point_entries"]["value"]["max_hourly_entries"]
+    assert max(p["entries"] for p in STOCK["event_station_peak_hours"]) == peak
+    for s in make_specs("dev", 50) + make_specs("train", 50):
+        assert s["entry_rate_event"] >= peak / 3600.0
 
 
-def test_car_area_table():
-    table = ANCHORS["en81_car_area"]["value"]["rated_kg_to_area_m2"]
-    for kg, area in table:
-        assert abs(car_area_for(kg) - area) < 1e-9
+def test_instances_respect_venue_capacity_and_egress_time():
+    v = ANCHORS["venue_and_station"]["value"]
+    assert CITI_FIELD_CAPACITY == v["citi_field_capacity"]
+    for s in make_specs("dev", 50) + make_specs("train", 50):
+        assert s["occupancy"] <= v["citi_field_capacity"] and s["window"] >= 60 * v["green_guide_egress_min"]
 
 
-def test_instances_drawn_from_registry():
-    stock = load_stock()
-    speeds = {round(r["speed_ms"], 6) for r in stock}
-    for s in make_specs("dev", 10):
-        assert any(abs(s["speed_ms"] - v) < 1e-6 for v in speeds) or s["speed_ms"] in (1.5, 6.0)
+def test_bus_capacity():
+    assert line_from_stock(STOCK).bus_capacity == ANCHORS["bus"]["value"]["total"]
 
 
-def test_kinematics_defaults_in_design_ranges():
-    v = ANCHORS["transfer_and_door_times"]["value"]
-    k = Kinematics()
-    assert v["transfer_s"][0] <= k.t_board <= v["transfer_s"][1]
-    assert v["door_open_s"][0] <= k.t_door_open <= v["door_open_s"][1]
-    assert v["door_close_s"][0] <= k.t_door_close <= v["door_close_s"][1]
+def test_nfpa_reference_metric_is_reported():
+    sc = evacuation_scenario(STOCK, occupancy=20000, seed=3)
+    m = evaluate(Simulation(sc, Timetable()).run())
+    assert 0.0 <= m["platform_over_4min_frac"] <= 1.0
+    assert ANCHORS["nfpa130_egress"]["value"]["platform_clear_min"] == 4

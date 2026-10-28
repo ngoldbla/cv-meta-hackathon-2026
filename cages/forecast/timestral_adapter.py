@@ -1,7 +1,7 @@
-"""Timestral (Mistral) adapter: per-floor demand forecasts from the observable hall-call history.
+"""Timestral (Mistral) adapter: per-station demand forecasts from the observable alert history.
 
-Target: per-floor hall-call registrations in 10 s bins (multivariate, one variate per floor).
-Known-future covariates: the published event schedule (surge-window indicator, time to event).
+Target: per-station platform-crowding alerts in 30 s bins (multivariate, one variate per station).
+Known-future covariates: the emergency declaration (declared indicator, time since onset).
 Install the optional dependency per the upstream repository (github.com/mistralai/timestral);
 the weights (e.g. ``mistralai/Timestral-28M``) are released under a Modified MIT license with a
 revenue cap -- check it before production use.  Written against the documented API
@@ -15,7 +15,7 @@ import os
 
 import numpy as np
 
-from .baseline import ScheduleForecaster, call_series
+from .baseline import ScheduleForecaster, alert_series
 
 
 def available() -> bool:
@@ -29,7 +29,7 @@ def available() -> bool:
 class TimestralDemand:
     name = "timestral"
 
-    def __init__(self, repo: str | None = None, bin_s: float = 10.0, context_bins: int = 360,
+    def __init__(self, repo: str | None = None, bin_s: float = 30.0, context_bins: int = 120,
                  device: str | None = None, blend_schedule: float | None = None):
         from timestral import TimestralForecaster
 
@@ -46,24 +46,27 @@ class TimestralDemand:
         pass
 
     def _known(self, sim, horizon_bins: int) -> np.ndarray:
-        info = sim.scenario.info()
         t = sim.now + self.bin_s * (np.arange(-self.context_bins, horizon_bins) + 1)
-        t0, w = info.get("t_event", 0.0), info.get("window", 0.0)
-        in_window = ((t >= t0) & (t <= t0 + w)).astype(float)
-        to_event = np.clip((t0 - t) / 600.0, -3, 3)
-        return np.stack([in_window, to_event])[None]  # (1, 2, T + H)
+        declared = ((t >= sim.t_onset) & sim.declared).astype(float)
+        since = np.clip((t - sim.t_onset) / 900.0, -3, 3) * declared
+        return np.stack([declared, since])[None]  # (1, 2, T + H)
 
     def quantiles(self, sim, horizon: float) -> np.ndarray:
         h = max(1, int(round(horizon / self.bin_s)))
-        ctx = call_series(sim, self.bin_s, self.context_bins).T[None]  # (1, floors, T)
+        ctx = alert_series(sim, self.bin_s, self.context_bins).T[None]  # (1, stations, T)
         out = self.fc.forecast(ctx, prediction_length=h, known_covariates=self._known(sim, h))
         q = out.quantiles
         if hasattr(q, "cpu"):  # torch tensor, possibly on CUDA -> move to host first
             q = q.cpu()
-        return np.asarray(q)[0]  # (floors, H, 21)
+        return np.asarray(q)[0]  # (stations, H, 21)
 
     def demand(self, sim, horizon: float) -> np.ndarray:
         q = self.quantiles(sim, horizon)
-        calls = np.clip(q[..., q.shape[-1] // 2], 0, None).sum(axis=1)  # median, summed over horizon
-        # calls -> people: a crowd hides behind each call; blend with the schedule prior
-        return (1 - self.blend) * calls * 10.0 + self.blend * self.prior.demand(sim, horizon)
+        alerts = np.clip(q[..., q.shape[-1] // 2], 0, None).sum(axis=1)  # median, summed over horizon
+        # alerts -> people: each alert level stands for hundreds waiting; blend with the schedule prior
+        return (1 - self.blend) * alerts * sim.L.alert_levels[0] + self.blend * self.prior.demand(sim, horizon)
+
+    def __getattr__(self, name):  # rates, evacuee mass and shares come from the schedule prior
+        if name in ("rate", "evac_mass", "evac_total", "dir_share", "background_rate"):
+            return getattr(self.__dict__["prior"], name)
+        raise AttributeError(name)

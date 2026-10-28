@@ -1,139 +1,181 @@
-import itertools
-import math
-
 import numpy as np
 import pytest
 
-from cages.controllers import ClosestCar, ESAPlanner, kmedian_line, weighted_median
-from cages.sim import FailureModes, Kinematics, Simulation, evaluate, uppeak_scenario, venue_scenario
+from cages.controllers import ExpressRule, ForecastStaging, NextTrain, RollingHorizon, Timetable
+from cages.data.stock import load_line_stock
+from cages.sim import (
+    DOWN,
+    UP,
+    BackgroundStream,
+    EvacStream,
+    FailureModes,
+    Scenario,
+    Simulation,
+    evacuation_scenario,
+    evaluate,
+    line_from_stock,
+)
+
+STOCK = load_line_stock()
 
 
-def test_kinematics_position_matches_flight_time():
-    kin = Kinematics(speed=3.5, accel=1.0)
-    for floors in (1, 2, 5, 20):
-        T = kin.flight_time(floors)
-        assert kin.position(floors, T) == pytest.approx(floors)
-        xs = [kin.position(floors, t) for t in np.linspace(0, T, 50)]
-        assert all(b >= a - 1e-9 for a, b in zip(xs, xs[1:]))  # monotone
+def _scenario(fm=None, seed=1, occupancy=30000, **kw):
+    return evacuation_scenario(STOCK, occupancy=occupancy, subway_share=0.45, hour=21, failures=fm or FailureModes(),
+                               seed=seed, **kw)
 
 
-def test_round_trip_time_matches_barney():
-    """Simulated up-peak round trip time equals Barney's RTT = 2H tv + (S+1) ts + 2P tp."""
-    N, P = 12, 8
-    kin = Kinematics(speed=1.6, accel=1.0, t_door_open=1.8, t_door_close=2.9, t_board=1.0, t_alight=1.0, t_dwell_min=0.0)
-    assert kin.floor_height >= kin.accel_distance  # every leg reaches rated speed
-    sim = Simulation(uppeak_scenario(N, P, n_pax=4000, seed=3, kin=kin), ClosestCar()).run()
-    opens = [t for (_, f, t, *_rest) in sim.door_log if f == 0]
-    rtt_sim = float(np.mean(np.diff(opens)[5:-5]))
-    S = N * (1 - (1 - 1 / N) ** P)
-    H = N - sum((i / N) ** P for i in range(1, N))
-    tv = kin.floor_height / kin.speed
-    ts = kin.speed / kin.accel + kin.t_door_open + kin.t_door_close
-    rtt = 2 * H * tv + (S + 1) * ts + P * (kin.t_board + kin.t_alight)
-    assert rtt_sim == pytest.approx(rtt, rel=0.02)
+def test_stock_is_the_7_line():
+    names = [s["name"] for s in STOCK["stations"]]
+    assert len(names) == 22 and names[0] == "Flushing-Main St" and names[-1] == "34 St-Hudson Yards"
+    assert names[1] == "Mets-Willets Point"
+    assert all(b > a for a, b in zip([s["pos_m"] for s in STOCK["stations"]],
+                                      [s["pos_m"] for s in STOCK["stations"]][1:], strict=False))
 
 
-def _small(kind="egress", fm=None, seed=0, attendees=300):
-    return venue_scenario(kind, attendees, fm or FailureModes(), seed=seed)
+def test_empty_line_reproduces_gtfs_run_times():
+    """One train on an empty line stops at every station on the GTFS schedule (where kinematically feasible)."""
+    line = line_from_stock(STOCK, n_service=1, n_yard=0, n_buses=0, headway=60.0)
+    sc = Scenario(line, streams=(), t_onset=10_000.0, t_max=10_000.0, seed=0)
+    sim = Simulation(sc, Timetable(), record_trace=True)
+    sim.run(until=6000.0)
+    stops = [(e["t"], e["station"], e["dir"]) for e in sim.trace if e["ev"] == "stop"]
+    up = [(t, s) for t, s, d in stops if d == UP]
+    run = {s: t2 - t1 for (t1, s), (t2, s2) in zip(up, up[1:], strict=False) if s2 == s + 1}
+    assert len(run) >= 15
+    for s, dt in run.items():
+        gtfs = STOCK["segment_s"][s]
+        floor = line.seg_time(s, UP, True, True) + line.t_min_dwell  # kinematic floor where GTFS is too tight
+        assert dt == pytest.approx(max(gtfs, floor), abs=1.0)
+    total_sim = sum(run.values())
+    total_gtfs = sum(STOCK["segment_s"][s] for s in run)
+    assert total_sim == pytest.approx(total_gtfs, rel=0.03)
 
 
-def test_conservation_and_capacity():
-    sim = Simulation(_small(fm=FailureModes(0.5, 0.5, 0.5, 0.5, 0.5)), ESAPlanner()).run()
-    assert sim.finished() and not sim.deadlocked
-    pids = [p.pid for p in sim.done]
-    assert len(pids) == len(set(pids)) == sim._next_pid
-    for p in sim.done:
-        assert p.t_arrive <= p.t_board <= p.t_alight
-    for _, _, _, _, _, _, load in sim.door_log:
-        assert load <= sim.b.rated_mass + 1e-6
+class FourthTrain(NextTrain):
+    def assign(self, sim, call):
+        return 4 if call.slots[4] is not None else super().assign(sim, call)
 
 
-def test_determinism_and_clone_fidelity():
-    sc = _small(fm=FailureModes(0.3, 0.7, 0.7, 0.3, 0.3), seed=5)
-    a = evaluate(Simulation(sc, ESAPlanner()).run())
-    b = evaluate(Simulation(sc, ESAPlanner()).run())
-    assert a == b
-    s = Simulation(sc, ESAPlanner()).run(until=600.0)
-    n_before = len(s.done)
-    c = s.clone()
-    s.run()
+def test_one_train_per_block_and_no_overtaking():
+    sc = _scenario(occupancy=40000)
+    sim = Simulation(sc, FourthTrain())
+    taken = []
+    orig = sim._take
+
+    def checked(res, ti):
+        table = sim.plat_occ if res[0] == "plat" else sim.seg_occ
+        assert table.get(res[1:]) in (None, ti), f"{res} held by {table.get(res[1:])}, wanted by {ti}"
+        taken.append(res)
+        orig(res, ti)
+
+    sim._take = checked
+    sim.run()
+    assert len(taken) > 1000 and not sim.deadlocked
+    assert sum(t.n_skips for t in sim.trains) > 0  # express runs happened and still respected the blocks
+
+
+def test_dwell_grows_with_boarding_load():
+    line = line_from_stock(STOCK, n_service=1, n_yard=0, n_buses=0)
+    sc = Scenario(line, streams=(), t_onset=10_000.0, t_max=10_000.0, seed=0)
+    dwells = []
+    for n in (0, 600):
+        sim = Simulation(sc, Timetable())
+        t = sim.trains[0]
+        s, d = t.station, t.direction
+        for _ in range(n):
+            sim._place_on_platform(sim._new_passenger(s, s + d if 0 <= s + d < 22 else s - d, "bg"))
+        sim._heap.clear()
+        sim._serve(t, s)
+        close = [e for e in sim._heap if e[2] == "close"]
+        dwells.append(close[0][0] - sim.now)
+    assert dwells[0] == pytest.approx(line.t_min_dwell)
+    assert dwells[1] == pytest.approx(line.t_doors + 600 * line.t_board / line.doors)  # 33 doors share the crowd
+
+
+@pytest.mark.parametrize("mode", ["w1_hidden", "w2_left_behind", "w4_doors", "w6_cold", "w9_egress"])
+def test_each_failure_mode_has_its_effect(mode):
+    nominal = Simulation(_scenario(), ExpressRule()).run()
+    severe = Simulation(_scenario(FailureModes(**{mode: 1.0})), ExpressRule()).run()
+    a, b = evaluate(nominal), evaluate(severe)
+    if mode == "w1_hidden":
+        first = lambda s: min((c.t_register for c in s.call_log if c.station == s.L.event_station), default=1e9)  # noqa: E731
+        assert first(severe) > first(nominal) + 100
+    elif mode == "w2_left_behind":
+        assert b["stranded_frac"] > a["stranded_frac"] and b["p95"] > a["p95"]
+    elif mode == "w4_doors":
+        assert b["p95"] > a["p95"]
+    elif mode == "w6_cold":
+        assert severe.L.n_service < nominal.L.n_service and b["p95"] > a["p95"]
+    elif mode == "w9_egress":
+        assert b["peak_plaza_density"] > a["peak_plaza_density"]
+
+
+def test_every_passenger_boards_once_and_nobody_is_lost():
+    sim = Simulation(_scenario(occupancy=20000), ForecastStaging(RollingHorizon())).run()
+    m = evaluate(sim)
+    pids = [b.pid for b in sim.done]
+    assert len(pids) == len(set(pids))
+    assert m["n_censored"] == 0 and m["n_passengers"] == len(sim.done)
+    assert m["bus_boarded"] > 0 and all(t.load >= -1e-9 for t in sim.trains)
+    assert all(t.load <= sim.L.train_capacity + 1e-6 for t in sim.trains)
+
+
+def test_clone_reproduces_the_run_exactly():
+    """A clone taken at a decision, given the same decision, replays the original run event for event."""
+    sc = _scenario(occupancy=25000, seed=5)
+    clones = []
+
+    def hook(sim, call):
+        if not clones and sim.now > sim.t_onset:
+            c = sim.clone()
+            cc = c.active_calls[(call.station, call.direction)]
+            c.assign(cc, c.controller.assign(c, cc))
+            clones.append(c)
+
+    sim = Simulation(sc, RollingHorizon())
+    sim.decision_hook = hook
+    sim.run()
+    c = clones[0]
+    t0 = c.now
     c.run()
-    ws = sorted((p.pid, p.t_board, p.t_alight) for p in s.done[n_before:])
-    wc = sorted((p.pid, p.t_board, p.t_alight) for p in c.done)
-    assert ws == wc and len(wc) > 0
+    after = lambda s: sorted((b.pid, round(b.t_board, 9), b.vehicle) for b in s.done if b.t_board > t0)  # noqa: E731
+    assert after(c) == after(sim) and len(after(c)) > 1000
+    assert c.t_end == pytest.approx(sim.t_end)
 
 
-def _metric(fm, key, kind="egress", seeds=(0, 1, 2), attendees=400):
-    vals = []
-    for sd in seeds:
-        vals.append(evaluate(Simulation(_small(kind, fm, sd, attendees), ClosestCar()).run())[key])
-    return float(np.mean(vals))
+def test_conditional_resampling_keeps_the_crowd_size():
+    sc = _scenario(occupancy=20000, seed=2)
+    sim = Simulation(sc, Timetable())
+    sim.run(until=sc.t_onset + 600.0)
+    c = sim.clone(drop_future=True)
+    c.resample_future(3)
+    n_evac = next(s for s in sc.streams if isinstance(s, EvacStream)).n
+    future = sum(1 for p in c.pax.values() if p.stream == "evac" and p.t_arrive > c.now)
+    assert c.arrived_by_stream.get("evac", 0) + future == n_evac
 
 
-def test_w1_hidden_queue_raises_tail_wait():
-    assert _metric(FailureModes(w1_hidden_queue=1.0), "p95") > _metric(FailureModes(), "p95")
+def test_background_stream_is_memoryless_and_rate_matches():
+    st = BackgroundStream(rates=(0.5, 0.0, 0.25), attract=(1.0, 1.0, 1.0), t0=0.0, t1=4000.0)
+    out = st.sample(np.random.default_rng(0))
+    counts = np.bincount(out["o"], minlength=3)
+    assert counts[1] == 0 and counts[0] == pytest.approx(2000, rel=0.1) and counts[2] == pytest.approx(1000, rel=0.1)
+    assert np.all(out["o"] != out["d"])
 
 
-def test_w2_strand_raises_waits():
-    assert _metric(FailureModes(w2_strand=1.0), "awt") > _metric(FailureModes(), "awt")
+def test_operator_logs_understate_evacuation_waits():
+    m = evaluate(Simulation(_scenario(occupancy=40000), Timetable()).run())
+    assert m["stranded_frac"] > 0.2 and m["logged_stranded_frac"] == 0.0
+    assert m["logger_understatement"] > 0.25
 
 
-def test_w4_held_doors_lengthen_dwell():
-    def dwell(fm):
-        sim = Simulation(_small(fm=fm, attendees=800), ClosestCar()).run()
-        return float(np.mean([tc - to for (_, _, to, tc, *_r) in sim.door_log]))
-
-    assert dwell(FailureModes(w4_doors=1.0)) > dwell(FailureModes()) + 0.5
-
-
-def test_w6_cold_start_delays_first_pickup():
-    def first_pickup(fm):
-        sim = Simulation(_small(fm=fm, attendees=400), ClosestCar()).run()
-        surge = [p for p in sim.done if p.stream == "egress"]
-        return min(p.t_board for p in surge) - min(p.t_arrive for p in surge)
-
-    assert first_pickup(FailureModes(w6_cold=1.0)) > first_pickup(FailureModes())
+def test_yard_trains_and_staging_add_capacity():
+    sc = _scenario(occupancy=40000)
+    base = evaluate(Simulation(sc, Timetable()).run())
+    staged = evaluate(Simulation(sc, ForecastStaging(Timetable())).run())
+    assert staged["evac_p95"] < base["evac_p95"]
 
 
-def test_w9_saturated_lobby_raises_lobby_density():
-    fm = FailureModes(w9_lobby=1.0)
-    assert _metric(fm, "peak_lobby_density", "ingress") > _metric(FailureModes(), "peak_lobby_density", "ingress")
-
-
-def test_logger_understates_crush_waits():
-    m = evaluate(Simulation(_small(attendees=800), ClosestCar()).run())
-    assert m["logger_awt"] < 0.5 * m["awt"]
-
-
-def test_weighted_median_is_eq6_argmin():
-    rng = np.random.default_rng(0)
-    for _ in range(50):
-        w = rng.random(12) * (rng.random(12) > 0.3)
-        if w.sum() == 0:
-            continue
-        cost = [sum(abs(x - f) * w[x] for x in range(12)) for f in range(12)]
-        assert cost[weighted_median(w)] == pytest.approx(min(cost))
-
-
-def test_kmedian_matches_brute_force():
-    rng = np.random.default_rng(1)
-    for _ in range(20):
-        w = rng.random(9)
-        for k in (1, 2, 3):
-            best = min(
-                sum(w[x] * min(abs(x - m) for m in ms) for x in range(9)) for ms in itertools.combinations(range(9), k)
-            )
-            got = kmedian_line(w, k)
-            val = sum(w[x] * min(abs(x - m) for m in got) for x in range(9))
-            assert val == pytest.approx(best, rel=1e-9, abs=1e-9)
-
-
-def test_paper_profile_runs():
-    from dataclasses import replace
-
-    from cages.sim import PAPER_PROFILE, venue_building
-
-    b = replace(venue_building(n_floors=10, n_cars=2, wait_area_overrides=()), kin=PAPER_PROFILE)
-    sc = venue_scenario("egress", 100, building=b, event_floor=8)
-    m = evaluate(Simulation(sc, ClosestCar()).run())
-    assert m["n_censored"] == 0 and math.isfinite(m["awt"])
+def test_directions_and_terminals():
+    line = line_from_stock(STOCK)
+    assert line.terminal(UP) == 21 and line.terminal(DOWN) == 0
+    assert line.hub(UP) == 7 and line.hub(DOWN) == 0

@@ -1,0 +1,10 @@
+id: mets_willets_point_entries
+quantity: busiest observed hourly entries at Mets-Willets Point (station complex 448), 2024
+value: {max_hourly_entries: 13165, at: "2024-06-09T22:00", next_highest: [10151, 10046, 9547]}
+source: "MTA Subway Hourly Ridership, data.ny.gov dataset wujg-7c2s; query and result in cages/data/mta_7line.json"
+license: NYS open data (facts)
+used_by: cages/data/instances.py (entry_rate_event range); cages/sim/line.py (Line.entry_rate)
+enforced_by: tests/test_anchors.py::test_event_station_entry_rate_covers_observed_peak
+tolerance: every instance's nominal entry rate (before W9) >= 13,165 / 3,600 p/s, the observed sustained flow
+status: enforced
+notes: Hourly entries are a lower bound on the stairs-and-fare-array capacity; W9 then throttles it (down to 35%) to model a saturated station.

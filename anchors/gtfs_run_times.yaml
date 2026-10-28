@@ -1,0 +1,10 @@
+id: gtfs_run_times
+quantity: scheduled stop-to-stop times on the 7 line (weekday local trips, median)
+value: {total_s_flushing_to_hudson_yards: 2280, stations: 22, source_resolution_s: 30}
+source: "MTA New York City Transit subway GTFS static feed (https://rrgtfsfeeds.s3.amazonaws.com/gtfs_subway.zip); feed version and SHA-256 in cages/data/mta_7line.json"
+license: MTA developer data (facts; see mta.info/developers terms)
+used_by: cages/sim/line.py (calibrate_speeds -> Line.seg_speed)
+enforced_by: tests/test_sim.py::test_empty_line_reproduces_gtfs_run_times
+tolerance: each simulated stop-to-stop time within 1 s of max(GTFS, kinematic floor); total within 3%
+status: enforced
+notes: GTFS times have 30 s resolution and include dwell; segments too short to meet them at 1.12 / 1.34 m/s^2 run at the kinematic floor.

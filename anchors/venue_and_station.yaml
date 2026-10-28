@@ -1,0 +1,10 @@
+id: venue_and_station
+quantity: venue capacity, stadium egress design time, and where spare trains and buses wait
+value: {citi_field_capacity: 41922, green_guide_egress_min: 8, green_guide_emergency_evacuation_min: [2.5, 8], yard: Corona Yard (beside Mets-Willets Point), bus_depot: Casey Stengel Depot (beside Corona Yard)}
+source: "Citi Field, Wikipedia and Ticketmaster venue guide (capacity 41,922); SGSA Guide to Safety at Sports Grounds (Green Guide), via secondary sources citing the 4th edition (egress usually 8 min; emergency evacuation 2.5-8 min); List of New York City Subway yards, Wikipedia (Corona Yard south of Mets-Willets Point, adjacent to Casey Stengel Bus Depot)"
+license: published values (facts)
+used_by: cages/data/instances.py (occupancy <= capacity, release window >= 8 min); cages/sim/line.py (yard_station, depot_offset_m)
+enforced_by: tests/test_anchors.py::test_instances_respect_venue_capacity_and_egress_time
+tolerance: occupancy <= 41,922 and arrival window >= 480 s in every instance
+status: enforced
+notes: The Green Guide figures come from secondary sources; check the current SGSA edition before relying on them.

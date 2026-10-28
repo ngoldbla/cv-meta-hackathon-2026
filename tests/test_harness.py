@@ -23,12 +23,13 @@ def test_ledger_chain_and_one_shot_holdout(tmp_path, monkeypatch):
     with pytest.raises(ValueError):
         led.preregister(str(pre))
     monkeypatch.setenv("CAGES_HOLDOUT_SALT", "unit-test-salt")
-    rep = eval_holdout(["closest_car", "esa"], "H9", [("esa", "closest_car")], n=2, workers=2, ledger=led)
+    rep = eval_holdout(["timetable", "express_rule"], "H9", [("express_rule", "timetable")], n=2, workers=2,
+                       ledger=led)
     assert rep["split"] == "holdout" and len(rep["tests"]) == 3
     with pytest.raises(PermissionError):
-        eval_holdout(["closest_car"], "H9", [], n=1, workers=1, ledger=led)
+        eval_holdout(["timetable"], "H9", [], n=1, workers=1, ledger=led)
     with pytest.raises(PermissionError):
-        eval_holdout(["closest_car"], "H_missing", [], n=1, workers=1, ledger=led)
+        eval_holdout(["timetable"], "H_missing", [], n=1, workers=1, ledger=led)
     # tampering breaks the chain
     lines = (tmp_path / "ledger.jsonl").read_text().splitlines()
     e = json.loads(lines[0])
@@ -47,8 +48,8 @@ def test_paired_statistics():
 def test_run_one_reports_tail_metrics():
     from cages.data import make_specs
 
-    m = run_one((make_specs("dev", 1)[0], "esa"))
-    for k in ("p95", "cvar95", "peak_landing_density", "logger_understatement"):
+    m = run_one((make_specs("dev", 1)[0], "rolling_horizon"))
+    for k in ("p95", "cvar95", "peak_density", "logger_understatement"):
         assert np.isfinite(m[k])
 
 
@@ -57,7 +58,7 @@ def test_mcp_tools_end_to_end(tmp_path):
 
     tools = {t.name for t in asyncio.run(mcp_server.mcp.list_tools())}
     assert {"simulate", "generate_cages", "label", "train", "eval_dev", "eval_holdout", "ledger_commit"} <= tools
-    out = asyncio.run(mcp_server.mcp.call_tool("simulate", {"controller": "closest_car", "attendees": 200,
+    out = asyncio.run(mcp_server.mcp.call_tool("simulate", {"controller": "express_rule", "occupancy": 15000,
                                                             "failures": [0.5, 0.5, 0.5, 0.5, 0.5]}))
     text = json.dumps(out, default=lambda o: getattr(o, "model_dump", lambda: str(o))())
     assert "p95" in text and "logger_awt" in text
@@ -91,13 +92,12 @@ def test_gym_env_api():
     import gymnasium as gym
     from gymnasium.utils.env_checker import check_env
 
-    import cages.envs  # noqa: F401  (registers cages/Dispatch-v0)
+    import cages.envs  # noqa: F401  (registers cages/Evacuation-v0)
     from cages.data import make_specs
-    from cages.sim import FailureModes
 
     spec = make_specs("dev", 1)[0]
-    spec.update(attendees=500, failures=FailureModes().as_vector())
-    env = gym.make("cages/Dispatch-v0", specs=[spec]).unwrapped
+    spec.update(occupancy=20000, subway_share=0.4, hour=21)
+    env = gym.make("cages/Evacuation-v0", specs=[spec]).unwrapped
     check_env(env, skip_render_check=True)
     obs, info = env.reset(seed=0)
     done, steps, total = False, 0, 0.0
@@ -111,6 +111,6 @@ def test_gym_env_api():
 
 def test_confirm_refuses_without_salt():
     env = {k: v for k, v in os.environ.items() if k != "CAGES_HOLDOUT_SALT"}
-    r = subprocess.run([sys.executable, "scripts/confirm.py", "--prereg", "H1", "--controllers", "esa"], cwd=ROOT,
+    r = subprocess.run([sys.executable, "scripts/confirm.py", "--prereg", "H1", "--controllers", "timetable"], cwd=ROOT,
                        capture_output=True, text=True, env=env)
     assert r.returncode == 2 and "refusing" in r.stderr

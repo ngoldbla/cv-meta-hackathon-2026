@@ -14,7 +14,8 @@ except ImportError:  # 1.x
     from mcp.server.fastmcp import FastMCP as _Server
 
 from ..data.instances import build_scenario
-from ..sim import FailureModes, Simulation, evaluate, venue_scenario
+from ..data.stock import load_line_stock
+from ..sim import FailureModes, Simulation, evacuation_scenario, evaluate
 from .evaluate import eval_dev as _eval_dev
 from .evaluate import eval_holdout as _eval_holdout
 from .evaluate import make_controller
@@ -24,18 +25,20 @@ mcp = _Server("cages")
 
 
 @mcp.tool()
-def simulate(controller: str = "esa", kind: str = "egress", attendees: int = 1200,
-             failures: list[float] | None = None, seed: int = 0) -> dict:
-    """Run one venue-tower surge with a named controller; returns ground-truth and logger metrics.
-    failures = [w1_hidden_queue, w2_strand, w4_doors, w6_cold, w9_lobby], each in [0, 1]."""
+def simulate(controller: str = "rolling_horizon", occupancy: int = 40000, subway_share: float = 0.45,
+             hour: int = 21, daytype: str = "weekday", failures: list[float] | None = None, seed: int = 0) -> dict:
+    """Run one emergency evacuation of the venue at Mets-Willets Point (7 line) with a named controller;
+    returns ground-truth and operator-log metrics.
+    failures = [w1_hidden, w2_left_behind, w4_doors, w6_cold, w9_egress], each in [0, 1]."""
     fm = FailureModes(*(failures or [0.0] * 5))
-    sim = Simulation(venue_scenario(kind, attendees, fm, seed=seed), make_controller(controller)).run()
-    return evaluate(sim)
+    sc = evacuation_scenario(load_line_stock(), occupancy=occupancy, subway_share=subway_share, hour=hour,
+                             daytype=daytype, failures=fm, seed=seed)
+    return evaluate(Simulation(sc, make_controller(controller)).run())
 
 
 @mcp.tool()
 def generate_cages(out: str = "datasets/cages-dev-run", train: int = 4, dev: int = 2, workers: int = 2,
-                   K: int = 4, horizon: float = 240.0, max_states: int = 10) -> dict:
+                   K: int = 4, horizon: float = 900.0, max_states: int = 10) -> dict:
     """Generate a CAGES release (specs + counterfactual-labelled decision shards)."""
     from ..data.generate import generate
     from ..data.labeler import LabelConfig
@@ -44,13 +47,18 @@ def generate_cages(out: str = "datasets/cages-dev-run", train: int = 4, dev: int
 
 
 @mcp.tool()
-def label(spec: dict, K: int = 4, horizon: float = 240.0, max_states: int = 5) -> dict:
-    """Counterfactual-label one instance spec; returns per-state best car and relative action gaps."""
+def label(spec: dict, K: int = 4, horizon: float = 900.0, max_states: int = 5) -> dict:
+    """Counterfactual-label one instance spec; returns per-state best slot and relative action gaps
+    (slots: 0 no action, 1-4 nearest trains express, 5 yard train, 6-7 buses; null = unavailable)."""
+    import numpy as np
+
     from ..data.labeler import LabelConfig, label_instance
 
     recs = label_instance(spec, LabelConfig(K=K, horizon=horizon, max_states=max_states, p_label=1.0))
-    return {"states": [{"t": r["t"], "call": list(r["call"]), "best": r["best"], "esa": r["esa_choice"],
-                        "q_rel": [float(x) for x in r["q_mean"] / r["q_mean"].min()]} for r in recs]}
+    return {"states": [{"t": r["t"], "alert": list(r["call"]), "best": r["best"], "planner": r["planner_choice"],
+                        "rule": r["rule_choice"],
+                        "q_rel": [None if not np.isfinite(x) else float(x / np.nanmin(r["q_mean"]))
+                                  for x in r["q_mean"]]} for r in recs]}
 
 
 @mcp.tool()

@@ -1,5 +1,5 @@
-from .dispatch_env import DispatchEnv, register
+from .evacuation_env import EvacuationEnv, register
 
 register()
 
-__all__ = ["DispatchEnv"]
+__all__ = ["EvacuationEnv"]

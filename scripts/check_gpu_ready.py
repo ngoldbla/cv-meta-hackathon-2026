@@ -80,7 +80,7 @@ def _nf4_smoke() -> str:
         import torch
         from transformers.models.muse_glimmer import MuseGlimmerConfig, MuseGlimmerForConditionalGeneration
 
-        from cages.data.features import N_FLOOR, N_GLOBAL, car_dim
+        from cages.data.features import N_GLOBAL, N_STN, N_VEH
         from cages.model.decapitate import decapitate
         from cages.model.decision import DecisionModel
 
@@ -91,11 +91,11 @@ def _nf4_smoke() -> str:
         with tempfile.TemporaryDirectory() as d:
             MuseGlimmerForConditionalGeneration(MuseGlimmerConfig(text_config=tc, vision_config=vc)).save_pretrained(d + "/src")
             decapitate(d + "/src", d + "/trunk", keep_layers=1, dtype="bfloat16")
-            m = DecisionModel(car_dim(30), N_FLOOR, N_GLOBAL, 30, 6, f"hf:{d}/trunk", lora_rank=4,
+            m = DecisionModel(N_VEH, N_STN, N_GLOBAL, 22, 8, f"hf:{d}/trunk", lora_rank=4,
                               quant="nf4").to_device("cuda")
-            car = torch.randn(2, 6, car_dim(30), device="cuda")
-            out = m(car, torch.randn(2, 30, N_FLOOR, device="cuda"), torch.randn(2, N_GLOBAL, device="cuda"),
-                    torch.ones(2, 6, dtype=torch.bool, device="cuda"))
+            veh = torch.randn(2, 8, N_VEH, device="cuda")
+            out = m(veh, torch.randn(2, 22, N_STN, device="cuda"), torch.randn(2, N_GLOBAL, device="cuda"),
+                    torch.ones(2, 8, dtype=torch.bool, device="cuda"))
             out.sum().backward()
         return "ok"
     except Exception as e:  # noqa: BLE001

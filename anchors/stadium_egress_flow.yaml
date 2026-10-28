@@ -1,9 +1,0 @@
-id: stadium_egress
-quantity: measured crowd flow rate during stadium egress
-value: {max_observed_pmmin: 60, green_guide_max_pmmin: 82}
-source: Larsson, A., Ronchi, E., et al. (2020). Fire Safety Journal, doi:10.1016/j.firesaf.2020.103040
-license: published values (facts)
-used_by: cages/sim/building.py (exit_rate for the discharge lobby, W9)
-enforced_by: tests/test_anchors.py::test_lobby_exit_flow_within_observed_range
-tolerance: exit flow per metre of exit width <= 82 p/m/min at every W9 severity (nominal exit width 4 m)
-status: enforced

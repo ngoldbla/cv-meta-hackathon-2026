@@ -1,49 +1,45 @@
 """The predict-and-decide mixture used at the edge.
 
-* forecast  -> pre-positions idle cars at the k-median of forecast demand (before the surge);
-* decide    -> the decision model scores every car in one deterministic pass;
-* fallback  -> when the model's calibrated confidence is below ``threshold``, the ESA planner decides.
+* forecast  -> on the emergency declaration, stages yard trains and shuttle buses for the forecast crowd;
+* decide    -> the decision model scores every candidate slot for an alert in one deterministic pass;
+* fallback  -> when the model's calibrated confidence is below ``threshold``, the rolling-horizon
+               dispatcher decides.
 """
 
 from __future__ import annotations
 
-import numpy as np
-
 from ..data.features import decision_features
 from .base import Controller
-from .classic import ESAPlanner, ForecastParking
+from .classic import ExpressRule, ForecastStaging, RollingHorizon
 
 
 class MixtureController(Controller):
-    def __init__(self, model, forecaster, threshold: float = 0.35, fallback: Controller | None = None,
-                 horizon: float = 600.0):
+    def __init__(self, model, forecaster, threshold: float = 0.35, fallback: Controller | None = None):
         self.model = model
         self.forecaster = forecaster
         self.threshold = threshold
-        self.fallback = fallback or ESAPlanner()
-        self._esa = ESAPlanner()
-        self._parking = ForecastParking(self.fallback, forecaster, horizon)
+        self.fallback = fallback or RollingHorizon(forecaster=forecaster)
+        self._planner = RollingHorizon(forecaster=forecaster)
+        self._rule = ExpressRule()
+        self._staging = ForecastStaging(self.fallback, forecaster)
         self.name = f"mixture(t={threshold})"
         self.stats = {"model": 0, "fallback": 0}
 
     def reset(self, sim) -> None:
-        self._parking.reset(sim)
+        self._staging.reset(sim)
         self.stats = {"model": 0, "fallback": 0}
 
-    def assign(self, sim, call, exclude=()) -> int:
-        f = decision_features(sim, call, self.forecaster, self._esa)
-        mask = f["mask"].copy()
-        for i in exclude:
-            mask[i] = False
-        a, conf, _ = self.model.decide(f["car"], f["floor"], f["glob"], mask)
-        if conf < self.threshold or not mask[a]:
+    def on_declaration(self, sim) -> None:
+        self._staging.on_declaration(sim)
+
+    def assign(self, sim, call) -> int:
+        f = decision_features(sim, call, self.forecaster, self._planner, self._rule)
+        a, conf, _ = self.model.decide(f["veh"], f["stn"], f["glob"], f["mask"])
+        if conf < self.threshold or not f["mask"][a]:
             self.stats["fallback"] += 1
-            return self.fallback.assign(sim, call, exclude)
+            return self.fallback.assign(sim, call)
         self.stats["model"] += 1
         return int(a)
-
-    def park(self, sim, ci: int):
-        return self._parking.park(sim, ci)
 
     def __deepcopy__(self, memo):  # rollouts never deep-copy the neural model
         import copy
@@ -58,4 +54,4 @@ def fallback_rate(ctrl: MixtureController) -> float:
     return float(ctrl.stats["fallback"] / tot) if tot else float("nan")
 
 
-__all__ = ["MixtureController", "fallback_rate", "np"]
+__all__ = ["MixtureController", "fallback_rate"]

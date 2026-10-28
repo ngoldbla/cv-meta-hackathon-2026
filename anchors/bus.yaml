@@ -1,0 +1,10 @@
+id: shuttle_bus
+quantity: capacity of a 40-ft transit bus used as a shuttle
+value: {seated: 38, standing: 44, total: 82}
+source: "SEPTA New Flyer XDE40 fleet specification (38 seats, 44 standees), https://philadelphiatransitvehicles.info/2017-2021-new-flyer-xde40/"
+license: published values (facts)
+used_by: cages/sim/line.py (Line.bus_capacity)
+enforced_by: tests/test_anchors.py::test_bus_capacity
+tolerance: exact
+status: enforced
+notes: A comparable 40-ft New Flyer bus; an NYC Transit fleet figure was not found.

@@ -29,9 +29,12 @@ def load_split(root: str, split: str) -> dict:
 
 
 def soft_targets(q_mean: np.ndarray, q_std: np.ndarray, floor_frac: float = 0.005) -> np.ndarray:
-    adv = q_mean - q_mean.min(axis=1, keepdims=True)
-    scale = np.maximum(np.median(q_std, axis=1, keepdims=True), floor_frac * q_mean.mean(axis=1, keepdims=True))
-    z = -adv / np.maximum(scale, 1e-6)
+    """softmax(-(Q - min Q) / s) over the valid actions (invalid actions are NaN and get probability 0)."""
+    valid = np.isfinite(q_mean)
+    adv = q_mean - np.nanmin(q_mean, axis=1, keepdims=True)
+    scale = np.maximum(np.nanmedian(np.where(valid, q_std, np.nan), axis=1, keepdims=True),
+                       floor_frac * np.nanmean(q_mean, axis=1, keepdims=True))
+    z = np.where(valid, -adv / np.maximum(scale, 1e-6), -np.inf)
     z -= z.max(axis=1, keepdims=True)
     p = np.exp(z)
     return p / p.sum(axis=1, keepdims=True)
@@ -39,10 +42,10 @@ def soft_targets(q_mean: np.ndarray, q_std: np.ndarray, floor_frac: float = 0.00
 
 def to_tensors(d: dict) -> dict:
     return {
-        "car": torch.tensor(d["car"], dtype=torch.float32), "floor": torch.tensor(d["floor"], dtype=torch.float32),
+        "veh": torch.tensor(d["veh"], dtype=torch.float32), "stn": torch.tensor(d["stn"], dtype=torch.float32),
         "glob": torch.tensor(d["glob"], dtype=torch.float32), "mask": torch.tensor(d["mask"], dtype=torch.bool),
         "target": torch.tensor(soft_targets(d["q_mean"], d["q_std"]), dtype=torch.float32),
-        "q": torch.tensor(d["q_mean"], dtype=torch.float32),
+        "q": torch.tensor(np.nan_to_num(d["q_mean"], nan=0.0), dtype=torch.float32),
     }
 
 
@@ -57,9 +60,9 @@ def ece(conf: np.ndarray, correct: np.ndarray, bins: int = 10) -> float:
 
 
 def regret(q: np.ndarray, choice: np.ndarray) -> float:
-    """Mean relative regret: (Q[choice] - min Q) / mean Q."""
+    """Mean relative regret over the valid actions: (Q[choice] - min Q) / mean Q."""
     qc = q[np.arange(len(q)), choice]
-    return float(np.mean((qc - q.min(1)) / q.mean(1)))
+    return float(np.mean((qc - np.nanmin(q, 1)) / np.nanmean(q, 1)))
 
 
 def pick_device(device: str = "auto") -> torch.device:
@@ -69,14 +72,14 @@ def pick_device(device: str = "auto") -> torch.device:
 
 
 def _batch(t: dict, idx, device) -> tuple:
-    return tuple(t[k][idx].to(device, non_blocking=True) for k in ("car", "floor", "glob", "mask"))
+    return tuple(t[k][idx].to(device, non_blocking=True) for k in ("veh", "stn", "glob", "mask"))
 
 
 @torch.no_grad()
 def predict_logits(model: DecisionModel, t: dict, batch: int = 256) -> torch.Tensor:
     model.eval()
     dev = model.device
-    return torch.cat([model(*_batch(t, slice(i, i + batch), dev)).float().cpu() for i in range(0, len(t["car"]), batch)])
+    return torch.cat([model(*_batch(t, slice(i, i + batch), dev)).float().cpu() for i in range(0, len(t["veh"]), batch)])
 
 
 @torch.no_grad()
@@ -85,17 +88,18 @@ def evaluate(model: DecisionModel, t: dict, raw: dict, batch: int = 256) -> dict
     p = torch.softmax(logits, -1).numpy()
     choice = p.argmax(1)
     q = raw["q_mean"]
-    best = q.argmin(1)
+    best = np.nanargmin(q, 1)
     target = t["target"].numpy()
     nll = float(-(target * np.log(np.clip(p, 1e-9, 1))).sum(1).mean())
     return {
         "n": int(len(q)),
         "top1": float((choice == best).mean()),
         "regret": regret(q, choice),
-        "regret_esa": regret(q, raw["esa_choice"]),
-        "regret_eta": regret(q, raw["eta_choice"]),
-        "regret_random": float(np.mean((q.mean(1) - q.min(1)) / q.mean(1))),
-        "top1_esa": float((raw["esa_choice"] == best).mean()),
+        "regret_planner": regret(q, raw["planner_choice"]),
+        "regret_rule": regret(q, raw["rule_choice"]),
+        "regret_none": regret(q, np.zeros(len(q), dtype=int)),
+        "regret_random": float(np.mean((np.nanmean(q, 1) - np.nanmin(q, 1)) / np.nanmean(q, 1))),
+        "top1_planner": float((raw["planner_choice"] == best).mean()),
         "ece": ece(p.max(1), (choice == best).astype(float)),
         "log_score": nll,
     }
@@ -121,12 +125,12 @@ def train(data: str, out: str, backbone: str = "scratch", epochs: int = 30, lr: 
     dev = pick_device(device)
     tr_raw, dv_raw = load_split(data, "train"), load_split(data, "dev")
     tr, dv = to_tensors(tr_raw), to_tensors(dv_raw)
-    _, C, Fc = tr["car"].shape
-    Fl, Ff = tr["floor"].shape[1:]
+    _, C, Fc = tr["veh"].shape
+    Fl, Ff = tr["stn"].shape[1:]
     model = DecisionModel(Fc, Ff, tr["glob"].shape[1], Fl, C, backbone, d_model, n_layers, hf_dtype, lora_rank,
                           quant).to_device(dev)
     opt = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad], lr=lr, weight_decay=0.01)
-    n = len(tr["car"])
+    n = len(tr["veh"])
     t0 = time.time()
     history = []
     for ep in range(epochs):
@@ -192,7 +196,7 @@ def load_model(path: str, quant: str | None = None, device: str = "cpu") -> Deci
         return _LOADED[key]
     ck = torch.load(ckpt, map_location="cpu", weights_only=False)
     c = ck["config"]
-    m = DecisionModel(c["car_dim"], c["floor_dim"], c["glob_dim"], c["n_floors"], c["n_cars"], c["backbone"],
+    m = DecisionModel(c["veh_dim"], c["stn_dim"], c["glob_dim"], c["n_stations"], c["n_slots"], c["backbone"],
                       c["d_model"], c["n_layers"], hf_dtype=c.get("hf_dtype", "float32"),
                       lora_rank=c.get("lora_rank", 0), quant=quant or trained_quant(path, c))
     if "state_dict" in ck:

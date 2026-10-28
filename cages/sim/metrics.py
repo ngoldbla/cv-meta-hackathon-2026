@@ -1,8 +1,10 @@
-"""Ground-truth and logger-view metrics.  Tails, not means, are the primary targets."""
+"""Ground-truth and operator-view metrics.  Tails, not means, are the primary targets."""
 
 from __future__ import annotations
 
 import numpy as np
+
+from .line import DOWN, UP
 
 
 def _cvar(x: np.ndarray, alpha: float = 0.95) -> float:
@@ -12,45 +14,66 @@ def _cvar(x: np.ndarray, alpha: float = 0.95) -> float:
     return float(np.mean(np.sort(x)[-k:]))
 
 
+def _pct(x: np.ndarray, q: float) -> float:
+    return float(np.percentile(x, q)) if x.size else float("nan")
+
+
 def evaluate(sim) -> dict:
     t_end = sim.t_end if sim.t_end is not None else sim.now
-    allp = list(sim.done) + list(sim.pax.values())
-    arrived = [p for p in allp if p.t_arrive <= t_end]
-    waits = np.array([(p.t_board if p.t_board is not None else t_end) - p.t_arrive for p in arrived])
-    censored = sum(1 for p in arrived if p.t_board is None)
-    wc = np.array([(p.t_board if p.t_board is not None else t_end) - p.t_arrive for p in arrived if p.klass == "wheelchair"])
-    ttd = np.array([p.t_alight - p.t_arrive for p in sim.done if p.t_alight is not None])
-    calls = [c for c in sim.call_log if c.t_cancel is not None]
-    log_waits = np.array([c.t_cancel - c.t_register for c in calls])
-    surge = [p for p in sim.done if p.stream in ("egress", "ingress")]
-    info = sim.scenario.info()
-    ev = info.get("event_floor")
-    out = {
-        "n_passengers": len(arrived),
-        "n_censored": censored,
+    L = sim.L
+    ev = L.event_station
+    done = sim.done
+    waiting = [p for p in sim.pax.values() if p.t_arrive <= t_end]
+    waits = np.array([b.t_board - b.t_arrive for b in done] + [t_end - p.t_arrive for p in waiting])
+    klass = [b.klass for b in done] + [p.klass for p in waiting]
+    stream = [b.stream for b in done] + [p.stream for p in waiting]
+    wc = waits[np.array([k == "wheelchair" for k in klass], dtype=bool)] if waits.size else waits
+    evac = waits[np.array([s == "evac" for s in stream], dtype=bool)] if waits.size else waits
+    logged = np.array([b.logged_wait for b in done])
+    true_boarded = np.array([b.t_board - b.t_arrive for b in done])
+    left = np.array([b.n_left_behind for b in done])
+    # danger time includes the interval since each density's last change
+    danger = dict(sim.danger_time)
+    for key, (t_prev, v) in sim._dens.items():
+        if v >= L.rho_danger and t_end > t_prev:
+            danger[key] = danger.get(key, 0.0) + (t_end - t_prev)
+    plat_peak = max(sim.peak_density.get(("plat", ev, d), 0.0) for d in (UP, DOWN))
+    plaza_peak = sim.peak_density.get(("plaza", ev), 0.0)
+    evac_boards = [b.t_board for b in done if b.stream == "evac"]
+    # NFPA 130 reference (not a certification): evacuees who stood on the platform for over 4 minutes
+    on_plat = np.array([b.t_board - b.t_platform for b in done if b.stream == "evac" and b.t_platform is not None])
+    n_evac_left = sum(1 for p in waiting if p.stream == "evac")
+    return {
+        "n_passengers": int(waits.size),
+        "n_censored": len(waiting),
         "awt": float(waits.mean()) if waits.size else float("nan"),
-        "p50": float(np.percentile(waits, 50)) if waits.size else float("nan"),
-        "p95": float(np.percentile(waits, 95)) if waits.size else float("nan"),
-        "p99": float(np.percentile(waits, 99)) if waits.size else float("nan"),
+        "p50": _pct(waits, 50),
+        "p95": _pct(waits, 95),
+        "p99": _pct(waits, 99),
         "cvar95": _cvar(waits),
         "max_wait": float(waits.max()) if waits.size else float("nan"),
-        "wheelchair_p95": float(np.percentile(wc, 95)) if wc.size else float("nan"),
-        "time_to_dest": float(ttd.mean()) if ttd.size else float("nan"),
-        "logger_awt": float(log_waits.mean()) if log_waits.size else float("nan"),
-        "logger_p95": float(np.percentile(log_waits, 95)) if log_waits.size else float("nan"),
-        "logger_understatement": float(1 - log_waits.mean() / waits.mean()) if waits.size and log_waits.size and waits.mean() > 0 else float("nan"),
-        "stranded_frac": float(np.mean([p.n_left_behind > 0 for p in arrived])) if arrived else 0.0,
-        "strand_events": int(sum(p.n_left_behind for p in arrived)),
-        "wasted_stops": int(sum(c.n_wasted_stops for c in sim.cars)),
-        "starts": int(sum(c.n_starts for c in sim.cars)),
-        "floors_travelled": float(sum(c.floors_travelled for c in sim.cars)),
-        "peak_lobby_density": float(sim.peak_lobby_density),
-        "peak_event_floor_density": float(sim.peak_density.get(ev, 0.0)) if ev is not None else float("nan"),
-        "danger_s_lobby": float(sim.danger_time.get(sim.b.lobby_floor, 0.0)),
-        "danger_s_event_floor": float(sim.danger_time.get(ev, 0.0)) if ev is not None else float("nan"),
-        "clearance_s": float(max(p.t_alight for p in surge) - min(p.t_arrive for p in surge)) if surge else float("nan"),
+        "evac_p95": _pct(evac, 95),
+        "evac_cvar95": _cvar(evac),
+        "wheelchair_p95": _pct(wc, 95),
+        "logger_awt": float(logged.mean()) if logged.size else float("nan"),
+        "logger_p95": _pct(logged, 95),
+        "logger_understatement": float(1 - logged.mean() / true_boarded.mean())
+        if logged.size and true_boarded.mean() > 0 else float("nan"),
+        "stranded_frac": float(np.mean(left > 0)) if left.size else 0.0,
+        "strand_events": int(left.sum()) if left.size else 0,
+        "logged_stranded_frac": 0.0,  # passenger counters and train logs cannot see left-behinds
+        "peak_platform_density": float(plat_peak),
+        "peak_plaza_density": float(plaza_peak),
+        "peak_density": float(max(plat_peak, plaza_peak)),
+        "danger_s_platform": float(sum(danger.get(("plat", ev, d), 0.0) for d in (UP, DOWN))),
+        "danger_s_plaza": float(danger.get(("plaza", ev), 0.0)),
+        "platform_over_4min_frac": float(np.mean(on_plat > 240.0)) if on_plat.size else float("nan"),
+        "clearance_s": float(max(evac_boards) - sim.t_onset) if evac_boards and n_evac_left == 0 else float("nan"),
         "n_calls": len(sim.call_log),
+        "express_runs": int(sum(1 for c in sim.call_log if c.vehicle and c.vehicle[0] == "train")),
+        "bus_boarded": int(sim.bus_boarded),
+        "backtrack": int(sim.n_backtrack),
+        "train_km": float(sum(t.km for t in sim.trains)),
         "t_end": float(t_end),
-        "deadlocked": bool(getattr(sim, "deadlocked", False)),
+        "deadlocked": bool(sim.deadlocked),
     }
-    return out

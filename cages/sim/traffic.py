@@ -1,4 +1,8 @@
-"""Passenger arrival streams and scenarios (with exact conditional resampling for rollouts)."""
+"""Passenger arrival streams and evacuation scenarios (with exact conditional resampling for rollouts).
+
+Streams return column arrays (time, origin, destination, class index, stream name) so that sampling
+tens of thousands of evacuees stays fast inside counterfactual rollouts.
+"""
 
 from __future__ import annotations
 
@@ -7,122 +11,112 @@ from dataclasses import dataclass, field, replace
 import numpy as np
 from scipy import stats
 
-from .building import Building, FailureModes, _lerp
-from .core import Passenger
+from .line import FailureModes, Line, LineSpec, line_from_stock
 
-DEFAULT_MIX = (("adult", 0.89), ("luggage", 0.10), ("wheelchair", 0.01))
+CLASS_P = (0.99, 0.01)  # adult, wheelchair
 
 
-def _choice(rng: np.random.Generator, pairs) -> int | str:
-    vals = [v for v, _ in pairs]
-    w = np.asarray([w for _, w in pairs], dtype=float)
-    return vals[int(rng.choice(len(vals), p=w / w.sum()))]
+def _empty() -> dict:
+    return {"t": np.zeros(0), "o": np.zeros(0, int), "d": np.zeros(0, int), "k": np.zeros(0, int), "stream": []}
+
+
+def _concat(parts: list[dict]) -> dict:
+    parts = [p for p in parts if len(p["t"])]
+    if not parts:
+        return _empty()
+    out = {k: np.concatenate([p[k] for p in parts]) for k in ("t", "o", "d", "k")}
+    out["stream"] = [s for p in parts for s in p["stream"]]
+    order = np.argsort(out["t"], kind="stable")
+    return {**{k: out[k][order] for k in ("t", "o", "d", "k")}, "stream": [out["stream"][i] for i in order]}
 
 
 @dataclass(frozen=True)
-class FiniteStream:
-    """A fixed population whose arrival times are iid Beta(a, b) on [t0, t1].
+class EvacStream:
+    """A fixed population leaving the venue; arrival times at the station are iid Beta(a, b) on [t0, t1].
 
-    Given that k people have already arrived by time t, the remaining n - k arrive iid from the
-    same distribution truncated to (t, t1] -- which makes counterfactual resampling exact."""
+    Given that k evacuees have already arrived by time t, the remaining n - k arrive iid from the same
+    distribution truncated to (t, t1] -- which makes counterfactual resampling exact."""
 
-    name: str
     n: int
     t0: float
     t1: float
     a: float
     b: float
-    origins: tuple  # ((floor, weight), ...)
-    dests: tuple  # ((floor, weight), ...)
-    class_mix: tuple = DEFAULT_MIX
+    origin: int
+    dest_p: tuple  # probability per destination station
+    class_p: tuple = CLASS_P
+    name: str = "evac"
 
-    def sample(self, rng: np.random.Generator, t_from: float | None = None, n_arrived: int = 0) -> list[Passenger]:
+    def sample(self, rng: np.random.Generator, t_from: float | None = None, n_arrived: int = 0) -> dict:
         n = self.n - n_arrived
         if n <= 0:
-            return []
+            return _empty()
         span = self.t1 - self.t0
         lo = 0.0 if t_from is None else min(max((t_from - self.t0) / span, 0.0), 1.0)
         if lo >= 1.0:
-            return []
+            return _empty()
         dist = stats.beta(self.a, self.b)
-        u = rng.uniform(dist.cdf(lo), 1.0, size=n)
-        times = self.t0 + span * dist.ppf(u)
+        times = self.t0 + span * dist.ppf(rng.uniform(dist.cdf(lo), 1.0, size=n))
         if t_from is not None:
             times = np.maximum(times, t_from + 1e-6)
-        out = []
-        for t in np.sort(times):
-            o = _choice(rng, self.origins)
-            d = o
-            while d == o:
-                d = _choice(rng, self.dests)
-            out.append(Passenger(-1, float(t), int(o), int(d), str(_choice(rng, self.class_mix)), self.name))
-        return out
+        dest = rng.choice(len(self.dest_p), size=n, p=np.asarray(self.dest_p))
+        klass = rng.choice(len(self.class_p), size=n, p=np.asarray(self.class_p))
+        return {"t": times, "o": np.full(n, self.origin), "d": dest, "k": klass, "stream": [self.name] * n}
 
 
 @dataclass(frozen=True)
-class PoissonStream:
-    """Homogeneous Poisson background traffic on [t0, t1] (memoryless, so resampling is exact)."""
+class BackgroundStream:
+    """Poisson riders entering every station at their hourly rate (memoryless, so resampling is exact)."""
 
-    name: str
-    rate: float  # persons / s
+    rates: tuple  # persons/s per station
+    attract: tuple  # destination weight per station
     t0: float
     t1: float
-    origins: tuple
-    dests: tuple
-    class_mix: tuple = DEFAULT_MIX
+    class_p: tuple = CLASS_P
+    name: str = "bg"
 
-    def sample(self, rng: np.random.Generator, t_from: float | None = None, n_arrived: int = 0) -> list[Passenger]:
+    def sample(self, rng: np.random.Generator, t_from: float | None = None, n_arrived: int = 0) -> dict:
         start = self.t0 if t_from is None else max(self.t0, t_from)
-        if start >= self.t1 or self.rate <= 0:
-            return []
-        n = rng.poisson(self.rate * (self.t1 - start))
-        out = []
-        for t in np.sort(rng.uniform(start, self.t1, size=n)):
-            o = _choice(rng, self.origins)
-            d = o
-            while d == o:
-                d = _choice(rng, self.dests)
-            out.append(Passenger(-1, float(t) + 1e-6, int(o), int(d), str(_choice(rng, self.class_mix)), self.name))
-        return out
+        if start >= self.t1:
+            return _empty()
+        w = np.asarray(self.attract, dtype=float)
+        parts = []
+        for o, rate in enumerate(self.rates):
+            n = rng.poisson(rate * (self.t1 - start))
+            if n == 0:
+                continue
+            p = w.copy()
+            p[o] = 0.0
+            p /= p.sum()
+            parts.append({"t": rng.uniform(start, self.t1, size=n) + 1e-6, "o": np.full(n, o),
+                          "d": rng.choice(len(w), size=n, p=p),
+                          "k": rng.choice(len(self.class_p), size=n, p=np.asarray(self.class_p)),
+                          "stream": [self.name] * n})
+        return _concat(parts)
 
 
 @dataclass(frozen=True)
 class Scenario:
-    building: Building
+    line: Line
     streams: tuple
     failures: FailureModes = field(default_factory=FailureModes)
-    init_floors: tuple = ()
-    asleep: tuple = ()
-    t_max: float = 3600.0
+    t_onset: float = 900.0
+    t_max: float = 9000.0
     seed: int = 0
-    schedule: tuple = ()  # known-future information, e.g. (("kind","egress"),("event_floor",27),...)
+    schedule: tuple = ()  # known-future information, e.g. (("event_station", 1), ("occupancy", 40000), ...)
     name: str = "scenario"
 
-    def building_effective(self) -> Building:
-        return self.building.with_failures(self.failures)
-
-    def init_floor(self, i: int) -> int:
-        return int(self.init_floors[i]) if i < len(self.init_floors) else 0
-
-    def init_asleep(self, i: int) -> bool:
-        return i in self.asleep
+    def line_effective(self) -> Line:
+        return self.line.with_failures(self.failures)
 
     def info(self) -> dict:
         return dict(self.schedule)
 
-    def sample_passengers(self, rng: np.random.Generator) -> list[Passenger]:
-        out = []
-        for s in self.streams:
-            out.extend(s.sample(rng))
-        out.sort(key=lambda p: p.t_arrive)
-        return out
+    def sample_passengers(self, rng: np.random.Generator) -> dict:
+        return _concat([s.sample(rng) for s in self.streams])
 
-    def sample_future(self, rng: np.random.Generator, t_now: float, arrived: dict) -> list[Passenger]:
-        out = []
-        for s in self.streams:
-            out.extend(s.sample(rng, t_from=t_now, n_arrived=arrived.get(s.name, 0)))
-        out.sort(key=lambda p: p.t_arrive)
-        return out
+    def sample_future(self, rng: np.random.Generator, t_now: float, arrived: dict) -> dict:
+        return _concat([s.sample(rng, t_from=t_now, n_arrived=arrived.get(s.name, 0)) for s in self.streams])
 
     def with_seed(self, seed: int) -> Scenario:
         return replace(self, seed=int(seed))
@@ -131,90 +125,64 @@ class Scenario:
 # ---------------------------------------------------------------------- scenario builders
 
 
-def venue_building(**overrides) -> Building:
-    """30-floor venue tower, 6-car bank; overridable with registry-derived parameters."""
-    base = Building(n_floors=30, n_cars=6, wait_area_overrides=((27, 300.0),))
-    return replace(base, **overrides) if overrides else base
+def headway_at(stock: dict, hour: int, daytype: str = "Weekday") -> float:
+    """Scheduled headway at the event station for that hour (the shorter of the two directions)."""
+    svc = {"weekday": "Weekday", "saturday": "Saturday", "sunday": "Sunday"}.get(daytype.lower(), daytype)
+    hs = [stock["headway_s"][f"{svc}:{d}"].get(str(int(hour) % 24)) for d in ("0", "1")]
+    return float(min(h for h in hs if h is not None))
 
 
-def venue_scenario(
-    kind: str = "egress",
-    attendees: int = 1200,
+def station_rates(stock: dict, hour: int, daytype: str = "weekday") -> tuple:
+    kind = "weekday" if daytype.lower() == "weekday" else "weekend"
+    rid = stock["ridership_hourly_entries"]
+    return tuple(rid[s["complex_id"]][kind][int(hour) % 24] / 3600.0 for s in stock["stations"])
+
+
+def attraction(stock: dict) -> tuple:
+    rid = stock["ridership_hourly_entries"]
+    return tuple(sum(rid[s["complex_id"]]["weekday"]) for s in stock["stations"])
+
+
+def evacuation_scenario(
+    stock: dict,
+    occupancy: int = 40000,
+    subway_share: float = 0.45,
+    window: float = 900.0,
+    walk: float = 240.0,
+    a: float = 1.3,
+    b: float = 2.0,
+    hour: int = 21,
+    daytype: str = "weekday",
+    p_flushing: float = 0.15,
     failures: FailureModes | None = None,
     seed: int = 0,
-    building: Building | None = None,
-    event_floor: int = 27,
-    background_rate: float = 0.03,
-    t_event: float = 300.0,
+    t_onset: float = 900.0,
+    after: float = 7200.0,
+    bg_scale: float = 1.0,
+    line_spec: LineSpec | None = None,
+    **line_overrides,
 ) -> Scenario:
-    """Event surge in a venue tower.
-
-    egress: attendees leave the event floor after ``t_event`` (front-loaded release).
-    ingress: attendees arrive at the lobby before the event starts at ``t_event + window``.
-    W1 (hidden queue) shortens the release window, concentrating the crowd behind fewer calls.
-    W6 (cold start) puts cars to sleep and parks them on the wrong side of the building.
-    """
-    fm = failures or FailureModes()
-    b = building or venue_building()
-    n_f = b.n_floors
-    window = _lerp(20 * 60.0, 4 * 60.0, fm.w1_hidden_queue)
-    lug = _lerp(0.10, 0.35, fm.w2_strand)
-    mix = (("adult", 0.99 - lug), ("luggage", lug), ("wheelchair", 0.01))
-    others = tuple((f, 1.0) for f in range(1, n_f) if f != event_floor)
-    if kind == "egress":
-        surge = FiniteStream(
-            "egress", attendees, t_event, t_event + window, 1.3, 2.6,
-            origins=((event_floor, 1.0),),
-            dests=((0, 0.85),) + tuple((f, 0.15 / len(others)) for f, _ in others),
-            class_mix=mix,
-        )
-        far_floor = 0
-    elif kind == "ingress":
-        surge = FiniteStream(
-            "ingress", attendees, t_event, t_event + window, 2.6, 1.3,
-            origins=((0, 0.95),) + tuple((f, 0.05 / len(others)) for f, _ in others),
-            dests=((event_floor, 1.0),),
-            class_mix=mix,
-        )
-        far_floor = n_f - 1
-    else:
-        raise ValueError(kind)
-    horizon = t_event + window + 3600.0
-    floors_all = tuple((f, 1.0) for f in range(n_f) if f != event_floor)
-    bg = PoissonStream("background", background_rate, 0.0, horizon - 900.0, origins=floors_all, dests=floors_all)
-    # initial placement: spread evenly.  W6 (cold start) emulates off-peak energy saving: cars are
-    # returned to the far side of the building and a share of them is shut down.
-    n_c = b.n_cars
-    spread = [int(round(i * (n_f - 1) / max(n_c - 1, 1))) for i in range(n_c)]
-    n_far = int(round(fm.w6_cold * n_c))
-    n_cold = int(round(fm.w6_cold * n_c * 0.67))
-    init = [far_floor if i < n_far else spread[i] for i in range(n_c)]
-    asleep = tuple(range(n_cold))
-    b = replace(b, return_floor=far_floor)
-    sched = (
-        ("kind", kind), ("event_floor", event_floor), ("t_event", t_event),
-        ("window", window), ("attendees", attendees),
+    """An emergency at the venue next to the event station: the crowd leaves on foot and a share of it
+    heads into the subway.  Background riders keep entering every station at their hourly rate."""
+    failures = failures or FailureModes()
+    headway = headway_at(stock, hour, daytype)
+    base = line_from_stock(stock, line_spec)
+    cycle = 2 * sum(stock["segment_s"]) + 2 * base.t_turnback
+    n_service = max(2, int(round(cycle / headway)))
+    line = line_from_stock(stock, line_spec, headway=headway, n_service=n_service, **line_overrides)
+    ev = line.event_station
+    att = np.asarray(attraction(stock), dtype=float)
+    up = np.where(np.arange(len(att)) > ev, att, 0.0)
+    dest_p = (1 - p_flushing) * up / up.sum()
+    dest_p[0] += p_flushing
+    t0 = t_onset + walk
+    t_max = t0 + window + after
+    n = int(round(occupancy * subway_share))
+    streams = (
+        EvacStream(n, t0, t0 + window, a, b, ev, tuple(dest_p.tolist())),
+        BackgroundStream(tuple(r * bg_scale for r in station_rates(stock, hour, daytype)), tuple(att.tolist()),
+                         0.0, t_max - 1800.0),
     )
-    return Scenario(
-        building=b, streams=(surge, bg), failures=fm, init_floors=tuple(init), asleep=asleep,
-        t_max=horizon, seed=seed, schedule=sched, name=f"venue-{kind}",
-    )
-
-
-def uppeak_scenario(n_upper: int = 12, capacity_persons: int = 8, n_pax: int = 4000, seed: int = 0, kin=None) -> Scenario:
-    """Pure up-peak with an unbounded lobby queue (used to validate against Barney's RTT)."""
-    from .building import ADULT
-    from .kinematics import Kinematics
-
-    kin = kin or Kinematics(speed=1.6, accel=1.0, t_dwell_min=0.0)
-    b = Building(
-        n_floors=n_upper + 1, n_cars=1, kin=kin,
-        rated_mass=ADULT.mass * capacity_persons, car_area=ADULT.area * capacity_persons + 1e-6,
-        bypass_frac=10.0, repress_delay_mean=0.5,
-    )
-    s = FiniteStream(
-        "uppeak", n_pax, 0.0, 1.0, 1.0, 1.0,
-        origins=((0, 1.0),), dests=tuple((f, 1.0) for f in range(1, n_upper + 1)),
-        class_mix=(("adult", 1.0),),
-    )
-    return Scenario(building=b, streams=(s,), t_max=1e7, seed=seed, name="uppeak")
+    schedule = (("kind", "evacuation"), ("event_station", ev), ("onset", t_onset), ("occupancy", int(occupancy)),
+                ("hour", int(hour)), ("daytype", daytype), ("headway", headway))
+    return Scenario(line, streams, failures, t_onset, t_max, seed, schedule, "evacuation")

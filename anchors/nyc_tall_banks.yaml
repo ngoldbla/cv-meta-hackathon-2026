@@ -1,9 +1,0 @@
-id: nyc_tall_banks
-quantity: speed and rated load of tall (>=20 stops, >=4 cars) passenger elevator banks
-value: {file: datasets/cages-v0-mini/stock/nyc_tall_banks.json, n_banks: 446, speed_ms_median: 3.05, capacity_kg_median: 1247, overbalance_median: 0.45, dcs_share: 0.18}
-source: NYC Open Data, DOB NOW Build Elevator Device Details (juyv-2jek), retrieved 2026-10-26
-license: NYC Open Data terms of use; only aggregates are stored here
-used_by: cages/data/instances.py (car speed and capacity per instance)
-enforced_by: tests/test_anchors.py::test_instances_drawn_from_registry
-caveat: DOB NOW filings skew toward recently installed or modernised devices
-status: enforced

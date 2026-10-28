@@ -1,54 +1,59 @@
 import numpy as np
 import pytest
 
-from cages.controllers import ESAPlanner
+from cages.controllers import RollingHorizon
 from cages.data import holdout_specs, make_specs
 from cages.data.labeler import LabelConfig, rollout_costs
-from cages.sim import Building, FiniteStream, Scenario, Simulation, waiting_cost
+from cages.data.stock import load_line_stock
+from cages.sim import EvacStream, Scenario, Simulation, line_from_stock, waiting_cost
 
 
-def _tiny():
-    # all passengers arrive almost at once and cars carry two people, so later decisions are
-    # re-registrations by stranded passengers -- there are no future arrivals to resample
-    b = Building(n_floors=6, n_cars=2, rated_mass=160.0, car_area=0.5)
-    s = FiniteStream("burst", 7, 0.0, 0.01, 1.0, 1.0, origins=((5, 1.0), (3, 1.0)), dests=((0, 1.0),),
-                     class_mix=(("adult", 1.0),))
-    return Scenario(building=b, streams=(s,), init_floors=(0, 2), t_max=2000.0, seed=11)
+def _burst():
+    # the whole crowd reaches the station within one second, so every alert comes after the last
+    # arrival: there are no future passengers to resample and a brute-force replay is exact
+    stock = load_line_stock()
+    line = line_from_stock(stock, n_service=8, n_yard=3, n_buses=2, headway=480.0)
+    ev = line.event_station
+    dest = np.zeros(line.n_stations)
+    dest[[7, 21]] = 0.5
+    dest[0] = 0.0
+    crowd = EvacStream(3000, 310.0, 311.0, 1.0, 1.0, ev, tuple(dest / dest.sum()))
+    return Scenario(line, (crowd,), t_onset=300.0, t_max=4000.0, seed=11)
 
 
-class Forced(ESAPlanner):
-    def __init__(self, cid, action):
+class Forced(RollingHorizon):
+    def __init__(self, cid, slot):
         super().__init__()
-        self.cid, self.action = cid, action
+        self.cid, self.slot = cid, slot
 
-    def assign(self, sim, call, exclude=()):
-        return self.action if call.cid == self.cid else super().assign(sim, call, exclude)
+    def assign(self, sim, call):
+        return self.slot if call.cid == self.cid else super().assign(sim, call)
 
 
 def test_counterfactual_labels_match_brute_force_replay():
-    sc = _tiny()
-    probe = Simulation(sc, ESAPlanner()).run()
-    late = [c for c in probe.call_log if c.t_register > 1.0]
-    assert late, "expected re-registrations after the burst"
-    target = late[0].cid
+    sc = _burst()
+    probe = Simulation(sc, RollingHorizon()).run()
+    assert probe.call_log, "expected platform-crowding alerts"
+    target = probe.call_log[0].cid
     captured = {}
 
     def hook(sim, call):
         if call.cid == target and not captured:
             captured["q"] = rollout_costs(sim, call, LabelConfig(K=1, horizon=1500.0))
             captured["t0"] = sim.now
+            captured["valid"] = [j for j, c in enumerate(call.slots) if c is not None]
 
-    sim = Simulation(sc, ESAPlanner())
+    sim = Simulation(sc, RollingHorizon())
     sim.decision_hook = hook
     sim.run()
-    q = captured["q"][0]
-    t0 = captured["t0"]
-    brute = []
-    for a in range(2):
+    q, t0, valid = captured["q"][0], captured["t0"], captured["valid"]
+    assert len(valid) >= 4 and np.isnan(q[[j for j in range(8) if j not in valid]]).all()
+    brute = {}
+    for a in valid:
         s = Simulation(sc, Forced(target, a)).run()
-        brute.append(waiting_cost(s, t0, t0 + 1500.0))
-    assert np.allclose(q, brute, rtol=1e-9, atol=1e-6)
-    assert int(np.argmin(q)) == int(np.argmin(brute))
+        brute[a] = waiting_cost(s, t0, t0 + 1500.0)
+    assert np.allclose([q[a] for a in valid], [brute[a] for a in valid], rtol=1e-9, atol=1e-6)
+    assert len({round(v, 3) for v in brute.values()}) > 1  # the choice matters
 
 
 def test_splits_are_deterministic_and_holdout_needs_salt(monkeypatch):

@@ -45,28 +45,28 @@ def test_decapitate_truncates_glimmer_and_drops_head(tmp_path):
     assert h.shape == (2, 7, 32) and torch.isfinite(h).all()
 
 
-def _batch(B=3, C=6, F=30):
-    from cages.data.features import N_FLOOR, N_GLOBAL, car_dim
+def _batch(B=3, C=8, F=22):
+    from cages.data.features import N_GLOBAL, N_STN, N_VEH
 
     g = torch.Generator().manual_seed(0)
-    car = torch.randn(B, C, car_dim(F), generator=g)
-    floor = torch.randn(B, F, N_FLOOR, generator=g)
+    veh = torch.randn(B, C, N_VEH, generator=g)
+    stn = torch.randn(B, F, N_STN, generator=g)
     glob = torch.randn(B, N_GLOBAL, generator=g)
     mask = torch.ones(B, C, dtype=torch.bool)
     mask[0, 2] = False
-    return car, floor, glob, mask
+    return veh, stn, glob, mask
 
 
-def test_decision_model_scratch_scores_every_car_once():
-    car, floor, glob, mask = _batch()
-    m = DecisionModel(car.shape[-1], floor.shape[-1], glob.shape[-1], 30, 6, "scratch", 64, 2)
+def test_decision_model_scores_every_slot_once():
+    veh, stn, glob, mask = _batch()
+    m = DecisionModel(veh.shape[-1], stn.shape[-1], glob.shape[-1], 22, 8, "scratch", 64, 2)
     m.eval()
-    logits = m(car, floor, glob, mask)
-    assert logits.shape == (3, 6)
-    assert logits[0, 2] < -1e8  # masked car never chosen
-    a, conf, p = m.decide(car[0].numpy(), floor[0].numpy(), glob[0].numpy(), mask[0].numpy())
+    logits = m(veh, stn, glob, mask)
+    assert logits.shape == (3, 8)
+    assert logits[0, 2] < -1e8  # a masked slot is never chosen
+    a, conf, p = m.decide(veh[0].numpy(), stn[0].numpy(), glob[0].numpy(), mask[0].numpy())
     assert a != 2 and 0 < conf <= 1 and abs(p.sum() - 1) < 1e-5
-    a2, conf2, _ = m.decide(car[0].numpy(), floor[0].numpy(), glob[0].numpy(), mask[0].numpy())
+    a2, conf2, _ = m.decide(veh[0].numpy(), stn[0].numpy(), glob[0].numpy(), mask[0].numpy())
     assert (a, conf) == (a2, conf2)  # deterministic
 
 
@@ -74,12 +74,12 @@ def test_decision_model_on_decapitated_glimmer_trunk(tmp_path):
     _, src = _tiny_glimmer(tmp_path)
     out = tmp_path / "trunk"
     decapitate(str(src), str(out), keep_layers=2, dtype="float32")
-    car, floor, glob, mask = _batch()
-    m = DecisionModel(car.shape[-1], floor.shape[-1], glob.shape[-1], 30, 6, f"hf:{out}")
-    logits = m(car, floor, glob, mask)
+    veh, stn, glob, mask = _batch()
+    m = DecisionModel(veh.shape[-1], stn.shape[-1], glob.shape[-1], 22, 8, f"hf:{out}")
+    logits = m(veh, stn, glob, mask)
     loss = -torch.log_softmax(logits, -1)[:, 0].mean()
     loss.backward()
-    assert m.car_in[0].weight.grad is not None and torch.isfinite(logits[mask]).all()
+    assert m.veh_in[0].weight.grad is not None and torch.isfinite(logits[mask]).all()
 
 
 def test_soft_targets_and_metrics():
@@ -88,6 +88,9 @@ def test_soft_targets_and_metrics():
     p = soft_targets(q, s)
     assert np.allclose(p.sum(1), 1) and p[0, 0] > p[0, 1] > p[0, 2] and p[1, 0] > 0.99
     assert regret(q, np.array([0, 0])) == 0.0
+    qn = np.array([[10.0, np.nan, 12.0]])  # an unavailable slot gets probability 0 and is ignored by regret
+    pn = soft_targets(qn, np.array([[0.5, np.nan, 0.5]]))
+    assert pn[0, 1] == 0.0 and np.isclose(pn.sum(), 1) and regret(qn, np.array([2])) == 2.0 / 11.0
     assert ece(np.array([1.0, 1.0]), np.array([1.0, 1.0])) == 0.0
 
 
@@ -96,11 +99,11 @@ def test_lora_on_decapitated_glimmer(tmp_path):
     _, src = _tiny_glimmer(tmp_path)
     out = tmp_path / "trunk"
     decapitate(str(src), str(out), keep_layers=2, dtype="float32")
-    car, floor, glob, mask = _batch()
-    m = DecisionModel(car.shape[-1], floor.shape[-1], glob.shape[-1], 30, 6, f"hf:{out}", lora_rank=4)
+    veh, stn, glob, mask = _batch()
+    m = DecisionModel(veh.shape[-1], stn.shape[-1], glob.shape[-1], 22, 8, f"hf:{out}", lora_rank=4)
     trainable = [n for n, p in m.backbone.named_parameters() if p.requires_grad]
     assert trainable and all("lora_" in n for n in trainable)
-    m(car, floor, glob, mask).sum().backward()
+    m(veh, stn, glob, mask).sum().backward()
 
 
 def test_adapter_checkpoint_roundtrip(tmp_path):
@@ -110,26 +113,26 @@ def test_adapter_checkpoint_roundtrip(tmp_path):
     _, src = _tiny_glimmer(tmp_path)
     out = tmp_path / "trunk"
     decapitate(str(src), str(out), keep_layers=2, dtype="float32")
-    car, floor, glob, mask = _batch()
-    m = DecisionModel(car.shape[-1], floor.shape[-1], glob.shape[-1], 30, 6, f"hf:{out}", lora_rank=4)
+    veh, stn, glob, mask = _batch()
+    m = DecisionModel(veh.shape[-1], stn.shape[-1], glob.shape[-1], 22, 8, f"hf:{out}", lora_rank=4)
     with torch.no_grad():
         for n, p in m.backbone.named_parameters():
             if "lora_B" in n:
                 p.normal_(0, 0.1)  # make adapters non-trivial
     m.eval()
-    ref = m(car, floor, glob, mask)
+    ref = m(veh, stn, glob, mask)
     save_checkpoint(m, str(tmp_path / "ck"))
     ck = torch.load(tmp_path / "ck" / "decision_model.pt", weights_only=False)
     assert "head_state" in ck and ck["lora_state"] and not any(k.startswith("backbone.") for k in ck["head_state"])
     m2 = load_model(str(tmp_path / "ck"))
-    assert torch.allclose(m2(car, floor, glob, mask), ref, atol=1e-5)
+    assert torch.allclose(m2(veh, stn, glob, mask), ref, atol=1e-5)
 
 
 def test_load_model_uses_trained_precision_and_reuses_the_model(tmp_path):
     from cages.model.train import load_model, save_checkpoint, trained_quant
 
-    car, floor, glob, _ = _batch()
-    save_checkpoint(DecisionModel(car.shape[-1], floor.shape[-1], glob.shape[-1], 30, 6, "scratch", 32, 1),
+    veh, stn, glob, _ = _batch()
+    save_checkpoint(DecisionModel(veh.shape[-1], stn.shape[-1], glob.shape[-1], 22, 8, "scratch", 32, 1),
                     str(tmp_path))
     assert torch.load(tmp_path / "decision_model.pt", weights_only=False)["config"]["quant"] == "none"
     assert load_model(str(tmp_path)) is load_model(str(tmp_path))  # one load per evaluator worker

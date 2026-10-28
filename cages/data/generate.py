@@ -6,7 +6,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import os
 import subprocess
 import time
 from multiprocessing import Pool
@@ -24,7 +26,10 @@ def _job(args):
 
 
 def git_sha() -> str:
-    """HEAD commit, suffixed with -dirty when tracked files have uncommitted changes."""
+    """HEAD commit, suffixed with -dirty when tracked files have uncommitted changes (``CAGES_CODE_SHA``
+    overrides it when generating from a copy of the tree, e.g. ``maintainer/overlay.sh``)."""
+    if os.environ.get("CAGES_CODE_SHA"):
+        return os.environ["CAGES_CODE_SHA"]
     try:
         sha = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
         dirty = subprocess.run(["git", "diff", "--quiet", "HEAD", "--", "cages"]).returncode != 0
@@ -35,7 +40,10 @@ def git_sha() -> str:
 
 def generate(out: str, n_train: int, n_dev: int, workers: int, cfg: LabelConfig, regime: str = "inversion") -> dict:
     root = Path(out)
-    manifest = {"version": "0.1", "label_config": config_dict(cfg), "regime": regime, "code_sha": git_sha(),
+    from . import instances
+
+    manifest = {"version": "0.2", "label_config": config_dict(cfg), "regime": regime, "code_sha": git_sha(),
+                "instances_sha256": hashlib.sha256(Path(instances.__file__).read_bytes()).hexdigest(),
                 "created_unix": int(time.time()), "splits": {}}
     for split, n in (("train", n_train), ("dev", n_dev)):
         specs = make_specs(split, n, regime)
@@ -68,8 +76,8 @@ def main():
     ap.add_argument("--dev", type=int, default=15)
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--K", type=int, default=4)
-    ap.add_argument("--horizon", type=float, default=240.0)
-    ap.add_argument("--max-states", type=int, default=30)
+    ap.add_argument("--horizon", type=float, default=900.0)
+    ap.add_argument("--max-states", type=int, default=20)
     ap.add_argument("--regime", default="inversion")
     a = ap.parse_args()
     cfg = LabelConfig(K=a.K, horizon=a.horizon, max_states=a.max_states)

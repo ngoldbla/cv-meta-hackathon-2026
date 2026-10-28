@@ -1,0 +1,10 @@
+id: r188_train
+quantity: R188 subway car capacity and train make-up on the 7 line
+value: {a_car_capacity: 176, bc_car_capacity: 188, cars_per_train: 11, a_cars_per_train: 4, doors_per_side_per_car: 3}
+source: "R188 (New York City Subway car), Wikipedia (capacity 176 A car, 188 B and C cars; 46 eleven-car trains for the 7). https://en.wikipedia.org/wiki/R188_(New_York_City_Subway_car)"
+license: published values (facts)
+used_by: cages/sim/line.py (Line.train_capacity, Line.doors)
+enforced_by: tests/test_anchors.py::test_train_capacity_from_r188
+tolerance: exact (4 x 176 + 7 x 188 = 2,020 per train)
+status: enforced
+notes: An 11-car train is a 5-car and a 6-car set, each with an A (cab) car at both ends, so 4 A cars and 7 B/C cars (an assumption about set make-up). Whether the published figures are guideline or crush loads is not stated; W2 lowers the usable share for uneven car loading.

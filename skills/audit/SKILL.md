@@ -15,4 +15,4 @@ description: Check literature claims against their sources and any public code, 
    - pin the commit SHA you inspected;
    - list each discrepancy you can verify against the raw source.
 4. Append the results to `research/claims.yaml` with `id`, `claim`, `source`, `verdict`, `evidence`.
-5. Worked example: `docs/paper-digest-tsai2025.md`.
+5. Worked examples: the entries already in `research/claims.yaml`.

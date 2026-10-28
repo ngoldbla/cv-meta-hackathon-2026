@@ -1,9 +1,9 @@
-"""Predict-and-decide decision model: one deterministic forward pass scores every car.
+"""Predict-and-decide decision model: one deterministic forward pass scores every candidate vehicle.
 
-Observable feature tokens (global, floors, cars) are projected into the backbone's hidden size and
-fed as ``inputs_embeds``.  The car tokens come last, so causal (decoder) backbones such as a
-decapitated Muse Glimmer still let every car token attend to the whole building state.  A small
-value head maps each car token to a score; softmax over the valid cars gives a calibrated decision
+Observable feature tokens (global, stations, vehicle slots) are projected into the backbone's hidden size
+and fed as ``inputs_embeds``.  The vehicle tokens come last, so causal (decoder) backbones such as a
+decapitated Muse Glimmer still let every vehicle token attend to the whole line state.  A small value
+head maps each vehicle token to a score; softmax over the valid slots gives a calibrated decision
 distribution (trained with a strictly proper scoring rule, see ``train.py``).
 
 Backbones:
@@ -82,7 +82,7 @@ class HFBackbone(nn.Module):
 
 
 class DecisionModel(nn.Module):
-    def __init__(self, car_dim: int, floor_dim: int, glob_dim: int, n_floors: int, n_cars: int,
+    def __init__(self, veh_dim: int, stn_dim: int, glob_dim: int, n_stations: int, n_slots: int,
                  backbone: str = "scratch", d_model: int = 256, n_layers: int = 6, hf_dtype: str = "float32",
                  lora_rank: int = 0, quant: str = "none"):
         super().__init__()
@@ -93,28 +93,28 @@ class DecisionModel(nn.Module):
         else:
             raise ValueError(backbone)
         h = self.backbone.hidden_size
-        self.config = dict(car_dim=car_dim, floor_dim=floor_dim, glob_dim=glob_dim, n_floors=n_floors,
-                           n_cars=n_cars, backbone=backbone, d_model=d_model, n_layers=n_layers, lora_rank=lora_rank,
+        self.config = dict(veh_dim=veh_dim, stn_dim=stn_dim, glob_dim=glob_dim, n_stations=n_stations,
+                           n_slots=n_slots, backbone=backbone, d_model=d_model, n_layers=n_layers, lora_rank=lora_rank,
                            hf_dtype=hf_dtype, quant=quant)
-        self.car_in = nn.Sequential(nn.Linear(car_dim, h), nn.GELU(), nn.Linear(h, h))
-        self.floor_in = nn.Sequential(nn.Linear(floor_dim, h), nn.GELU(), nn.Linear(h, h))
+        self.veh_in = nn.Sequential(nn.Linear(veh_dim, h), nn.GELU(), nn.Linear(h, h))
+        self.stn_in = nn.Sequential(nn.Linear(stn_dim, h), nn.GELU(), nn.Linear(h, h))
         self.glob_in = nn.Sequential(nn.Linear(glob_dim, h), nn.GELU(), nn.Linear(h, h))
-        self.floor_pos = nn.Embedding(n_floors, h)
-        self.car_pos = nn.Embedding(n_cars, h)
+        self.stn_pos = nn.Embedding(n_stations, h)
+        self.veh_pos = nn.Embedding(n_slots, h)
         self.type_emb = nn.Embedding(3, h)
         self.head = nn.Sequential(nn.LayerNorm(h), nn.Linear(h, h // 2), nn.GELU(), nn.Linear(h // 2, 1))
         self.log_temp = nn.Parameter(torch.zeros(()), requires_grad=False)  # post-hoc calibration
-        for m in (self.car_in, self.floor_in, self.glob_in):
+        for m in (self.veh_in, self.stn_in, self.glob_in):
             nn.init.normal_(m[-1].weight, std=0.02)
 
-    def forward(self, car, floor, glob, mask):
-        """car (B,C,Fc), floor (B,F,Ff), glob (B,Fg), mask (B,C) True=valid -> logits (B,C)."""
-        B, C, _ = car.shape
-        F = floor.shape[1]
-        dev = car.device
+    def forward(self, veh, stn, glob, mask):
+        """veh (B,C,Fv), stn (B,F,Fs), glob (B,Fg), mask (B,C) True=valid -> logits (B,C)."""
+        B, C, _ = veh.shape
+        F = stn.shape[1]
+        dev = veh.device
         g = self.glob_in(glob)[:, None] + self.type_emb.weight[0]
-        f = self.floor_in(floor) + self.floor_pos(torch.arange(F, device=dev)) + self.type_emb.weight[1]
-        c = self.car_in(car) + self.car_pos(torch.arange(C, device=dev)) + self.type_emb.weight[2]
+        f = self.stn_in(stn) + self.stn_pos(torch.arange(F, device=dev)) + self.type_emb.weight[1]
+        c = self.veh_in(veh) + self.veh_pos(torch.arange(C, device=dev)) + self.type_emb.weight[2]
         x = torch.cat([g, f, c], dim=1)
         pad = torch.zeros(B, 1 + F, dtype=torch.bool, device=dev)
         key_pad = torch.cat([pad, ~mask], dim=1)
@@ -140,11 +140,11 @@ class DecisionModel(nn.Module):
         return {k: v.detach().cpu() for k, v in self.state_dict().items() if not k.startswith("backbone.")}
 
     @torch.no_grad()
-    def decide(self, car, floor, glob, mask):
+    def decide(self, veh, stn, glob, mask):
         """Deterministic decision + calibrated confidence for a single state (numpy in/out)."""
         dev = self.device
         t = lambda a, dt=torch.float32: torch.as_tensor(a, dtype=dt, device=dev)[None]  # noqa: E731
-        logits = self(t(car), t(floor), t(glob), t(mask, torch.bool))[0]
+        logits = self(t(veh), t(stn), t(glob), t(mask, torch.bool))[0]
         p = torch.softmax(logits, -1).cpu()
         a = int(torch.argmax(p))
         return a, float(p[a]), p.numpy()

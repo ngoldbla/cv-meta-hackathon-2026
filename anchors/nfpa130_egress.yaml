@@ -1,0 +1,10 @@
+id: nfpa130_egress
+quantity: station egress design times in NFPA 130 (fixed guideway transit)
+value: {platform_clear_min: 4, point_of_safety_min: 6}
+source: "NFPA 130, Standard for Fixed Guideway Transit and Passenger Rail Systems, as summarized in station-design papers and Singapore's CPFPRTS, which mirrors it (edition varies by jurisdiction)"
+license: published values (facts)
+used_by: cages/sim/metrics.py (platform_over_4min_frac, a reference metric)
+enforced_by: tests/test_anchors.py::test_nfpa_reference_metric_is_reported
+tolerance: not a calibration target
+status: reference
+notes: NFPA 130 concerns evacuating a station on foot. CAGES reports the share of evacuees who stood on the platform for more than 4 minutes as a reference only. Nothing here certifies a station.

@@ -2,9 +2,9 @@
 
 Set CAGES_HOLDOUT_SALT in *your own shell* (never in a shared environment or file), then:
 
-    python scripts/confirm.py --prereg H1 --controllers esa closest_car --n 40
-    python scripts/confirm.py --prereg H2 --controllers mixture:runs/best@0.35 esa+schedule esa \\
-        --compare mixture:runs/best@0.35,esa+schedule --compare mixture:runs/best@0.35,esa --n 40
+    python scripts/confirm.py --prereg E1 --controllers timetable express_rule --n 40
+    python scripts/confirm.py --prereg E2 --controllers mixture:runs/best@0.35 staging express_rule \\
+        --compare mixture:runs/best@0.35,staging --compare mixture:runs/best@0.35,express_rule --n 40
 
 Each pre-registration can be tested once; the ledger records the report hash.  The full report is
 written to research/holdout/<prereg>.json for review and commit.
