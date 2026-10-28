@@ -4,7 +4,7 @@ This repository is a scientific instrument. Any agent, model or harness can run 
 
 ## The loop (skills in `skills/`)
 1. **audit** (`skills/audit/`): check literature claims against their sources and code; update `research/claims.yaml`.
-2. **replicate** (`skills/replicate/`): reproduce the baselines (closest car, ETA, ESA, Tsai standby, forecast parking) on the dev split before extending anything.
+2. **replicate** (`skills/replicate/`): reproduce the baselines (timetable, next train, express rule, rolling horizon, forecast staging) on the dev split before extending anything.
 3. **preregister** (`skills/preregister/`): write the hypothesis, metric, threshold and analysis in `research/prereg/<ID>.md`, then commit it to the ledger. This must happen **before** any holdout run.
 4. **search** (`skills/search/`): a bounded loop of generating CAGES data, training a decision model and evaluating on **dev only**. Log every run.
 5. **confirm** (`skills/confirm/`): run **one** holdout evaluation per pre-registration through `eval_holdout`. The result is final, whatever it shows.
@@ -22,8 +22,8 @@ Work is handed to the runner as files: tasks in `ops/tasks/`, reports in `ops/re
 - **Never edit `research/ledger.jsonl` by hand.** It is append-only and hash-chained; use `ledger_commit` and `eval_holdout`.
 - **Never weaken a test or an anchor tolerance** to make a result pass.
 - **Every claim in a document must cite a ledger entry or a committed results file.** Negative results are recorded with the same care as positive ones.
-- **Controllers may only read observable state:** cars, registered calls, the call log and the published event schedule. Anything that reads ground-truth queue lengths must set `omniscient = True` and is a reference, not a candidate.
-- **The language models orchestrate, write code and review. They never dispatch cars in real time.**
+- **Controllers may only read observable state:** train positions and loads (passenger counters), bus positions, platform-crowding alerts and their log, published ridership and the emergency declaration. Anything that reads true queue lengths or riders' destinations must set `omniscient = True` and is a reference, not a candidate.
+- **The language models orchestrate, write code and review. They never dispatch trains or buses in real time.**
 - **Licences:**
   - Muse Glimmer: Apache-2.0.
   - Laya: Apache-2.0.
@@ -32,7 +32,7 @@ Work is handed to the runner as files: tasks in `ops/tasks/`, reports in `ops/re
   - Before Muse outputs enter a dataset or training set, check the Muse Model License terms on output use.
 
 ## Safety scope
-This is simulation research. Nothing here certifies a building, an elevator system or an evacuation strategy. Results that touch life safety must say so explicitly.
+This is simulation research. Nothing here certifies a station, a train or bus service, or an evacuation strategy. Results that touch life safety must say so explicitly.
 
 ## Definition of done for a run
 - Code is committed.

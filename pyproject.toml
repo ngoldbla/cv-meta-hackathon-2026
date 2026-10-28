@@ -26,6 +26,9 @@ cages = "cages.cli:main"
 [tool.setuptools.packages.find]
 include = ["cages*"]
 
+[tool.setuptools.package-data]
+"cages.data" = ["mta_7line.json"]  # MTA calibration aggregates
+
 [tool.ruff]
 line-length = 110
 target-version = "py310"

@@ -1,0 +1,669 @@
+{
+ "n_instances": 40,
+ "evaluator_sha256": "97e924f895c021b5049c686ab819724589ad4338518bebb58f31a3760bac447a",
+ "e1_dev_logger_understatement": {
+  "mean": 0.7253631602860521,
+  "ci95": [
+   0.6922323884489662,
+   0.756927803629508
+  ]
+ },
+ "paired": [
+  {
+   "metric": "p95",
+   "a": "timetable",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 3384.5664611887523,
+   "mean_b": 2622.631755504662,
+   "rel_change": 0.3505701154405309,
+   "ci95": [
+    0.27469828433323756,
+    0.4313460871714874
+   ],
+   "wilcoxon_p": 1.2732925824820995e-11
+  },
+  {
+   "metric": "cvar95",
+   "a": "timetable",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 3580.447128366941,
+   "mean_b": 2759.137746688065,
+   "rel_change": 0.3625352832904137,
+   "ci95": [
+    0.2888658068206348,
+    0.442048565699228
+   ],
+   "wilcoxon_p": 2.546585164964199e-11
+  },
+  {
+   "metric": "peak_density",
+   "a": "timetable",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 6.016793344601801,
+   "mean_b": 5.999836527961511,
+   "rel_change": 0.004559270516717325,
+   "ci95": [
+    0.0,
+    0.013677811550151974
+   ],
+   "wilcoxon_p": 0.31731050786291415
+  },
+  {
+   "metric": "p95",
+   "a": "next_train",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 3687.5218310491873,
+   "mean_b": 2622.631755504662,
+   "rel_change": 0.5051903361531324,
+   "ci95": [
+    0.39450030336836367,
+    0.6257085476470038
+   ],
+   "wilcoxon_p": 3.637978807091713e-12
+  },
+  {
+   "metric": "cvar95",
+   "a": "next_train",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 3876.2437924218525,
+   "mean_b": 2759.137746688065,
+   "rel_change": 0.5067189170834501,
+   "ci95": [
+    0.3949524539617734,
+    0.6363556879358796
+   ],
+   "wilcoxon_p": 1.8189894035458565e-11
+  },
+  {
+   "metric": "peak_density",
+   "a": "next_train",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 6.075341963501066,
+   "mean_b": 5.999836527961511,
+   "rel_change": 0.01653470299387181,
+   "ci95": [
+    0.002428017949800168,
+    0.03739169933324191
+   ],
+   "wilcoxon_p": 0.006210256590449749
+  },
+  {
+   "metric": "p95",
+   "a": "rolling_horizon",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 3145.5531567956327,
+   "mean_b": 2622.631755504662,
+   "rel_change": 0.1941373056370746,
+   "ci95": [
+    0.13508785840651577,
+    0.2584746374639563
+   ],
+   "wilcoxon_p": 7.1933679320850935e-06
+  },
+  {
+   "metric": "cvar95",
+   "a": "rolling_horizon",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 3305.656624591491,
+   "mean_b": 2759.137746688065,
+   "rel_change": 0.20348488162849887,
+   "ci95": [
+    0.1429390063412788,
+    0.2681805012773113
+   ],
+   "wilcoxon_p": 7.195054420722184e-06
+  },
+  {
+   "metric": "peak_density",
+   "a": "rolling_horizon",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 6.0474994690210195,
+   "mean_b": 5.999836527961511,
+   "rel_change": 0.007889807884776192,
+   "ci95": [
+    0.0028586986907897633,
+    0.01393537361566533
+   ],
+   "wilcoxon_p": 0.00918142110309248
+  },
+  {
+   "metric": "p95",
+   "a": "rolling_horizon_omniscient",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 3083.72639246831,
+   "mean_b": 2622.631755504662,
+   "rel_change": 0.17368778772347632,
+   "ci95": [
+    0.11678285209915809,
+    0.23472206042058763
+   ],
+   "wilcoxon_p": 3.414141649108689e-05
+  },
+  {
+   "metric": "cvar95",
+   "a": "rolling_horizon_omniscient",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 3245.341076348085,
+   "mean_b": 2759.137746688065,
+   "rel_change": 0.1796428529396274,
+   "ci95": [
+    0.12371257765129412,
+    0.23886269165181556
+   ],
+   "wilcoxon_p": 8.442575224111161e-06
+  },
+  {
+   "metric": "peak_density",
+   "a": "rolling_horizon_omniscient",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 6.0411232813194236,
+   "mean_b": 5.999836527961511,
+   "rel_change": 0.0063498413113622365,
+   "ci95": [
+    -0.00020927937007851437,
+    0.012774710515707688
+   ],
+   "wilcoxon_p": 0.015085824244536002
+  },
+  {
+   "metric": "p95",
+   "a": "staging",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 2220.779762785739,
+   "mean_b": 2622.631755504662,
+   "rel_change": -0.18107847320355094,
+   "ci95": [
+    -0.21730220038918455,
+    -0.14464875656584122
+   ],
+   "wilcoxon_p": 2.546585164964199e-11
+  },
+  {
+   "metric": "cvar95",
+   "a": "staging",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 2409.363419418517,
+   "mean_b": 2759.137746688065,
+   "rel_change": -0.14178454504398288,
+   "ci95": [
+    -0.17897717881842942,
+    -0.10234004888125413
+   ],
+   "wilcoxon_p": 2.697561285458505e-09
+  },
+  {
+   "metric": "peak_density",
+   "a": "staging",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 5.862286743033221,
+   "mean_b": 5.999836527961511,
+   "rel_change": -0.030462450830176006,
+   "ci95": [
+    -0.0631058283581502,
+    -0.004522956968302287
+   ],
+   "wilcoxon_p": 0.10894087157711467
+  },
+  {
+   "metric": "p95",
+   "a": "staging+express",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 2292.109735691737,
+   "mean_b": 2622.631755504662,
+   "rel_change": -0.13252100082611026,
+   "ci95": [
+    -0.1764987970833613,
+    -0.08622316872502375
+   ],
+   "wilcoxon_p": 2.0396328181959689e-07
+  },
+  {
+   "metric": "cvar95",
+   "a": "staging+express",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 2497.1639673517066,
+   "mean_b": 2759.137746688065,
+   "rel_change": -0.09106095369902814,
+   "ci95": [
+    -0.1395267224232043,
+    -0.03659657318039609
+   ],
+   "wilcoxon_p": 5.371159204514697e-06
+  },
+  {
+   "metric": "peak_density",
+   "a": "staging+express",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 5.850561182920015,
+   "mean_b": 5.999836527961511,
+   "rel_change": -0.031229270171513095,
+   "ci95": [
+    -0.06517884331396637,
+    -0.0031403212639015883
+   ],
+   "wilcoxon_p": 0.20456441569175576
+  },
+  {
+   "metric": "p95",
+   "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.0",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 2178.468752097111,
+   "mean_b": 2622.631755504662,
+   "rel_change": -0.1924223103623504,
+   "ci95": [
+    -0.22891259218156668,
+    -0.1540260148662423
+   ],
+   "wilcoxon_p": 3.456079866737127e-11
+  },
+  {
+   "metric": "cvar95",
+   "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.0",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 2343.533736334903,
+   "mean_b": 2759.137746688065,
+   "rel_change": -0.16153653211610372,
+   "ci95": [
+    -0.19899478380441954,
+    -0.12146383363055735
+   ],
+   "wilcoxon_p": 1.6443664208054543e-09
+  },
+  {
+   "metric": "peak_density",
+   "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.0",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 5.849267209614496,
+   "mean_b": 5.999836527961511,
+   "rel_change": -0.03261096755739646,
+   "ci95": [
+    -0.06500130702975335,
+    -0.007117177840967744
+   ],
+   "wilcoxon_p": 0.1625717591562893
+  },
+  {
+   "metric": "p95",
+   "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.2",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 2192.502154741621,
+   "mean_b": 2622.631755504662,
+   "rel_change": -0.18878330324175513,
+   "ci95": [
+    -0.22556884480319028,
+    -0.15192606987556834
+   ],
+   "wilcoxon_p": 2.546585164964199e-11
+  },
+  {
+   "metric": "cvar95",
+   "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.2",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 2365.1947261654254,
+   "mean_b": 2759.137746688065,
+   "rel_change": -0.15409894032594393,
+   "ci95": [
+    -0.19116690387117216,
+    -0.1144011735523913
+   ],
+   "wilcoxon_p": 2.697561285458505e-09
+  },
+  {
+   "metric": "peak_density",
+   "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.2",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 5.856110043259434,
+   "mean_b": 5.999836527961511,
+   "rel_change": -0.03149198857249746,
+   "ci95": [
+    -0.06447694587132617,
+    -0.005319708590986703
+   ],
+   "wilcoxon_p": 0.17011443450093033
+  },
+  {
+   "metric": "p95",
+   "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.35",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 2220.903447861191,
+   "mean_b": 2622.631755504662,
+   "rel_change": -0.18106306154355498,
+   "ci95": [
+    -0.21728801561730263,
+    -0.14466823966880699
+   ],
+   "wilcoxon_p": 2.546585164964199e-11
+  },
+  {
+   "metric": "cvar95",
+   "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.35",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 2407.503462459606,
+   "mean_b": 2759.137746688065,
+   "rel_change": -0.14221113391076315,
+   "ci95": [
+    -0.17982728397270167,
+    -0.10289259120738029
+   ],
+   "wilcoxon_p": 2.697561285458505e-09
+  },
+  {
+   "metric": "peak_density",
+   "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.35",
+   "b": "express_rule",
+   "n": 40,
+   "mean_a": 5.862286743033221,
+   "mean_b": 5.999836527961511,
+   "rel_change": -0.030462450830176006,
+   "ci95": [
+    -0.0631058283581502,
+    -0.004522956968302287
+   ],
+   "wilcoxon_p": 0.10894087157711467
+  },
+  {
+   "metric": "p95",
+   "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.0",
+   "b": "staging",
+   "n": 40,
+   "mean_a": 2178.468752097111,
+   "mean_b": 2220.779762785739,
+   "rel_change": -0.013842462859183158,
+   "ci95": [
+    -0.023006955285409574,
+    -0.005148116606784609
+   ],
+   "wilcoxon_p": 0.0005475916314319289
+  },
+  {
+   "metric": "cvar95",
+   "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.0",
+   "b": "staging",
+   "n": 40,
+   "mean_a": 2343.533736334903,
+   "mean_b": 2409.363419418517,
+   "rel_change": -0.023313863679898537,
+   "ci95": [
+    -0.032561519946554346,
+    -0.014446592906518356
+   ],
+   "wilcoxon_p": 2.3772920020891243e-05
+  },
+  {
+   "metric": "peak_density",
+   "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.0",
+   "b": "staging",
+   "n": 40,
+   "mean_a": 5.849267209614496,
+   "mean_b": 5.862286743033221,
+   "rel_change": -0.0020467138945679,
+   "ci95": [
+    -0.005094065857856465,
+    0.00036172252597192186
+   ],
+   "wilcoxon_p": 0.3742593192802244
+  },
+  {
+   "metric": "p95",
+   "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.2",
+   "b": "staging",
+   "n": 40,
+   "mean_a": 2192.502154741621,
+   "mean_b": 2220.779762785739,
+   "rel_change": -0.00941976615347748,
+   "ci95": [
+    -0.01683428031414102,
+    -0.003294106078494632
+   ],
+   "wilcoxon_p": 0.006035006473812041
+  },
+  {
+   "metric": "cvar95",
+   "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.2",
+   "b": "staging",
+   "n": 40,
+   "mean_a": 2365.1947261654254,
+   "mean_b": 2409.363419418517,
+   "rel_change": -0.014458792119894684,
+   "ci95": [
+    -0.023235903469453874,
+    -0.006347307110585621
+   ],
+   "wilcoxon_p": 0.0006984106608704661
+  },
+  {
+   "metric": "peak_density",
+   "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.2",
+   "b": "staging",
+   "n": 40,
+   "mean_a": 5.856110043259434,
+   "mean_b": 5.862286743033221,
+   "rel_change": -0.0010569338933598957,
+   "ci95": [
+    -0.003095619545892079,
+    0.0005234361990198158
+   ],
+   "wilcoxon_p": 0.34523107177184
+  },
+  {
+   "metric": "p95",
+   "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.35",
+   "b": "staging",
+   "n": 40,
+   "mean_a": 2220.903447861191,
+   "mean_b": 2220.779762785739,
+   "rel_change": 1.450797771797919e-05,
+   "ci95": [
+    -3.946208238259012e-05,
+    8.298601553652769e-05
+   ],
+   "wilcoxon_p": 0.6547208460185769
+  },
+  {
+   "metric": "cvar95",
+   "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.35",
+   "b": "staging",
+   "n": 40,
+   "mean_a": 2407.503462459606,
+   "mean_b": 2409.363419418517,
+   "rel_change": -0.0004994273707019275,
+   "ci95": [
+    -0.0014693776043258832,
+    0.0
+   ],
+   "wilcoxon_p": 0.17971249487899976
+  },
+  {
+   "metric": "peak_density",
+   "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.35",
+   "b": "staging",
+   "n": 40,
+   "mean_a": 5.862286743033221,
+   "mean_b": 5.862286743033221,
+   "rel_change": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "wilcoxon_p": NaN
+  }
+ ],
+ "summary": {
+  "timetable": {
+   "awt": 1211.3928360339858,
+   "p95": 3384.5664611887523,
+   "cvar95": 3580.447128366941,
+   "evac_p95": 3534.2645327745036,
+   "max_wait": 3816.165880028563,
+   "wheelchair_p95": 3377.5991173460607,
+   "peak_density": 6.016793344601801,
+   "danger_s_platform": 2598.8371273559524,
+   "danger_s_plaza": 587.8301813213135,
+   "clearance_s": 4546.8085947423415,
+   "logger_understatement": 0.7324219025204615,
+   "stranded_frac": 0.4413171439959676,
+   "n_censored": 175.9
+  },
+  "next_train": {
+   "awt": 1372.3024377557535,
+   "p95": 3687.5218310491873,
+   "cvar95": 3876.2437924218525,
+   "evac_p95": 3843.6458426585245,
+   "max_wait": 4290.278780956365,
+   "wheelchair_p95": 3678.656561080397,
+   "peak_density": 6.075341963501066,
+   "danger_s_platform": 3091.223685577862,
+   "danger_s_plaza": 628.1638551623658,
+   "clearance_s": 4619.219807246492,
+   "logger_understatement": 0.6983020852928045,
+   "stranded_frac": 0.4272022319366101,
+   "n_censored": 1442.8
+  },
+  "express_rule": {
+   "awt": 951.5600025946738,
+   "p95": 2622.631755504662,
+   "cvar95": 2759.137746688065,
+   "evac_p95": 2743.7643121431215,
+   "max_wait": 2954.005918915455,
+   "wheelchair_p95": 2597.084042496948,
+   "peak_density": 5.999836527961511,
+   "danger_s_platform": 1667.5061223652106,
+   "danger_s_plaza": 559.7526398870397,
+   "clearance_s": 3863.6826873588607,
+   "logger_understatement": 0.7183044180516427,
+   "stranded_frac": 0.43727526196059685,
+   "n_censored": 20.725
+  },
+  "rolling_horizon": {
+   "awt": 1122.6861857742522,
+   "p95": 3145.5531567956327,
+   "cvar95": 3305.656624591491,
+   "evac_p95": 3280.350073569298,
+   "max_wait": 3522.4817736870245,
+   "wheelchair_p95": 3124.0708829361547,
+   "peak_density": 6.0474994690210195,
+   "danger_s_platform": 2276.05937624677,
+   "danger_s_plaza": 575.2972556116883,
+   "clearance_s": 4115.43185213197,
+   "logger_understatement": 0.7107536081477435,
+   "stranded_frac": 0.43674451585839397,
+   "n_censored": 144.35
+  },
+  "rolling_horizon_omniscient": {
+   "awt": 1116.4305523199182,
+   "p95": 3083.72639246831,
+   "cvar95": 3245.341076348085,
+   "evac_p95": 3197.2986411253637,
+   "max_wait": 3508.1733445866653,
+   "wheelchair_p95": 3071.620329528801,
+   "peak_density": 6.0411232813194236,
+   "danger_s_platform": 2228.03436974177,
+   "danger_s_plaza": 572.1847075126213,
+   "clearance_s": 4156.020087597874,
+   "logger_understatement": 0.7140019847388881,
+   "stranded_frac": 0.43909569918252805,
+   "n_censored": 110.35
+  },
+  "staging": {
+   "awt": 808.3523179975002,
+   "p95": 2220.779762785739,
+   "cvar95": 2409.363419418517,
+   "evac_p95": 2363.940335409331,
+   "max_wait": 2699.306077428146,
+   "wheelchair_p95": 2215.958893128918,
+   "peak_density": 5.862286743033221,
+   "danger_s_platform": 1074.7117436262408,
+   "danger_s_plaza": 484.7002124616603,
+   "clearance_s": 3607.6872728879193,
+   "logger_understatement": 0.6956698250617492,
+   "stranded_frac": 0.42319880084872513,
+   "n_censored": 3.725
+  },
+  "staging+express": {
+   "awt": 841.9208102759352,
+   "p95": 2292.109735691737,
+   "cvar95": 2497.1639673517066,
+   "evac_p95": 2438.484865536636,
+   "max_wait": 2873.8198982600943,
+   "wheelchair_p95": 2276.9419158312176,
+   "peak_density": 5.850561182920015,
+   "danger_s_platform": 1166.8554489021328,
+   "danger_s_plaza": 478.09256501559975,
+   "clearance_s": 3611.3991460205434,
+   "logger_understatement": 0.6747799761508663,
+   "stranded_frac": 0.41094719056936313,
+   "n_censored": 4.85
+  },
+  "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.0": {
+   "awt": 794.0913907823785,
+   "p95": 2178.468752097111,
+   "cvar95": 2343.533736334903,
+   "evac_p95": 2313.645970992774,
+   "max_wait": 2604.2239392517836,
+   "wheelchair_p95": 2165.6043114714157,
+   "peak_density": 5.849267209614496,
+   "danger_s_platform": 1033.8787198756286,
+   "danger_s_plaza": 470.21794238248305,
+   "clearance_s": 3496.294481035943,
+   "logger_understatement": 0.6943227116576095,
+   "stranded_frac": 0.4175072472556833,
+   "n_censored": 0.0
+  },
+  "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.2": {
+   "awt": 801.1922970154004,
+   "p95": 2192.502154741621,
+   "cvar95": 2365.1947261654254,
+   "evac_p95": 2340.9343709451987,
+   "max_wait": 2618.3236148839533,
+   "wheelchair_p95": 2179.212291868317,
+   "peak_density": 5.856110043259434,
+   "danger_s_platform": 1049.8227452099745,
+   "danger_s_plaza": 474.3934860207636,
+   "clearance_s": 3515.874710164769,
+   "logger_understatement": 0.6931208302352821,
+   "stranded_frac": 0.42125134737556386,
+   "n_censored": 0.0
+  },
+  "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.35": {
+   "awt": 808.8077884152832,
+   "p95": 2220.903447861191,
+   "cvar95": 2407.503462459606,
+   "evac_p95": 2363.927900201881,
+   "max_wait": 2683.5267252590356,
+   "wheelchair_p95": 2215.958893128918,
+   "peak_density": 5.862286743033221,
+   "danger_s_platform": 1074.7117436262408,
+   "danger_s_plaza": 484.7002124616603,
+   "clearance_s": 3589.6799915797296,
+   "logger_understatement": 0.6952399189931581,
+   "stranded_frac": 0.4231903480702625,
+   "n_censored": 0.0
+  }
+ }
+}

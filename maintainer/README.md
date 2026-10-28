@@ -1,24 +1,29 @@
 # Maintainer actions (repository author only)
 
-Agents cannot change frozen paths. Changes to them are prepared here as reviewed patches, and the
-maintainer applies them.
+Agents cannot change frozen paths. Changes to them are prepared here, reviewed, and applied by the maintainer.
 
-## Evaluator v1.1 (`evaluator-v1.1.patch`)
-- **Why:**
-  - It adds `mixture+timestral:<ckpt>@<thr>`, so that the mixture and its comparison arm (`esa+timestral`) use the same learned forecaster.
-  - It adds GPU evaluation (`CAGES_EVAL_DEVICE=cuda`, spawned workers).
-- **Safe to apply now:** no holdout run exists.
-- **Tested:** in a throwaway worktree, harness tests pass and the mixture loads.
+## v2.0: the transit pivot (`maintainer/v2/`, `apply-v2.sh`)
+- **Why:** the project pivots from elevators to subway and bus evacuation. The frozen evaluator (`cages/harness/evaluate.py`) and instance generator (`cages/data/instances.py`) must follow:
+  - new controller names;
+  - transit instances drawn from the 7 line;
+  - `peak_density` as the third primary metric.
+
+  The ledger, the one-shot holdout rule and the statistics are unchanged.
+- **Safe to apply now:** no holdout run exists, and H1–H3 are withdrawn by a `protocol_note` ledger entry before any holdout.
+- **Tested:** with `maintainer/overlay.sh`, which copies the tree to a throwaway directory, overlays `maintainer/v2/` and runs `pytest`. Everything passes there except the name guard, which needs `.git`; it passes in the real tree.
 
 ```bash
-git apply maintainer/evaluator-v1.1.patch
-git config cages.unfreeze maintainer          # lets the frozen-path pre-commit hook pass for this commit
-pytest -q
-git add cages/harness/evaluate.py && git commit -m "Evaluator v1.1: learned-forecaster arm and GPU evaluation"
-git config --unset cages.unfreeze
-python scripts/record_evaluator_update.py --reason "v1.1: mixture+timestral arm, GPU evaluation"
-git add research/ledger.jsonl && git commit -m "Ledger: evaluator v1.1" && git push
+git checkout transit-pivot && git pull --ff-only
+bash maintainer/apply-v2.sh
 ```
 
-If the learned forecaster becomes the H2 comparison, pre-register **H2b** (`mixture+timestral` vs
-`esa+timestral`) before any holdout run. H2 as written (schedule-prior arm) stays valid; it is not edited.
+The script does the following:
+1. Copies the two files into place and runs `pytest`.
+2. Commits them with the guard unlocked for that one commit.
+3. Records an `evaluator_update` ledger entry with both SHA-256s.
+4. Pushes `transit-pivot` and fast-forwards `gpu-phase`.
+
+It refuses to run if `CAGES_HOLDOUT_SALT` is set.
+
+## History
+- **v1.1** (applied in `bf9bfeb`): added the learned-forecaster mixture arm and GPU evaluation for the elevator phase.

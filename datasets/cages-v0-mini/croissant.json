@@ -1,0 +1,124 @@
+{
+ "@context": {
+  "@vocab": "https://schema.org/",
+  "sc": "https://schema.org/",
+  "cr": "http://mlcommons.org/croissant/"
+ },
+ "@type": "sc:Dataset",
+ "name": "cages-v0-mini",
+ "description": "CAGES: Calibrated, Adversarially Generated Evacuation Simulation dataset. Counterfactual-labelled subway and bus dispatch decisions during worst-case venue evacuations.",
+ "license": "https://creativecommons.org/licenses/by/4.0/",
+ "creator": {
+  "@type": "Person",
+  "name": "Dylan Goldblatt"
+ },
+ "version": "0.2",
+ "conformsTo": "http://mlcommons.org/croissant/1.0",
+ "distribution": [
+  {
+   "@type": "cr:FileObject",
+   "@id": "train/shard-000.npz",
+   "name": "train/shard-000.npz",
+   "contentUrl": "train/shard-000.npz",
+   "encodingFormat": "application/octet-stream",
+   "sha256": "793fe40e40ddce44fe6f2d33e48f82266087b24e444cc2575fa5a3a8e1301ae5"
+  },
+  {
+   "@type": "cr:FileObject",
+   "@id": "train/specs.jsonl",
+   "name": "train/specs.jsonl",
+   "contentUrl": "train/specs.jsonl",
+   "encodingFormat": "application/jsonlines",
+   "sha256": "b015b6de8e79f0385ba24fefc1613e6deb6f64cea7774e4ac2c425f018bda783"
+  },
+  {
+   "@type": "cr:FileObject",
+   "@id": "dev/shard-000.npz",
+   "name": "dev/shard-000.npz",
+   "contentUrl": "dev/shard-000.npz",
+   "encodingFormat": "application/octet-stream",
+   "sha256": "882a192df4c4777e10a0cf08f8d6f47f9cd87e0be0b0371f40107ae226a4ef0d"
+  },
+  {
+   "@type": "cr:FileObject",
+   "@id": "dev/specs.jsonl",
+   "name": "dev/specs.jsonl",
+   "contentUrl": "dev/specs.jsonl",
+   "encodingFormat": "application/jsonlines",
+   "sha256": "9ba3ac5af57f752f32831332442cb526f77d29a4fe654d447fa9a7a0e70ab68e"
+  }
+ ],
+ "recordSet": [
+  {
+   "@type": "cr:RecordSet",
+   "name": "decisions",
+   "field": [
+    {
+     "@type": "cr:Field",
+     "name": "veh",
+     "description": "per-slot observable features (8 slots x 14): no action, four nearest trains express, a yard train, two buses"
+    },
+    {
+     "@type": "cr:Field",
+     "name": "stn",
+     "description": "per-station observable features (22 stations x 12)"
+    },
+    {
+     "@type": "cr:Field",
+     "name": "glob",
+     "description": "global observable features (13)"
+    },
+    {
+     "@type": "cr:Field",
+     "name": "mask",
+     "description": "valid candidate slots"
+    },
+    {
+     "@type": "cr:Field",
+     "name": "q_k",
+     "description": "counterfactual tail-aware waiting cost per CRN rollout and slot (K x 8; NaN = invalid slot)"
+    },
+    {
+     "@type": "cr:Field",
+     "name": "q_mean",
+     "description": "mean counterfactual cost per slot"
+    },
+    {
+     "@type": "cr:Field",
+     "name": "q_std",
+     "description": "std of counterfactual cost across CRN rollouts"
+    },
+    {
+     "@type": "cr:Field",
+     "name": "best",
+     "description": "index of the counterfactual-best slot"
+    },
+    {
+     "@type": "cr:Field",
+     "name": "planner_choice",
+     "description": "slot chosen by the rolling-horizon dispatcher"
+    },
+    {
+     "@type": "cr:Field",
+     "name": "rule_choice",
+     "description": "slot chosen by the express rule (current practice)"
+    },
+    {
+     "@type": "cr:Field",
+     "name": "t",
+     "description": "decision time (s)"
+    },
+    {
+     "@type": "cr:Field",
+     "name": "call",
+     "description": "alert (station, direction, level)"
+    },
+    {
+     "@type": "cr:Field",
+     "name": "instance",
+     "description": "instance id (see specs.jsonl)"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,18 @@
+{
+ "train": {
+  "states": 419,
+  "median_rel_action_gap": 0.05105489492416382,
+  "planner_matches_best": 0.665871121718377,
+  "rule_matches_best": 0.37708830548926014,
+  "no_action_best": 0.5083532219570406,
+  "valid_slots_mean": 7.4534606205250595
+ },
+ "dev": {
+  "states": 153,
+  "median_rel_action_gap": 0.03767482191324234,
+  "planner_matches_best": 0.6470588235294118,
+  "rule_matches_best": 0.43137254901960786,
+  "no_action_best": 0.6274509803921569,
+  "valid_slots_mean": 7.4640522875816995
+ }
+}

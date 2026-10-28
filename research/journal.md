@@ -60,3 +60,28 @@
   2. H3 training runs on the GPU (L8 bf16 LoRA, L12 QLoRA, Laya, scratch-20M on CAGES v0).
   3. Check that the mixture holds up under the misspecified prior.
   4. Dev selection and the edge benchmark.
+
+## 2026-10-28: pivot to subway and bus evacuation
+- **Decision (Dylan):** a hard pivot from elevators to emergency evacuation by train and bus, treated as "trains instead of elevators". The elevator code is deleted, CAGES keeps its name with E = Evacuation, and calibration is to the NYC subway and buses.
+  - Task 001 (elevator GPU work) was withdrawn before it started.
+  - Ledger entry 5 withdraws H1–H3; no holdout was ever run.
+  - The last elevator commit is `5b9ee7e`. Pushing a tag from the build container was refused by the git proxy, so that commit is recorded here instead.
+- **Built:**
+  - a line simulator for the 7 line: 22 stations from MTA GTFS, two tracks, no overtaking, one train per signal block, terminal turnbacks, load-dependent dwell and door holds;
+  - Corona Yard spare trains and shuttle buses;
+  - platform-crowding alerts answered by one of eight slots;
+  - five worst-case failure modes;
+  - true vs operator-logged waits;
+  - calibration from MTA GTFS (feed `20261028-fall-2026-pick`) and 2024 hourly ridership, with Mets–Willets Point's busiest hour at 13,165 entries.
+  - The baselines, features, labeller, decision-model inputs, gym env, MCP tools and anchors were rewritten. The frozen evaluator and instances at v2.0 wait in `maintainer/v2/` for the maintainer.
+- **Validated:** all tests pass in the v2 overlay (`research/results.md`, "Validation").
+- **Results (dev, exploratory; `research/results.md`):**
+  - CAGES v0-mini: 419 / 153 labelled alerts (ledger entry 6).
+  - Staging yard trains and buses on the declaration cuts P95 by 18% vs current reactive practice.
+  - A tiny decision model adds −1.4% [−2.3, −0.5] beyond staging.
+  - The rolling-horizon planner is worse than the simple express rule.
+  - Logs understate true waits by 72.5%.
+- **Next:**
+  1. Dylan applies `maintainer/apply-v2.sh` and reviews the E1–E3 drafts (`research/prereg/drafts/`).
+  2. Test a longer label horizon on dev, because 900 s probably undervalues yard trains.
+  3. Scale to CAGES v0 and run the E3 backbones on the GPU (runbook §2–5, through the mailbox).

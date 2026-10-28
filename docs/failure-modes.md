@@ -1,20 +1,29 @@
-# Failure modes (inversion: "how would we guarantee the worst crush?")
+# Failure modes (inversion: "how would we guarantee the worst evacuation?")
 
-Each mode is a parametric mechanism with severity s ∈ [0, 1] (`cages/sim/building.py: FailureModes`). Each has a unit test showing its effect (`tests/test_sim.py`).
+Each mode is a parametric mechanism with severity s ∈ [0, 1] (`cages/sim/line.py: FailureModes`). Each has a unit test showing its effect (`tests/test_sim.py::test_each_failure_mode_has_its_effect`).
 
 | Mode | Mechanism in the simulator | Assumption it breaks |
 |---|---|---|
-| **W1 hidden queue** | The surge window shrinks from 20 to 4 minutes, so hundreds of people wait behind one conventional hall call | known waiting counts (ESA-DP) |
-| **W2 full-car strand** | Any car opening its doors cancels the call even when full. Stranded people re-press after a delay (3 s → 20 s). Newcomers assume someone already pressed (bystander effect, κ = 15/s). Bulky loads (luggage 10% → 35%) fill cars by area before the load-weighing bypass trips | infinite capacity; call = demand |
-| **W4 held doors** | When people are left behind or ≥10 wait, doors re-open about Poisson(1.5·s) times per stop, adding 4.8 s each | nominal door times |
-| **W6 cold start** | Energy saving returns idle cars to the far side after 600 s → 60 s; up to 2/3 of cars shut down; waking takes up to 30 s | a warm, well-placed bank at surge onset |
-| **W9 saturated lobby** | The discharge lobby shrinks from 150 to 50 m² and the exits slow from 4 to 0.8 p/s; cars cannot unload above 3 p/m² | an unconstrained destination floor |
+| **W1 hidden crowd** | Platform-crowding alerts arrive later (60 s → 300 s) and their level thresholds double, so a "level 3" alert can stand for ten thousand people. With fare gates opened for the evacuation, there is no tap data to fall back on | passenger flows known to the dispatcher [Gao et al. 2016] |
+| **W2 left behind** | Uneven car loading wastes up to 25% of each train's capacity. Once an alert is served, a still-stranded crowd is re-reported only after up to 300 s. Passenger counters never see left-behinds | everyone boards the first train [MassDOT 2018] |
+| **W4 door holding** | At crowded platforms, doors are re-opened about Poisson(3·s) times per stop, each adding 5–20 s, and the delay propagates to every train behind (one train per block) | scheduled dwell times |
+| **W6 cold start** | Service thins (up to half the trains), the yard has fewer spare trains (6 → 2) that need up to 25 min to crew, and buses start at a far depot (0.6 → 8 km) with drivers up to 30 min away | a warm, well-staged fleet at emergency onset [Bish 2011 assumes buses ready at depots] |
+| **W9 saturated egress** | Stairs and fare arrays at the event station pass only 35% of their nominal flow, and the plaza outside is halved, so the crowd waits outside in the open | an unconstrained path onto the platform |
 
-The inversion sampler (`cages/data/instances.py: sample_failures`) draws severities from Beta(2, 1.2), skewed toward severe, and switches modes off at random so their effects can be separated.
+The inversion sampler (`cages/data/instances.py: sample_failures`) draws severities from Beta(2, 1.2), skewed toward severe, and switches modes off at random so their effects can be separated. The other instance parameters are drawn too:
+- occupancy (15,000–41,922);
+- subway share (30–60%);
+- release window (8–25 min);
+- hour and day type, which set the GTFS headway;
+- the station's entry capacity and platform area.
 
 Metrics are about tails, not means:
-- P95 wait and CVaR₉₅ wait;
-- peak landing density (capped at 6 p/m², because queues spill back);
-- seconds above 4 p/m²;
-- P95 wait for wheelchair users;
-- logger understatement (H1).
+- P95 wait and CVaR₉₅ wait, measured from reaching the station to boarding;
+- P95 wait for evacuees and for wheelchair users;
+- peak density at the event station: the platform, capped at 6 p/m², or the plaza outside, which is not capped;
+- seconds above 4 p/m² on the platform and in the plaza;
+- the share of evacuees left behind at least once (true), against zero in the operator's view;
+- operator-log understatement (E1): one minus logged over true mean wait. The logged wait is half the observed headway per boarding, which is all that train logs and passenger counters can support;
+- the share of evacuees who stood on the platform for more than 4 minutes. This is an NFPA 130 reference only, not a certification.
+
+*Safety scope: simulation research only. Nothing here certifies a station, a train service or an evacuation plan.*
