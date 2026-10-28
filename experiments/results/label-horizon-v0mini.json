@@ -112,7 +112,7 @@
   "h2700": [
    {
     "metric": "p95",
-    "a": "mixture:/tmp/claude-0/-home-user-cv-meta-hackathon-2026/07010e5d-a645-5250-a6c0-63c4edd11b24/scratchpad/runs/seed-evac-scratch-h2700@0.0",
+    "a": "mixture:runs/seed-evac-scratch-h2700@0.0",
     "b": "staging",
     "n": 40,
     "mean_a": 2218.5504482128563,
@@ -126,7 +126,7 @@
    },
    {
     "metric": "cvar95",
-    "a": "mixture:/tmp/claude-0/-home-user-cv-meta-hackathon-2026/07010e5d-a645-5250-a6c0-63c4edd11b24/scratchpad/runs/seed-evac-scratch-h2700@0.0",
+    "a": "mixture:runs/seed-evac-scratch-h2700@0.0",
     "b": "staging",
     "n": 40,
     "mean_a": 2396.3023408239014,
@@ -140,7 +140,7 @@
    },
    {
     "metric": "peak_density",
-    "a": "mixture:/tmp/claude-0/-home-user-cv-meta-hackathon-2026/07010e5d-a645-5250-a6c0-63c4edd11b24/scratchpad/runs/seed-evac-scratch-h2700@0.0",
+    "a": "mixture:runs/seed-evac-scratch-h2700@0.0",
     "b": "staging",
     "n": 40,
     "mean_a": 5.853520107914806,
