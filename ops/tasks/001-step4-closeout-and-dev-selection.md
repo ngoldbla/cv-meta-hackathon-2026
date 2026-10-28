@@ -1,7 +1,7 @@
 ---
 id: "001"
 title: Close out step 4, then run steps 5–6 (dev only)
-status: open
+status: withdrawn      # 2026-10-28: project pivots from elevators to transit evacuation; not started
 created: 2026-10-27
 report: ops/reports/001-step4-closeout-and-dev-selection.md
 ---

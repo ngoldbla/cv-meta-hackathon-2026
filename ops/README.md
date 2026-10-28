@@ -24,7 +24,7 @@ ops/reports/NNN-<slug>.md   written by the runner: what was done, results, quest
 ---
 id: "001"
 title: Short imperative title
-status: open           # open | in_progress | done | blocked
+status: open           # open | in_progress | done | blocked | withdrawn (by the reviewer, before it starts)
 created: 2026-10-27
 report: ops/reports/001-<slug>.md
 ---
