@@ -83,5 +83,5 @@
   - Logs understate true waits by 72.5%.
 - **Next:**
   1. Dylan applies `maintainer/apply-v2.sh` and reviews the E1–E3 drafts (`research/prereg/drafts/`).
-  2. Test a longer label horizon on dev, because 900 s probably undervalues yard trains.
+  2. Label-horizon test (done, `experiments/results/label-horizon-v0mini.json`): with 2,700 s labels "no action" is best in 29% of alerts instead of 51%, but the tiny model gains nothing over staging (+0.4% [−2.0, +3.8] vs −1.4% at 900 s). Compare both horizons on CAGES v0.
   3. Scale to CAGES v0 and run the E3 backbones on the GPU (runbook §2–5, through the mailbox).

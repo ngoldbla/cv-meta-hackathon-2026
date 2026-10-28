@@ -76,7 +76,12 @@ Paired comparisons (Wilcoxon over instances, bootstrap 95% CI of mean relative c
 - **The decision model adds only about 1.4% on P95 beyond staging so far.** It is consistent across instances, but small, and comes from a 0.86M model trained on 419 states. Scaling CAGES and the backbones (E3) is the next test.
 - **Caveats:**
   - n = 40 dev instances, and 15 of them overlap the labelled dev split (used only for temperature fitting and progress tracking).
-  - The label horizon (900 s) is shorter than an evacuation. It probably undervalues yard trains, whose benefit lasts the whole evacuation; this could explain why offline labels favour "no action" while closed-loop results favour adding capacity. This needs testing, not assuming.
+  - The label horizon (900 s) is shorter than an evacuation. A first test (`experiments/results/label-horizon-v0mini.json`) regenerated v0-mini with a 2,700 s horizon:
+    - "no action" is best far less often (29% vs 51% of train alerts);
+    - action gaps double (median 11% vs 5%);
+    - the planner agrees with the best slot less often (41% vs 67%).
+
+    The short horizon does undervalue interventions. But the tiny model trained on the longer labels gained nothing over staging (+0.4% [−2.0, +3.8]), against −1.4% for the 900 s labels. At 419 training states the question stays open; CAGES v0 will compare both horizons on dev.
   - Peak density barely moves, because the platform caps at 6 p/m² by construction and the plaza is the overflow.
   - Night instances with thin service can't clear the crowd within the 2-hour horizon, so their waits are censored and their tails understated.
 - **Status:** exploratory only. E2 (mixture vs the best classical dispatcher on the holdout) is the confirmatory test, once pre-registered.

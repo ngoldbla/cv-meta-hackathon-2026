@@ -1,0 +1,185 @@
+{
+ "note": "exploratory, dev only: CAGES v0-mini regenerated with a 2700 s label horizon (same specs and seeds), tiny scratch model retrained, closed loop on 40 dev instances",
+ "label_stats": {
+  "h900": {
+   "train": {
+    "states": 419,
+    "median_rel_action_gap": 0.05105489492416382,
+    "planner_matches_best": 0.665871121718377,
+    "rule_matches_best": 0.37708830548926014,
+    "no_action_best": 0.5083532219570406,
+    "valid_slots_mean": 7.4534606205250595
+   },
+   "dev": {
+    "states": 153,
+    "median_rel_action_gap": 0.03767482191324234,
+    "planner_matches_best": 0.6470588235294118,
+    "rule_matches_best": 0.43137254901960786,
+    "no_action_best": 0.6274509803921569,
+    "valid_slots_mean": 7.4640522875816995
+   }
+  },
+  "h2700": {
+   "train": {
+    "states": 419,
+    "median_rel_action_gap": 0.10919899493455887,
+    "planner_matches_best": 0.4105011933174224,
+    "rule_matches_best": 0.4033412887828162,
+    "no_action_best": 0.2935560859188544,
+    "valid_slots_mean": 7.4534606205250595
+   },
+   "dev": {
+    "states": 153,
+    "median_rel_action_gap": 0.08675989508628845,
+    "planner_matches_best": 0.3006535947712418,
+    "rule_matches_best": 0.45751633986928103,
+    "no_action_best": 0.24183006535947713,
+    "valid_slots_mean": 7.4640522875816995
+   }
+  }
+ },
+ "model_dev_offline": {
+  "h900": {
+   "n": 153,
+   "top1": 0.39869281045751637,
+   "regret": 0.006764739286154509,
+   "regret_planner": 0.006543360650539398,
+   "regret_rule": 0.017621168866753578,
+   "regret_none": 0.006480363197624683,
+   "regret_random": 0.024106280878186226,
+   "top1_planner": 0.6470588235294118,
+   "ece": 0.1808868042783799,
+   "log_score": 1.8612191677093506
+  },
+  "h2700": {
+   "n": 153,
+   "top1": 0.3202614379084967,
+   "regret": 0.028547000139951706,
+   "regret_planner": 0.02597229555249214,
+   "regret_rule": 0.03058098815381527,
+   "regret_none": 0.03192047029733658,
+   "regret_random": 0.05033465474843979,
+   "top1_planner": 0.30718954248366015,
+   "ece": 0.08945331620235068,
+   "log_score": 1.6595313549041748
+  }
+ },
+ "closed_loop_vs_staging": {
+  "h900": [
+   {
+    "metric": "p95",
+    "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.0",
+    "b": "staging",
+    "n": 40,
+    "mean_a": 2178.468752097111,
+    "mean_b": 2220.779762785739,
+    "rel_change": -0.013842462859183158,
+    "ci95": [
+     -0.023006955285409574,
+     -0.005148116606784609
+    ],
+    "wilcoxon_p": 0.0005475916314319289
+   },
+   {
+    "metric": "cvar95",
+    "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.0",
+    "b": "staging",
+    "n": 40,
+    "mean_a": 2343.533736334903,
+    "mean_b": 2409.363419418517,
+    "rel_change": -0.023313863679898537,
+    "ci95": [
+     -0.032561519946554346,
+     -0.014446592906518356
+    ],
+    "wilcoxon_p": 2.3772920020891243e-05
+   },
+   {
+    "metric": "peak_density",
+    "a": "mixture:/home/user/cv-meta-hackathon-2026/runs/seed-evac-scratch@0.0",
+    "b": "staging",
+    "n": 40,
+    "mean_a": 5.849267209614496,
+    "mean_b": 5.862286743033221,
+    "rel_change": -0.0020467138945679,
+    "ci95": [
+     -0.005094065857856465,
+     0.00036172252597192186
+    ],
+    "wilcoxon_p": 0.3742593192802244
+   }
+  ],
+  "h2700": [
+   {
+    "metric": "p95",
+    "a": "mixture:/tmp/claude-0/-home-user-cv-meta-hackathon-2026/07010e5d-a645-5250-a6c0-63c4edd11b24/scratchpad/runs/seed-evac-scratch-h2700@0.0",
+    "b": "staging",
+    "n": 40,
+    "mean_a": 2218.5504482128563,
+    "mean_b": 2220.779762785739,
+    "rel_change": 0.0038190599202474656,
+    "ci95": [
+     -0.01950437047480987,
+     0.03778316971964733
+    ],
+    "wilcoxon_p": 0.1294759380345595
+   },
+   {
+    "metric": "cvar95",
+    "a": "mixture:/tmp/claude-0/-home-user-cv-meta-hackathon-2026/07010e5d-a645-5250-a6c0-63c4edd11b24/scratchpad/runs/seed-evac-scratch-h2700@0.0",
+    "b": "staging",
+    "n": 40,
+    "mean_a": 2396.3023408239014,
+    "mean_b": 2409.363419418517,
+    "rel_change": 0.004981437820206548,
+    "ci95": [
+     -0.01909474162677416,
+     0.03832944397294496
+    ],
+    "wilcoxon_p": 0.060375050361956256
+   },
+   {
+    "metric": "peak_density",
+    "a": "mixture:/tmp/claude-0/-home-user-cv-meta-hackathon-2026/07010e5d-a645-5250-a6c0-63c4edd11b24/scratchpad/runs/seed-evac-scratch-h2700@0.0",
+    "b": "staging",
+    "n": 40,
+    "mean_a": 5.853520107914806,
+    "mean_b": 5.862286743033221,
+    "rel_change": -0.0017170179758057703,
+    "ci95": [
+     -0.006469726142517795,
+     0.0025261052297234883
+    ],
+    "wilcoxon_p": 0.7212766990291557
+   }
+  ]
+ },
+ "evaluator_sha256": "97e924f895c021b5049c686ab819724589ad4338518bebb58f31a3760bac447a",
+ "manifest_h2700": {
+  "version": "0.2",
+  "label_config": {
+   "K": 4,
+   "horizon": 2700.0,
+   "p_label": 1.0,
+   "max_states": 20,
+   "epsilon": 0.25,
+   "tau": 60.0
+  },
+  "regime": "inversion",
+  "code_sha": "52b1028a9eb6ca6a78f57c768c19de895d851947+maintainer/v2",
+  "instances_sha256": "a9ab2f77697cf38a2fe641117b57fa649a7c735ab6b970050486db34b1552b02",
+  "created_unix": 1793226960,
+  "splits": {
+   "train": {
+    "instances": 60,
+    "states": 419,
+    "seconds": 504.5
+   },
+   "dev": {
+    "instances": 15,
+    "states": 153,
+    "seconds": 178.8
+   }
+  }
+ }
+}
