@@ -34,7 +34,7 @@ Direct search by the lead agent. No researcher subagents: this is one coherent c
 | T2 evidence: venue-transit-evacuation | done |
 | T2 evidence: ems-surge-dispatch | done |
 | T3 method novelty check | done |
-| T4 scored draft | todo |
+| T4 scored draft | done |
 | T5 citations checked | todo |
 | T6 adversarial verification (top 3) | todo |
 | T7 deliver brief + provenance | todo |
