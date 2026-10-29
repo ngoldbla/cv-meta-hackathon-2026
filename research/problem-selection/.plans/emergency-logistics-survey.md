@@ -36,7 +36,7 @@ Direct search by the lead agent. No researcher subagents: this is one coherent c
 | T3 method novelty check | done |
 | T4 scored draft | done |
 | T5 citations checked | done |
-| T6 adversarial verification (top 3) | todo |
+| T6 adversarial verification (top 3) | done |
 | T7 deliver brief + provenance | todo |
 
 ## Verification log
@@ -48,4 +48,6 @@ Direct search by the lead agent. No researcher subagents: this is one coherent c
 
 ## Decision log
 (append: date, decision, reason — e.g. candidate added or dropped)
+- 2026-10-29 T6: verification rescored 4 criteria (EMS 1 and 2: 3→4; wildfire 6: 3→4; hurricane 6: 4→5). Ranking is now EMS 36 > wildfire 35 > hurricane 34, and the recommendation moves to EMS surge dispatch (FATAL F1). Full corrected file: .drafts/emergency-logistics-survey-revised.md.
 - 2026-10-29: novelty verdict = partial overlap; RAISE (arXiv 2606.31801) is the closest prior combination; recommend it as an M4 ablation baseline.
+- 2026-10-29 T6: on-disk checks: the revised file contains the EMS row `4 | 4 | 5 | 4 | 4 | 5 | 5 | 5 | **36**` (1 match), 'Recommendation: EMS dispatch' (1) and 'Recommendation: wildfire' (0). 37 sources, all cited.
