@@ -20,3 +20,6 @@
 | 2026-10-29 | healthcare-facility-evacuation | nursing home evacuation hurricane deaths Hollywood Hills Irma 2017 Katrina Memorial hospital evacuation deaths patient transport | NBC/CBS Irma; ProPublica Memorial |
 | 2026-10-29 | healthcare-facility-evacuation | hospital evacuation optimization model patient transport vehicles receiving hospitals stochastic programming Bish Agca | NSF PAR Bish; robust possibilistic; VT dissertation |
 | 2026-10-29 | healthcare-facility-evacuation | evacuation vs shelter in place nursing homes hurricane mortality morbidity study Dosa Brown transfer trauma | PMC3711109 Brown/Dosa; JAMDA Dosa 2012; RTI |
+| 2026-10-29 | relief-last-mile | Holguín-Veras deprivation cost post-disaster humanitarian logistics objective function last mile distribution | JOM 2013 deprivation costs; discrete choice |
+| 2026-10-29 | relief-last-mile | Hurricane Maria Puerto Rico 2017 relief supply distribution failures excess deaths logistics GAO report | DHS OIG-20-76; NBC; Axios |
+| 2026-10-29 | relief-last-mile | last mile relief distribution vehicle routing stochastic demand road damage dynamic model data humanitarian benchmark instances | MSOM 2024 isolated communities; Tongji MSSP; Imperial UAV |
