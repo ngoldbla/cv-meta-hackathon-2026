@@ -78,4 +78,7 @@ Seed spread for scratch (best-threshold P95): s0 2137.86, s1 2159.82, s2 2145.11
 The E2 checkpoint is the lowest-dev-P95 candidate over everything that passes
 the 50 ms p99 edge gate. Ranked by P95: laya@0.0 (2118.72), scratch-s0@0.2
 (2137.86), scratch-s2@0.2 (2145.11), L8@0.2 (2145.73), L12@0.0 (2148.03),
-scratch-s1@0.0 (2159.82). **E2 pick pending edge-gate results (Part F step 3).**
+scratch-s1@0.0 (2159.82). Edge p99 (ms): L8 44.78, L12 48.90, laya 29.45,
+s0 3.08, s1 2.62, s2 2.78 — **all pass the 50 ms gate**
+(`experiments/results/edge-<run>.json`). **E2 checkpoint: laya-r16 @0.0
+(2118.72), needs approval; no `model_choice` written (task stops here).**

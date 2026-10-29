@@ -85,3 +85,13 @@
   1. Dylan applies `maintainer/apply-v2.sh` and reviews the E1–E3 drafts (`research/prereg/drafts/`).
   2. Label-horizon test (done, `experiments/results/label-horizon-v0mini.json`): with 2,700 s labels "no action" is best in 29% of alerts instead of 51%, but the tiny model gains nothing over staging (+0.4% [−2.0, +3.8] vs −1.4% at 900 s). Compare both horizons on CAGES v0.
   3. Scale to CAGES v0 and run the E3 backbones on the GPU (runbook §2–5, through the mailbox).
+
+## 2026-10-29: CAGES v0, horizon choice, E3 backbones (task 002, done)
+- **Laya reproducible:** `scripts/extract_laya_encoder.py` rebuilds `runs/laya-encoder` byte-identically from `convaiinnovations/laya` at `7b928d82…` (170 tensors, 394.8M params).
+- **Protocol fixed first:** ledger seq 8 records the horizon rule, the six E3 arms and the dev-selection rule before any result existed.
+- **CAGES v0** (ledger seqs 9–10): 3,000/300 instances → 23,554/2,360 labelled alerts at each of h900 and h2700, from byte-identical specs. Cards: no-action-best 52%→23%, median action gap 5%→10% at the longer horizon.
+- **Horizon:** the 3.4M scratch probes give mixture@0.0 dev P95 2142.69 (h900) vs 2136.97 (h2700); the rule picks h2700 mechanically (`experiments/results/label-horizon-v0.md`). Margin 5.72 s with overlapping CIs.
+- **E3 arms** (all 6 epochs, batch 16, lr 2e-4, no OOM): L8-bf16 52 min, L12-nf4 104 min, Laya 17 min, scratch ×3 seeds ~3 min each. Offline dev top-1: s1 0.505, L8 0.502, s2 0.479, Laya 0.455, s0 0.449, L12 0.420 (`experiments/results/evac-*-metrics.json`).
+- **Dev selection** (`experiments/results/dev-selection.md`, 40 instances): best P95 per arm — Laya @0.0 2118.72 (−3.45% vs staging), scratch s0 @0.2 2137.86, L8 @0.2 2145.73, L12 @0.0 2148.03. Laya and scratch beat both Glimmer trunks in closed loop despite L8's better offline top-1.
+- **Edge:** all pass p99 ≤ 50 ms at trained precision — L12-nf4 48.90, L8-bf16 44.78, Laya 29.45, scratch ~3 ms (`experiments/results/edge-*.json`). E2 checkpoint by the rule: laya-r16 @0.0.
+- **Needs approval:** the four arm picks and the E2 checkpoint; then `model_choice`, E1–E3 registration, and Dylan's confirmatory runs. Full record: `ops/reports/002-transit-v0-and-backbones.md`.

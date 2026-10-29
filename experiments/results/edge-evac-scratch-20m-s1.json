@@ -1,0 +1,11 @@
+{
+ "model": "runs/evac-scratch-20m-s1",
+ "device": "cuda",
+ "quant": "none",
+ "n": 500,
+ "p50_ms": 2.3022470995783806,
+ "p99_ms": 2.6187744364142413,
+ "params": 19873282,
+ "peak_vram_gb": 0.09166848,
+ "meets_50ms_p99": true
+}

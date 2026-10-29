@@ -1,0 +1,11 @@
+{
+ "model": "runs/evac-glimmer-L12-q16",
+ "device": "cuda",
+ "quant": "nf4",
+ "n": 500,
+ "p50_ms": 46.90492572262883,
+ "p99_ms": 48.90101721510291,
+ "params": 3083619842,
+ "peak_vram_gb": 4.022931456,
+ "meets_50ms_p99": true
+}

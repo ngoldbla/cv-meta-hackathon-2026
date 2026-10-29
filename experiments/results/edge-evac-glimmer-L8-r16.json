@@ -1,0 +1,11 @@
+{
+ "model": "runs/evac-glimmer-L8-r16",
+ "device": "cuda",
+ "quant": "none",
+ "n": 500,
+ "p50_ms": 42.23662195727229,
+ "p99_ms": 44.78226535953581,
+ "params": 4043288066,
+ "peak_vram_gb": 8.470859264,
+ "meets_50ms_p99": true
+}

@@ -1,0 +1,11 @@
+{
+ "model": "runs/evac-laya-r16",
+ "device": "cuda",
+ "quant": "none",
+ "n": 500,
+ "p50_ms": 26.43367415294051,
+ "p99_ms": 29.451120868325233,
+ "params": 405731330,
+ "peak_vram_gb": 1.635378176,
+ "meets_50ms_p99": true
+}
