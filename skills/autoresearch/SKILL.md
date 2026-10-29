@@ -53,7 +53,7 @@ Role:                <blue|red>
    - `autoresearch.md`: the plan block plus running notes;
    - `autoresearch.sh`: `#!/usr/bin/env bash`, `set -euo pipefail` and the benchmark command, made executable;
    - an empty `autoresearch.jsonl`.
-2. **Baseline.** Run `bash research/autoresearch/<slug>/autoresearch.sh` on the unchanged tree. Log it as iteration 0 with `"decision": "baseline"` and `"best_before": null`.
+2. **Baseline.** Run `bash research/autoresearch/<slug>/autoresearch.sh` on the unchanged tree. Log it as iteration 0 with `"decision": "baseline"` and `"best_before": null`, and commit it as `Autoresearch <slug> #0: baseline - unchanged`.
 3. **Each iteration:**
    1. State one hypothesis. Make one change, only in files in scope.
    2. Run `bash research/autoresearch/<slug>/autoresearch.sh`. Read the metric from its last line, `METRIC <name>=<value>`.
@@ -78,6 +78,9 @@ One JSON object per line:
 
 - `best_before` is the best kept value before this iteration.
 - `iter` counts from 0, and 0 is the baseline.
+- `commit` is the SHA of the tree that was tested: `HEAD` before this iteration's own commit, with the uncommitted change on top.
+- `seconds` is the wall-clock time of `autoresearch.sh`, measured by the loop (for example with `date +%s` before and after).
+- **[project]** Never commit the `.venv` symlink that `scripts/ar_worktree.sh` creates. Stage only the files in scope and `research/autoresearch/<slug>/`.
 
 ## Guardrails [project]
 - **Never edit what the benchmark scores with.** That covers the frozen paths in `AGENTS.md`, the evaluator, the anchors and the scenario bounds. If an improvement would need one of them, stop and record it in the report.
