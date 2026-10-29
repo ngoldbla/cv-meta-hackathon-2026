@@ -18,6 +18,7 @@ Prerequisites pass; Part A done. `scripts/extract_laya_encoder.py` rebuilds `run
 - Part E (3/6): `evac-laya-r16` — 6 epochs, batch 16, 16.9 min on CUDA, no OOM. Dev top-1 0.455, regret 0.0084, ECE 0.068. Metrics in `experiments/results/evac-laya-r16-metrics.json`.
 - Part E (4/6): `evac-scratch-20m` (s0) — 6 epochs, batch 16, 2.8 min on CUDA, no OOM. Dev top-1 0.449, regret 0.0142, ECE 0.074. Metrics in `experiments/results/evac-scratch-20m-metrics.json`.
 - Part E (5/6): `evac-scratch-20m-s1` — same config, seed 1, 2.8 min on CUDA, no OOM. Dev top-1 0.505, regret 0.0147, ECE 0.130. Metrics in `experiments/results/evac-scratch-20m-s1-metrics.json`.
+- Part E (6/6): `evac-scratch-20m-s2` — same config, seed 2, 2.8 min on CUDA, no OOM. Dev top-1 0.479, regret 0.0112, ECE 0.112. Metrics in `experiments/results/evac-scratch-20m-s2-metrics.json`. Part E complete: all six arms at batch 16, zero OOM retries.
 
 ## Results
 | probe mixture @0.0 | mean dev P95 | vs staging | file |
