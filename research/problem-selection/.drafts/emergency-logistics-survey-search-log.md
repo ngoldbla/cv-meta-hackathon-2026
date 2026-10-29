@@ -23,3 +23,7 @@
 | 2026-10-29 | relief-last-mile | Holguín-Veras deprivation cost post-disaster humanitarian logistics objective function last mile distribution | JOM 2013 deprivation costs; discrete choice |
 | 2026-10-29 | relief-last-mile | Hurricane Maria Puerto Rico 2017 relief supply distribution failures excess deaths logistics GAO report | DHS OIG-20-76; NBC; Axios |
 | 2026-10-29 | relief-last-mile | last mile relief distribution vehicle routing stochastic demand road damage dynamic model data humanitarian benchmark instances | MSOM 2024 isolated communities; Tongji MSSP; Imperial UAV |
+| 2026-10-29 | crowd-crush | Itaewon crowd crush 2022 investigation crowd density police response failures 159 deaths | Semafor; Al Jazeera; CBS; Korea Times |
+| 2026-10-29 | crowd-crush | crowd crush prevention real-time crowd management density monitoring flow control Helbing Love Parade analysis systemic failure | EPJ Data Science 2012; ScienceDaily |
+| 2026-10-29 | crowd-crush | pedestrian crowd simulation open source JuPedSim Vadere calibration data fundamental diagram crowd management optimization | Vadere arXiv; JuPedSim PyPI |
+| 2026-10-29 | crowd-crush | pedestrian dynamics data archive Jülich experiments high density crowd validation data crush conditions | Jülich archive; Collective Dynamics; Lyon field study |
