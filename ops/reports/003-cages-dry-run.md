@@ -1,6 +1,6 @@
 # Report 003: Autoresearch blue loop: cages-dry-run
 Status: done
-Branch head at start: f13483339cbed010b99a0a73bec6ad991391c740  ·  at finish: TBD
+Branch head at start: f13483339cbed010b99a0a73bec6ad991391c740  ·  at finish: 533af00479cc3a75c6b82a71c2bbb195b81da4ba
 
 ## Summary
 M2 wiring test of the blue autoresearch loop: worktree, 1 baseline + 3 iterations, keep/revert, per-iteration commits and pushes, audit. All machinery worked; `ar_check.py` reports 4 entries, 0 problems.
