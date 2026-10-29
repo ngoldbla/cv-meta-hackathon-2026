@@ -30,3 +30,7 @@
 | 2026-10-29 | venue-transit-evacuation | stadium event crowd transit station platform overcrowding incident after match evacuation subway crush injuries | Mumbai Elphinstone; Bengaluru 2025; Secaucus Super Bowl; Rome escalator |
 | 2026-10-29 | venue-transit-evacuation | Gao Kroon Schmidt Yang rescheduling metro line over-crowded situation after disruptions Transportation Research Part B 2016 | TR-B 93:425-449 |
 | 2026-10-29 | venue-transit-evacuation | (repository) research/results.md, experiments/results/dev-selection.md, ops/reports/002 | committed CAGES results |
+| 2026-10-29 | ems-surge-dispatch | EMS ambulance response times heat wave surge 2021 Pacific Northwest heat dome 911 calls overwhelmed deaths | CTV; Global News; Squamish Chief; CBC |
+| 2026-10-29 | ems-surge-dispatch | ambulance redeployment approximate dynamic programming Maxwell Henderson Topaloglu dispatch relocation policy | IJOC 2010; OR 2014; MSOM 2017; arXiv 2409.09158 |
+| 2026-10-29 | ems-surge-dispatch | public EMS incident dataset 911 call open data ambulance dispatch simulation calibration NEMSIS reinforcement learning ambulance | data.gov NYC/ATCEMS; OpenEMS; arXiv 2503.11848 |
+| 2026-10-29 | ems-surge-dispatch | BC Coroners Service death review panel heat dome 619 deaths report findings ambulance 911 delays | CTV coroners review; Global; gov.bc.ca |
