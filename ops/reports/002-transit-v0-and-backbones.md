@@ -25,6 +25,8 @@ Prerequisites pass; Part A done. `scripts/extract_laya_encoder.py` rebuilds `run
   - `evac-scratch-20m-s2`: @0.0 2145, @0.2 2145, @0.35 2189 (`experiments/results/dev-evac-scratch-20m-s2/`).
   - `evac-laya-r16`: @0.0 2119, @0.2 2127, @0.35 2177 (`experiments/results/dev-evac-laya-r16/`).
   - `evac-glimmer-L8-r16`: @0.0 2152, @0.2 2146, @0.35 2192 (`experiments/results/dev-evac-glimmer-L8-r16/`).
+  - `evac-glimmer-L12-q16`: @0.0 2148, @0.2 2155, @0.35 2176 (`experiments/results/dev-evac-glimmer-L12-q16/`).
+- Part F step 2: wrote `experiments/results/dev-selection.md`. Mechanical rule picks: L8 @0.2 (2145.73), L12 @0.0 (2148.03), Laya @0.0 (2118.72), scratch s0 @0.2 (2137.86). E2 pending edge gate.
 
 ## Results
 | probe mixture @0.0 | mean dev P95 | vs staging | file |
