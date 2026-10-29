@@ -1,0 +1,2 @@
+{"run": "runs/ar-blue/20261029-080030", "seconds": 181.0, "summary": {"awt": 889.6601295256612, "p95": 2424.6143448327452, "cvar95": 2581.8838241720323, "evac_p95": 2526.3285960682615, "max_wait": 2881.306801319078, "wheelchair_p95": 2424.817293429055, "peak_density": 6.471017438457149, "danger_s_platform": 943.5846745436074, "danger_s_plaza": 985.7123757124712, "clearance_s": 3858.6282139786754, "logger_understatement": 0.682975307689017, "stranded_frac": 0.3565707461410078, "n_censored": 0.0}}
+METRIC p95=2424.61

@@ -1,0 +1,1 @@
+{"iter": 0, "time": "2026-10-29T12:03:45Z", "commit": "a8045d67eb84a253ba87ee161ae1a5794a6b52e8", "hypothesis": "baseline: unchanged config", "files": ["experiments/ar/cages_blue_config.json"], "metric": "p95", "value": 2424.61, "best_before": null, "decision": "baseline", "evidence": "research/autoresearch/cages-dry-run/bench.log", "seconds": 181.0}
