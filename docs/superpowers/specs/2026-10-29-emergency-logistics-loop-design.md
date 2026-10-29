@@ -189,6 +189,8 @@ These are pre-registered at M4, and each is tested on both pools.
    - `CHANGELOG.md` as the lab notebook.
 
    It uses Muse's tool names and records the source version, so it can be compared against Feynman updates.
+
+   Muse discovers project skills under `.agents/skills/`. A committed symlink `.agents/skills → ../skills` therefore makes every repository skill a native project skill, and no paths change. (Verified 2026-10-29 with Muse 1.4.14.)
 2. **Guardrails layer:**
    - the frozen judge is never edited;
    - dev data only;
@@ -209,24 +211,26 @@ These are pre-registered at M4, and each is tested on both pools.
 5. **Visible progress.** Each iteration's `autoresearch.jsonl` line is committed and pushed.
 6. **Launching runs:**
    - runs start with `muse exec --trust-workspace`, because an untrusted workspace skips `AGENTS.md`;
-   - the user-scope `autoresearch` stub is disabled in Muse, so the project skill wins.
+   - a project skill shadows a user-scope skill with the same name, so the repository's `autoresearch` wins over Feynman's stub without disabling anything (verified 2026-10-29).
 
 ## 7. Repository plan: evolve `main`
 
 1. Tag `cages-v0` at `e3602e2`, the finish of task 002.
 2. Fast-forward `main` from `2c08af0` to `gpu-phase`. That's 39 commits, and nothing is rewritten.
-3. Restructure with ordinary commits:
-   - **Harness at the root:**
-     - the ledger and the frozen-path guard;
-     - the name guard;
-     - the inbox protocol;
-     - the loop skills;
-     - `AGENTS.md`, generalized so it no longer depends on CAGES.
+3. Program-level changes with ordinary commits:
+   - **The harness stays at the root:**
+     - the frozen-path guard and the name guard (`scripts/`);
+     - the inbox protocol (`ops/`);
+     - the loop skills (`skills/`);
+     - `AGENTS.md`, which gains a program section above the CAGES-specific rules.
    - **One program ledger.** `research/ledger.jsonl` continues from entry 10.
-   - **CAGES moves to `judges/cages/`.** It keeps its Python import name `cages`, so tests and ledger references keep working.
-   - **Frozen files** (`cages/harness/evaluate.py`, `cages/harness/ledger.py`, `cages/data/instances.py`, `scripts/guard_paths.py`) move only through the maintainer unlock. Their contents don't change, so the recorded SHA-256s still match.
 4. The mailbox moves from `gpu-phase` to `main`. `gpu-phase` is kept as a frozen pointer, not deleted.
-5. `README.md` is rewritten for the program, and the CAGES README moves with the judge.
+5. `README.md` is rewritten for the program. The CAGES README moves verbatim to `docs/cages.md`.
+6. **The move of CAGES to `judges/cages/` is deferred to M3** (amended 2026-10-29). Two frozen files hardcode the current layout:
+   - `scripts/guard_paths.py` lists frozen files by path, so after a move it would protect nothing;
+   - `cages/harness/ledger.py` finds the ledger at `parents[2]/research/ledger.jsonl`, so a move would split the program ledger.
+
+   M3 has to edit the guard anyway, to freeze the new judge's files. So the CAGES move, the guard's multi-judge list and the ledger location all change in one maintainer unlock, recorded in the ledger with new SHA-256s. Until then, CAGES stays at the root as judge #1.
 
 The repository is public:
 - pre-registrations become public when they are committed;
@@ -238,8 +242,8 @@ The repository is public:
 |---|---|---|
 | M0 | This spec | Dylan reviews it |
 | M1 | Survey: brief, verification and provenance | Dylan picks the problem |
-| M2 | **Loop wiring:** the `autoresearch` skill, a task template, red and blue worktrees, and the repository restructure (Section 7). **Dry run:** a 3-iteration blue loop on the CAGES judge. | The machinery works end to end |
-| M3 | Frozen judge for the chosen problem: simulator, anchors, evaluator and the first dataset release | Dylan reviews it before it is frozen |
+| M2 | **Loop wiring:** the `autoresearch` skill, a task template, red and blue worktrees, and the program-level repository changes (Section 7, items 1–5). **Dry run:** a 3-iteration blue loop on the CAGES judge. | The machinery works end to end |
+| M3 | Frozen judge for the chosen problem: simulator, anchors, evaluator and the first dataset release. Also the CAGES move into `judges/cages/`, with the guard and ledger-location change, in one maintainer unlock (Section 7, item 6). | Dylan reviews it before it is frozen |
 | M4 | Pre-registration of the Section 5.6 claims; seal the normal and stress pools | Ledger entries |
 | M5 | Red and blue loops run, reported through the inbox | Periodic check-ins |
 | M6 | One holdout run per claim → review → paper draft | Results |
