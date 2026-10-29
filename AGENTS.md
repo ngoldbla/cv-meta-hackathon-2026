@@ -6,7 +6,7 @@ This repository is a scientific instrument. Any agent, model or harness can run 
 1. **audit** (`skills/audit/`): check literature claims against their sources and code; update `research/claims.yaml`.
 2. **replicate** (`skills/replicate/`): reproduce the baselines (timetable, next train, express rule, rolling horizon, forecast staging) on the dev split before extending anything.
 3. **preregister** (`skills/preregister/`): write the hypothesis, metric, threshold and analysis in `research/prereg/<ID>.md`, then commit it to the ledger. This must happen **before** any holdout run.
-4. **search** (`skills/search/`): a bounded loop of generating CAGES data, training a decision model and evaluating on **dev only**. Log every run.
+4. **autoresearch** (`skills/autoresearch/`): Feynman's bounded experiment loop on **dev only**. One fixed benchmark and metric, one change per iteration, keep or revert. Every iteration is logged to `research/autoresearch/<slug>/autoresearch.jsonl` and committed.
 5. **confirm** (`skills/confirm/`): run **one** holdout evaluation per pre-registration through `eval_holdout`. The result is final, whatever it shows.
 6. **review** (`skills/review/`): adversarial review of claims, statistics and threats to validity before anything is called a result.
 

@@ -26,3 +26,18 @@ def test_every_skill_has_matching_name_and_description():
         fm = _frontmatter(d / "SKILL.md")
         assert fm.get("name") == d.name, d
         assert fm.get("description"), d
+
+
+def test_search_skill_retired_for_autoresearch():
+    assert not (SKILLS / "search").exists()
+    agents = (ROOT / "AGENTS.md").read_text()
+    assert "skills/autoresearch/" in agents
+    assert "skills/search/" not in agents
+
+
+def test_autoresearch_skill_keeps_feynman_steps_and_guardrails():
+    text = (SKILLS / "autoresearch" / "SKILL.md").read_text()
+    for needed in ("Feynman 0.3.4", "## Step 1: Gather", "## Step 2: Environment", "## Step 3: Confirm",
+                   "## Step 4: Run", "research/autoresearch/<slug>/", "METRIC <name>=<value>",
+                   "autoresearch.jsonl", "eval_holdout", "CAGES_HOLDOUT_SALT", "ar/<role>/<slug>"):
+        assert needed in text, needed
