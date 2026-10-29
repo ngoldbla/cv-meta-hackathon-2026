@@ -3,7 +3,7 @@ Status: in_progress
 Branch head at start: 0d0ccd1db4a3d3f087fecd5cd757b6da9a9d1c67  ·  at finish: TBD
 
 ## Summary
-Prerequisites pass; Part A done. `scripts/extract_laya_encoder.py` rebuilds `runs/laya-encoder` byte-identically (170 tensors, 394,781,696 params, sha256 `0c31065b…`) from `convaiinnovations/laya` at revision `7b928d82…`. Parts B–C done (ledger seqs 8–10, chain verifies). Parts D–F not yet started.
+Prerequisites pass; Part A done. `scripts/extract_laya_encoder.py` rebuilds `runs/laya-encoder` byte-identically (170 tensors, 394,781,696 params, sha256 `0c31065b…`) from `convaiinnovations/laya` at revision `7b928d82…`. Parts B–D done (ledger seqs 8–10; horizon chosen: h2700). Parts E–F next.
 
 ## Work done
 - Claimed task 002: set `status: in_progress`, created this report.
@@ -12,11 +12,18 @@ Prerequisites pass; Part A done. `scripts/extract_laya_encoder.py` rebuilds `run
 - Part B: `ledger_commit(kind="protocol_note")` → seq 8 (`24a3d8c7…`), fixing the label-horizon rule, the six E3 arms, the dev-selection rule and the edge gate before any Part C–F result exists. `Ledger().verify()` → True.
 - Part C: generated `datasets/cages-v0` (h900: 23,554/2,360 states, 13 MB) and `datasets/cages-v0-h2700` (h2700: 23,554/2,360 states, 13 MB) on 24 workers (~1h50 + ~3h05 wall). Train and dev `specs.jsonl` are byte-identical across horizons (`cmp`). Cards: no-action-best 52%→23% (train) and gaps 5%→10% at the longer horizon. `dataset_release` entries seq 9 (`156ee59d…`, h900) and seq 10 (`b70735e4…`, h2700); chain verifies. Both datasets committed whole (each < 50 MB).
 
+- Part D: trained `evac-probe-h900` (dev top-1 0.364) and `evac-probe-h2700` (dev top-1 0.449), 20 epochs each, ~1.5 min on CUDA, no OOM. Baselines on CPU reproduce `research/results.md` exactly (staging P95 2220.78). Closed loop @0.0: h900 2142.69 vs staging −2.11%; h2700 2136.97 vs staging −3.18%. Rule → **h2700** (margin 5.72 s). Decision in `experiments/results/label-horizon-v0.md`. Probe evals ran on GPU per runbook §4 (task Part D silent on device).
+
 ## Results
-None yet.
+| probe mixture @0.0 | mean dev P95 | vs staging | file |
+|---|---|---|---|
+| h900 | 2142.69 | −2.11% [−4.26, +0.08] | `experiments/results/dev-evac-probe-h900/summary.json` |
+| h2700 | 2136.97 | −3.18% [−4.83, −1.54] | `experiments/results/dev-evac-probe-h2700/summary.json` |
+
+Decision: all E3 arms train on `datasets/cages-v0-h2700` (`experiments/results/label-horizon-v0.md`).
 
 ## Deviations
-None.
+- Part D: copied probe `metrics.json` files to `experiments/results/evac-probe-<h>-metrics.json` (task only requires this for E3 arms in Part E; done so the decision file cites committed files, since `runs/` is git-ignored). Probe closed-loop evals ran on CUDA per runbook §4.
 
 ## Blocked / questions
 None.
