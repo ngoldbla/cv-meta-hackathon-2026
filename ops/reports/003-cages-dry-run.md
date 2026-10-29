@@ -13,7 +13,8 @@ Skill loaded natively via `read_skill`.
 - Wrote `research/autoresearch/cages-dry-run/{autoresearch.md,autoresearch.sh,autoresearch.jsonl}` in the worktree; ran baseline.
 
 ## Results
-Baseline (iter 0): p95 2424.61, 181 s, branch commit `89b1595`. Full table at finish.
+Baseline (iter 0): p95 2424.61, 181 s, branch commit `89b1595`.
+Iter 1 (threshold 0.2 → 0.0): p95 2434.69, 179 s, reverted, branch commit `ec5d5ac`. Full table at finish.
 
 ## Deviations
 None so far.
