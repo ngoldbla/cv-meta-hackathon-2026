@@ -1,7 +1,7 @@
 ---
 id: "003"
 title: "Autoresearch blue loop: cages-dry-run"
-status: in_progress
+status: done
 created: 2026-10-29
 report: ops/reports/003-cages-dry-run.md
 ---
