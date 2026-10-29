@@ -6,7 +6,7 @@ description: Pick up the next task from the ops mailbox (ops/tasks/), do it unde
 
 The protocol is in `ops/README.md`. Read it, together with `AGENTS.md`, before the first task of a session.
 
-1. **Sync.** Run `git checkout gpu-phase && git pull --ff-only`. If the pull fails, stop and report why. Do not reset, rebase or force anything.
+1. **Sync.** Run `git checkout main && git pull --ff-only`. If the pull fails, stop and report why. Do not reset, rebase or force anything.
 2. **Pick.** Choose a task from `ops/tasks/`:
    - if Dylan named one, take that;
    - otherwise take the lowest-numbered task whose `status` is `open`;

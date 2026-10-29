@@ -1,6 +1,6 @@
 # Ops mailbox: tasks in, reports out
 
-Work is handed to the runner (the agent on the GPU machine) as files in this directory, on branch `gpu-phase`. No instructions need to be pasted between sessions.
+Work is handed to the runner (the agent on the GPU machine) as files in this directory, on branch `main`. (`gpu-phase` is a frozen pointer at `e3602e2`, the CAGES v0 state; never push to it.) No instructions need to be pasted between sessions.
 
 ```
 ops/tasks/NNN-<slug>.md     written by the reviewer: one task per file
@@ -9,7 +9,7 @@ ops/reports/NNN-<slug>.md   written by the runner: what was done, results, quest
 
 ## The cycle
 1. **The reviewer** commits a new task with `status: open` and pushes.
-2. **Dylan** tells the runner: *"Pull gpu-phase and follow `skills/inbox/SKILL.md`."*
+2. **Dylan** tells the runner: *"Pull main and follow `skills/inbox/SKILL.md`."*
 3. **The runner:**
    - takes the lowest-numbered open task;
    - marks it `in_progress`;

@@ -3,14 +3,14 @@
 This runbook is for an agent session, or a person, working on the GPU machine. Work through the steps in order. After each step:
 - commit the results under `experiments/results/` or `runs/*/metrics.json`;
 - add a `research/journal.md` entry;
-- push to `gpu-phase`.
+- push to `main`.
 
 Never set `CAGES_HOLDOUT_SALT` in this session. Commit messages end with `Assisted-by: agent` and name no assistant product.
 
 ## 0. Setup (once; already done on dylan-pc)
 
 ```bash
-git clone -b gpu-phase https://github.com/ngoldbla/cv-meta-hackathon-2026 && cd cv-meta-hackathon-2026
+git clone -b main https://github.com/ngoldbla/cv-meta-hackathon-2026 && cd cv-meta-hackathon-2026
 git config user.name "Dylan Goldblatt"; git config user.email "70771914+ngoldbla@users.noreply.github.com"
 huggingface-cli login                 # token with read access
 bash scripts/setup_gpu_host.sh        # CUDA 12.8 torch, extras, bitsandbytes, Timestral, git hooks, readiness check

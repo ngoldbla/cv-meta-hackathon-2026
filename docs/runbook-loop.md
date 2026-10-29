@@ -16,15 +16,21 @@ The research loop is driven by a Muse model in Muse Code, Dylan's session. The r
 
 ## Handing over work: the mailbox
 
-Tasks arrive as files in `ops/tasks/` on `gpu-phase` (protocol: `ops/README.md`). To start the next one, tell the session:
+Tasks arrive as files in `ops/tasks/` on `main` (protocol: `ops/README.md`). To start the next one, tell the session:
 
-> Pull gpu-phase and follow `skills/inbox/SKILL.md`.
+> Pull main and follow `skills/inbox/SKILL.md`.
+
+Headless, from the repository root on the GPU machine (the workspace must be trusted, or `AGENTS.md` and the skills are skipped):
+
+    setsid nohup muse exec --trust-workspace "Pull main and follow skills/inbox/SKILL.md." > ~/muse-logs/task-$(date +%Y%m%d-%H%M%S).log 2>&1 < /dev/null &
+
+The log holds only the final answer. Follow progress through the commits the session pushes.
 
 The session does the task, writes `ops/reports/<task>.md`, pushes, and stops at anything that needs Dylan's approval.
 
 ## Session brief (for open-ended loop work without a task file)
 
-> Read `AGENTS.md`, `research/results.md`, `research/journal.md` and `docs/runbook-gpu.md`. Run the loop: `replicate` → `autoresearch` (dev only, within the iteration cap I give) → `preregister` any new claim → `review`. Do not run `eval_holdout`: the confirm step belongs to the repository author. Commit as the repository author with an `Assisted-by: agent` trailer, and push to `gpu-phase`. Report negative results with the same care as positive ones.
+> Read `AGENTS.md`, `research/results.md`, `research/journal.md` and `docs/runbook-gpu.md`. Run the loop: `replicate` → `autoresearch` (dev only, within the iteration cap I give) → `preregister` any new claim → `review`. Do not run `eval_holdout`: the confirm step belongs to the repository author. Commit as the repository author with an `Assisted-by: agent` trailer, and push to `main`. Report negative results with the same care as positive ones.
 
 ## Suggested subagents (one worktree each)
 - **Data builder:** scales CAGES, keeps manifests and the ledger up to date.

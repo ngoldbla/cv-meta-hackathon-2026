@@ -41,3 +41,16 @@ def test_autoresearch_skill_keeps_feynman_steps_and_guardrails():
                    "## Step 4: Run", "research/autoresearch/<slug>/", "METRIC <name>=<value>",
                    "autoresearch.jsonl", "eval_holdout", "CAGES_HOLDOUT_SALT", "ar/<role>/<slug>"):
         assert needed in text, needed
+
+
+MAILBOX_DOCS = ["ops/README.md", "skills/inbox/SKILL.md", "docs/runbook-loop.md", "docs/runbook-gpu.md"]
+
+
+def test_mailbox_lives_on_main():
+    for rel in MAILBOX_DOCS:
+        text = (ROOT / rel).read_text()
+        for stale in ("Pull gpu-phase", "checkout gpu-phase", "-b gpu-phase", "push to `gpu-phase`"):
+            assert stale not in text, f"{rel}: {stale}"
+    assert "git checkout main && git pull --ff-only" in (SKILLS / "inbox" / "SKILL.md").read_text()
+    assert 'muse exec --trust-workspace "Pull main and follow skills/inbox/SKILL.md."' in \
+        (ROOT / "docs" / "runbook-loop.md").read_text()
