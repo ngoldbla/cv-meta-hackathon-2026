@@ -99,3 +99,7 @@
 ## 2026-10-29 — autoresearch dry run `cages-dry-run` (blue), baseline
 - Branch `ar/blue/cages-dry-run`: M2 wiring test, not a finding.
 - Baseline p95 2424.61 over 10 dev instances (config threshold 0.2), 181 s. Log: `research/autoresearch/cages-dry-run/autoresearch.jsonl`.
+
+## 2026-10-29 — autoresearch dry run `cages-dry-run` (blue), finished
+- 3 iterations on branch `ar/blue/cages-dry-run`: iter 1 threshold→0.0 reverted (2434.69), iter 2 lr→3e-4 kept (2416.78), iter 3 epochs→8 reverted (2425.30). Baseline 2424.61.
+- Wiring test only; numbers are not findings. Full loop record in the branch log and `ops/reports/003-cages-dry-run.md` on main.

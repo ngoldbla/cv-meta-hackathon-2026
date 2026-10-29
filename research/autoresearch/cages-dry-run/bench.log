@@ -4,3 +4,5 @@ METRIC p95=2424.61
 METRIC p95=2434.69
 {"run": "runs/ar-blue/20261029-080726", "seconds": 178.8, "summary": {"awt": 893.0014577701389, "p95": 2416.7843930574936, "cvar95": 2589.347110601333, "evac_p95": 2524.638728149526, "max_wait": 2989.428884968413, "wheelchair_p95": 2403.1731550715676, "peak_density": 6.471017438457149, "danger_s_platform": 939.353296464863, "danger_s_plaza": 995.0951371741623, "clearance_s": 3865.950366988127, "logger_understatement": 0.6825797255002365, "stranded_frac": 0.35798723836963287, "n_censored": 14.8}}
 METRIC p95=2416.78
+{"run": "runs/ar-blue/20261029-081117", "seconds": 230.2, "summary": {"awt": 893.8863027685463, "p95": 2425.3042252292826, "cvar95": 2585.6599816727276, "evac_p95": 2530.764955748022, "max_wait": 3006.181461033563, "wheelchair_p95": 2402.900676279021, "peak_density": 6.471017438457149, "danger_s_platform": 946.346750174733, "danger_s_plaza": 993.4187392449742, "clearance_s": 3869.2876835369957, "logger_understatement": 0.6816603198025494, "stranded_frac": 0.3591390457596558, "n_censored": 0.0}}
+METRIC p95=2425.30
