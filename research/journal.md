@@ -106,3 +106,13 @@
   - Brief: `research/problem-selection/emergency-logistics-survey-brief.md`.
 - **Next:** Dylan picks the problem (M1 gate); then M3 planning.
 
+## 2026-10-29: M2 dry run (task 003, blue loop on CAGES)
+- **What was tried:** the ported autoresearch skill, run by Muse Code headless (`muse exec --trust-workspace`), for 3 iterations over `experiments/ar/cages_blue_config.json`. Metric: p95. This was a wiring test, not a finding.
+- **What happened:**
+  - 4 log entries: a baseline of 2424.61; #1 threshold 0.2→0.0 reverted (2434.69); #2 lr 2e-4→3e-4 kept (2416.78); #3 epochs 6→8 reverted (2425.30).
+  - `ar_check`: 4 entries, 0 problems. Scope was clean, pytest and the name guard pass on `ar/blue/cages-dry-run`, and the branch was pushed.
+  - 179–230 s per benchmark run, against a 30-minute ceiling.
+  - The skill loaded natively through `read_skill`.
+  - Friction found and fixed: the baseline commit format, the meaning of `commit` and `seconds`, and the `.venv` symlink showing as untracked (now ignored).
+- **Next:** M2 machinery verified. M3 waits on the M1 pick.
+
