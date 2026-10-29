@@ -95,3 +95,14 @@
 - **Dev selection** (`experiments/results/dev-selection.md`, 40 instances): best P95 per arm — Laya @0.0 2118.72 (−3.45% vs staging), scratch s0 @0.2 2137.86, L8 @0.2 2145.73, L12 @0.0 2148.03. Laya and scratch beat both Glimmer trunks in closed loop despite L8's better offline top-1.
 - **Edge:** all pass p99 ≤ 50 ms at trained precision — L12-nf4 48.90, L8-bf16 44.78, Laya 29.45, scratch ~3 ms (`experiments/results/edge-*.json`). E2 checkpoint by the rule: laya-r16 @0.0.
 - **Needs approval:** the four arm picks and the E2 checkpoint; then `model_choice`, E1–E3 registration, and Dylan's confirmatory runs. Full record: `ops/reports/002-transit-v0-and-backbones.md`.
+
+## 2026-10-29: problem survey (M1)
+- **What was tried:** 8 emergency-logistics candidates scored against the 8-criterion scorecard, with 37 sources accepted. A method novelty check, and adversarial verification of the top 3.
+- **What happened:**
+  - Verification rescored 4 criteria and changed the ranking: top 3 = EMS surge dispatch (36), wildfire evacuation (35), hurricane evacuation (34).
+  - Recommendation: EMS surge dispatch, with the loop metric "acuity-weighted minutes beyond the response-time target".
+  - Novelty is partial: RAISE (2026) pairs LLM heuristic design with an adversary, and genetic programming has evolved EMS dispatch policies (GECCO 2023).
+  - Nothing was dropped by the hard filters.
+  - Brief: `research/problem-selection/emergency-logistics-survey-brief.md`.
+- **Next:** Dylan picks the problem (M1 gate); then M3 planning.
+

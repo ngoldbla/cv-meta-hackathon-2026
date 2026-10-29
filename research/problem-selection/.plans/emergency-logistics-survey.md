@@ -37,7 +37,7 @@ Direct search by the lead agent. No researcher subagents: this is one coherent c
 | T4 scored draft | done |
 | T5 citations checked | done |
 | T6 adversarial verification (top 3) | done |
-| T7 deliver brief + provenance | todo |
+| T7 deliver brief + provenance | done |
 
 ## Verification log
 (append: date, what was checked, how, result)
