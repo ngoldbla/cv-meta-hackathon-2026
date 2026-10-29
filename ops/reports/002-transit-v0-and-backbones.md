@@ -13,6 +13,7 @@ Prerequisites pass; Part A done. `scripts/extract_laya_encoder.py` rebuilds `run
 - Part C: generated `datasets/cages-v0` (h900: 23,554/2,360 states, 13 MB) and `datasets/cages-v0-h2700` (h2700: 23,554/2,360 states, 13 MB) on 24 workers (~1h50 + ~3h05 wall). Train and dev `specs.jsonl` are byte-identical across horizons (`cmp`). Cards: no-action-best 52%→23% (train) and gaps 5%→10% at the longer horizon. `dataset_release` entries seq 9 (`156ee59d…`, h900) and seq 10 (`b70735e4…`, h2700); chain verifies. Both datasets committed whole (each < 50 MB).
 
 - Part D: trained `evac-probe-h900` (dev top-1 0.364) and `evac-probe-h2700` (dev top-1 0.449), 20 epochs each, ~1.5 min on CUDA, no OOM. Baselines on CPU reproduce `research/results.md` exactly (staging P95 2220.78). Closed loop @0.0: h900 2142.69 vs staging −2.11%; h2700 2136.97 vs staging −3.18%. Rule → **h2700** (margin 5.72 s). Decision in `experiments/results/label-horizon-v0.md`. Probe evals ran on GPU per runbook §4 (task Part D silent on device).
+- Part E (1/6): `evac-glimmer-L8-r16` — 6 epochs, batch 16, 52.1 min on CUDA, no OOM. Dev top-1 0.502, regret 0.0130, ECE 0.107. Metrics in `experiments/results/evac-glimmer-L8-r16-metrics.json`.
 
 ## Results
 | probe mixture @0.0 | mean dev P95 | vs staging | file |
