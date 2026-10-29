@@ -34,3 +34,11 @@
 | 2026-10-29 | ems-surge-dispatch | ambulance redeployment approximate dynamic programming Maxwell Henderson Topaloglu dispatch relocation policy | IJOC 2010; OR 2014; MSOM 2017; arXiv 2409.09158 |
 | 2026-10-29 | ems-surge-dispatch | public EMS incident dataset 911 call open data ambulance dispatch simulation calibration NEMSIS reinforcement learning ambulance | data.gov NYC/ATCEMS; OpenEMS; arXiv 2503.11848 |
 | 2026-10-29 | ems-surge-dispatch | BC Coroners Service death review panel heat dome 619 deaths report findings ambulance 911 delays | CTV coroners review; Global; gov.bc.ca |
+| 2026-10-29 | method-novelty | FunSearch Nature 2023 Mathematical discoveries from program search with large language models bin packing heuristics | DeepMind blog; Nature/PMC; GitHub |
+| 2026-10-29 | method-novelty | AlphaEvolve 2025 evolutionary coding agent Gemini data center scheduling heuristic recovered compute | DeepMind blog 2025-05-14 |
+| 2026-10-29 | method-novelty | PAIRED Dennis 2020 Emergent Complexity and Zero-shot Transfer via Unsupervised Environment Design regret adversary protagonist antagonist | arXiv 2012.02096; NeurIPS |
+| 2026-10-29 | method-novelty | large language model evolutionary program search evacuation policy heuristic discovery (extended) | MLES; Code Evolution for Control; ReEvo; EoH |
+| 2026-10-29 | method-novelty | FunSearch OR LLM-driven heuristic emergency logistics ambulance dispatch disaster relief routing heuristic generation | no combined work; MoD objective evolution |
+| 2026-10-29 | method-novelty | unsupervised environment design adversarial scenario generation emergency response evacuation reinforcement learning robustness | UED optimisation; ADD diffusion; fire evac RL |
+| 2026-10-29 | method-novelty | Evolution of Heuristics EoH LLM automated heuristic design vehicle routing stochastic dynamic problems benchmark | RAISE 2606.31801; EoH-S; MEoH; PyVRP+ |
+| 2026-10-29 | method-novelty | counterfactual simulation common random numbers policy evaluation dispatch learning emergency services regret adversarial scenarios stress testing | CRN refs; selective ambulance dispatch |

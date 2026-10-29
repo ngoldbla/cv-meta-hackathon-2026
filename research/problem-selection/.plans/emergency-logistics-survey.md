@@ -33,7 +33,7 @@ Direct search by the lead agent. No researcher subagents: this is one coherent c
 | T2 evidence: crowd-crush | done |
 | T2 evidence: venue-transit-evacuation | done |
 | T2 evidence: ems-surge-dispatch | done |
-| T3 method novelty check | todo |
+| T3 method novelty check | done |
 | T4 scored draft | todo |
 | T5 citations checked | todo |
 | T6 adversarial verification (top 3) | todo |
@@ -44,3 +44,4 @@ Direct search by the lead agent. No researcher subagents: this is one coherent c
 
 ## Decision log
 (append: date, decision, reason — e.g. candidate added or dropped)
+- 2026-10-29: novelty verdict = partial overlap; RAISE (arXiv 2606.31801) is the closest prior combination; recommend it as an M4 ablation baseline.
