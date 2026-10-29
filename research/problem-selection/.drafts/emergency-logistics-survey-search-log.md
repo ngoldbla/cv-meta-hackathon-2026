@@ -13,3 +13,7 @@
 | 2026-10-29 | hurricane-evacuation | hurricane evacuation contraflow staged evacuation optimization model review transportation research | UMD CTM thesis; NICTA planner; UF |
 | 2026-10-29 | hurricane-evacuation | hurricane evacuation decision forecast uncertainty when to issue evacuation order stochastic dynamic programming | NSF PAR MSSP; Delaware hazard trees |
 | 2026-10-29 | hurricane-evacuation | Huang Lindell Prater 2016 hurricane evacuation decision meta-analysis empirical studies Environment and Behavior | Env & Behavior 48(8) |
+| 2026-10-29 | mci-patient-distribution | mass casualty incident patient distribution hospitals after-action closest hospital overwhelmed Las Vegas 2017 Route 91 transport | PMC Lake 2025; ASTHO; ACS Bulletin |
+| 2026-10-29 | mci-patient-distribution | mass casualty incident ambulance dispatch patient allocation hospitals optimization model triage Mills Argon Ziya | MSOM 2013; OR dynamic distribution; City Univ MIP |
+| 2026-10-29 | mci-patient-distribution | mass casualty incident simulation model hospital surge patient distribution data calibration open source | EasyChair DES; RAND burn surge; RMA |
+| 2026-10-29 | mci-patient-distribution | Sacco survival probability deterioration model mass casualty triage time-dependent survival function calibration | Sacco Triage Method abstracts; MORTT |
