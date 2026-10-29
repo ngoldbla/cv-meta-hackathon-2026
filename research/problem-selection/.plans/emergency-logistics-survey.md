@@ -35,12 +35,16 @@ Direct search by the lead agent. No researcher subagents: this is one coherent c
 | T2 evidence: ems-surge-dispatch | done |
 | T3 method novelty check | done |
 | T4 scored draft | done |
-| T5 citations checked | todo |
+| T5 citations checked | done |
 | T6 adversarial verification (top 3) | todo |
 | T7 deliver brief + provenance | todo |
 
 ## Verification log
 (append: date, what was checked, how, result)
+- 2026-10-29 T5: 30 cited sources; every non-PDF URL fetched with curl (-L, 20 s timeout, browser UA).
+  - 200: 25 URLs. PDF, metadata only: 4 URLs (OIG-20-76, Holguín-Veras 2013 JOM, Sacco K116). Local repository files: 2 (exist).
+  - Dead and replaced: CTV coroners story (404), replaced by the BC Government release 2022PSSG0042-000903 (read; confirms 619 deaths, 98% indoors, 67% aged 70+, 56% alone, 911 calls doubled, 17 holds, 6 no-ambulance, 54% attended, median 10 min 25 s). data.gov ATCEMS page (404) removed; ATCEMS is cited through OpenEMS.
+  - 403 to scripts (bot blocking, source exists in search results): PreventionWeb UA story (replaced by news.ua.edu, 200); INFORMS MSOM 2017 epdf (kept; DOI also 403 to scripts).
 
 ## Decision log
 (append: date, decision, reason — e.g. candidate added or dropped)

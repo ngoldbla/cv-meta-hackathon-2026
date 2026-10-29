@@ -66,10 +66,10 @@
 | 3 | 3 | 5 | 4 | 4 | 5 | 5 | 5 |
 
 ## Sources
-- [S1] CTV News, "Coroners' review reveals true death toll of B.C.'s 2021 heat dome" (BC Coroners Service death review panel, June 2022). https://bc.ctvnews.ca/here-s-what-a-coroners-review-uncovered-about-b-c-s-2021-heat-dome-deaths-1.5936108 (metadata only)
+- [S1] BC Government news release on the BC Coroners Service death review panel report "Extreme Heat and Human Mortality: A Review of Heat-Related Deaths in B.C. in Summer 2021", 2022-06-07. https://news.gov.bc.ca/releases/2022PSSG0042-000903 (read). (Replaces a CTV link that returned 404 on 2026-10-29.)
 - [S2] Squamish Chief, "B.C. heat wave leads to 11-hour ambulance wait time, spike in sudden deaths", 2021. https://squamishchief.com/bc-news/bc-heat-wave-leads-to-11-hour-ambulance-wait-time-spike-in-sudden-deaths-3918823 (metadata only)
 - [S3] Maxwell M.S., Restrepo M., Henderson S.G., Topaloglu H., Approximate dynamic programming for ambulance redeployment, INFORMS Journal on Computing 22(2):266–281, 2010; Maxwell et al., A bound on the performance of an optimal ambulance redeployment policy, Operations Research 62(5):1014–1027, 2014. https://web.mit.edu/orc/www/archive/seminars/2009s/abs/Henderson_abs.html (metadata only)
 - [S4] Real-Time Ambulance Dispatching and Relocation, Manufacturing & Service Operations Management, 2018. https://pubsonline.informs.org/doi/epdf/10.1287/msom.2017.0649 (metadata only)
 - [S5] Optimization-Augmented Machine Learning for Vehicle Operations in Emergency Medical Services, arXiv 2503.11848. https://arxiv.org/abs/2503.11848 (metadata only)
-- [S6] Public EMS datasets: NYC EMS Incident Dispatch Data (https://catalog.data.gov/dataset/ems-incident-dispatch-data); University of Texas Good Systems and ATCEMS incidents data (https://catalog.data.gov/dataset/university-of-texas-good-systems-and-atcems-incidents-data). (metadata only)
+- [S6] Public EMS datasets: NYC EMS Incident Dispatch Data (https://catalog.data.gov/dataset/ems-incident-dispatch-data); Austin-Travis County EMS incident data are used by OpenEMS (Ong et al. 2022) (the data.gov ATCEMS page returned 404 on 2026-10-29). (metadata only)
 - [S7] Ong J., Kulpanowski D., Xie Y., Nikolova E., Tran N.M., OpenEMS: an open-source package for two-stage stochastic and robust optimization for ambulance location and routing with applications to Austin-Travis County EMS data, 2022. https://arxiv.org/abs/2201.11208 (read: abstract page)
