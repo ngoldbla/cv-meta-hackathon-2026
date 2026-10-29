@@ -25,7 +25,7 @@ Direct search by the lead agent. No researcher subagents: this is one coherent c
 ## Task ledger
 | Task | Status |
 |---|---|
-| T2 evidence: wildfire-evacuation | todo |
+| T2 evidence: wildfire-evacuation | done |
 | T2 evidence: hurricane-evacuation | todo |
 | T2 evidence: mci-patient-distribution | todo |
 | T2 evidence: healthcare-facility-evacuation | todo |
