@@ -1,7 +1,7 @@
 ---
 id: "002"
 title: Scale CAGES (evacuation) to v0, pick the label horizon, train the E3 backbones, dev selection and edge latency
-status: open
+status: in_progress
 created: 2026-10-28
 report: ops/reports/002-transit-v0-and-backbones.md
 ---
