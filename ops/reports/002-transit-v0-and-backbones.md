@@ -15,6 +15,7 @@ Prerequisites pass; Part A done. `scripts/extract_laya_encoder.py` rebuilds `run
 - Part D: trained `evac-probe-h900` (dev top-1 0.364) and `evac-probe-h2700` (dev top-1 0.449), 20 epochs each, ~1.5 min on CUDA, no OOM. Baselines on CPU reproduce `research/results.md` exactly (staging P95 2220.78). Closed loop @0.0: h900 2142.69 vs staging −2.11%; h2700 2136.97 vs staging −3.18%. Rule → **h2700** (margin 5.72 s). Decision in `experiments/results/label-horizon-v0.md`. Probe evals ran on GPU per runbook §4 (task Part D silent on device).
 - Part E (1/6): `evac-glimmer-L8-r16` — 6 epochs, batch 16, 52.1 min on CUDA, no OOM. Dev top-1 0.502, regret 0.0130, ECE 0.107. Metrics in `experiments/results/evac-glimmer-L8-r16-metrics.json`.
 - Part E (2/6): `evac-glimmer-L12-q16` — 6 epochs, batch 16, nf4, 104.0 min on CUDA, no OOM. Dev top-1 0.420, regret 0.0124, ECE 0.052. Metrics in `experiments/results/evac-glimmer-L12-q16-metrics.json`.
+- Part E (3/6): `evac-laya-r16` — 6 epochs, batch 16, 16.9 min on CUDA, no OOM. Dev top-1 0.455, regret 0.0084, ECE 0.068. Metrics in `experiments/results/evac-laya-r16-metrics.json`.
 
 ## Results
 | probe mixture @0.0 | mean dev P95 | vs staging | file |
