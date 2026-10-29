@@ -17,3 +17,6 @@
 | 2026-10-29 | mci-patient-distribution | mass casualty incident ambulance dispatch patient allocation hospitals optimization model triage Mills Argon Ziya | MSOM 2013; OR dynamic distribution; City Univ MIP |
 | 2026-10-29 | mci-patient-distribution | mass casualty incident simulation model hospital surge patient distribution data calibration open source | EasyChair DES; RAND burn surge; RMA |
 | 2026-10-29 | mci-patient-distribution | Sacco survival probability deterioration model mass casualty triage time-dependent survival function calibration | Sacco Triage Method abstracts; MORTT |
+| 2026-10-29 | healthcare-facility-evacuation | nursing home evacuation hurricane deaths Hollywood Hills Irma 2017 Katrina Memorial hospital evacuation deaths patient transport | NBC/CBS Irma; ProPublica Memorial |
+| 2026-10-29 | healthcare-facility-evacuation | hospital evacuation optimization model patient transport vehicles receiving hospitals stochastic programming Bish Agca | NSF PAR Bish; robust possibilistic; VT dissertation |
+| 2026-10-29 | healthcare-facility-evacuation | evacuation vs shelter in place nursing homes hurricane mortality morbidity study Dosa Brown transfer trauma | PMC3711109 Brown/Dosa; JAMDA Dosa 2012; RTI |
