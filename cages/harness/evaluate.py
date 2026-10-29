@@ -2,16 +2,19 @@
 
 Controllers are run on the same instances (common random numbers: identical passengers and keyed
 draws per instance), so comparisons are paired.  Tail metrics are primary:
-  p95 wait, CVaR95 wait, peak landing density (max of lobby and event floor), and
-  logger understatement (H1).
+  p95 wait, CVaR95 wait, peak density at the event station (platform or plaza), and
+  logger understatement (E1).
 
 dev:     instances from the public dev split (any number of runs).
 holdout: instances derived from CAGES_HOLDOUT_SALT; requires a ledger pre-registration and runs
          exactly once per pre-registration.
 
 v1.1 (no holdout run had occurred): adds ``mixture+timestral:<ckpt>@<thr>`` so the mixture and its
-comparison arm (``esa+timestral``) share the learned forecaster, and GPU evaluation: set
-``CAGES_EVAL_DEVICE=cuda`` to run decision models on the GPU (spawned workers, default 1).
+comparison arm share the learned forecaster, and GPU evaluation: set ``CAGES_EVAL_DEVICE=cuda`` to run
+decision models on the GPU (spawned workers, default 1).
+v2.0 (no holdout run had occurred): the project pivots from elevators to subway and bus evacuation.
+The controllers, instances and primary metrics are those of the transit simulator; the ledger, the
+one-shot holdout rule and the statistics are unchanged.
 """
 
 from __future__ import annotations
@@ -24,33 +27,36 @@ from pathlib import Path
 import numpy as np
 from scipy import stats
 
-from ..controllers import ETA, ClosestCar, ESAPlanner, ForecastParking, TsaiStandby
+from ..controllers import ExpressRule, ForecastStaging, NextTrain, RollingHorizon, Timetable
 from ..data.instances import build_scenario, holdout_specs, make_specs
 from ..forecast import ScheduleForecaster
 from ..sim import Simulation, evaluate
 from .ledger import Ledger, file_sha256
 
-EVAL_VERSION = "1.1"
-PRIMARY = ("p95", "cvar95", "peak_landing_density")
+EVAL_VERSION = "2.0"
+PRIMARY = ("p95", "cvar95", "peak_density")
 
 
 def make_controller(name: str):
-    if name == "closest_car":
-        return ClosestCar()
-    if name == "eta":
-        return ETA()
-    if name == "esa":
-        return ESAPlanner()
-    if name == "esa_omniscient":
-        return ESAPlanner(omniscient=True)
-    if name == "tsai_standby":
-        return TsaiStandby()
-    if name == "esa+schedule":
-        return ForecastParking(ESAPlanner(), ScheduleForecaster())
-    if name == "esa+timestral":
+    if name == "timetable":
+        return Timetable()
+    if name == "next_train":
+        return NextTrain()
+    if name == "express_rule":
+        return ExpressRule()
+    if name == "rolling_horizon":
+        return RollingHorizon()
+    if name == "rolling_horizon_omniscient":
+        return RollingHorizon(omniscient=True)
+    if name == "staging":
+        return ForecastStaging(RollingHorizon(), ScheduleForecaster())
+    if name == "staging+express":
+        return ForecastStaging(ExpressRule(), ScheduleForecaster())
+    if name == "staging+timestral":
         from ..forecast.timestral_adapter import TimestralDemand
 
-        return ForecastParking(ESAPlanner(), TimestralDemand())
+        fc = TimestralDemand()
+        return ForecastStaging(RollingHorizon(forecaster=fc), fc)
     if name.startswith(("mixture:", "mixture+timestral:")):
         import torch
 
@@ -80,7 +86,6 @@ def run_one(args) -> dict:
     ctrl = make_controller(cname)
     sim = Simulation(build_scenario(spec), ctrl).run()
     m = evaluate(sim)
-    m["peak_landing_density"] = max(m["peak_lobby_density"], m["peak_event_floor_density"])
     m["instance"], m["controller"] = spec["id"], cname
     if hasattr(ctrl, "stats"):
         tot = sum(ctrl.stats.values())
@@ -121,8 +126,8 @@ def paired(results: dict, a: str, b: str, metric: str, n_boot: int = 2000, seed:
 
 
 def summarize(results: dict) -> dict:
-    keys = ("awt", "p95", "cvar95", "max_wait", "wheelchair_p95", "peak_landing_density", "danger_s_lobby",
-            "logger_understatement", "stranded_frac", "n_censored")
+    keys = ("awt", "p95", "cvar95", "evac_p95", "max_wait", "wheelchair_p95", "peak_density", "danger_s_platform",
+            "danger_s_plaza", "clearance_s", "logger_understatement", "stranded_frac", "n_censored")
     return {c: {k: float(np.nanmean([r[k] for r in rows])) for k in keys} for c, rows in results.items()}
 
 
