@@ -1,6 +1,6 @@
 # Report 002: Scale CAGES (evacuation) to v0, pick the label horizon, train the E3 backbones, dev selection and edge latency
-Status: in_progress
-Branch head at start: 0d0ccd1db4a3d3f087fecd5cd757b6da9a9d1c67  ·  at finish: TBD
+Status: done
+Branch head at start: 0d0ccd1db4a3d3f087fecd5cd757b6da9a9d1c67  ·  at finish: e16cd18f75a56ca4b731837b00035ed3bd5f7735
 
 ## Summary
 Task complete. CAGES v0 generated at both horizons (23,554/2,360 states each);
