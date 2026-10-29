@@ -31,7 +31,7 @@ Direct search by the lead agent. No researcher subagents: this is one coherent c
 | T2 evidence: healthcare-facility-evacuation | done |
 | T2 evidence: relief-last-mile | done |
 | T2 evidence: crowd-crush | done |
-| T2 evidence: venue-transit-evacuation | todo |
+| T2 evidence: venue-transit-evacuation | done |
 | T2 evidence: ems-surge-dispatch | todo |
 | T3 method novelty check | todo |
 | T4 scored draft | todo |

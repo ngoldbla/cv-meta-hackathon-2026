@@ -27,3 +27,6 @@
 | 2026-10-29 | crowd-crush | crowd crush prevention real-time crowd management density monitoring flow control Helbing Love Parade analysis systemic failure | EPJ Data Science 2012; ScienceDaily |
 | 2026-10-29 | crowd-crush | pedestrian crowd simulation open source JuPedSim Vadere calibration data fundamental diagram crowd management optimization | Vadere arXiv; JuPedSim PyPI |
 | 2026-10-29 | crowd-crush | pedestrian dynamics data archive Jülich experiments high density crowd validation data crush conditions | Jülich archive; Collective Dynamics; Lyon field study |
+| 2026-10-29 | venue-transit-evacuation | stadium event crowd transit station platform overcrowding incident after match evacuation subway crush injuries | Mumbai Elphinstone; Bengaluru 2025; Secaucus Super Bowl; Rome escalator |
+| 2026-10-29 | venue-transit-evacuation | Gao Kroon Schmidt Yang rescheduling metro line over-crowded situation after disruptions Transportation Research Part B 2016 | TR-B 93:425-449 |
+| 2026-10-29 | venue-transit-evacuation | (repository) research/results.md, experiments/results/dev-selection.md, ops/reports/002 | committed CAGES results |
