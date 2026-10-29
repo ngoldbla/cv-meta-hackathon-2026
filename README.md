@@ -1,89 +1,34 @@
-# CAGES: worst-case-ready evacuation by subway and bus
+# Emergency-logistics autoresearch
 
-**CAGES** = **C**alibrated, **A**dversarially **G**enerated **E**vacuation **S**imulation.
+An open research program. An agent-driven loop co-designs worst-case scenarios and response policies against a frozen, calibrated simulator. The test is whether the policies it finds beat the strongest classical planners on the worst outcomes of a hard emergency-logistics problem, and which parts of the loop cause the gain.
+
 Author: Dylan Goldblatt. Code: MIT. Data: CC BY 4.0.
 
-## The problem
+*Safety scope: simulation research only. Nothing here certifies an evacuation, a dispatch policy or a relief plan.*
 
-When an emergency empties a crowded venue into its subway station, today's rail and bus dispatch methods fail by design:
-- they reschedule trains against passenger flows they assume are known [1];
-- they cannot see the people left behind on platforms when full trains depart [2];
-- they plan bus evacuations for evacuee counts fixed in advance [3].
+## How the loop works
+- **Frozen judge.** A calibrated simulator, its evaluator and its real-world anchors. Their hashes are in the ledger, and no loop may edit them.
+- **Blue loop.** Feynman's autoresearch ([`skills/autoresearch/`](skills/autoresearch/SKILL.md)) over response policies: learned and hybrid models first, readable code as a baseline. One change per iteration, keep or revert, every iteration logged and committed.
+- **Red loop.** The same loop over the scenario generator. It looks for scenarios where the policy falls furthest short of what was achievable (regret), inside calibrated bounds.
+- **Counterfactual reports.** Every decision is replayed under every option, so each run shows which decisions cost the most.
+- **One-shot holdout.** Claims are pre-registered in the hash-chained ledger and tested once, on sealed holdout pools.
 
-As a result, platform crush, stranded evacuees and dangerous densities go unmodelled, unmeasured and unmanaged.
+Design: [`docs/superpowers/specs/2026-10-29-emergency-logistics-loop-design.md`](docs/superpowers/specs/2026-10-29-emergency-logistics-loop-design.md)
 
-[1] Gao, Kroon, Schmidt & Yang, *Rescheduling a metro line in an over-crowded situation after disruptions*, Transp. Res. B 93 (2016) 425–449
-[2] *Measuring Left-Behinds on Subway*, MassDOT research report (2018)
-[3] Bish, *Planning for a bus-based evacuation*, OR Spectrum 33(3) (2011) 629–654
-
-## The mission
-
-We make subway and bus service ready for the worst-case evacuation with an open three-model mixture trained on CAGES:
-- **Muse** orchestrates the science;
-- **Timestral-28M** forecasts;
-- a **decapitated local Muse** decides which train or bus answers each crowded platform, with an open rolling-horizon dispatcher as the fallback.
-
-The mixture has four parts:
-- **CAGES data.**
-  - An event-driven simulation of the NYC **7 line**, calibrated to MTA open data: GTFS station positions, run times and headways, and 2024 hourly ridership.
-  - The narrow target is an emergency evacuation of the venue at **Mets–Willets Point** (Citi Field, up to 41,922 people), with spare trains from Corona Yard and shuttle buses.
-  - Scenarios combine five worst-case failure modes (`docs/failure-modes.md`).
-  - Every decision is labelled with its counterfactual outcome, and each run records both the true passenger waits and what the operator's logs show.
-- **Forecast.** On the emergency declaration, the forecast stages yard trains and buses for the expected crowd.
-- **Decide.** Muse Glimmer is decapitated (LM head removed) and truncated to its first layers. A per-slot value head scores every candidate in one deterministic pass, with a calibrated confidence. The candidates are: no action, one of the four nearest trains sent express, a yard train, or a bus. When confidence is low, the rolling-horizon dispatcher decides.
-  - Controls: Laya-421M and a 20M transformer trained from scratch.
-- **Orchestrate.** A Muse model runs the Feynman loop (audit → replicate → pre-register → bounded search → one holdout test → review) through MCP tools and Markdown skills. It works offline only and is never in the control path.
-
-## How the simulation maps the old elevator design
-
-| Elevator (until commit `5b9ee7e`) | Transit (now) |
+## Status
+| Milestone | State |
 |---|---|
-| car | train on the 7 line, or shuttle bus |
-| floor | station (22, Flushing–Main St to 34 St–Hudson Yards) |
-| hall call | platform-crowding alert: coarse levels, delayed |
-| landing density | platform density, with spill-back into the plaza outside |
-| which car answers the call | which vehicle answers the alert |
-| parking / standby | staging yard trains and buses on the emergency declaration |
-| ESA planner | rolling-horizon dispatcher |
+| M1 problem survey | in progress (`research/problem-selection/`) |
+| M2 loop wiring and dry run on CAGES | in progress |
+| M3–M6 | planned after the problem is chosen |
 
-## How the code runs the loop
+## Judges
+| Judge | Problem | Where | State |
+|---|---|---|---|
+| CAGES v0 | Subway and bus evacuation of a stadium on the NYC 7 line | repository root (`cages/`); moves to `judges/cages/` in M3 | frozen evaluator v2.0, ledger entries 1–10, tag `cages-v0`. See [`docs/cages.md`](docs/cages.md). |
 
-| Piece | Where |
-|---|---|
-| Line simulator and failure modes | `cages/sim/` |
-| MTA calibration data (aggregates) | `cages/data/stock.py`, `cages/data/mta_7line.json` |
-| Crowd model (social force + boids, Weidmann-calibrated; optional JuPedSim) | `cages/crowd/` |
-| Baselines (timetable, next train, express rule, rolling horizon, omniscient reference, staging) | `cages/controllers/` |
-| CAGES generator and counterfactual labeller | `cages/data/` |
-| Forecasting (schedule prior, Timestral adapter) | `cages/forecast/` |
-| Decapitation tool, decision model, training | `cages/model/` |
-| Frozen evaluator, hash-chained ledger, MCP server | `cages/harness/` |
-| Gymnasium env `cages/Evacuation-v0` | `cages/envs/` |
-| Agent rules, loop skills, task mailbox | `AGENTS.md`, `skills/`, `ops/` |
-| Pre-registrations and ledger | `research/` |
-| Edge benchmark, budget-capped cloud jobs | `scripts/edge_bench.py`, `cloud/` |
-
-Guardrails are enforced in code:
-- the evaluator is frozen (`scripts/guard_paths.py`);
-- holdout seeds derive from `CAGES_HOLDOUT_SALT`, which never enters the repository;
-- each pre-registration gets exactly one holdout run, recorded in `research/ledger.jsonl`.
-
-## Quick start
-
-```bash
-python -m venv .venv && . .venv/bin/activate
-pip install -e ".[dev,model,hf,mcp]"
-pytest -q                                          # line physics, crowd, labels, models, harness
-python -m cages.cli simulate --controller staging  # one evacuation, true vs logged metrics
-python -m cages.data.generate --out datasets/cages-v0-mini --train 60 --dev 15
-python -m cages.model.train --data datasets/cages-v0-mini --out runs/scratch
-python -m cages.harness.mcp_server                 # expose the loop to any agent harness
-```
-
-Results so far, with their caveats, are in [`research/results.md`](research/results.md).
-
-GPU phase (backbones, edge latency): [`docs/runbook-gpu.md`](docs/runbook-gpu.md).
-Running the research loop from Muse Code: [`docs/runbook-loop.md`](docs/runbook-loop.md).
-Maintainer-only changes to frozen paths: [`maintainer/README.md`](maintainer/README.md).
-
-*Safety scope: simulation research only. Nothing here certifies a station, a train service or an evacuation plan.*
+## Running the loop
+- Rules for any agent: [`AGENTS.md`](AGENTS.md).
+- Muse Code runbook: [`docs/runbook-loop.md`](docs/runbook-loop.md).
+- Task mailbox: [`ops/README.md`](ops/README.md).
+- CAGES quick start: [`docs/cages.md`](docs/cages.md#quick-start).

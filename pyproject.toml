@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "cages"
 version = "0.1.0"
 description = "CAGES: Calibrated, Adversarially Generated Evacuation Simulation dataset and worst-case-ready subway and bus dispatch for emergency evacuations."
-readme = "README.md"
+readme = "docs/cages.md"
 license = { text = "MIT" }
 authors = [{ name = "Dylan Goldblatt" }]
 requires-python = ">=3.10"

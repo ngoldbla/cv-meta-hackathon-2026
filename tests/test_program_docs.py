@@ -1,5 +1,6 @@
 """Program-level repository invariants: skill discovery, the mailbox branch, and documentation links."""
 
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -54,3 +55,23 @@ def test_mailbox_lives_on_main():
     assert "git checkout main && git pull --ff-only" in (SKILLS / "inbox" / "SKILL.md").read_text()
     assert 'muse exec --trust-workspace "Pull main and follow skills/inbox/SKILL.md."' in \
         (ROOT / "docs" / "runbook-loop.md").read_text()
+
+
+LINK = re.compile(r"\]\(([^)#\s]+)(?:#[^)]*)?\)")
+
+
+def test_relative_links_resolve():
+    for rel in ("README.md", "docs/cages.md", "AGENTS.md", "docs/runbook-loop.md", "ops/README.md"):
+        doc = ROOT / rel
+        assert doc.exists(), rel
+        for target in LINK.findall(doc.read_text()):
+            if target.startswith(("http://", "https://", "mailto:")):
+                continue
+            assert (doc.parent / target).exists(), f"{rel}: broken link {target}"
+
+
+def test_program_readme_and_agents_program_section():
+    readme = (ROOT / "README.md").read_text()
+    assert readme.startswith("# Emergency-logistics autoresearch")
+    assert "docs/cages.md" in readme
+    assert "## Program" in (ROOT / "AGENTS.md").read_text()

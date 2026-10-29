@@ -2,6 +2,11 @@
 
 This repository is a scientific instrument. Any agent, model or harness can run the loop for free; the rules below are what make its results trustworthy. Attribution: commits are authored by the repository author, with an `Assisted-by: agent` trailer, and never name an assistant vendor or product.
 
+## Program
+This repository hosts one research program: a loop that co-designs adversarial scenarios and response policies against a frozen judge (design: `docs/superpowers/specs/2026-10-29-emergency-logistics-loop-design.md`).
+- **Judges.** Each judge is a calibrated simulator with a frozen evaluator. CAGES is judge #1 and lives at the repository root until M3. The rules below that name CAGES paths apply to it.
+- **Loops.** Each loop runs through `skills/autoresearch/`, in its own git worktree (`scripts/ar_worktree.sh`), and is audited with `scripts/ar_check.py` before anything is reported.
+
 ## The loop (skills in `skills/`)
 1. **audit** (`skills/audit/`): check literature claims against their sources and code; update `research/claims.yaml`.
 2. **replicate** (`skills/replicate/`): reproduce the baselines (timetable, next train, express rule, rolling horizon, forecast staging) on the dev split before extending anything.
