@@ -23,6 +23,7 @@ Prerequisites pass; Part A done. `scripts/extract_laya_encoder.py` rebuilds `run
   - `evac-scratch-20m`: @0.0 2141, @0.2 2138, @0.35 2202 (`experiments/results/dev-evac-scratch-20m/`).
   - `evac-scratch-20m-s1`: @0.0 2160, @0.2 2161, @0.35 2190 (`experiments/results/dev-evac-scratch-20m-s1/`).
   - `evac-scratch-20m-s2`: @0.0 2145, @0.2 2145, @0.35 2189 (`experiments/results/dev-evac-scratch-20m-s2/`).
+  - `evac-laya-r16`: @0.0 2119, @0.2 2127, @0.35 2177 (`experiments/results/dev-evac-laya-r16/`).
 
 ## Results
 | probe mixture @0.0 | mean dev P95 | vs staging | file |
