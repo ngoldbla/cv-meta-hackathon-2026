@@ -1,0 +1,27 @@
+{
+ "version": "0.2",
+ "label_config": {
+  "K": 4,
+  "horizon": 2700.0,
+  "p_label": 1.0,
+  "max_states": 20,
+  "epsilon": 0.25,
+  "tau": 60.0
+ },
+ "regime": "inversion",
+ "code_sha": "cfc862f5f4857208d6224ad16278f6acf7e71331",
+ "instances_sha256": "a9ab2f77697cf38a2fe641117b57fa649a7c735ab6b970050486db34b1552b02",
+ "created_unix": 1793246690,
+ "splits": {
+  "train": {
+   "instances": 3000,
+   "states": 23554,
+   "seconds": 9879.9
+  },
+  "dev": {
+   "instances": 300,
+   "states": 2360,
+   "seconds": 1082.9
+  }
+ }
+}
