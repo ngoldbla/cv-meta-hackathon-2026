@@ -9,3 +9,7 @@
 | 2026-10-29 | wildfire-evacuation | reinforcement learning wildfire evacuation order timing traffic simulation 2024 2025 | PyroRL; JaxWildfire; Mitacs Flin Flon |
 | 2026-10-29 | wildfire-evacuation | NIST Technical Note 2252 Camp Fire NETTRA ... Maranghides | NIST publication page |
 | 2026-10-29 | wildfire-evacuation | wildfire evacuation survey data departure time decisions 2017 2018 California fires Wong Shaheen Walker | Transportation 50(4) 2023; Berkeley ITS |
+| 2026-10-29 | hurricane-evacuation | Hurricane Rita 2005 evacuation gridlock deaths Houston traffic heat bus fire | Wikipedia Rita evacuation; Texas Tribune; NPR 2005 |
+| 2026-10-29 | hurricane-evacuation | hurricane evacuation contraflow staged evacuation optimization model review transportation research | UMD CTM thesis; NICTA planner; UF |
+| 2026-10-29 | hurricane-evacuation | hurricane evacuation decision forecast uncertainty when to issue evacuation order stochastic dynamic programming | NSF PAR MSSP; Delaware hazard trees |
+| 2026-10-29 | hurricane-evacuation | Huang Lindell Prater 2016 hurricane evacuation decision meta-analysis empirical studies Environment and Behavior | Env & Behavior 48(8) |
