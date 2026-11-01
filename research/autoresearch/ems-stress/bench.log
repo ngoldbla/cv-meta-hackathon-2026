@@ -1,2 +1,4 @@
 {"run": "runs/ar-red-ems/20261101-175148", "seconds": 61.5, "b1_primary": 10894.519452305442, "oracle_primary": 12877.83254852939, "days_with_regret": 72, "mean_demand": 1.0773876117258954, "mean_unavailable": 0.10858145877754798}
 METRIC regret_b1=500.25
+{"run": "runs/ar-red-ems/20261101-175344", "seconds": 62.2, "b1_primary": 11456.837059505657, "oracle_primary": 13970.929112265001, "days_with_regret": 60, "mean_demand": 1.0773876117258954, "mean_unavailable": 0.10858145877754798}
+METRIC regret_b1=491.75
