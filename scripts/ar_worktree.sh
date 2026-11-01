@@ -11,5 +11,8 @@ case "$role" in blue|red) ;; *) echo "role must be blue or red" >&2; exit 2 ;; e
 root=$(git rev-parse --show-toplevel)
 dest="$(dirname "$root")/$(basename "$root")-ar-$role-$slug"
 git -C "$root" worktree add -q -b "ar/$role/$slug" "$dest" "$base"
-[ -e "$root/.venv" ] && ln -s "$root/.venv" "$dest/.venv"
+if [ -e "$root/.venv" ]; then
+  ln -s "$root/.venv" "$dest/.venv"
+  for j in "$dest"/judges/*/; do [ -d "$j" ] && ln -s "$root/.venv" "${j%/}/.venv"; done
+fi
 echo "$dest"

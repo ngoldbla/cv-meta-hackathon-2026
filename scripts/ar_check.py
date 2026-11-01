@@ -76,7 +76,8 @@ def main(argv: list[str] | None = None) -> int:
     changed = subprocess.run(["git", "diff", "--name-only", f"{a.base}...{a.branch}"], capture_output=True,
                              text=True, check=True).stdout.split()
     problems += check_scope(changed, [s for s in a.scope.split(",") if s], str(Path(a.log).parent))
-    frozen = subprocess.run([sys.executable, "scripts/guard_paths.py", *changed], capture_output=True, text=True)
+    guard = Path(__file__).resolve().parent / "guard_paths.py"
+    frozen = subprocess.run([sys.executable, str(guard), *changed], capture_output=True, text=True)
     if frozen.returncode:
         problems.append("frozen paths changed: " + frozen.stdout.strip())
     for p in problems:
