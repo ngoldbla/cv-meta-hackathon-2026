@@ -12,14 +12,14 @@ from datetime import date
 
 import numpy as np
 
-from ems.scenarios.bounds import LOAD_CAP, check
+from ems.scenarios.bounds import check
 from ems.scenarios.sampler import sample_theta as nominal_theta
 
 
 def sample_theta(rng: np.random.Generator, d: date) -> dict:
     t = nominal_theta(rng)
     t["unavailable"] = 0.25
-    t["demand"] = LOAD_CAP * (1.0 - 0.25) - 1e-6
+    t["demand"] = 1.0
     t["urgent_share"] = 1.153
     return check(t)
 
