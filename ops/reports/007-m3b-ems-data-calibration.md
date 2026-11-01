@@ -43,3 +43,9 @@ Started task 007. Prerequisite holds (FROZEN exists, ledger ends seq 11 evaluato
 - Cache round-trip: `load('calib-2019')` → 1,533,251 rows, manifest hash verified.
 - Deviation: `bounds_daily.csv` is 6.15 MB, over the plan's "well under 5 MB" estimate. Content is correct (daily borough×severity aggregates, 14 years); recorded here, continuing since all correctness checks pass and the 10 MB committed-output budget still holds.
 - Commit: `06b325a26623fb473c93c5140420cca4d6b00e71` ("EMS: Socrata ingest, manifests (holdout = counts only), bounds aggregates"). `git status | grep -c cache` → 0 (cache ignored).
+
+### Task 4: Cleaning and derived durations
+- Tests written: `judges/ems/tests/test_clean.py` (types, tiers, durations, bad-severity drop).
+- Failing run first lines: `F [100%]`, `ModuleNotFoundError: No module named 'ems.data.clean'`.
+- Passing run: `1 passed`, `ruff check .` clean, `name_guard.py` clean.
+- Commit: `3afd9c8c38a203909ce9099074b70a9b73bc11f9` ("EMS: typed cleaning and derived durations").
