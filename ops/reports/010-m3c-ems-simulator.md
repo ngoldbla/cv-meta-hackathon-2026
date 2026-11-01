@@ -1,9 +1,13 @@
 # Report 010: M3c: EMS simulator, b0, fit and the single anchor check (plan Tasks 1-4)
-Status: in_progress
-Branch head at start: 79b9af4  ·  at finish: <tbd>
+Status: done
+Branch head at start: 79b9af4  ·  at finish: 3e6df93
 
 ## Summary
-Executing `docs/superpowers/plans/2026-11-01-m3c-ems-simulator.md` Tasks 1-4 exactly. (To be completed.)
+Executed `docs/superpowers/plans/2026-11-01-m3c-ems-simulator.md` Tasks 1-4 exactly, one commit and push per task.
+Built the simulator core, policy API and b0 (7/7 tests), replay day tables (1095 days) and fit-day inputs,
+fitted fleet_k = 1.1980 with tier factors 0.546/0.712/0.957, and ran the anchor check exactly once: 7/10
+(exit 1), matching every expected value to the third decimal. Known limits frozen in the anchor report;
+journal updated. Nothing here is a finding and no ledger entries were written.
 
 ## Work done
 - Claimed task 010.

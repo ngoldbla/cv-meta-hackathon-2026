@@ -1,7 +1,7 @@
 ---
 id: "010"
 title: "M3c: EMS simulator, b0, fit and the single anchor check (plan Tasks 1-4)"
-status: in_progress
+status: done
 created: 2026-11-01
 report: ops/reports/010-m3c-ems-simulator.md
 ---
