@@ -46,17 +46,36 @@ class IdleUnit:
     moving: bool
 
 
-@dataclass(frozen=True)
 class Observation:
-    """Only what a dispatcher has: no future calls, final severity, transport need or offload completion."""
+    """Only what a dispatcher has: no future calls, final severity, transport need or offload completion.
 
-    now: float
-    hour: int
-    queue: tuple[QueuedCall, ...]
-    idle: tuple[IdleUnit, ...]
-    busy_at_hospital: tuple[tuple[int, int, float], ...]  # (unit, borough, seconds at hospital so far)
-    budget_unit_hours: float
-    calls_last_hour: tuple[int, ...]  # per borough index
+    `queue`, `idle` and `busy_at_hospital` are built on first access (read `idle` first to stop early).
+    busy_at_hospital: (unit, borough, seconds at hospital so far); calls_last_hour: per borough index;
+    divert_left: Divert actions still allowed by the divert cap.
+    """
+
+    def __init__(self, now, hour, queue_fn, idle_fn, hosp_fn, budget_unit_hours, calls_last_hour, divert_left=0):
+        self.now, self.hour, self.divert_left = now, hour, divert_left
+        self.budget_unit_hours, self.calls_last_hour = budget_unit_hours, calls_last_hour
+        self._q, self._i, self._h = queue_fn, idle_fn, hosp_fn
+
+    @property
+    def queue(self) -> tuple[QueuedCall, ...]:
+        if callable(self._q):
+            self._q = self._q()
+        return self._q
+
+    @property
+    def idle(self) -> tuple[IdleUnit, ...]:
+        if callable(self._i):
+            self._i = self._i()
+        return self._i
+
+    @property
+    def busy_at_hospital(self) -> tuple[tuple[int, int, float], ...]:
+        if callable(self._h):
+            self._h = self._h()
+        return self._h
 
 
 class Policy:

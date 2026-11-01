@@ -13,6 +13,8 @@ class Practice(Policy):
     def act(self, obs: Observation) -> list:
         acts = []
         idle = list(obs.idle)
+        if not idle:
+            return acts
         for c in sorted(obs.queue, key=lambda q: (q.tier, -q.waited_s)):
             if not idle:
                 break

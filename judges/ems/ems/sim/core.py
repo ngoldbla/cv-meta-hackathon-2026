@@ -15,15 +15,13 @@ from dataclasses import dataclass, field
 import numpy as np
 from scipy.special import ndtri
 
+from ..params import CENTRAL
 from ..policy.api import Activate, Assign, Divert, IdleUnit, Observation, QueuedCall, Relocate
 from .calib import BOROUGHS, Calibration, inv_cdf
 
 U_PROC, U_TRAVEL, U_TRANSPORT, U_ONSCENE, U_TTIME, U_OFFLOAD, U_CLOSE, U_DIVERT = range(8)
 N_U = 8
-PARAMS = {  # PROVISIONAL lever parameters; sourced from literature and frozen in M3d (spec §8)
-    "activate_lag_s": 2700.0, "tour_s": 12 * 3600.0, "budget_frac": 0.10,
-    "divert_triage_s": 900.0, "divert_callback_p": 0.10, "divert_callback_delay_s": 3600.0,
-}
+PARAMS = CENTRAL  # frozen lever parameters (ems/params.py)
 
 
 @dataclass
@@ -90,6 +88,9 @@ class Simulation:
         self.invalid = 0
         self.unit_hours_extra = 0.0
         self.recent = (0,) * len(BOROUGHS)
+        self.n3_seen = 0
+        self.n_diverted = 0
+        self.queued: set[int] = set()
         fleet_hours = sum(self.cal.fleet_target(b, h) for b in BOROUGHS for h in range(24))
         self.budget = self.p["budget_frac"] * fleet_hours
         self._make_units()
@@ -144,6 +145,8 @@ class Simulation:
 
     def _on_call(self, i: int) -> None:
         c = self.calls[i]
+        if c.tier == 3 and c.parent < 0:
+            self.n3_seen += 1
         self._push(c.t_call + self._svc(c, "processing_q", U_PROC), "ready", i)
 
     def _on_ready(self, i: int) -> None:
@@ -151,6 +154,7 @@ class Simulation:
         c.t_ready = self.now
         c.held = not any(u.status == "idle" and u.on_duty for u in self.units)
         self.queue.append(i)
+        self.queued.add(i)
 
     def _on_hour(self, h: int) -> None:
         hh = h % 24
@@ -166,7 +170,7 @@ class Simulation:
         for bi, b in enumerate(BOROUGHS):
             exp3 = sum(self.cal.expected_calls(b, (hh - k) % 24) for k in range(1, 4))
             ratio = trail[bi] / exp3 if exp3 > 0 and h >= 3 else 1.0
-            target = self.cal.fleet_target(b, hh, ratio)
+            target = int(round(self.cal.fleet_target(b, hh, ratio) * (1.0 - float(self.theta.get("unavailable", 0.0)))))
             mine = [u for u in self.units if u.b == bi and math.isnan(u.extra_until)]
             on = [u for u in mine if u.on_duty and not u.leave_when_free]
             if len(on) < target:
@@ -223,11 +227,20 @@ class Simulation:
     # ---------------------------------------------------------------- policy interface
     def observe(self) -> Observation:
         hour = int(self.now // 3600) % 24
-        q = tuple(QueuedCall(i, self.calls[i].z, self.calls[i].b, self.calls[i].tier, self.now - self.calls[i].t_ready)
-                  for i in self.queue)
-        idle = tuple(IdleUnit(u.id, u.z, u.b, u.home, u.dest >= 0) for u in self.units if u.status == "idle" and u.on_duty)
-        hosp = tuple((u.id, u.b, self.now - u.at_hospital_since) for u in self.units if not math.isnan(u.at_hospital_since))
-        return Observation(self.now, hour, q, idle, hosp, self.budget - self.unit_hours_extra, self.recent)
+        now = self.now
+
+        def queue():
+            return tuple(QueuedCall(i, self.calls[i].z, self.calls[i].b, self.calls[i].tier, now - self.calls[i].t_ready)
+                         for i in self.queue)
+
+        def idle():
+            return tuple(IdleUnit(u.id, u.z, u.b, u.home, u.dest >= 0) for u in self.units if u.status == "idle" and u.on_duty)
+
+        def hosp():
+            return tuple((u.id, u.b, now - u.at_hospital_since) for u in self.units if not math.isnan(u.at_hospital_since))
+
+        divert_left = math.ceil(self.p["divert_cap"] * self.n3_seen) - self.n_diverted
+        return Observation(now, hour, queue, idle, hosp, self.budget - self.unit_hours_extra, self.recent, divert_left)
 
     def _apply(self, actions) -> None:
         for a in actions or ():
@@ -235,12 +248,13 @@ class Simulation:
             self.invalid += 0 if ok else 1
 
     def _do_assign(self, a: Assign) -> bool:
-        if a.call not in self.queue or not (0 <= a.unit < len(self.units)):
+        if a.call not in self.queued or not (0 <= a.unit < len(self.units)):
             return False
         u, c = self.units[a.unit], self.calls[a.call]
         if u.status != "idle" or not u.on_duty:
             return False
         self.queue.remove(a.call)
+        self.queued.discard(a.call)
         c.t_assign, c.unit = self.now, u.id
         c.t_scene = self.now + self._travel(u.z, c)
         u.status, u.dest = "busy", -1
@@ -278,10 +292,14 @@ class Simulation:
         return True
 
     def _do_divert(self, a: Divert) -> bool:
-        if a.call not in self.queue or self.calls[a.call].tier != 3:
+        if a.call not in self.queued or self.calls[a.call].tier != 3:
+            return False
+        if self.n_diverted + 1 > math.ceil(self.p["divert_cap"] * self.n3_seen):
             return False
         c = self.calls[a.call]
         self.queue.remove(a.call)
+        self.queued.discard(a.call)
+        self.n_diverted += 1
         c.diverted, c.t_assign = True, self.now
         c.t_scene = self.now + self.p["divert_triage_s"]  # resolved by secondary triage
         if c.u[U_DIVERT] < self.p["divert_callback_p"]:
