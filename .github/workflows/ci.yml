@@ -16,7 +16,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install torch --index-url https://download.pytorch.org/whl/cpu
-          pip install -e ".[dev,model,hf,mcp]" peft
+          pip install -e ".[dev,model,hf,mcp,ems]" peft
       - name: Lint
         run: ruff check .
       - name: Name guard (vendor neutrality)
