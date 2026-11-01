@@ -1,6 +1,6 @@
 # Report 011: M3d: EMS evaluator, scenarios, b1, counterfactual reports, benchmark and compute gate (plan Tasks 1-4)
 Status: done
-Branch head at start: 0794d03ea594f88dd3622500fd410af83a7fcbbc  ·  at finish: TBD
+Branch head at start: 0794d03ea594f88dd3622500fd410af83a7fcbbc  ·  at finish: 601eae6fc4de486ecc62ba64abada7806a8102c9
 
 ## Summary
 Executed plan Tasks 1-4 from docs/superpowers/plans/2026-11-01-m3d-ems-evaluator.md exactly: frozen lever parameters, scenario bounds/sampler and simulator changes; b1 classical baseline with foresight oracle; frozen evaluator with paired claims and holdout gate plus counterfactual reports; blue-loop benchmark, compute gate, sensitivity sweep and report. All numbers match the plan's expected values (oracle 13278.5 vs plan 13279.x is within 0.5%). Dev days only; eval_holdout never called; no FROZEN, no ledger entries. Nothing here is a finding.
