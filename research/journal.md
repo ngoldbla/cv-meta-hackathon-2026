@@ -140,3 +140,8 @@
 - **What was tried:** built the frozen lever parameters and scenario bounds/sampler, the b1 classical baseline with its foresight oracle, the frozen evaluator with paired claims and holdout gate, per-decision counterfactual reports with a sensitivity sweep, and the blue-loop benchmark (plan: `docs/superpowers/plans/2026-11-01-m3d-ems-evaluator.md` Tasks 1–4; report: `ops/reports/011-m3d-ems-evaluator.md`). Dev days only; `eval_holdout` never called. Nothing here is a finding.
 - **What happened:** compute gate passes: cold 91.22 s, warm 30.66 s (gate 600 s), METRIC ratio_b1=1.0000, candidate primary 11247.14. On 200 dev days: b1 11247.1, oracle 13278.5, ref 10759.4 (primary); oracle beats b1 on 71 of 200. Counterfactual on 2018-02-12: factual_primary 1603.57, 22 decision points, 20 sampled. Sensitivity (b1/b0 primary, n=48): central 0.0413, all CI upper ends below 0.1; callback delay most sensitive (0.0091–0.0824). Known limits in `judges/ems/calibration/m3d_report.md`. Full suite: 122 passed, 1 skipped; ruff and name guard clean.
 - **Next:** freeze is a separate maintainer step after Dylan's review (no `judges/ems/FROZEN`, no ledger entries written).
+
+## 2026-11-01: ems-stress red loop baseline (task 014)
+- **What was tried:** initialized the red autoresearch loop in this worktree (branch `ar/red/ems-stress`); ran the unchanged nominal generator as iteration 0 (bench: 200 dev days, `regret_b1`, higher is better).
+- **What happened:** baseline `regret_b1=500.25` in 62 s, matching the task's expected value; oracle beats b1 on 72 of 200 days. Nothing here is a finding.
+- **Next:** iterations 1+ test one generator change each (concentration, load, urgency, offload, unavailability, day choice, date conditioning), keeping strict improvements.

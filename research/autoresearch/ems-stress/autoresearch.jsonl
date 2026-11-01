@@ -1,0 +1,1 @@
+{"iter": 0, "time": "2026-11-01T22:52:10Z", "commit": "d67b05811a85fd4ee50fbf5abfb29cfb2e6f7241", "hypothesis": "baseline: nominal sampler, random days", "files": ["judges/ems/experiments/ar/ems_red_sampler.py"], "metric": "regret_b1", "value": 500.25, "best_before": null, "decision": "baseline", "evidence": "research/autoresearch/ems-stress/bench.log", "seconds": 62.0}
