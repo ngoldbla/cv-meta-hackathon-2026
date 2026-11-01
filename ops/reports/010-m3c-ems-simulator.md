@@ -1,6 +1,6 @@
 # Report 010: M3c: EMS simulator, b0, fit and the single anchor check (plan Tasks 1-4)
 Status: done
-Branch head at start: 79b9af4  ·  at finish: 3e6df93
+Branch head at start: 79b9af4  ·  at finish: ddf0882
 
 ## Summary
 Executed `docs/superpowers/plans/2026-11-01-m3c-ems-simulator.md` Tasks 1-4 exactly, one commit and push per task.
