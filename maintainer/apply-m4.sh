@@ -23,6 +23,7 @@ red_commit=$(git rev-parse "$RED")
 git show "$RED:judges/ems/experiments/ar/ems_red_sampler.py" > judges/ems/experiments/ar/ems_red_generator_m4.py
 cp maintainer/m4/evaluate.py judges/ems/ems/evaluate.py
 cp maintainer/m4/test_evaluate.py judges/ems/tests/test_evaluate.py
+cp maintainer/m4/test_judges_layout.py tests/test_judges_layout.py
 (cd judges/ems && "$PY" scripts/stress_pool.py --generator experiments/ar/ems_red_generator_m4.py)
 cat maintainer/m4/FROZEN.add >> judges/ems/FROZEN
 "$PY" -m pytest -q
@@ -35,7 +36,8 @@ echo "$out" | grep -q '"primary": 11247.14150209779' || { echo "bench drifted: $
 git config loopkit.unfreeze maintainer
 trap 'git config --unset loopkit.unfreeze || true' EXIT
 git add judges/ems/FROZEN judges/ems/ems/evaluate.py judges/ems/tests/test_evaluate.py \
-  judges/ems/experiments/ar/ems_red_generator_m4.py judges/ems/data/manifests/stress-pool.json
+  judges/ems/experiments/ar/ems_red_generator_m4.py judges/ems/data/manifests/stress-pool.json \
+  tests/test_judges_layout.py
 git commit -q -m "M4: evaluator ems-1.1, sealed stress pool, freeze the red bench and sampler" -m "Assisted-by: agent"
 git config --unset loopkit.unfreeze
 trap - EXIT
