@@ -16,3 +16,5 @@ Traceback (most recent call last):
     return check(t)
            ^^^^^
 NameError: name 'check' is not defined
+{"run": "runs/ar-red-ems/20261101-175604", "seconds": 91.7, "b1_primary": 10258.532484894744, "oracle_primary": 13649.884076841934, "days_with_regret": 27, "mean_demand": 1.413, "mean_unavailable": 0.0}
+METRIC regret_b1=142.37
