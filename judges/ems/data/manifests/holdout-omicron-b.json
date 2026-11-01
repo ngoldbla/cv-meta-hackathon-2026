@@ -1,0 +1,9 @@
+{
+ "dataset": "76xm-jjuj",
+ "end": "2022-01-15",
+ "name": "holdout-omicron-b",
+ "note": "sealed: rows not downloaded; eval_holdout downloads, hashes and checks this count",
+ "rows": 141950,
+ "sha256": null,
+ "start": "2021-12-15"
+}

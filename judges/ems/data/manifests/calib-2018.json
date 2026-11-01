@@ -1,0 +1,9 @@
+{
+ "dataset": "76xm-jjuj",
+ "end": "2018-12-31",
+ "name": "calib-2018",
+ "note": "",
+ "rows": 1530922,
+ "sha256": "5e2af7b8468c49be32689b2155b5a6186ae8fc1b36203ef427e302f5bd6376a0",
+ "start": "2018-01-01"
+}
