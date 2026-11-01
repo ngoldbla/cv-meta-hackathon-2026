@@ -48,6 +48,8 @@ The mixture has four parts:
 
 ## How the code runs the loop
 
+Paths below are relative to `judges/cages/`.
+
 | Piece | Where |
 |---|---|
 | Line simulator and failure modes | `cages/sim/` |
@@ -74,6 +76,7 @@ Guardrails are enforced in code:
 python -m venv .venv && . .venv/bin/activate
 pip install -e ".[dev,model,hf,mcp]"
 pytest -q                                          # line physics, crowd, labels, models, harness
+cd judges/cages && ln -s ../../.venv .venv         # CAGES commands run from the judge directory
 python -m cages.cli simulate --controller staging  # one evacuation, true vs logged metrics
 python -m cages.data.generate --out datasets/cages-v0-mini --train 60 --dev 15
 python -m cages.model.train --data datasets/cages-v0-mini --out runs/scratch

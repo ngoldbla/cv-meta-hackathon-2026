@@ -12,6 +12,7 @@ from cages.harness.evaluate import eval_holdout, paired, run_one
 from cages.harness.ledger import Ledger
 
 ROOT = Path(__file__).resolve().parents[1]
+REPO = ROOT.parents[1]
 
 
 def test_ledger_chain_and_one_shot_holdout(tmp_path, monkeypatch):
@@ -71,19 +72,19 @@ def test_mcp_tools_end_to_end(tmp_path):
 
 
 def test_guard_blocks_frozen_paths():
-    r = subprocess.run([sys.executable, "scripts/guard_paths.py", "cages/harness/evaluate.py"], cwd=ROOT,
+    r = subprocess.run([sys.executable, "scripts/guard_paths.py", "judges/cages/cages/harness/evaluate.py"], cwd=REPO,
                        capture_output=True, text=True)
     assert r.returncode == 1
-    r = subprocess.run([sys.executable, "scripts/guard_paths.py", "--hook"], cwd=ROOT, capture_output=True, text=True,
+    r = subprocess.run([sys.executable, "scripts/guard_paths.py", "--hook"], cwd=REPO, capture_output=True, text=True,
                        input=json.dumps({"tool_input": {"file_path": str(ROOT / "cages/data/instances.py")}}))
     assert r.returncode == 2
-    r = subprocess.run([sys.executable, "scripts/guard_paths.py", "cages/sim/core.py"], cwd=ROOT,
+    r = subprocess.run([sys.executable, "scripts/guard_paths.py", "judges/cages/cages/sim/core.py"], cwd=REPO,
                        capture_output=True, text=True)
     assert r.returncode == 0
 
 
 def test_name_guard_passes():
-    r = subprocess.run([sys.executable, "scripts/name_guard.py"], cwd=ROOT, capture_output=True, text=True,
+    r = subprocess.run([sys.executable, "scripts/name_guard.py"], cwd=REPO, capture_output=True, text=True,
                        env={**os.environ})
     assert r.returncode == 0, r.stdout
 

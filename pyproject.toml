@@ -24,6 +24,7 @@ dev = ["pytest>=8", "ruff>=0.5", "hypothesis>=6", "gymnasium>=1.0"]
 cages = "cages.cli:main"
 
 [tool.setuptools.packages.find]
+where = [".", "judges/cages"]
 include = ["cages*", "loopkit*"]
 
 [tool.setuptools.package-data]
@@ -31,6 +32,7 @@ include = ["cages*", "loopkit*"]
 
 [tool.ruff]
 line-length = 110
+src = [".", "judges/cages"]
 target-version = "py310"
 
 [tool.ruff.lint]
@@ -38,4 +40,5 @@ select = ["E", "F", "W", "I", "B", "UP"]
 ignore = ["E501", "B905"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "judges/cages/tests"]
+addopts = "--import-mode=importlib"

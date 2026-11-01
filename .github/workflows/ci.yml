@@ -27,6 +27,6 @@ jobs:
           git diff --name-only origin/${{ github.base_ref }}...HEAD > changed.txt
           python scripts/guard_paths.py $(cat changed.txt) || (echo "frozen paths changed" && exit 1)
       - name: Ledger chain
-        run: python -c "from cages.harness.ledger import Ledger; assert Ledger().verify()"
+        run: python -c "from loopkit.ledger import Ledger; assert Ledger().verify()"
       - name: Tests
         run: pytest -q

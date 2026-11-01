@@ -1,5 +1,7 @@
 # Cloud and edge
 
+Run the CAGES commands below from `judges/cages/` (call this tool as `../../cloud/budget.py`).
+
 ## Budget ($100 of cloud credit, held in reserve)
 
 All GPU work runs on the local RTX 5060 Ti (`docs/runbook-gpu.md`). The credit is spent only when a local limit

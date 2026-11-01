@@ -16,7 +16,8 @@ import argparse
 import json
 import os
 import sys
-from pathlib import Path
+
+from loopkit.ledger import repo_root
 
 
 def main() -> int:
@@ -33,7 +34,7 @@ def main() -> int:
     from cages.harness.evaluate import eval_holdout
 
     comps = [tuple(c.split(",", 1)) for c in a.compare]
-    out = Path("research/holdout") / f"{a.prereg}.json"
+    out = repo_root() / "research" / "holdout" / f"{a.prereg}.json"
     rep = eval_holdout(a.controllers, a.prereg, comps, n=a.n, workers=a.workers, out=str(out))
     print(json.dumps({"summary": rep["summary"], "tests": rep["tests"]}, indent=1))
     print(f"\nreport: {out}  (commit it, plus research/ledger.jsonl)")

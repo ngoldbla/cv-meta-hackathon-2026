@@ -15,7 +15,7 @@ Check each of these, and write findings with a severity (blocker, major, minor):
   - effect sizes with CIs;
   - censored waits included, not dropped.
 - **Realism:**
-  - Do all anchors in `anchors/` still pass?
+  - Do all anchors in the judge's `anchors/` (CAGES: `judges/cages/anchors/`) still pass?
   - Are claims limited to the simulated regime?
   - Is life-safety language avoided?
 - **Reproducibility:**

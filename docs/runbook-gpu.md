@@ -5,7 +5,7 @@ This runbook is for an agent session, or a person, working on the GPU machine. W
 - add a `research/journal.md` entry;
 - push to `main`.
 
-Never set `CAGES_HOLDOUT_SALT` in this session. Commit messages end with `Assisted-by: agent` and name no assistant product.
+Run `bash scripts/setup_gpu_host.sh` from the repository root. Run every other command from `judges/cages/` (link the environment once: `ln -s ../../.venv judges/cages/.venv`). Never set `CAGES_HOLDOUT_SALT` in this session. Commit messages end with `Assisted-by: agent` and name no assistant product.
 
 ## 0. Setup (once; already done on dylan-pc)
 

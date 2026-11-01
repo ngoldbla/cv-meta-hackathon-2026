@@ -25,7 +25,7 @@ Design: [`docs/superpowers/specs/2026-10-29-emergency-logistics-loop-design.md`]
 ## Judges
 | Judge | Problem | Where | State |
 |---|---|---|---|
-| CAGES v0 | Subway and bus evacuation of a stadium on the NYC 7 line | repository root (`cages/`); moves to `judges/cages/` in M3 | frozen evaluator v2.0, ledger entries 1–10, tag `cages-v0`. See [`docs/cages.md`](docs/cages.md). |
+| CAGES v0 | Subway and bus evacuation of a stadium on the NYC 7 line | `judges/cages/` | frozen evaluator v2.0, ledger entries 1–10, tag `cages-v0`. See [`docs/cages.md`](docs/cages.md). |
 
 ## Running the loop
 - Rules for any agent: [`AGENTS.md`](AGENTS.md).

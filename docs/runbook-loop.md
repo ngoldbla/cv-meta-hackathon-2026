@@ -4,7 +4,7 @@ The research loop is driven by a Muse model in Muse Code, Dylan's session. The r
 
 ## Connect
 1. Open the repository on the GPU machine (see `docs/runbook-gpu.md` §0) and start Muse Code in it.
-2. Register the MCP server from `mcp/cages.mcp.json`:
+2. Register the MCP server from `judges/cages/mcp/cages.mcp.json`, with `judges/cages/` as its working directory:
    - command: `.venv/bin/python -m cages.harness.mcp_server`
    - tools: `simulate`, `generate_cages`, `label`, `train`, `eval_dev`, `eval_holdout`, `ledger_commit`.
 3. Muse Code discovers the skills in `skills/` through the `.agents/skills` symlink once the workspace is trusted (`muse exec --trust-workspace`, or trust the folder in the TUI):
