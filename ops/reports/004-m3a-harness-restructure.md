@@ -1,6 +1,6 @@
 # Report 004: M3a harness restructure, Tasks 1-5 with rehearsal
 Status: blocked
-Branch head at start: 0ffa582523e97eb8e36baebb5a0d1c80e0700640  ·  at finish: TBD
+Branch head at start: 0ffa582523e97eb8e36baebb5a0d1c80e0700640  ·  at finish: 154e69561c1e548b6f61687dbbdcebff105abc19
 
 ## Summary
 Plan Tasks 1–2 are committed and pushed (`loopkit.ledger`, `loopkit.stats`; all test counts match the plan). Plan Task 3's code and tests were written verbatim and its fail-then-pass runs match the plan (5 failed → 12 passed), but its commit is blocked: the plan's literal test code trips the repo's pre-commit ruff gate (UP031, `%`-formatting), so the step cannot be completed as written. Per the task's stop condition the run stops here instead of adapting the plan. Task 3's files were reverted, leaving the tree green at the Task 2 commit; Tasks 4–5 were not started. The fix is a one-line plan correction (see Blocked / questions).
