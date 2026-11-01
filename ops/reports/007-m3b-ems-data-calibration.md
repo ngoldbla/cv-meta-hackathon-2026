@@ -31,3 +31,15 @@ Started task 007. Prerequisite holds (FROZEN exists, ledger ends seq 11 evaluato
 - Failing run first lines: `FF [100%]`, `ModuleNotFoundError: No module named 'ems.data.windows'`.
 - Passing run: `2 passed`, `ruff check .` clean, `name_guard.py` clean.
 - Commit: `855aa72b522058cf2d27e74cf4dfd74d98a2a946` ("EMS: data windows with the sealed holdout refusal").
+
+### Task 3: Socrata client, store and ingest
+- Tests written: `judges/ems/tests/test_socrata_store.py` (keyset paging, holdout refusal for rows/aggregates but not counts, order-independent hash + manifest verify, load refusal).
+- Failing run first lines: `FFFF [100%]`, `ModuleNotFoundError: No module named 'ems.data.socrata'`.
+- Passing run: `4 passed`, `ruff check .` clean, `name_guard.py` clean.
+- Network (adaptation 4):
+  - `calib`: wall 28:38.97; rows 1,463,446 / 1,530,922 / 1,533,251 — exact matches of the plan's 2026-10-29 counts, each equal to Socrata `count(*)` (ingest raises on mismatch; exit 0). Cache parquets 230 MB total; CSV transferred ≈ 1.5 GB (plan estimate, consistent with ~350 B/row × 4.53 M rows).
+  - `holdout-counts`: wall 1.43 s; covid-a 161,820, omicron-b 141,950, normal-2016 1,441,211. Counts only; `sha256: null` in all three manifests; no rows downloaded (code path calls `count()` only).
+  - `bounds`: wall 1:27.70; `bounds_daily.csv` 200,286 data rows, 6,149,899 bytes.
+- Cache round-trip: `load('calib-2019')` → 1,533,251 rows, manifest hash verified.
+- Deviation: `bounds_daily.csv` is 6.15 MB, over the plan's "well under 5 MB" estimate. Content is correct (daily borough×severity aggregates, 14 years); recorded here, continuing since all correctness checks pass and the 10 MB committed-output budget still holds.
+- Commit: `06b325a26623fb473c93c5140420cca4d6b00e71` ("EMS: Socrata ingest, manifests (holdout = counts only), bounds aggregates"). `git status | grep -c cache` → 0 (cache ignored).
