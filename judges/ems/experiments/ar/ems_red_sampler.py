@@ -38,7 +38,7 @@ def sample_theta(rng: np.random.Generator, d: date) -> dict:
     t = nominal_theta(rng)
     t["unavailable"] = 0.25
     t["demand"] = 1.0
-    if d.weekday() >= 5 or _federal_holiday(d):
+    if d.weekday() >= 5 or _federal_holiday(d) or d.month in (2, 3, 11):
         t["demand"] = LOAD_CAP * 0.75 - 1e-6
     t["urgent_share"] = 1.153
     return check(t)
