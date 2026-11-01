@@ -1,6 +1,6 @@
 # Report 006: M3a: fix the confirm.py rewrite (unused Path import) and repeat the rehearsal
 Status: done
-Branch head at start: 0171c4b51f689f5218e7d6ebcb2e7095a0754f97  ·  at finish: TBD
+Branch head at start: 0171c4b51f689f5218e7d6ebcb2e7095a0754f97  ·  at finish: d3bfe1672ddbc4b4070b1475ee270b6b9b134d9f
 
 ## Summary
 Fixed the `confirm.py` import rewrite in `maintainer/m3/rewrite_paths.py` (drops the now-unused `pathlib.Path` import) and committed it on `main`. Step 4 checks pass (74 passed + 1 skipped, name guard and ruff clean). The repeated rehearsal in a throwaway clone ends with `done:`: 78 passed + 1 skipped, ledger entry 11 `evaluator_update` lists the 9 frozen files, and the guard behaves as expected (exit 1 on the CAGES evaluator, 0 on `sim/core.py`, 2 in `--hook` mode). The shared `.venv` was restored to the main checkout and the clone deleted. No ledger entries were written in the main checkout; `apply-m3.sh` was not run there.
