@@ -2,6 +2,12 @@
 
 Agents cannot change frozen paths. Changes to them are prepared here, reviewed, and applied by the maintainer.
 
+## M3 freeze: the EMS judge (`maintainer/m3d/`, `apply-m3d-freeze.sh`)
+- **What:** adds `judges/ems/FROZEN` (35 paths: simulator, policies b0/b1/oracle, evaluator, lever parameters, scenario mechanics and bounds, anchors, calibration bundle, data manifests) and updates `tests/test_judges_layout.py` to check it. The red loop's `ems/scenarios/sampler.py` and the blue loop's `experiments/ar/ems_candidate.py` stay editable.
+- **Ledger:** an `evaluator_update` (scope `ems`, every frozen SHA-256), then a `dataset_release` (`maintainer/m3d/record_dataset.py`: calibration and manifest hashes, plus one digest over the 1,095 git-ignored day tables).
+- **Needs:** task 012 applied (`ems/scenarios/core.py`), and the day-table cache built. The script reruns the compute-gate bench and refuses to commit if the result drifts from task 011.
+- **Run:** `git checkout main && git pull --ff-only && bash maintainer/apply-m3d-freeze.sh`. Dry run: `--no-push` in a throwaway clone.
+
 ## M3a: judges/ layout and the loopkit harness (`maintainer/m3/`, `apply-m3.sh`)
 - **What:** the shared harness moves to `loopkit/` (ledger, statistics, guard), and CAGES moves to `judges/cages/`. The guard reads one `FROZEN` manifest per judge.
 - **What changes in frozen files:** `scripts/guard_paths.py` becomes a wrapper around `loopkit.guard`, and CAGES's `ledger.py` becomes a re-export of `loopkit.ledger`. The CAGES evaluator and instance generator move byte for byte.
