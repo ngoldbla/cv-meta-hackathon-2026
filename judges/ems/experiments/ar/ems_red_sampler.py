@@ -20,6 +20,7 @@ def sample_theta(rng: np.random.Generator, d: date) -> dict:
     t = nominal_theta(rng)
     t["unavailable"] = 0.25
     t["demand"] = LOAD_CAP * (1.0 - 0.25) - 1e-6
+    t["urgent_share"] = 1.153
     return check(t)
 
 

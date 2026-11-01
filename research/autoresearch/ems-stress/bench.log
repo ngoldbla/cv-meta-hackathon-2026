@@ -20,3 +20,5 @@ NameError: name 'check' is not defined
 METRIC regret_b1=142.37
 {"run": "runs/ar-red-ems/20261101-175716", "seconds": 46.9, "b1_primary": 34331.546165031665, "oracle_primary": 35716.79998401879, "days_with_regret": 72, "mean_demand": 1.059749, "mean_unavailable": 0.25}
 METRIC regret_b1=682.39
+{"run": "runs/ar-red-ems/20261101-175857", "seconds": 46.9, "b1_primary": 35861.260990747134, "oracle_primary": 37077.558202661676, "days_with_regret": 71, "mean_demand": 1.059749, "mean_unavailable": 0.25}
+METRIC regret_b1=694.06
