@@ -29,9 +29,12 @@ def test_guard_freezes_the_ems_judge_but_not_what_the_loops_edit():
     must = ["judges/ems/FROZEN", "judges/ems/ems/sim/core.py", "judges/ems/ems/evaluate.py",
             "judges/ems/ems/scenarios/core.py", "judges/ems/ems/scenarios/bounds.py", "judges/ems/ems/policy/classical.py",
             "judges/ems/calibration/sim_inputs.json", "judges/ems/data/manifests/holdout-omicron-b.json",
-            "judges/ems/experiments/ar/ems_blue_bench.py"]
+            "judges/ems/experiments/ar/ems_blue_bench.py", "judges/ems/ems/scenarios/sampler.py",
+            "judges/ems/experiments/ar/ems_red_bench.py", "judges/ems/experiments/ar/ems_red_generator_m4.py",
+            "judges/ems/scripts/stress_pool.py", "judges/ems/data/manifests/stress-pool.json"]
     assert check(must, ROOT) == must
-    assert check(["judges/ems/ems/scenarios/sampler.py", "judges/ems/experiments/ar/ems_candidate.py"], ROOT) == []
+    loops_edit = ["judges/ems/experiments/ar/ems_red_sampler.py", "judges/ems/experiments/ar/ems_candidate.py"]
+    assert check(loops_edit, ROOT) == []
 
 
 def test_cages_frozen_files_moved_byte_for_byte():

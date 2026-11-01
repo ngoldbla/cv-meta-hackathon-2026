@@ -41,3 +41,9 @@ data/manifests/calib-2019.json
 data/manifests/holdout-covid-a.json
 data/manifests/holdout-normal-2016.json
 data/manifests/holdout-omicron-b.json
+# M4 (2026-11-01): the nominal sampler, the red bench, the stress-pool builder, the red run's generator and the pool
+ems/scenarios/sampler.py
+experiments/ar/ems_red_bench.py
+experiments/ar/ems_red_generator_m4.py
+scripts/stress_pool.py
+data/manifests/stress-pool.json

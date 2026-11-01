@@ -43,15 +43,42 @@ def test_ratio_of_means_survives_zero_baseline_days():
     assert r == pytest.approx(0.5) and ci[0] <= 0.5 <= ci[1]
 
 
-def test_eval_holdout_requires_preregistration(tmp_path):
+def test_eval_holdout_requires_preregistration_and_known_pools(tmp_path):
     from ems.evaluate import eval_holdout
     from loopkit.ledger import Ledger
 
     led = Ledger(tmp_path / "ledger.jsonl")
     with pytest.raises(PermissionError):
-        eval_holdout(["b0"], "prereg-x", [], "omicron-b", [], [], ledger=led)
+        eval_holdout(["b0"], "prereg-x", [], {"omicron-b": ([], [])}, ledger=led)
     with pytest.raises(ValueError):
-        eval_holdout(["b0"], "prereg-x", [], "2019", [], [], ledger=led)
+        eval_holdout(["b0"], "prereg-x", [], {"2019": ([], [])}, ledger=led)
+    with pytest.raises(ValueError):
+        eval_holdout(["b0"], "prereg-x", [], {}, ledger=led)
+
+
+def test_eval_holdout_runs_all_pools_once_with_holm_across_them(tmp_path, monkeypatch):
+    import ems.evaluate as ev
+    from loopkit.ledger import Ledger
+
+    prereg = tmp_path / "P1.md"
+    prereg.write_text("id: P1\nclaim: test\n")
+    led = Ledger(tmp_path / "ledger.jsonl")
+    led.preregister(str(prereg))
+    rng = np.random.default_rng(0)
+
+    def fake_pool(scenarios, policies, workers, params, tables):
+        base = rng.uniform(100, 200, 30)
+        return {"a": [{w: v * 0.5 for w in ev.WEIGHTINGS} for v in base],
+                "b": [{w: v for w in ev.WEIGHTINGS} for v in base]}
+
+    monkeypatch.setattr(ev, "run_pool", fake_pool)
+    monkeypatch.setattr(ev, "summarize", lambda rows: {})
+    rep = ev.eval_holdout(["a", "b"], "P1", [("a", "b")], {"omicron-b": ([], []), "stress": ([], [])}, ledger=led)
+    assert len(rep["tests"]) == 6 and rep["claim_stands"]
+    assert {t["pool"] for t in rep["tests"]} == {"omicron-b", "stress"}
+    assert sum(e["kind"] == "holdout_eval" for e in led.entries()) == 1
+    with pytest.raises(PermissionError):
+        ev.eval_holdout(["a", "b"], "P1", [("a", "b")], {"omicron-b": ([], [])}, ledger=led)
 
 
 def test_counterfactual_refuses_non_dev_days():

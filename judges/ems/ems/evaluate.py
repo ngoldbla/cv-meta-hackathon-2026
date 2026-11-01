@@ -29,7 +29,7 @@ from loopkit.stats import holm, paired
 from .params import CENTRAL
 from .tiers import TARGET_MIN
 
-EVAL_VERSION = "ems-1.0"
+EVAL_VERSION = "ems-1.1"  # 1.1: eval_holdout runs all pools of a pre-registration at once, Holm across them
 WEIGHTINGS = {"primary": {1: 8.0, 2: 3.0, 3: 1.0}, "equal": {1: 1.0, 2: 1.0, 3: 1.0}, "steep": {1: 20.0, 2: 5.0, 3: 1.0}}
 HOLDOUT_POOLS = ("omicron-b", "covid-a", "normal-2016", "stress")
 
@@ -188,11 +188,18 @@ def eval_dev(policies: list[str], n: int = 200, seed: int = 0, workers: int = 24
     return report
 
 
-def eval_holdout(policies: list[str], prereg_id: str, comparisons: list[tuple], pool: str, scenarios: list,
-                 tables: list, ledger: Ledger | None = None, workers: int = 24) -> dict:
-    """Confirmatory run on a sealed pool; the caller (scripts/confirm) supplies the sealed day tables."""
-    if pool not in HOLDOUT_POOLS:
-        raise ValueError(f"unknown holdout pool {pool!r}")
+def eval_holdout(policies: list[str], prereg_id: str, comparisons: list[tuple], pools: dict[str, tuple[list, list]],
+                 ledger: Ledger | None = None, workers: int = 24, ratio_max: float = 0.95, alpha: float = 0.05) -> dict:
+    """The one confirmatory run of a pre-registration, over all of its sealed pools at once.
+
+    `pools` maps a pool name (HOLDOUT_POOLS) to (scenarios, day tables) that the caller (scripts/confirm) built
+    from the sealed window. Holm runs across every test of the pre-registration (comparisons x pools x
+    weightings). The claim stands only if every test has ratio CI upper end < ratio_max and Holm p < alpha.
+    One holdout_eval ledger entry is written; a second run for the same pre-registration is refused.
+    """
+    unknown = sorted(set(pools) - set(HOLDOUT_POOLS))
+    if unknown or not pools:
+        raise ValueError(f"unknown or missing holdout pools: {unknown or 'none given'}")
     ledger = ledger or Ledger()
     if not ledger.verify():
         raise RuntimeError("ledger chain broken")
@@ -200,13 +207,20 @@ def eval_holdout(policies: list[str], prereg_id: str, comparisons: list[tuple], 
         raise PermissionError(f"no pre-registration {prereg_id} in the ledger")
     if ledger.holdout_used(prereg_id):
         raise PermissionError(f"holdout already used for {prereg_id}")
-    rows = run_pool(scenarios, policies, workers, None, tables)
-    tests = [t for a, b in comparisons for t in compare(rows, a, b)]
-    report = {"split": "holdout", "pool": pool, "prereg": prereg_id, "eval_version": EVAL_VERSION,
-              "evaluator_sha256": file_sha256(__file__), "summary": summarize(rows), "tests": tests}
+    tests, summary = [], {}
+    for name, (scenarios, tables) in pools.items():
+        rows = run_pool(scenarios, policies, workers, None, tables)
+        summary[name] = summarize(rows)
+        tests += [{**t, "pool": name} for a, b in comparisons for t in compare(rows, a, b)]
+    for t, p in zip(tests, holm([t["wilcoxon_p"] for t in tests]), strict=True):
+        t["holm_p"] = p
+    stands = all(t["ratio_ci95"][1] < ratio_max and t["holm_p"] < alpha for t in tests)
+    report = {"split": "holdout", "pools": sorted(pools), "prereg": prereg_id, "eval_version": EVAL_VERSION,
+              "evaluator_sha256": file_sha256(__file__), "ratio_max": ratio_max, "alpha": alpha,
+              "claim_stands": stands, "summary": summary, "tests": tests}
     import hashlib
 
     blob = json.dumps(report, sort_keys=True, default=str)
-    ledger.append("holdout_eval", {"prereg": prereg_id, "pool": pool,
+    ledger.append("holdout_eval", {"prereg": prereg_id, "pools": sorted(pools), "claim_stands": stands,
                                    "report_sha256": hashlib.sha256(blob.encode()).hexdigest(), "tests": tests})
     return report
