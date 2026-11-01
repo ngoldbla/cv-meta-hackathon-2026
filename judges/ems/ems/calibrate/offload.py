@@ -1,4 +1,7 @@
-"""Hospital offload (arrival -> close) by borough and hour, with a fitted load term (spec §6)."""
+"""Hospital offload (arrival -> close) by borough and hour (spec §6).
+
+The bundle uses the base-only model. The load-term fits below are kept for the record (task 008 null result).
+"""
 
 from __future__ import annotations
 
@@ -21,6 +24,16 @@ def prior_load(df: pd.DataFrame, window_s: int = 7200) -> pd.Series:
         cnt = np.arange(len(ts)) - lo
         out.loc[g.index[order]] = cnt
     return out
+
+
+def fit_offload_base(df: pd.DataFrame) -> dict:
+    x = df[df["transported"] & df["offload_s"].notna() & (df["offload_s"] > 0)].copy()
+    if "hour" not in x:
+        x["hour"] = x["t_hosp"].dt.hour
+    base = {}
+    for b, g in x.groupby("borough"):
+        base[b] = {str(h): quantiles(gh["offload_s"]) for h, gh in g.groupby("hour")}
+    return {"model": "base", "base": base}
 
 
 def fit_offload_ratio(df: pd.DataFrame, window_s: int = 86400) -> dict:

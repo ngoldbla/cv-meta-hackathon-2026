@@ -46,6 +46,19 @@ def test_ratio_fit_recovers_a_known_slope():
     assert len(fit["base"]["BRONX"]["10"]) == 101 and fit["mean_load"]["BRONX"] > 0
 
 
+def test_fit_offload_base_has_no_load_term():
+    from ems.calibrate.offload import fit_offload_base
+
+    t = pd.to_datetime(["2019-01-01 10:00", "2019-01-01 10:30", "2019-01-01 11:00"])
+    df = pd.DataFrame(
+        {"borough": "BRONX", "t_hosp": t, "transported": True, "offload_s": [1000.0, 2000.0, 3000.0]}
+    )
+    fit = fit_offload_base(df)
+    assert set(fit) == {"model", "base"}
+    assert fit["model"] == "base"
+    assert len(fit["base"]["BRONX"]["10"]) == 101
+
+
 def test_jan2018_check_known_obs_and_pred():
     from ems.calibrate.offload import jan2018_check
 

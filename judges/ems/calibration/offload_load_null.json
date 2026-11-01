@@ -1,0 +1,28 @@
+{
+ "BRONX": {
+  "obs": 1.047926267281106,
+  "ok": false,
+  "pred": 0.9988062272252618
+ },
+ "BROOKLYN": {
+  "obs": 1.0322429906542057,
+  "ok": false,
+  "pred": 0.9975830847850946
+ },
+ "MANHATTAN": {
+  "obs": 1.0273540241977905,
+  "ok": false,
+  "pred": 0.9997782794756715
+ },
+ "QUEENS": {
+  "obs": 1.024330900243309,
+  "ok": false,
+  "pred": 0.9981541708183751
+ },
+ "RICHMOND / STATEN ISLAND": {
+  "obs": 1.0248659190638714,
+  "ok": false,
+  "pred": 1.0009770107926454
+ },
+ "note": "Task 008 null result (2026-11-01), kept as committed evidence: the ratio24 load-term refit found betas about 0 or negative over 1,027 fit days, so the predicted Jan-2018 flu-day inflation is about 1.000 in every borough while observed medians rose 2.4-4.8%. Per task 009 the endogenous load term was removed (offload.json is now base-only) and surge offload became the bounded scenario factor theta (see offload_inflation.json). Full numbers in ops/reports/008-offload-refit.md."
+}

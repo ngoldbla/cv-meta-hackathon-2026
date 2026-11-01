@@ -57,7 +57,7 @@ def verify_bundle(out_dir) -> None:
             raise ValueError(f"calibration bundle file {f} does not match bundle_manifest.json")
 
 
-def _report(parts: dict, df_stats: dict) -> str:
+def _report(parts: dict, df_stats: dict, null_rows: dict) -> str:
     fl = parts["fleet"]
     lines = ["# EMS calibration fit report", "", f"Fit rows: {df_stats['fit_rows']:,} on {df_stats['fit_days']} fit days "
              f"(anchor days excluded: {df_stats['anchor_days']}). Dropped (bad severity): {df_stats['dropped']}.", "",
@@ -67,14 +67,18 @@ def _report(parts: dict, df_stats: dict) -> str:
         for h in sorted(fl[b], key=int):
             v = fl[b][h]
             lines.append(f"| {b} | {h} | {v['median']:.0f} | {v['p10']:.0f} | {v['p90']:.0f} | {v['n_onsets']} |")
-    lines += ["", "## Offload surge coefficient (ratio24: log offload per unit of 24 h load over the borough mean)", "",
-              "| borough | beta | mean_load |", "|---|---|---|"] + [
-                  f"| {b} | {parts['offload']['beta'][b]:.4f} | {parts['offload']['mean_load'][b]:.1f} |"
-                  for b in sorted(parts["offload"]["beta"])]
-    lines += ["", "## Offload check (Jan 2018 anchor days)", "",
+    lines += ["", "## Offload (base-only; no load term)", "",
+              "Offload is base-only: `offload.json` holds 101-point base tables per borough and hour "
+              "(`{\"model\": \"base\"}`), with no beta and no load term. The endogenous load term was removed "
+              "on 2026-11-01 after the task 008 null result below: day-to-day ambulance load does not predict "
+              "offload on the fit days. Surge offload is now the stress-scenario factor θ "
+              "\"extra offload inflation\" (spec §9), bounded by the inflation range below."]
+    lines += ["", "## Offload load-term null result (task 008; Jan 2018 anchor days)", "",
+              "Committed evidence in `offload_load_null.json`: observed flu-day offload medians rose 2.4–4.8% "
+              "while the ratio24 load term predicted about 1.000 everywhere (tol 0.015).", "",
               "| borough | obs | pred | ok |", "|---|---|---|---|"] + [
                   f"| {b} | {v['obs']:.4f} | {v['pred']:.4f} | {str(v['ok']).lower()} |"
-                  for b, v in sorted(parts["offload_check"].items())]
+                  for b, v in sorted(null_rows.items())]
     lines += ["", "## Anchor targets (observed)", "", "```json", json.dumps(parts["anchor_targets"], indent=1), "```",
               "", "## Caveats", "- Fleet counts first-unit intervals only; multi-unit incidents are undercounted.",
               "- Travel-time hour scale is not fitted here (M3c fits it by simulation against travel_targets).",
@@ -89,7 +93,7 @@ def main() -> int:
     from ..data.store import load
     from .anchors import anchor_targets, fit_days, select_anchor_days
     from .fleet import fit_fleet
-    from .offload import fit_offload_ratio, jan2018_check
+    from .offload import fit_offload_base
     from .service import call_type_groups, service_tables
     from .travel import osrm_table, travel_targets, zip_centroids
 
@@ -105,16 +109,17 @@ def main() -> int:
     zips = zip_centroids(gaz, set(df["zipcode"].dropna()) - {""})
     order = sorted(zips)
     durations = osrm_table([zips[z] for z in order])
-    offload_fit = fit_offload_ratio(fit)
+    offload_fit = fit_offload_base(fit)
     parts = {"anchor_days": anchor, "anchor_targets": anchor_targets(df, anchor), "call_type_groups": groups,
              "service": service_tables(fit, groups), "offload": offload_fit, "fleet": fit_fleet(fit),
              "travel_targets": travel_targets(fit), "zips": zips,
-             "travel_osrm": {"zips": order, "durations": durations},
-             "offload_check": jan2018_check(df, anchor, offload_fit)}
+             "travel_osrm": {"zips": order, "durations": durations}}
+    null_evidence = json.loads((OUT / "offload_load_null.json").read_text())
+    null_rows = {b: v for b, v in null_evidence.items() if b != "note"}
     m = write_bundle(OUT, parts)
     stats = {"fit_rows": len(fit), "fit_days": len(keep), "anchor_days": len(anchor["normal_2019"]) + len(anchor["flu_2018"]),
              "dropped": df.attrs["dropped_bad_severity"]}
-    (OUT / "fit_report.md").write_text(_report(parts, stats))
+    (OUT / "fit_report.md").write_text(_report(parts, stats, null_rows))
     print(json.dumps({"files": list(m["files"]), **stats}, indent=1))
     return 0
 
