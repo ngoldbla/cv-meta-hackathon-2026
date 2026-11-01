@@ -1,6 +1,6 @@
 # Report 007: M3b: EMS data ingest and calibration bundle (plan Tasks 1-10)
 Status: done
-Branch head at start: 13613b46fe3ad9fe9647f0afe2dbcd3295d3fec0  ·  at finish: <sha>
+Branch head at start: 13613b46fe3ad9fe9647f0afe2dbcd3295d3fec0  ·  at finish: 3097cef450bfdc2e5540fa5949c62c5edcb39197
 
 ## Summary
 Executed plan Tasks 1–10 on `main`: new `ems` judge package with Socrata ingest, sealed holdout windows, cleaning, anchor selection, service/offload/fleet/travel fits, and a hashed calibration bundle with fit report. Calib rows match Socrata counts exactly (1,463,446 / 1,530,922 / 1,533,251); holdouts are counts-only manifests. All three fit-report sanity checks pass with documented explanations (Queens fleet 4th per its low call volume; tier-1 p90 8.0 min pooled vs a noisy single-day 10.2). Full suite: 98 passed, 1 skipped; ruff and name guard clean. No ledger entries written (dataset_release comes at the M3d freeze). Nothing here is a finding.
