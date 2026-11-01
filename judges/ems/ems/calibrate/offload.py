@@ -36,6 +36,43 @@ def fit_offload_base(df: pd.DataFrame) -> dict:
     return {"model": "base", "base": base}
 
 
+def offload_inflation_range(df: pd.DataFrame) -> dict:
+    """Per-borough range of day-median offload over its trailing 28-day median (spec §9).
+
+    For each borough and day, the ratio is that day's median offload_s over the pooled
+    median offload_s of the previous 28 calendar days. A day qualifies only if at least
+    20 of those 28 days have transports in the borough. Boroughs with no qualifying
+    day are skipped. Quantiles use linear interpolation.
+    """
+    tr = df[df["transported"] & df["t_hosp"].notna()]
+    transport_days = {b: set(gb["day"]) for b, gb in tr.groupby("borough")}
+    x = df[df["transported"] & df["offload_s"].notna() & (df["offload_s"] > 0)]
+    out = {}
+    for b, g in x.groupby("borough"):
+        have_days = transport_days.get(b, set())
+        by_day = {d: gd["offload_s"].to_numpy(dtype=float) for d, gd in g.groupby("day")}
+        ratios = []
+        for d in sorted(by_day):
+            window = [c for k in range(1, 29) if (c := d - timedelta(k)) in have_days]
+            if len(window) < 20:
+                continue
+            pool = np.concatenate([by_day[c] for c in window if c in by_day])
+            if pool.size == 0:
+                continue
+            ratios.append(float(np.median(by_day[d]) / np.median(pool)))
+        if not ratios:
+            continue
+        r = np.asarray(ratios)
+        out[b] = {
+            "p50": float(np.quantile(r, 0.50)),
+            "p95": float(np.quantile(r, 0.95)),
+            "p99": float(np.quantile(r, 0.99)),
+            "max": float(r.max()),
+            "n_days": len(r),
+        }
+    return out
+
+
 def fit_offload_ratio(df: pd.DataFrame, window_s: int = 86400) -> dict:
     x = df[df["transported"] & df["offload_s"].notna() & (df["offload_s"] > 0)].copy()
     x["load"] = prior_load(x, window_s=window_s)

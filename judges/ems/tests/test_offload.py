@@ -59,6 +59,36 @@ def test_fit_offload_base_has_no_load_term():
     assert len(fit["base"]["BRONX"]["10"]) == 101
 
 
+def test_offload_inflation_range_known_max():
+    from ems.calibrate.offload import offload_inflation_range
+
+    rows = []
+    for i in range(30):
+        t = pd.Timestamp("2019-01-01") + pd.Timedelta(days=i)
+        rows += [(t + pd.Timedelta(hours=h), 1000.0) for h in (8, 10, 12, 14)]
+    t = pd.Timestamp("2019-01-31")
+    rows += [(t + pd.Timedelta(hours=h), 2500.0) for h in (8, 10, 12, 14)]
+    df = pd.DataFrame(rows, columns=["t_hosp", "offload_s"])
+    df["borough"] = "BRONX"
+    df["transported"] = True
+    df["day"] = df["t_hosp"].dt.date
+    got = offload_inflation_range(df)
+    assert set(got) == {"BRONX"}
+    assert set(got["BRONX"]) == {"p50", "p95", "p99", "max", "n_days"}
+    assert got["BRONX"]["n_days"] == 11
+    assert got["BRONX"]["max"] == pytest.approx(2.5)
+    assert got["BRONX"]["p50"] == pytest.approx(1.0)
+
+
+def test_offload_inflation_range_skips_short_windows():
+    from ems.calibrate.offload import offload_inflation_range
+
+    t = pd.Timestamp("2019-01-01") + pd.to_timedelta(range(10), unit="D")
+    df = pd.DataFrame({"borough": "QUEENS", "t_hosp": t, "transported": True, "offload_s": 1000.0})
+    df["day"] = df["t_hosp"].dt.date
+    assert offload_inflation_range(df) == {}
+
+
 def test_jan2018_check_known_obs_and_pred():
     from ems.calibrate.offload import jan2018_check
 

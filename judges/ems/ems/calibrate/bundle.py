@@ -79,6 +79,15 @@ def _report(parts: dict, df_stats: dict, null_rows: dict) -> str:
               "| borough | obs | pred | ok |", "|---|---|---|---|"] + [
                   f"| {b} | {v['obs']:.4f} | {v['pred']:.4f} | {str(v['ok']).lower()} |"
                   for b, v in sorted(null_rows.items())]
+    inf = parts["offload_inflation"]
+    lines += ["", "## Offload inflation range (scenario factor θ)", "",
+              "| borough | p50 | p95 | p99 | max | n_days |", "|---|---|---|---|---|---|"] + [
+                  f"| {b} | {v['p50']:.4f} | {v['p95']:.4f} | {v['p99']:.4f} | {v['max']:.4f} | {v['n_days']} |"
+                  for b, v in sorted(inf.items())]
+    lines += ["", f"o_max (citywide maximum of max; bound for the M3d scenario factor θ): "
+                  f"{max(v['max'] for v in inf.values()):.4f}.",
+              "The inflation range uses only the 2017–2019 calibration window; "
+              "the 2005–2015 bounds data has no offload times."]
     lines += ["", "## Anchor targets (observed)", "", "```json", json.dumps(parts["anchor_targets"], indent=1), "```",
               "", "## Caveats", "- Fleet counts first-unit intervals only; multi-unit incidents are undercounted.",
               "- Travel-time hour scale is not fitted here (M3c fits it by simulation against travel_targets).",
@@ -93,7 +102,7 @@ def main() -> int:
     from ..data.store import load
     from .anchors import anchor_targets, fit_days, select_anchor_days
     from .fleet import fit_fleet
-    from .offload import fit_offload_base
+    from .offload import fit_offload_base, offload_inflation_range
     from .service import call_type_groups, service_tables
     from .travel import osrm_table, travel_targets, zip_centroids
 
@@ -113,7 +122,8 @@ def main() -> int:
     parts = {"anchor_days": anchor, "anchor_targets": anchor_targets(df, anchor), "call_type_groups": groups,
              "service": service_tables(fit, groups), "offload": offload_fit, "fleet": fit_fleet(fit),
              "travel_targets": travel_targets(fit), "zips": zips,
-             "travel_osrm": {"zips": order, "durations": durations}}
+             "travel_osrm": {"zips": order, "durations": durations},
+             "offload_inflation": offload_inflation_range(df)}
     null_evidence = json.loads((OUT / "offload_load_null.json").read_text())
     null_rows = {b: v for b, v in null_evidence.items() if b != "note"}
     m = write_bundle(OUT, parts)
