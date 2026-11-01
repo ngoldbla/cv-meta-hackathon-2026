@@ -24,7 +24,7 @@ dev = ["pytest>=8", "ruff>=0.5", "hypothesis>=6", "gymnasium>=1.0"]
 cages = "cages.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["cages*"]
+include = ["cages*", "loopkit*"]
 
 [tool.setuptools.package-data]
 "cages.data" = ["mta_7line.json"]  # MTA calibration aggregates
