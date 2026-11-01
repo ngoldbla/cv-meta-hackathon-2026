@@ -121,3 +121,8 @@
 - **What happened:** 4,238,644 fit rows on 1,027 fit days (68 anchor days excluded; 48 dropped bad severity). Fleet median-of-medians: Brooklyn 61.5, Bronx 52.0, Manhattan 49.0, Queens 41.5, Staten Island 9.0. Offload betas: Bronx 0.0008, Brooklyn 0.0003, Manhattan 0.0009, Queens 0.0012, Staten Island 0.0033, UNKNOWN 0.0000 (all ≥ 0). Anchor tier-1 p50/p90 4.9/8.0 min; flu held-share increase 0.121. Bundle files and SHA-256s in `judges/ems/calibration/bundle_manifest.json`.
 - **Next:** M3c plan (simulator, policies, anchors, travel-scale fit).
 
+## 2026-11-01: Offload ratio24 refit blocked on the Jan 2018 check (task 008)
+- **What was tried:** refit hospital offload with a 24 h surge ratio (`fit_offload_ratio`) and checked it against the dev-visible Jan 2018 flu anchor days (`jan2018_check`, tol 0.015), then re-ran the full calibration bundle (report: `ops/reports/008-offload-refit.md`).
+- **What happened:** the check failed in all 5 boroughs. Observed flu-day offload medians rose 2.4–4.8% (BRONX 1.0479, BROOKLYN 1.0322, MANHATTAN 1.0274, QUEENS 1.0243, RICHMOND 1.0249), but the fitted betas are ≈0 to slightly negative (−0.022 to +0.011), so predictions sit at ≈1.000. Day-to-day 24 h load variation does not predict offload on the 1,027 fit days. Numbers in `judges/ems/calibration/offload_check.json` and `judges/ems/calibration/fit_report.md`; bundle re-verified (BUNDLE_OK). Per the task stop rule the task is blocked with the model unchanged.
+- **Next:** reviewer decides the next offload-model direction in a new task.
+

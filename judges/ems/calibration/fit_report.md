@@ -127,16 +127,26 @@ Fit rows: 4,238,644 on 1027 fit days (anchor days excluded: 68). Dropped (bad se
 | RICHMOND / STATEN ISLAND | 22 | 8 | 5 | 13 | 115 |
 | RICHMOND / STATEN ISLAND | 23 | 6 | 4 | 11 | 88 |
 
-## Offload load coefficient (per extra transport into the borough in the prior 2 h)
+## Offload surge coefficient (ratio24: log offload per unit of 24 h load over the borough mean)
 
-| borough | beta |
-|---|---|
-| BRONX | 0.0008 |
-| BROOKLYN | 0.0003 |
-| MANHATTAN | 0.0009 |
-| QUEENS | 0.0012 |
-| RICHMOND / STATEN ISLAND | 0.0033 |
-| UNKNOWN | 0.0000 |
+| borough | beta | mean_load |
+|---|---|---|
+| BRONX | -0.0125 | 661.7 |
+| BROOKLYN | -0.0222 | 782.3 |
+| MANHATTAN | -0.0030 | 656.8 |
+| QUEENS | -0.0156 | 535.9 |
+| RICHMOND / STATEN ISLAND | 0.0107 | 118.0 |
+| UNKNOWN | 0.0000 | 0.0 |
+
+## Offload check (Jan 2018 anchor days)
+
+| borough | obs | pred | ok |
+|---|---|---|---|
+| BRONX | 1.0479 | 0.9988 | false |
+| BROOKLYN | 1.0322 | 0.9976 | false |
+| MANHATTAN | 1.0274 | 0.9998 | false |
+| QUEENS | 1.0243 | 0.9982 | false |
+| RICHMOND / STATEN ISLAND | 1.0249 | 1.0010 | false |
 
 ## Anchor targets (observed)
 
