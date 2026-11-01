@@ -49,3 +49,9 @@ Started task 007. Prerequisite holds (FROZEN exists, ledger ends seq 11 evaluato
 - Failing run first lines: `F [100%]`, `ModuleNotFoundError: No module named 'ems.data.clean'`.
 - Passing run: `1 passed`, `ruff check .` clean, `name_guard.py` clean.
 - Commit: `3afd9c8c38a203909ce9099074b70a9b73bc11f9` ("EMS: typed cleaning and derived durations").
+
+### Task 5: Anchor days and anchor targets
+- Tests written: `judges/ems/tests/test_anchors_select.py` (selection rules, targets incl. flu increase).
+- Failing run first lines: `FF [100%]`, `ModuleNotFoundError: No module named 'ems.calibrate.anchors'`.
+- Passing run: `2 passed`, `ruff check .` clean, `name_guard.py` clean.
+- Commit: `c6deeca05c6c87248743a0a1cbd20e75456ddfff` ("EMS: anchor-day selection and observed anchor targets").
