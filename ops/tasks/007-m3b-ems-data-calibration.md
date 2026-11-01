@@ -1,7 +1,7 @@
 ---
 id: "007"
 title: "M3b: EMS data ingest and calibration bundle (plan Tasks 1-10)"
-status: open
+status: in_progress
 created: 2026-11-01
 report: ops/reports/007-m3b-ems-data-calibration.md
 ---
