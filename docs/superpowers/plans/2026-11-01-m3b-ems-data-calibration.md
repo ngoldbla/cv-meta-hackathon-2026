@@ -1141,6 +1141,8 @@ git commit -m "EMS: fleet inference from busy-unit concurrency at held onsets" -
 
 ### Task 9: Travel targets, zip centroids, OSRM matrix
 
+Port 5000 is taken on dylan-pc, so OSRM is published on `127.0.0.1:5005` (checked 2026-11-01).
+
 **Files:**
 - Create: `judges/ems/ems/calibrate/travel.py`, `judges/ems/tests/test_travel.py`
 
@@ -1148,7 +1150,7 @@ git commit -m "EMS: fleet inference from busy-unit concurrency at held onsets" -
 - Produces:
   - `travel_targets(df) -> dict[borough][hour] = 101-point quantiles of travel_s`;
   - `zip_centroids(gazetteer_txt: str, zips: set[str]) -> dict[str, tuple[float, float]]`, reading the Census 2020 ZCTA Gazetteer (tab-separated: `GEOID`, `INTPTLAT`, `INTPTLONG`);
-  - `osrm_table(points: list[tuple[float, float]], base="http://127.0.0.1:5000", opener=urlopen) -> ndarray` of durations in seconds, (n, n), from the OSRM `/table/v1/driving/` service with `annotations=duration`.
+  - `osrm_table(points: list[tuple[float, float]], base="http://127.0.0.1:5005", opener=urlopen) -> ndarray` of durations in seconds, (n, n), from the OSRM `/table/v1/driving/` service with `annotations=duration`.
 
 - [ ] **Step 1: Write the failing test.** Create `judges/ems/tests/test_travel.py`:
 
@@ -1231,7 +1233,7 @@ def zip_centroids(gazetteer_txt: str, zips: set[str]) -> dict[str, tuple[float, 
     return out
 
 
-def osrm_table(points: list[tuple[float, float]], base: str = "http://127.0.0.1:5000", opener=urlopen) -> np.ndarray:
+def osrm_table(points: list[tuple[float, float]], base: str = "http://127.0.0.1:5005", opener=urlopen) -> np.ndarray:
     coords = ";".join(f"{lon},{lat}" for lat, lon in points)
     with opener(f"{base}/table/v1/driving/{coords}?annotations=duration", timeout=600) as resp:
         data = json.load(resp)
@@ -1260,8 +1262,8 @@ docker pull $IMG || IMG=osrm/osrm-backend:latest
 docker run --rm -t -v "$PWD:/data" $IMG osrm-extract -p /opt/car.lua /data/new-york-latest.osm.pbf
 docker run --rm -t -v "$PWD:/data" $IMG osrm-partition /data/new-york-latest.osrm
 docker run --rm -t -v "$PWD:/data" $IMG osrm-customize /data/new-york-latest.osrm
-docker run -d --name osrm-ny -p 127.0.0.1:5000:5000 -v "$PWD:/data" $IMG osrm-routed --algorithm mld --max-table-size 1000 /data/new-york-latest.osrm
-sleep 5 && curl -s "http://127.0.0.1:5000/route/v1/driving/-73.84,40.847;-73.99,40.75?overview=false" | head -c 200
+docker run -d --name osrm-ny -p 127.0.0.1:5005:5000 -v "$PWD:/data" $IMG osrm-routed --algorithm mld --max-table-size 1000 /data/new-york-latest.osrm
+sleep 5 && curl -s "http://127.0.0.1:5005/route/v1/driving/-73.84,40.847;-73.99,40.75?overview=false" | head -c 200
 ```
 
 Expected: a JSON response containing `"code":"Ok"`. If extraction runs out of memory, stop and report: the box has 125 GB of RAM, so this is not expected.
@@ -1312,7 +1314,7 @@ Expected: FAIL, `ModuleNotFoundError: No module named 'ems.calibrate.bundle'`.
 ```python
 """Run every calibration fit on 2017-2019 fit days and write the hashed calibration bundle (spec §6, §13.3).
 
-    python -m ems.calibrate.bundle      # needs the calib cache (ems.data.ingest calib) and OSRM on :5000
+    python -m ems.calibrate.bundle      # needs the calib cache (ems.data.ingest calib) and OSRM on :5005
 """
 
 from __future__ import annotations
