@@ -68,3 +68,9 @@ Started task 007. Prerequisite holds (FROZEN exists, ledger ends seq 11 evaluato
 - Failing run first lines: `FF [100%]`, `ModuleNotFoundError: No module named 'ems.calibrate.offload'`.
 - Passing run: `2 passed`, `ruff check .` clean, `name_guard.py` clean.
 - Commit: `4579d4f179d5e318d0c8e6f361171bb19110c4ab` ("EMS: offload base tables and per-borough load coefficient").
+
+### Task 8: Fleet inference from held onsets
+- Tests written: `judges/ems/tests/test_fleet.py` (half-open concurrency counts, M/M/10 capacity recovery).
+- Failing run first lines: `FF [100%]`, `ModuleNotFoundError: No module named 'ems.calibrate.fleet'`.
+- Passing run: `2 passed`, `ruff check .` clean, `name_guard.py` clean.
+- Commit: `c6341305fa3d65eb7988f0fb7b6fb62dc32f418d` ("EMS: fleet inference from busy-unit concurrency at held onsets").
