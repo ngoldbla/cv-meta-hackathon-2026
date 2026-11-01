@@ -7,7 +7,8 @@ Executing plan Tasks 1-4 from docs/superpowers/plans/2026-11-01-m3d-ems-evaluato
 
 ## Work done
 - Claimed task 011 (3052621).
-- Task 1: applied plan patch via mktemp + git apply (git apply --check passed); created ems/params.py, ems/scenarios/{__init__,bounds,sampler}.py, tests/test_scenarios.py with exact plan content. Targeted tests: 10 passed. Full gate: 113 passed, 1 skipped; name_guard exit 0; ruff clean.
+- Task 1: applied plan patch via mktemp + git apply (git apply --check passed); created ems/params.py, ems/scenarios/{__init__,bounds,sampler}.py, tests/test_scenarios.py with exact plan content. Targeted tests: 10 passed. Full gate: 113 passed, 1 skipped; name_guard exit 0; ruff clean (commit bc45822).
+- Task 2: created ems/policy/classical.py, calibration/b1_params.json, tests/test_classical.py with exact plan content. Targeted tests: 2 passed. Full gate: 115 passed, 1 skipped; name_guard exit 0; ruff clean.
 
 ## Results
 TBD per plan task: test runs, commands with wall times, full outputs of Task 4 Steps 3-6.
