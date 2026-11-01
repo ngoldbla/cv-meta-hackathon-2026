@@ -1,7 +1,7 @@
 ---
 id: "004"
 title: "M3a: shared loopkit harness and the CAGES move, rehearsed (plan Tasks 1-5)"
-status: open
+status: in_progress
 created: 2026-11-01
 report: ops/reports/004-m3a-harness-restructure.md
 ---
