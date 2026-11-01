@@ -74,3 +74,11 @@ Started task 007. Prerequisite holds (FROZEN exists, ledger ends seq 11 evaluato
 - Failing run first lines: `FF [100%]`, `ModuleNotFoundError: No module named 'ems.calibrate.fleet'`.
 - Passing run: `2 passed`, `ruff check .` clean, `name_guard.py` clean.
 - Commit: `c6341305fa3d65eb7988f0fb7b6fb62dc32f418d` ("EMS: fleet inference from busy-unit concurrency at held onsets").
+
+### Task 9: Travel targets, zip centroids, OSRM matrix
+- Tests written: `judges/ems/tests/test_travel.py` (borough×hour targets, gazetteer centroids, OSRM table parsing + lon/lat order).
+- Failing run first lines: `FFF [100%]`, `ModuleNotFoundError: No module named 'ems.calibrate.travel'`.
+- Passing run: `3 passed`, `ruff check .` clean, `name_guard.py` clean.
+- Commit: `601351ac8da1dda8a143dedc5640637e07a65514` ("EMS: travel targets, ZCTA centroids and OSRM table client").
+- Step 5 (OSRM, adaptation 4 — wall time + volume): download 3:20.95 (498,401,978 bytes, matches plan's 498 MB); `docker pull ghcr.io/project-osrm/osrm-backend:latest` 14.31 s; extract 1:51.14 (peak RAM 5.5 GB); partition 0:40.49; customize 0:08.30. `osrm-ny` serving on 127.0.0.1:5005; route check returned `"code":"Ok"` (Bronx→Manhattan 1626.9 s).
+- Deviation (path, not content): OSRM data lives at `/home/ndgold/osrm-ny`, not `/mnt/data1/osrm-ny` — `/mnt/data1` is root-owned (drwxr-xr-x) and unwritable by ndgold, and escalated execution is unavailable (approval prompts disabled). Same extract bytes, same image, same :5005 port; Task 10 only queries localhost. Dylan can move it later if the /mnt/data1 path matters.
