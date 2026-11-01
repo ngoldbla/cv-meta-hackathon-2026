@@ -25,3 +25,9 @@ Started task 007. Prerequisite holds (FROZEN exists, ledger ends seq 11 evaluato
 - Passing run: `2 passed`, `ruff check .` clean, `name_guard.py` clean.
 - Pinned install printed `2.5.4 2.3.3 21.0.0 2.11.0+cu128` as expected.
 - Commit: `8d3d709235d713abd740218715d8ac340f6731ad` ("EMS judge skeleton: package wiring and tiers").
+
+### Task 2: Windows and the holdout refusal
+- Tests written: `judges/ems/tests/test_windows.py` (windows match spec; refusal on any overlap, pass otherwise).
+- Failing run first lines: `FF [100%]`, `ModuleNotFoundError: No module named 'ems.data.windows'`.
+- Passing run: `2 passed`, `ruff check .` clean, `name_guard.py` clean.
+- Commit: `855aa72b522058cf2d27e74cf4dfd74d98a2a946` ("EMS: data windows with the sealed holdout refusal").
