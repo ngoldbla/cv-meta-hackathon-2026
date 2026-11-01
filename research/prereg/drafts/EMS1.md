@@ -1,0 +1,16 @@
+id: EMS1
+claim: The full method (red and blue loops with counterfactual reports, learned or hybrid policy) dispatches with at least 5% less weighted lateness than the strongest classical baseline, b1.
+primary_metric: weighted lateness L per scenario-day (evaluator ems-1.0, judges/ems/ems/evaluate.py): sum over calls of w_tier * max(0, R - T_tier) in minutes, targets 15/40/120 min, weights 8/3/1; unserved calls censored at end of run; diverted calls count triage time or, if they call back, the time to the callback's unit on scene
+comparisons: [FULL, b1]
+threshold: the claim stands only if, for every one of the 12 tests (weightings primary 8:3:1, equal 1:1:1 and steep 20:5:1; pools omicron-b, stress, covid-a, normal-2016), the ratio's 95% CI upper end is below 0.95 and the Holm-adjusted p is below 0.05. Anything else is a reported null
+test: ratio of mean L (a / b) with a paired bootstrap 95% CI (2000 resamples, seed 0) over scenario-days, plus the paired Wilcoxon signed-rank p-value (loopkit.stats.paired); Holm correction across the 12 tests of this claim (3 weightings x 4 pools)
+n_holdout_instances: omicron-b 32 days x 3 seeds = 96; covid-a 31 x 3 = 93; normal-2016 366 x 3 = 1098; stress 366 x 3 = 1098 scenario-days (seeds 0, 1, 2; the same scenario-days for both arms, common random numbers)
+data: dataset_release ledger seq 13 (ems-nyc-76xm-jjuj-2017-2019, calibration and manifests); holdout windows sealed in data/manifests/holdout-*.json (row counts checked at download); stress pool data/manifests/stress-pool.json (dataset_release entry at M4, generator from the red run in task 014) applied to the 2016 dates; judge frozen at ledger seq 12
+arms (M5, 40 blue iterations each, Modal B200 for training, program spec §11):
+  FULL: blue loop scored on dev days from the nominal sampler plus the current hard-scenario library; one red iteration against the current best blue candidate after every 4 blue iterations (10 in all); the blue agent reads the counterfactual reports, and models may train on their labels; the policy must be learned or hybrid (a trained model makes the assignment or activation decisions, with a rule fallback allowed).
+  BLUE_ONLY: as FULL, but no red loop; scored on nominal dev days only.
+  NO_CF: as FULL, but the blue agent sees only the benchmark's final METRIC line; no counterfactual reports or labels.
+  READABLE: as FULL, but the policy is readable code with no trained parameters (at most 20 hand-set numeric constants); no GPU.
+  b1: the frozen classical baseline (judges/ems/ems/policy/classical.py, calibration/b1_params.json).
+models: each arm's final candidate is its best kept dev METRIC after 40 iterations. Its candidate file and any checkpoint are hashed into a protocol_note ledger entry when the arm ends, before any holdout run. No candidate is changed afterwards
+notes: Holdout data never leaves dylan-pc; each pool is downloaded, checked against its manifest row count and evaluated once per pre-registration (eval_holdout refuses a second run). COVID-A summary statistics were seen during design (2026-10-29), so COVID-A is disclosed as exposed; Omicron-B is the main real-surge pool. Regret against the foresight reference is reported as a diagnostic only (the reference is weak: M3 judge spec §16). The equal and steep weightings are part of the threshold, not secondary.
