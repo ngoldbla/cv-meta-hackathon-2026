@@ -1,5 +1,5 @@
 # Report 011: M3d: EMS evaluator, scenarios, b1, counterfactual reports, benchmark and compute gate (plan Tasks 1-4)
-Status: in_progress
+Status: done
 Branch head at start: 0794d03ea594f88dd3622500fd410af83a7fcbbc  ·  at finish: TBD
 
 ## Summary
