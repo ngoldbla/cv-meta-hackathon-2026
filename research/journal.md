@@ -155,3 +155,8 @@
 - **What was tried:** max offload (#6), no concentration (#7), min offload (#8), interior load via unavailable 0.125 (#9), thin staffing with demand 1.0 (#10), each on the kept state.
 - **What happened:** best kept `regret_b1=733.07` (#10): unavailable 0.25, demand 1.0, urgent_share 1.153, offload and concentration nominal. Offload and concentration extremes both lose to nominal draws; the interior load point collapses regret to 93.13. pytest (128 passed, 1 skipped) and name guard clean on the keep. Nothing here is a finding.
 - **Next:** date conditioning (weekend/holiday thetas; b1 expectations ignore day-of-week), fixed-moderate concentration, demand below 1.0, then audit and report.
+
+## 2026-11-01: ems-stress red loop iterations 11-15 (task 014)
+- **What was tried:** min demand (#11), fixed-moderate concentration (#12), weekend/holiday demand bump to cap (#13), low-volume-month bump (#14), summer-month ease (#15). A dev-only volume analysis (weekday/holiday/month means) grounded the date hypotheses; pick_days stays uniform so the bench estimates pool regret honestly.
+- **What happened:** best kept `regret_b1=866.21` (#14): thin staffing, max urgency, demand 1.0 on ordinary weekdays and at the load cap on weekends, federal holidays and Feb/Mar/Nov. Summer easing reverted (859.87). pytest (128 passed, 1 skipped) and name guard clean on keeps. Nothing here is a finding.
+- **Next:** refine the bumped-month set and bump level, then audit and report.
