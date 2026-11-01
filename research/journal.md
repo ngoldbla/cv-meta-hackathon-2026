@@ -116,3 +116,8 @@
   - Friction found and fixed: the baseline commit format, the meaning of `commit` and `seconds`, and the `.venv` symlink showing as untracked (now ignored).
 - **Next:** M2 machinery verified. M3 waits on the M1 pick.
 
+## 2026-11-01: EMS calibration bundle (M3b)
+- **What was tried:** ingested 2017–2019 NYC EMS dispatch data (manifests `calib-2017..2019`; holdout windows recorded as counts only) and fitted service, offload, fleet and travel targets on fit days (anchor days excluded).
+- **What happened:** 4,238,644 fit rows on 1,027 fit days (68 anchor days excluded; 48 dropped bad severity). Fleet median-of-medians: Brooklyn 61.5, Bronx 52.0, Manhattan 49.0, Queens 41.5, Staten Island 9.0. Offload betas: Bronx 0.0008, Brooklyn 0.0003, Manhattan 0.0009, Queens 0.0012, Staten Island 0.0033, UNKNOWN 0.0000 (all ≥ 0). Anchor tier-1 p50/p90 4.9/8.0 min; flu held-share increase 0.121. Bundle files and SHA-256s in `judges/ems/calibration/bundle_manifest.json`.
+- **Next:** M3c plan (simulator, policies, anchors, travel-scale fit).
+

@@ -1,0 +1,13 @@
+{
+ "files": {
+  "anchor_days.json": "27e8727e3565294252e24797bf2aa17b7b76e431d3ca8abc6bddb9cdc4dafc5d",
+  "anchor_targets.json": "9c3fa1b35e36bb9102af2ed56a5725ca0261479fdae3de4cc836a51353d2548b",
+  "call_type_groups.json": "d4991aa6ddd42633e3fc44829a11d28a79621d73f673f05eac7cc1ff7b63b5c5",
+  "fleet.json": "ec7739810700c8cea2e2e5b9276f89d63d81c00ef5c46ce3c4d5b2d21c79161b",
+  "offload.json": "bcbb1aab789e0914af4c0ac82a6e006912e64346aa1ff45adff1891cec75c2b8",
+  "service.json": "85191c02ac2bf55382757d0fb6c0aeb7532184a1fa483afd13087f625a70478e",
+  "travel_osrm.npz": "965782e3a562565b7bc0055846e5a64cf3103320eff9d992faa8905206a52c8e",
+  "travel_targets.json": "b092b4b2024808eab3fa825f8bad3a12c18d051d97df9ff2f53f40b8a6b9752e",
+  "zips.csv": "057da28a3607c6be316dd447026ca9fab15ea46e67507b8a3c02ea4d1ae1c84f"
+ }
+}
