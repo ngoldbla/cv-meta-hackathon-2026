@@ -80,6 +80,9 @@ judges/ems/              NEW judge, Python package `ems`
 | **Holdout: normal** | 2016 days, salted sample | A seed derived from a salt kept outside the repository, as in CAGES |
 | **Holdout: stress** | generated once | The red loop run against b1 before the first blue iteration; hashes in the ledger |
 
+**Amendment (2026-11-01, Dylan):** the reviewer saw surge A summary statistics during design (§3), before the seal existed. Omicron (surge B) is therefore the **primary** real-surge confirmatory pool, and COVID wave 1 (surge A) is secondary, with this exposure disclosed in every pre-registration and in the paper. Omicron and the 2016 normal pool were never viewed.
+
+
 **Sealing.** The data loader refuses holdout windows unless called by `eval_holdout`. `ar_check` flags any diff that adds a holdout date string. `AGENTS.md` forbids reading holdout windows outside the confirm step. The data is public, so this is a protocol fence, not encryption.
 
 ## 6. Calibration
