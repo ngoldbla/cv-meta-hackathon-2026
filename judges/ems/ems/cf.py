@@ -92,9 +92,9 @@ class _Probe(Policy):
 
 def report(d: date, theta: dict, seed: int, policy: str, n_points: int = 20, window_s: float = 3600.0) -> dict:
     from .evaluate import make_policy
-    from .scenarios.sampler import dev_days
+    from .scenarios.core import is_dev_day
 
-    if d not in set(dev_days()):
+    if not is_dev_day(d):
         raise PermissionError(f"{d} is not a dev day")
     count = _Probe(make_policy(policy), None, window_s)
     sim = build_sim(d, theta, seed, count)

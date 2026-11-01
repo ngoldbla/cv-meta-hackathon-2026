@@ -1,7 +1,7 @@
 ---
 id: "012"
 title: "M3d correction: frozen scenario mechanics split out of the red-loop sampler"
-status: in_progress
+status: done
 created: 2026-11-01
 report: ops/reports/012-ems-scenario-mechanics-split.md
 ---

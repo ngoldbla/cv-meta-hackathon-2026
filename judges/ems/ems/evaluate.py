@@ -6,7 +6,8 @@ triage time, or, if it calls back, the time from the original call to the callba
 callback is not counted again). Claims pair L by scenario-day (loopkit.stats.paired, Holm), and must hold
 under the "equal" and "steep" weightings as well as "primary".
 
-dev:     scenario-days from ems.scenarios.sampler.dev_pool (2017-2019 fit days with bounded theta).
+dev:     scenario-days from ems.scenarios.sampler.dev_pool; build_sim refuses any cached day outside the
+         frozen dev set (ems.scenarios.core) and perturb() refuses theta outside the bounds.
 holdout: sealed pools (omicron-b primary, covid-a secondary, normal-2016, stress); require a ledger
          pre-registration and run once per pre-registration.
 """
@@ -89,11 +90,13 @@ def day_metrics(rec: dict, end_s: float, unit_hours: float) -> dict:
 
 def build_sim(d, theta: dict, seed: int, policy, params: dict | None = None, day_table: dict | None = None):
     """The Simulation for one scenario-day (perturbed day table, theta, frozen params), not yet run."""
-    from .scenarios.sampler import perturb
+    from .scenarios.core import is_dev_day, perturb
     from .sim.calib import BOROUGHS, Calibration
     from .sim.core import Simulation
     from .sim.trace import load_day
 
+    if day_table is None and not is_dev_day(d):
+        raise PermissionError(f"{d} is not a dev day")
     cal = Calibration.load()
     day = day_table if day_table is not None else load_day(d)
     zb = cal.sim_inputs.get("zip_borough", {})

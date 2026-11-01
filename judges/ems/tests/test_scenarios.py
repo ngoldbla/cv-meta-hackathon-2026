@@ -22,7 +22,7 @@ def test_sampler_respects_load_cap_and_is_deterministic():
 
 
 def test_perturb_scales_demand_and_adds_concentration_calls():
-    from ems.scenarios.sampler import perturb
+    from ems.scenarios.core import perturb
 
     n = 2000
     rng = np.random.default_rng(0)
@@ -37,3 +37,14 @@ def test_perturb_scales_demand_and_adds_concentration_calls():
     assert len(conc["t"]) == n + 50
     with pytest.raises(ValueError):
         perturb(day, {"demand": 2.0}, 1, zip_b, tg)
+
+
+def test_evaluator_refuses_cached_days_outside_the_dev_set():
+    from datetime import date
+
+    from ems.evaluate import build_sim
+
+    with pytest.raises(PermissionError):
+        build_sim(date(2016, 6, 1), {}, 0, "b0")  # normal-2016 holdout
+    with pytest.raises(PermissionError):
+        build_sim(date(2019, 1, 5), {}, 0, "b0")  # a 2019 anchor day
