@@ -44,3 +44,5 @@ METRIC regret_b1=866.21
 METRIC regret_b1=859.87
 {"run": "runs/ar-red-ems/20261101-181422", "seconds": 43.3, "b1_primary": 33009.17022561859, "oracle_primary": 33870.26783566809, "days_with_regret": 84, "mean_demand": 1.03286195, "mean_unavailable": 0.25}
 METRIC regret_b1=840.33
+{"run": "runs/ar-red-ems/20261101-181521", "seconds": 43.2, "b1_primary": 31109.790985418997, "oracle_primary": 32151.957579835722, "days_with_regret": 79, "mean_demand": 1.01515, "mean_unavailable": 0.25}
+METRIC regret_b1=767.51
