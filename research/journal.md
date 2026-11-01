@@ -160,3 +160,8 @@
 - **What was tried:** min demand (#11), fixed-moderate concentration (#12), weekend/holiday demand bump to cap (#13), low-volume-month bump (#14), summer-month ease (#15). A dev-only volume analysis (weekday/holiday/month means) grounded the date hypotheses; pick_days stays uniform so the bench estimates pool regret honestly.
 - **What happened:** best kept `regret_b1=866.21` (#14): thin staffing, max urgency, demand 1.0 on ordinary weekdays and at the load cap on weekends, federal holidays and Feb/Mar/Nov. Summer easing reverted (859.87). pytest (128 passed, 1 skipped) and name guard clean on keeps. Nothing here is a finding.
 - **Next:** refine the bumped-month set and bump level, then audit and report.
+
+## 2026-11-01: ems-stress red loop iterations 16-20, done (task 014)
+- **What was tried:** April bump extension (#16), milder bump level 1.03 (#17), always-present concentration (#18), fixed-mid offload (#19), max offload on bumped days only (#20).
+- **What happened:** all five reverted; the loop ends at the iteration cap with best kept `regret_b1=866.21` (#14). Final generator: unavailable 0.25, urgent_share at max, demand 1.0 on ordinary weekdays and at the load cap on weekends, federal holidays and Feb/Mar/Nov; offload and concentration nominal. Nothing here is a finding.
+- **Next:** audit (`ar_check.py`), report on main, push the branch unmerged; the stress-pool build is a later task.
