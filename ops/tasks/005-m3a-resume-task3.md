@@ -1,7 +1,7 @@
 ---
 id: "005"
 title: "M3a resumed: plan Tasks 3-5 with the corrected Task 3 test (replaces the blocked remainder of 004)"
-status: open
+status: in_progress
 created: 2026-11-01
 report: ops/reports/005-m3a-resume-task3.md
 ---
