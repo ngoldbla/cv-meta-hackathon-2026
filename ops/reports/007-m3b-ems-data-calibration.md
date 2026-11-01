@@ -18,4 +18,10 @@ Started task 007. Prerequisite holds (FROZEN exists, ledger ends seq 11 evaluato
 (none yet)
 
 ## Plan tasks
-(adaptation 2: tests, failing run, passing run, commit per plan task — filled as tasks complete)
+
+### Task 1: Package skeleton, dependencies, tiers
+- Tests written: `judges/ems/tests/test_tiers.py` (tier mapping/targets/weights, unknown-severity rejection).
+- Failing run first lines: `FF [100%]`, `ModuleNotFoundError: No module named 'ems.tiers'` (plan expects `No module named 'ems'`; same failure class — package body not yet written).
+- Passing run: `2 passed`, `ruff check .` clean, `name_guard.py` clean.
+- Pinned install printed `2.5.4 2.3.3 21.0.0 2.11.0+cu128` as expected.
+- Commit: `8d3d709235d713abd740218715d8ac340f6731ad` ("EMS judge skeleton: package wiring and tiers").
