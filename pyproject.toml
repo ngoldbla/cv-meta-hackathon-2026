@@ -19,20 +19,21 @@ hf = ["transformers>=4.45"]
 mcp = ["mcp>=1.2"]
 jupedsim = ["jupedsim"]
 dev = ["pytest>=8", "ruff>=0.5", "hypothesis>=6", "gymnasium>=1.0"]
+ems = ["pandas==2.3.3", "pyarrow==21.0.0"]
 
 [project.scripts]
 cages = "cages.cli:main"
 
 [tool.setuptools.packages.find]
-where = [".", "judges/cages"]
-include = ["cages*", "loopkit*"]
+where = [".", "judges/cages", "judges/ems"]
+include = ["cages*", "ems*", "loopkit*"]
 
 [tool.setuptools.package-data]
 "cages.data" = ["mta_7line.json"]  # MTA calibration aggregates
 
 [tool.ruff]
 line-length = 110
-src = [".", "judges/cages"]
+src = [".", "judges/cages", "judges/ems"]
 target-version = "py310"
 
 [tool.ruff.lint]
@@ -40,5 +41,5 @@ select = ["E", "F", "W", "I", "B", "UP"]
 ignore = ["E501", "B905"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "judges/cages/tests"]
+testpaths = ["tests", "judges/cages/tests", "judges/ems/tests"]
 addopts = "--import-mode=importlib"

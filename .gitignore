@@ -13,3 +13,4 @@ artifacts/
 *.safetensors
 *.pt
 !datasets/**/*.json
+judges/ems/data/cache/
