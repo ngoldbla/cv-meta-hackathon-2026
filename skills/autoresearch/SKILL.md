@@ -51,7 +51,7 @@ Role:                <blue|red>
 ## Step 4: Run
 1. **Initialize** `research/autoresearch/<slug>/` with:
    - `autoresearch.md`: the plan block plus running notes;
-   - `autoresearch.sh`: `#!/usr/bin/env bash`, `set -euo pipefail` and the benchmark command, made executable;
+   - `autoresearch.sh`: `#!/usr/bin/env bash`, `set -euo pipefail`, then `root=$(git rev-parse --show-toplevel); export PYTHONPATH="$root:$(ls -d "$root"/judges/*/ 2>/dev/null | tr '\n' ':')${PYTHONPATH:-}"` so imports resolve to this worktree's code and not the main checkout's editable install, then the benchmark command. Make it executable;
    - an empty `autoresearch.jsonl`.
 2. **Baseline.** Run `bash research/autoresearch/<slug>/autoresearch.sh` on the unchanged tree. Log it as iteration 0 with `"decision": "baseline"` and `"best_before": null`, and commit it as `Autoresearch <slug> #0: baseline - unchanged`.
 3. **Each iteration:**

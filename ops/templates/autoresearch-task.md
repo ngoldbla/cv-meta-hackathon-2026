@@ -20,7 +20,7 @@ Role:                <blue|red>
 ## Setup
 1. In the main checkout (on `main`), claim this task as `skills/inbox/SKILL.md` describes, and keep the report there.
 2. Run `bash scripts/ar_worktree.sh <role> <slug>`, then run the loop in the directory it prints.
-3. Write `research/autoresearch/<slug>/autoresearch.sh` with `#!/usr/bin/env bash`, `set -euo pipefail` and exactly the benchmark command above, and make it executable.
+3. Write `research/autoresearch/<slug>/autoresearch.sh` with `#!/usr/bin/env bash`, `set -euo pipefail`, the `PYTHONPATH` export from `skills/autoresearch/SKILL.md` Step 4, and exactly the benchmark command above, and make it executable.
 
 ## Stop and report
 - **Stop** at the iteration cap or on a guardrail conflict. Also stop if, at the start, `nvidia-smi` shows another process using more than 2 GB of GPU memory.
