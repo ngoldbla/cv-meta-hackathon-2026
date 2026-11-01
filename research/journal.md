@@ -126,3 +126,8 @@
 - **What happened:** the check failed in all 5 boroughs. Observed flu-day offload medians rose 2.4–4.8% (BRONX 1.0479, BROOKLYN 1.0322, MANHATTAN 1.0274, QUEENS 1.0243, RICHMOND 1.0249), but the fitted betas are ≈0 to slightly negative (−0.022 to +0.011), so predictions sit at ≈1.000. Day-to-day 24 h load variation does not predict offload on the 1,027 fit days. Numbers in `judges/ems/calibration/offload_check.json` and `judges/ems/calibration/fit_report.md`; bundle re-verified (BUNDLE_OK). Per the task stop rule the task is blocked with the model unchanged.
 - **Next:** reviewer decides the next offload-model direction in a new task.
 
+## 2026-11-01: Base-only offload; surge offload becomes a bounded scenario factor (task 009)
+- **What was tried:** removed the endogenous load term from hospital offload (`offload.json` is now `{"model": "base"}` with 101-point base tables) and measured the surge-offload scenario factor θ "extra offload inflation" from real pre-2020 days (`offload_inflation_range`: day-median over trailing 28-day median, ≥20 transport days in the window), then re-ran the full calibration bundle (report: `ops/reports/009-offload-scenario.md`).
+- **What happened:** base tables identical to task 008; the task-008 null result is kept as committed evidence in `offload_load_null.json`. Inflation over 1,075 days per borough: p50 ≈ 1.00 everywhere, max 1.0495–1.1511; o_max (citywide max, bound for M3d) = 1.1511 (Staten Island). UNKNOWN has only 3 transported days and yields no window. Bundle re-verified (BUNDLE_OK); all other bundle bytes identical.
+- **Next:** M3d consumes o_max as the θ bound; reviewer writes the next task.
+

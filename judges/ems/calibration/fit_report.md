@@ -127,18 +127,13 @@ Fit rows: 4,238,644 on 1027 fit days (anchor days excluded: 68). Dropped (bad se
 | RICHMOND / STATEN ISLAND | 22 | 8 | 5 | 13 | 115 |
 | RICHMOND / STATEN ISLAND | 23 | 6 | 4 | 11 | 88 |
 
-## Offload surge coefficient (ratio24: log offload per unit of 24 h load over the borough mean)
+## Offload (base-only; no load term)
 
-| borough | beta | mean_load |
-|---|---|---|
-| BRONX | -0.0125 | 661.7 |
-| BROOKLYN | -0.0222 | 782.3 |
-| MANHATTAN | -0.0030 | 656.8 |
-| QUEENS | -0.0156 | 535.9 |
-| RICHMOND / STATEN ISLAND | 0.0107 | 118.0 |
-| UNKNOWN | 0.0000 | 0.0 |
+Offload is base-only: `offload.json` holds 101-point base tables per borough and hour (`{"model": "base"}`), with no beta and no load term. The endogenous load term was removed on 2026-11-01 after the task 008 null result below: day-to-day ambulance load does not predict offload on the fit days. Surge offload is now the stress-scenario factor θ "extra offload inflation" (spec §9), bounded by the inflation range below.
 
-## Offload check (Jan 2018 anchor days)
+## Offload load-term null result (task 008; Jan 2018 anchor days)
+
+Committed evidence in `offload_load_null.json`: observed flu-day offload medians rose 2.4–4.8% while the ratio24 load term predicted about 1.000 everywhere (tol 0.015).
 
 | borough | obs | pred | ok |
 |---|---|---|---|
@@ -147,6 +142,19 @@ Fit rows: 4,238,644 on 1027 fit days (anchor days excluded: 68). Dropped (bad se
 | MANHATTAN | 1.0274 | 0.9998 | false |
 | QUEENS | 1.0243 | 0.9982 | false |
 | RICHMOND / STATEN ISLAND | 1.0249 | 1.0010 | false |
+
+## Offload inflation range (scenario factor θ)
+
+| borough | p50 | p95 | p99 | max | n_days |
+|---|---|---|---|---|---|
+| BRONX | 0.9983 | 1.0447 | 1.0610 | 1.0820 | 1075 |
+| BROOKLYN | 1.0002 | 1.0234 | 1.0346 | 1.0571 | 1075 |
+| MANHATTAN | 1.0013 | 1.0269 | 1.0365 | 1.0495 | 1075 |
+| QUEENS | 1.0005 | 1.0355 | 1.0498 | 1.0740 | 1075 |
+| RICHMOND / STATEN ISLAND | 1.0024 | 1.0697 | 1.1034 | 1.1511 | 1075 |
+
+o_max (citywide maximum of max; bound for the M3d scenario factor θ): 1.1511.
+The inflation range uses only the 2017–2019 calibration window; the 2005–2015 bounds data has no offload times.
 
 ## Anchor targets (observed)
 
