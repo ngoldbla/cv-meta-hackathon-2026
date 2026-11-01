@@ -62,3 +62,9 @@ Started task 007. Prerequisite holds (FROZEN exists, ledger ends seq 11 evaluato
 - Passing run: `1 passed` (full EMS suite: 12 passed), `ruff check .` clean, `name_guard.py` clean.
 - Deviation (implementation, not test): the plan's `quantiles` (`np.percentile(x, linspace(0,100,q))`) fails the plan's own test on pinned numpy 2.5.4 — knot value 7 comes back as 7.000000000000001 (`At index 7 diff: 7.000000000000001 != 7.0`). Replaced with direct linear interpolation at `linspace(0, n-1, q)` positions, which is knot-exact. Verified equivalent to `np.percentile`: max abs diff 4.5e-12 on 50k exponential draws. The test was NOT weakened.
 - Commit: `5393493ceaf06481e3b91dca1199d4f67f8c42a0` ("EMS: service-time quantile tables per call-type group").
+
+### Task 7: Offload base and load coefficient
+- Tests written: `judges/ems/tests/test_offload.py` (prior-load window counts, known-slope recovery).
+- Failing run first lines: `FF [100%]`, `ModuleNotFoundError: No module named 'ems.calibrate.offload'`.
+- Passing run: `2 passed`, `ruff check .` clean, `name_guard.py` clean.
+- Commit: `4579d4f179d5e318d0c8e6f361171bb19110c4ab` ("EMS: offload base tables and per-borough load coefficient").
