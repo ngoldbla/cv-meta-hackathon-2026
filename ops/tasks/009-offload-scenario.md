@@ -1,7 +1,7 @@
 ---
 id: "009"
 title: "M3b fix 2: offload without a load term; surge offload becomes a bounded scenario factor"
-status: in_progress
+status: done
 created: 2026-11-01
 report: ops/reports/009-offload-scenario.md
 ---
