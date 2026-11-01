@@ -55,3 +55,10 @@ Started task 007. Prerequisite holds (FROZEN exists, ledger ends seq 11 evaluato
 - Failing run first lines: `FF [100%]`, `ModuleNotFoundError: No module named 'ems.calibrate.anchors'`.
 - Passing run: `2 passed`, `ruff check .` clean, `name_guard.py` clean.
 - Commit: `c6deeca05c6c87248743a0a1cbd20e75456ddfff` ("EMS: anchor-day selection and observed anchor targets").
+
+### Task 6: Service-time quantile tables
+- Tests written: `judges/ems/tests/test_service.py` (quantiles, groups, tables). Test kept byte-identical to the plan.
+- Failing run first lines: `F [100%]`, `ModuleNotFoundError: No module named 'ems.calibrate.service'`.
+- Passing run: `1 passed` (full EMS suite: 12 passed), `ruff check .` clean, `name_guard.py` clean.
+- Deviation (implementation, not test): the plan's `quantiles` (`np.percentile(x, linspace(0,100,q))`) fails the plan's own test on pinned numpy 2.5.4 — knot value 7 comes back as 7.000000000000001 (`At index 7 diff: 7.000000000000001 != 7.0`). Replaced with direct linear interpolation at `linspace(0, n-1, q)` positions, which is knot-exact. Verified equivalent to `np.percentile`: max abs diff 4.5e-12 on 50k exponential draws. The test was NOT weakened.
+- Commit: `5393493ceaf06481e3b91dca1199d4f67f8c42a0` ("EMS: service-time quantile tables per call-type group").
