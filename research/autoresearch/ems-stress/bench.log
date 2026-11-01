@@ -2,3 +2,17 @@
 METRIC regret_b1=500.25
 {"run": "runs/ar-red-ems/20261101-175344", "seconds": 62.2, "b1_primary": 11456.837059505657, "oracle_primary": 13970.929112265001, "days_with_regret": 60, "mean_demand": 1.0773876117258954, "mean_unavailable": 0.10858145877754798}
 METRIC regret_b1=491.75
+Traceback (most recent call last):
+  File "/home/ndgold/cv-meta-hackathon-2026-ar-red-ems-stress/judges/ems/experiments/ar/ems_red_bench.py", line 75, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/ndgold/cv-meta-hackathon-2026-ar-red-ems-stress/judges/ems/experiments/ar/ems_red_bench.py", line 57, in main
+    scen = pool(load(a.generator), a.n, a.seed)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ndgold/cv-meta-hackathon-2026-ar-red-ems-stress/judges/ems/experiments/ar/ems_red_bench.py", line 42, in pool
+    out.append((d, check(gen.sample_theta(rng, d)), int(seed)))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ndgold/cv-meta-hackathon-2026-ar-red-ems-stress/judges/ems/experiments/ar/ems_red_sampler.py", line 22, in sample_theta
+    return check(t)
+           ^^^^^
+NameError: name 'check' is not defined
