@@ -1,0 +1,75 @@
+{
+ "pass": false,
+ "rows": [
+  {
+   "check": "tier 1 response p50 (min)",
+   "sim": 4.5054228794473605,
+   "obs": 4.9,
+   "tol": "\u00b110%",
+   "ok": true
+  },
+  {
+   "check": "tier 1 response p90 (min)",
+   "sim": 11.127866700438197,
+   "obs": 8.0,
+   "tol": "\u00b115%",
+   "ok": false
+  },
+  {
+   "check": "tier 2 response p50 (min)",
+   "sim": 5.809507705237896,
+   "obs": 6.433333333333334,
+   "tol": "\u00b110%",
+   "ok": true
+  },
+  {
+   "check": "tier 2 response p90 (min)",
+   "sim": 14.361339036012316,
+   "obs": 11.033333333333333,
+   "tol": "\u00b115%",
+   "ok": false
+  },
+  {
+   "check": "tier 3 response p50 (min)",
+   "sim": 7.671697719627961,
+   "obs": 9.133333333333333,
+   "tol": "\u00b110%",
+   "ok": false
+  },
+  {
+   "check": "tier 3 response p90 (min)",
+   "sim": 20.44554028726825,
+   "obs": 22.533333333333335,
+   "tol": "\u00b115%",
+   "ok": true
+  },
+  {
+   "check": "held share",
+   "sim": 0.06315736068344047,
+   "obs": 0.07670302651862548,
+   "tol": "\u00b10.03",
+   "ok": true
+  },
+  {
+   "check": "transports per day",
+   "sim": 2875.688524590164,
+   "obs": 2854.9508196721313,
+   "tol": "\u00b15%",
+   "ok": true
+  },
+  {
+   "check": "offload median (min)",
+   "sim": 35.035791457390424,
+   "obs": 36.016666666666666,
+   "tol": "\u00b110%",
+   "ok": true
+  },
+  {
+   "check": "Jan 2018 held-share increase",
+   "sim": 0.16267661492821656,
+   "obs": 0.12055061125796394,
+   "tol": "\u00b10.05",
+   "ok": true
+  }
+ ]
+}
