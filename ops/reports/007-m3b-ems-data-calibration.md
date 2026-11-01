@@ -1,21 +1,33 @@
 # Report 007: M3b: EMS data ingest and calibration bundle (plan Tasks 1-10)
-Status: in_progress
+Status: done
 Branch head at start: 13613b46fe3ad9fe9647f0afe2dbcd3295d3fec0  ·  at finish: <sha>
 
 ## Summary
-Started task 007. Prerequisite holds (FROZEN exists, ledger ends seq 11 evaluator_update). Executing plan Tasks 1-10 on main.
+Executed plan Tasks 1–10 on `main`: new `ems` judge package with Socrata ingest, sealed holdout windows, cleaning, anchor selection, service/offload/fleet/travel fits, and a hashed calibration bundle with fit report. Calib rows match Socrata counts exactly (1,463,446 / 1,530,922 / 1,533,251); holdouts are counts-only manifests. All three fit-report sanity checks pass with documented explanations (Queens fleet 4th per its low call volume; tier-1 p90 8.0 min pooled vs a noisy single-day 10.2). Full suite: 98 passed, 1 skipped; ruff and name guard clean. No ledger entries written (dataset_release comes at the M3d freeze). Nothing here is a finding.
 
 ## Work done
-- Claimed task 007.
+- Claimed task 007 (prerequisite checked: `judges/cages/FROZEN` exists, ledger ends seq 11 `evaluator_update`).
+- Plan Tasks 1–10, each committed with the plan's message and pushed; report updated after each part. See Plan tasks below for tests, failing/passing runs, and SHAs.
+- Network steps: Socrata calib ingest (28:39, ~1.5 GB CSV → 230 MB Parquet), holdout counts (1.4 s), bounds aggregates (1:28, 6.15 MB), Geofabrik NY extract (3:21, 498 MB), OSRM build + serve on :5005 (stopped/removed after Task 10 Step 5; 2.3 GB data kept at `/home/ndgold/osrm-ny`), Census gazetteer (~1 MB) + OSRM table inside the bundle fit (3:43).
+- Sanity investigations (read-only, calib window): borough call/held shares; per-day tier-1 p90 spread over the 61 normal-anchor days.
 
 ## Results
-(none yet)
+From committed files (`judges/ems/data/manifests/*.json`, `judges/ems/calibration/*`):
+- Rows per calibration year: 2017: 1,463,446; 2018: 1,530,922; 2019: 1,533,251. Holdout counts: covid-a 161,820; omicron-b 141,950; normal-2016 1,441,211.
+- Fleet median per borough (median of hourly medians, hours with ≥3 onsets; `fleet.json`): Brooklyn 61.5, Bronx 52.0, Manhattan 49.0, Queens 41.5, Staten Island 9.0.
+- Offload beta per borough (`fit_report.md`): Bronx 0.0008, Brooklyn 0.0003, Manhattan 0.0009, Queens 0.0012, Staten Island 0.0033, UNKNOWN 0.0000.
+- Normal-anchor p50/p90 per tier (`anchor_targets.json`): tier 1: 4.9 / 8.0 min; tier 2: 6.43 / 11.03 min; tier 3: 9.13 / 22.53 min. Held share 0.077, transports/day 2855.0, offload median 36.0 min.
+- Flu held-share increase: 0.121 (`anchor_targets.json`).
+- Bundle: 6,880,728 bytes total (`bounds_daily.csv` 6.15 MB + 9 bundle files + manifest); `verify_bundle` → BUNDLE_OK. Run times: see Work done.
 
 ## Deviations
-(none yet)
+1. `bounds_daily.csv` is 6.15 MB vs the plan's "well under 5 MB" estimate — content correct (200,286 daily rows, 14 years); 10 MB total budget still holds.
+2. Task 6 `quantiles`: plan's `np.percentile` implementation fails the plan's own test on pinned numpy 2.5.4 (7.000000000000001 ≠ 7.0); replaced with knot-exact linear interpolation (max diff vs `np.percentile` 4.5e-12 on 50k draws). The test was NOT weakened.
+3. OSRM data at `/home/ndgold/osrm-ny` instead of `/mnt/data1/osrm-ny` (`/mnt/data1` root-owned, unwritable; no escalation path). Same bytes/image/port.
+4. Minor: Task 1 failing import error reads `No module named 'ems.tiers'` (plan says `'ems'`) — same failure class.
 
 ## Blocked / questions
-(none yet)
+- None blocking. For Dylan's review before M3c: the fit report (`judges/ems/calibration/fit_report.md`) — per adaptation 6, M3c not started. Optional follow-ups for the reviewer: (a) confirm the Queens-fleet and tier-1-p90 explanations above; (b) whether to move `/home/ndgold/osrm-ny` to `/mnt/data1/osrm-ny` (needs root); (c) whether Task 6's knot-exact `quantiles` should be kept as-is in the frozen bundle path.
 
 ## Plan tasks
 
@@ -82,3 +94,12 @@ Started task 007. Prerequisite holds (FROZEN exists, ledger ends seq 11 evaluato
 - Commit: `601351ac8da1dda8a143dedc5640637e07a65514` ("EMS: travel targets, ZCTA centroids and OSRM table client").
 - Step 5 (OSRM, adaptation 4 — wall time + volume): download 3:20.95 (498,401,978 bytes, matches plan's 498 MB); `docker pull ghcr.io/project-osrm/osrm-backend:latest` 14.31 s; extract 1:51.14 (peak RAM 5.5 GB); partition 0:40.49; customize 0:08.30. `osrm-ny` serving on 127.0.0.1:5005; route check returned `"code":"Ok"` (Bronx→Manhattan 1626.9 s).
 - Deviation (path, not content): OSRM data lives at `/home/ndgold/osrm-ny`, not `/mnt/data1/osrm-ny` — `/mnt/data1` is root-owned (drwxr-xr-x) and unwritable by ndgold, and escalated execution is unavailable (approval prompts disabled). Same extract bytes, same image, same :5005 port; Task 10 only queries localhost. Dylan can move it later if the /mnt/data1 path matters.
+
+### Task 10: Bundle, fit report and the full calibration run
+- Tests written: `judges/ems/tests/test_bundle.py` (write/verify round-trip, tamper detection).
+- Failing run first lines: `F [100%]`, `ModuleNotFoundError: No module named 'ems.calibrate.bundle'` (shown as `from ems.calibrate.bundle import ...` failure).
+- Passing run: `1 passed`; final full suite `98 passed, 1 skipped`, `ruff check .` clean, `name_guard.py` clean.
+- Step 5 (adaptation 4 — wall time + volume): `python -m ems.calibrate.bundle` wall 3:43.24 — 4,238,644 fit rows on 1,027 fit days (68 anchor days excluded, 48 dropped bad severity), exactly the plan's ~1,027. Inside the run: Census gazetteer ZIP (~1 MB) + one OSRM table query for 207 zips. `verify_bundle` → BUNDLE_OK. Bundle dir 6,880,728 bytes (6.6 MB, under the 10 MB budget; includes the 6.15 MB `bounds_daily.csv`).
+- Sanity checks (all pass, no tuning): fleet medians are tens of units with Brooklyn largest (61.5) — Queens is 4th (41.5), which the data explains (fewest calls/day, 794, and lowest held share, 1.2%, of the big 4; the plan's "Queens largest" parenthetical was population-based, not data-based); every offload beta ≥ 0 (0.0000–0.0033); tier-1 p90 = 8.0 min vs the single-day 10.2 — per-day tier-1 p90s over the 61 normal days range 6.65–10.02 (n≈47/day, noisy), and 2019-03-28 (10.01) is the maximum, so the pooled 8.0 is the stable estimate. Tiers 2/3 match the single-day values (11.0 vs 11.3; 22.5 vs 19.1/22.2).
+- Step 6: journal entry appended; `osrm-ny` stopped and removed per adaptation 5 (data kept: 2.3 GB at `/home/ndgold/osrm-ny`); pushed to `main` per adaptation 6. M3c NOT started.
+- Commit: `9f14fdf9d95acc3ac0e697166eddced642ac6fb5` ("EMS: calibration bundle and fit report (2017-2019 fit days)").
