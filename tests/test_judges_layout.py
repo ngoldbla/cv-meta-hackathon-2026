@@ -22,7 +22,16 @@ def test_guard_freezes_cages_and_the_harness():
     must = ["judges/cages/cages/harness/evaluate.py", "judges/cages/cages/data/instances.py", "judges/cages/FROZEN",
             "loopkit/ledger.py", "loopkit/guard.py", "scripts/guard_paths.py"]
     assert check(must, ROOT) == must
-    assert check(["judges/cages/cages/sim/core.py", "judges/ems/ems/sim/core.py"], ROOT) == []
+    assert check(["judges/cages/cages/sim/core.py"], ROOT) == []
+
+
+def test_guard_freezes_the_ems_judge_but_not_what_the_loops_edit():
+    must = ["judges/ems/FROZEN", "judges/ems/ems/sim/core.py", "judges/ems/ems/evaluate.py",
+            "judges/ems/ems/scenarios/core.py", "judges/ems/ems/scenarios/bounds.py", "judges/ems/ems/policy/classical.py",
+            "judges/ems/calibration/sim_inputs.json", "judges/ems/data/manifests/holdout-omicron-b.json",
+            "judges/ems/experiments/ar/ems_blue_bench.py"]
+    assert check(must, ROOT) == must
+    assert check(["judges/ems/ems/scenarios/sampler.py", "judges/ems/experiments/ar/ems_candidate.py"], ROOT) == []
 
 
 def test_cages_frozen_files_moved_byte_for_byte():
