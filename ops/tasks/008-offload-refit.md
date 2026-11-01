@@ -1,7 +1,7 @@
 ---
 id: "008"
 title: "M3b fix: refit hospital offload with a 24-hour surge ratio, checked on the Jan 2018 anchor days"
-status: open
+status: in_progress
 created: 2026-11-01
 report: ops/reports/008-offload-refit.md
 ---
