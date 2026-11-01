@@ -232,6 +232,16 @@ L = Σ over calls of w_tier × max(0, R − T_tier), in minutes.
 - **Compute** may fail the gate. Mitigations are in §12.
 - **Licensing:** NYC Open Data terms of use apply to the cached rows, and only derived parameters are committed (to confirm in step 2).
 
+## 16. M3d amendment (2026-11-01, Dylan approved the parameters and the load cap)
+- **Lever parameters** are frozen in `ems/params.py` with sources: *q* = 0.15 (24-hour re-contact after telephone hear-and-treat, 17.5%, and after video triage, 7.5%; Bell et al. 2021); a divert cap of 43% of tier-3 calls (DC 911 Nurse Triage Line); *λ* = 45 min (AMR, Napa 2014: 5 extra ambulances within 30 minutes, mutual aid later). *B* = 10%, *τ* = 15 min and *D* = 6 h are stated assumptions. Every claim must hold across the `SENSITIVITY` ranges.
+- **Bounds (§9)** are measured from pre-2020 data, 2016 excluded: demand 0.9–1.413; urgent share 0.765–1.153; offload 1–1.151; unavailability 0–0.25 (1 − median p10/median of busy units); concentration up to 104 calls in at most 3 zips.
+- **The load cap** (Dylan): demand / (1 − unavailable) ≤ 1.413, the worst real pre-2020 surge. Draws above it are rejected. Independent draws had produced collapse days (97% of calls held) that NYC never saw.
+- **The antagonist (§9) and reference.** The foresight oracle (b1's levers with true next-hour calls and next-3-hour activations) beat b1 on only 36% of 200 dev days. Hour-ahead true calls are sparse, and early activations spend the budget. The regret reference is therefore the per-day best of b1 and the oracle (`ems.evaluate.reference`), so regret against b1 is never negative.
+- **The claim statistic (§10)** is the ratio of mean L, with a paired bootstrap 95% CI, plus the Wilcoxon p-value, with Holm correction across weightings. `loopkit.stats.paired`'s mean per-day relative change is still reported, but it is undefined on days where the comparison L is 0.
+- **The divert cap and quota (§8).** The simulator rejects Divert past the cap, and the observation carries `divert_left`.
+- **Counterfactual reports (§11)** are as specified. Known limit: with *λ* = 45 min, an activation alternative has only 15 min of effect inside the 60-min window, so activation deltas are near 0. The sensitivity sweep is `python -m ems.cf --sensitivity`.
+- **b1 thresholds** come from a 27 + 18 + 12 point grid on 48 dev days: queue ≥ 2 → activate 3; queue ≥ 2 → divert tier 3. The optimum is interior on every axis. A divert threshold of 1 is catastrophic (mean L 2.08M vs 10.7k), because callbacks flood the queue.
+
 ## Sources
 - NYC Open Data, EMS Incident Dispatch Data (`76xm-jjuj`). https://data.cityofnewyork.us/resource/76xm-jjuj.json. Queried 2026-10-29 for the counts and day statistics in §3.
 - NHS England Ambulance Response Programme standards, as published by South East Coast Ambulance Service: Category 1 mean 7 min, 90th centile 15; Category 2 mean 18, 90th centile 40; Category 3 90th centile 120; Category 4 90th centile 180. https://www.secamb.nhs.uk/what-we-do/ambulance-response-programme (read 2026-10-29)
