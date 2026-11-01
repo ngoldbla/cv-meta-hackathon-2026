@@ -1,6 +1,6 @@
 # Report 005: M3a resumed: plan Tasks 3-5 with the corrected Task 3 test
 Status: blocked
-Branch head at start: 3765acdb8e987739587fd291468451fdafe0e851  ·  at finish: <sha>
+Branch head at start: 3765acdb8e987739587fd291468451fdafe0e851  ·  at finish: 20c1b240b1245879a53892291bec5915d845803a
 
 ## Summary
 Plan Tasks 3–4 are committed and pushed (`loopkit.guard`, `record_freeze`; all test counts match the plan). Plan Task 5's staged material is committed and pushed and its Step 4 checks pass, but the Step 5 rehearsal fails: `apply-m3.sh` exits at its `ruff check` with one F401 — the plan's `confirm.py` rewrite leaves `from pathlib import Path` unused. The clone made no commits and recorded no ledger entry; the shared `.venv` was restored to the main checkout and the clone deleted. Per the stop rule the run blocks here instead of adapting the plan. The fix is a one-entry plan correction (see Blocked / questions).
