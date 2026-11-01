@@ -2,6 +2,12 @@
 
 Agents cannot change frozen paths. Changes to them are prepared here, reviewed, and applied by the maintainer.
 
+## M3a: judges/ layout and the loopkit harness (`maintainer/m3/`, `apply-m3.sh`)
+- **What:** the shared harness moves to `loopkit/` (ledger, statistics, guard), and CAGES moves to `judges/cages/`. The guard reads one `FROZEN` manifest per judge.
+- **What changes in frozen files:** `scripts/guard_paths.py` becomes a wrapper around `loopkit.guard`, and CAGES's `ledger.py` becomes a re-export of `loopkit.ledger`. The CAGES evaluator and instance generator move byte for byte.
+- **Tested:** in a throwaway clone with `bash maintainer/apply-m3.sh --no-push` (see `docs/superpowers/plans/2026-11-01-m3a-harness-restructure.md`, Task 5).
+- **Run:** `git checkout main && git pull --ff-only && bash maintainer/apply-m3.sh`. The unlock key is now `loopkit.unfreeze`.
+- **Historical:** the v2 scripts below (`apply-v2.sh`, `overlay.sh`) assume the pre-M3 layout and no longer run.
 ## v2.0: the transit pivot (`maintainer/v2/`, `apply-v2.sh`)
 - **Why:** the project pivots from elevators to subway and bus evacuation. The frozen evaluator (`cages/harness/evaluate.py`) and instance generator (`cages/data/instances.py`) must follow:
   - new controller names;
