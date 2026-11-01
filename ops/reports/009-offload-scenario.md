@@ -1,6 +1,6 @@
 # Report 009: M3b fix 2: offload without a load term; surge offload becomes a bounded scenario factor
 Status: done
-Branch head at start: 663161e634b071752f99e5001cd59d121397d2ec  ·  at finish: <sha>
+Branch head at start: 663161e634b071752f99e5001cd59d121397d2ec  ·  at finish: 16470f2588ff02450fefd546a307b114dceb59d6
 
 ## Summary
 Removed the endogenous load term: `offload.json` is now `{"model": "base"}` with the same 101-point base tables (verified identical to task 008), and the task-008 null result is kept as committed evidence in `offload_load_null.json`. Measured the surge-offload scenario factor θ "extra offload inflation" over the 2017–2019 calibration window: p50 ≈ 1.00 in every borough, o_max (citywide max) = 1.1511. Re-ran the full bundle (identical counts, BUNDLE_OK) with the new fit report sections. Nothing here is a finding; no ledger entries written.
