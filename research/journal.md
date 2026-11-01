@@ -145,3 +145,8 @@
 - **What was tried:** initialized the red autoresearch loop in this worktree (branch `ar/red/ems-stress`); ran the unchanged nominal generator as iteration 0 (bench: 200 dev days, `regret_b1`, higher is better).
 - **What happened:** baseline `regret_b1=500.25` in 62 s, matching the task's expected value; oracle beats b1 on 72 of 200 days. Nothing here is a finding.
 - **Next:** iterations 1+ test one generator change each (concentration, load, urgency, offload, unavailability, day choice, date conditioning), keeping strict improvements.
+
+## 2026-11-01: ems-stress red loop iterations 1-5 (task 014)
+- **What was tried:** one-change iterations on the red generator: max concentration (#1), max demand load (#3), max load via unavailability (#4), max urgent share (#5); #2 crashed on a missing import (my bug, no METRIC line).
+- **What happened:** best kept `regret_b1=694.06` (#5): unavailable 0.25 with demand at the load cap plus urgent_share 1.153. Concentration and raw demand both lower regret (491.75, 142.37); tight staffing widens the foresight gap instead. pytest (128 passed, 1 skipped) and name guard clean on keeps. Nothing here is a finding.
+- **Next:** test offload max, no-concentration, then day choice (pick_days) and date conditioning.
