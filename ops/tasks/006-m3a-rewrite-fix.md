@@ -1,7 +1,7 @@
 ---
 id: "006"
 title: "M3a: fix the confirm.py rewrite (unused Path import) and repeat the rehearsal"
-status: open
+status: in_progress
 created: 2026-11-01
 report: ops/reports/006-m3a-rewrite-fix.md
 ---
