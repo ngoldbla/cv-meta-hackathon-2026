@@ -1,6 +1,6 @@
 # Report 013: M4: red-loop generator, red bench, stress-pool builder, worktree cache link
-Status: in_progress
-Branch head at start: 71a3c16d440c8cb6d9ec353a7dd07e8b3db9c0f4  ·  at finish: <sha>
+Status: done
+Branch head at start: 71a3c16d440c8cb6d9ec353a7dd07e8b3db9c0f4  ·  at finish: a937ae2d5ba00a3e2f1a903fc48186b01b24afd2
 
 ## Summary
 Task claimed; patch applied cleanly via `git apply`. Full suite: 128 passed, 1 skipped. `name_guard` passed, ruff clean. Red bench on 200 dev days printed `METRIC regret_b1=500.25` in ~63 s, matching the task's expected value.

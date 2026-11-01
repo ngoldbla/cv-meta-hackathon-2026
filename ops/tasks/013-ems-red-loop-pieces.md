@@ -1,7 +1,7 @@
 ---
 id: "013"
 title: "M4: red-loop generator, red bench, stress-pool builder, worktree cache link"
-status: in_progress
+status: done
 created: 2026-11-01
 report: ops/reports/013-ems-red-loop-pieces.md
 ---
