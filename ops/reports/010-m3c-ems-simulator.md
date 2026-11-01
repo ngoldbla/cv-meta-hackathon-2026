@@ -12,6 +12,7 @@ Executing `docs/superpowers/plans/2026-11-01-m3c-ems-simulator.md` Tasks 1-4 exa
 ## Work done (cont.)
 - Plan Task 2: created `ems/sim/trace.py` and `ems/sim/build.py` with the plan's exact content. Ran `.venv/bin/python -m ems.sim.build` (3m35s): wrote 1095 day tables to `judges/ems/data/cache/days/` (git-ignored) and `judges/ems/calibration/sim_inputs.json`. Full checks pass: `pytest -q` 110 passed, 1 skipped; `name_guard.py` and `ruff check .` clean.
 - Plan Task 3: created `ems/sim/fit.py` and `ems/sim/anchor_check.py` with the plan's exact content. Ran `.venv/bin/python -m ems.sim.fit` once (1m59s, 24 cores) and `.venv/bin/python -m ems.sim.anchor_check` exactly once (27s, exit 1 as expected). No code, inputs or tolerances were changed; no `confirm`-skill holdout applies (anchor days are calibration-window days; no ledger entries written).
+- Plan Task 4: appended the frozen `## Known limits` section to `judges/ems/calibration/anchor_report.md` and added the 2026-11-01 M3c entry to `research/journal.md`. Final checks: `pytest -q` 110 passed, 1 skipped; `name_guard.py` and `ruff check .` clean.
 
 ## Results
 - Task 1: 7/7 new tests pass; full suite 110 passed, 1 skipped.
