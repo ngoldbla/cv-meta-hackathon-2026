@@ -461,8 +461,7 @@ def test_staged_blocks_frozen_change_unless_unlocked_and_detects_ledger_rewrite(
 
 def test_hook_mode_exits_2_on_a_frozen_file(tmp_path):
     r = _repo(tmp_path)
-    code = ("import sys; sys.path.insert(0, %r); from loopkit.guard import main; sys.exit(main(['--hook']))"
-            % str(ROOT))
+    code = f"import sys; sys.path.insert(0, {str(ROOT)!r}); from loopkit.guard import main; sys.exit(main(['--hook']))"
     p = subprocess.run([sys.executable, "-c", code], cwd=r, capture_output=True, text=True,
                        input=json.dumps({"tool_input": {"file_path": str(r / "judges/x/x/eval.py")}}))
     assert p.returncode == 2
