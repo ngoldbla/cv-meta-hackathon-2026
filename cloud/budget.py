@@ -17,7 +17,7 @@ import time
 from pathlib import Path
 
 LOG = Path("runs/spend.jsonl")
-PROGRAM_BUDGET_USD = 100.0
+PROGRAM_BUDGET_USD = 200.0  # raised from $100 for M5 on Modal (Dylan, 2026-11-01)
 
 
 def spent() -> float:

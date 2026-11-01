@@ -2,7 +2,7 @@
 
 Run the CAGES commands below from `judges/cages/` (call this tool as `../../cloud/budget.py`).
 
-## Budget ($100 of cloud credit, held in reserve)
+## Budget ($200 program cap; raised from $100 for M5 on Modal, 2026-11-01)
 
 All GPU work runs on the local RTX 5060 Ti (`docs/runbook-gpu.md`). The credit is spent only when a local limit
 blocks a result, for example:
@@ -14,7 +14,7 @@ training budget for all backbones. Holdout runs and the E3 latency gate stay on 
 salt never leaves it and the gate is defined on the RTX 5060 Ti.
 
 Any cloud job runs through `cloud/budget.py`, which enforces caps:
-- it refuses a job whose cap would push total spend over $100;
+- it refuses a job whose cap would push total spend over $200;
 - it kills a job when its cap runs out;
 - it logs spend to `runs/spend.jsonl`.
 

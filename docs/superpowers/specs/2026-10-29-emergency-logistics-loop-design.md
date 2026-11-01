@@ -254,7 +254,7 @@ The first implementation plan covers only M1 and M2. M3–M6 depend on the chose
 - A model or alphaXiv login for the Feynman CLI.
 - Porting other Feynman workflows. `review` and `preregister` already exist here.
 - An agency partnership.
-- Cloud compute. The `cloud/budget.py` cap stays.
+- ~~Cloud compute.~~ Brought into scope for M5 on 2026-11-01 (see §11).
 
 ## 10. Open items and risks
 - **CAGES v0 decision (separate from this program).** The task 002 picks still await approval. The options:
@@ -270,3 +270,11 @@ The first implementation plan covers only M1 and M2. M3–M6 depend on the chose
   - one-shot holdouts.
 - **Long headless runs.** Step limits on long Muse runs are unknown. An 8.5-hour run completed on 2026-10-28.
 - **Licences.** The Muse Model License terms on output use must be checked before Muse outputs enter a dataset or a training set (`AGENTS.md`).
+
+## 11. M4 and M5 decisions (Dylan, 2026-11-01)
+- **Claims (M4):** the four §5.6 claims are pre-registered against b1. A claim stands only if the ratio of mean weighted lateness has a paired bootstrap 95% CI upper end below **0.95** (at least 5% less lateness) and a Holm-adjusted p below 0.05. This must hold under all three weightings and on **all four holdout pools**: Omicron-B, the stress pool, COVID-A and normal 2016. Regret against the foresight reference is a diagnostic only, because the reference is weak (M3 judge spec §16).
+- **Stress pool (M4):** one red run of **20 iterations** against b1, before any blue iteration. Its final θ generator, applied to the sealed 2016 days, is the stress pool. The generator's hash and the θ list go in the ledger.
+- **Blue budget (M5):** **40 iterations per arm**, the same for every arm.
+- **Cloud (M5):** Modal, entirely. Training runs on a **B200**. Simulation fans out across Modal CPU containers. The judge code, calibration bundle and dev day tables (about 32 MB) are prestaged in a Modal Volume, and the image is built once and cached. Every job goes through `cloud/budget.py`, with the program cap raised to **$200**. The estimate is about $172: about 27 B200-hours plus CPU.
+- **What stays local:** holdout data never goes to Modal. Every M6 holdout run uses the frozen judge on dylan-pc.
+
