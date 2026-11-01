@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pytest
 
 
 def test_prior_load_counts_arrivals_in_window():
@@ -43,3 +44,29 @@ def test_ratio_fit_recovers_a_known_slope():
     assert fit["model"] == "ratio24" and fit["window_s"] == 86400
     assert abs(fit["beta"]["BRONX"] - 0.3) < 0.05
     assert len(fit["base"]["BRONX"]["10"]) == 101 and fit["mean_load"]["BRONX"] > 0
+
+
+def test_jan2018_check_known_obs_and_pred():
+    from ems.calibrate.offload import jan2018_check
+
+    t = [pd.Timestamp("2017-12-08 12:00"), pd.Timestamp("2017-12-10 12:00"), pd.Timestamp("2017-12-12 12:00")]
+    t += [pd.Timestamp("2018-01-05 12:00") + pd.Timedelta(minutes=k) for k in range(5)]
+    df = pd.DataFrame(
+        {"borough": "BRONX", "t_hosp": t, "transported": True, "offload_s": [1000.0] * 3 + [1100.0] * 5}
+    )
+    unk = pd.DataFrame(
+        {
+            "borough": ["UNKNOWN"],
+            "t_hosp": [pd.Timestamp("2018-01-05 12:30")],
+            "transported": [True],
+            "offload_s": [99999.0],
+        }
+    )
+    df = pd.concat([df, unk], ignore_index=True)
+    df["day"] = df["t_hosp"].dt.date
+    fit = {"window_s": 86400, "mean_load": {"BRONX": 10.0}, "beta": {"BRONX": 0.5}}
+    got = jan2018_check(df, {"flu_2018": ["2018-01-05"]}, fit)
+    assert set(got) == {"BRONX"}
+    assert got["BRONX"]["obs"] == pytest.approx(1.1)
+    assert got["BRONX"]["pred"] == pytest.approx(np.exp(0.1))
+    assert got["BRONX"]["ok"] is True

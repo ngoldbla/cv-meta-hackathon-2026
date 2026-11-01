@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import date, timedelta
+
 import numpy as np
 import pandas as pd
 
@@ -53,3 +55,22 @@ def fit_offload(df: pd.DataFrame) -> dict:
         y, z = np.log(g["offload_s"]) - np.log(med), g["load"] - ml
         beta[b] = float((z * y).sum() / (z * z).sum()) if (z * z).sum() > 0 else 0.0
     return {"base": base, "mean_load": mean_load, "beta": beta, "window_s": 7200}
+
+
+def jan2018_check(df: pd.DataFrame, anchor: dict, fit: dict, tol: float = 0.015) -> dict:
+    flu_days = sorted(date.fromisoformat(x) for x in anchor["flu_2018"])
+    base_days = {flu_days[0] - timedelta(k) for k in range(1, 29)} - set(flu_days)
+    flu_set = set(flu_days)
+    x = df[df["transported"] & df["offload_s"].notna() & (df["offload_s"] > 0)].copy()
+    x["load"] = prior_load(x, window_s=fit["window_s"])
+    out = {}
+    for b, g in x.groupby("borough"):
+        if b == "UNKNOWN":
+            continue
+        r = g["load"] / fit["mean_load"][b]
+        is_flu = g["day"].isin(flu_set)
+        is_base = g["day"].isin(base_days)
+        obs = float(g.loc[is_flu, "offload_s"].median() / g.loc[is_base, "offload_s"].median())
+        pred = float(np.exp(fit["beta"][b] * (r[is_flu].mean() - r[is_base].mean())))
+        out[b] = {"obs": obs, "pred": pred, "ok": bool(abs(pred - obs) <= tol)}
+    return out
