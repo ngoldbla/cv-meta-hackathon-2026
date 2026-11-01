@@ -1,7 +1,7 @@
 ---
 id: "011"
 title: "M3d: EMS evaluator, scenarios, b1, counterfactual reports, benchmark and compute gate (plan Tasks 1-4)"
-status: open
+status: in_progress
 created: 2026-11-01
 report: ops/reports/011-m3d-ems-evaluator.md
 ---
