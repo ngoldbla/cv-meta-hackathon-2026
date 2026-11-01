@@ -1,6 +1,6 @@
 # Report 012: M3d correction: frozen scenario mechanics split out of the red-loop sampler
 Status: done
-Branch head at start: c3bde9e57c81f80a16b08736d124d7a2b80c7ec9  ·  at finish: <sha>
+Branch head at start: c3bde9e57c81f80a16b08736d124d7a2b80c7ec9  ·  at finish: cc48a9d23fb763d5757fd73968e529daa2f40af5
 
 ## Summary
 Applied the reviewer's patch via `git apply` (no hand edits): `perturb()` and `dev_days()` moved unchanged from `ems/scenarios/sampler.py` into new frozen `ems/scenarios/core.py`, dev set pinned to the 2017–2019 calibration window minus 68 anchor days (1,027 days), and `build_sim` now refuses cached days outside the dev set. Full suite gives 123 passed / 1 skipped, ruff and name_guard clean, and the task-011 benchmark reproduces exactly (`"primary": 11247.14150209779`, `METRIC ratio_b1=1.0000`).
