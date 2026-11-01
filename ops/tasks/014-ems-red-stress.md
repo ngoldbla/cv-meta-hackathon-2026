@@ -1,7 +1,7 @@
 ---
 id: "014"
 title: "Autoresearch red loop: ems-stress"
-status: open
+status: in_progress
 created: 2026-11-01
 report: ops/reports/014-ems-red-stress.md
 ---
