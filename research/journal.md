@@ -150,3 +150,8 @@
 - **What was tried:** one-change iterations on the red generator: max concentration (#1), max demand load (#3), max load via unavailability (#4), max urgent share (#5); #2 crashed on a missing import (my bug, no METRIC line).
 - **What happened:** best kept `regret_b1=694.06` (#5): unavailable 0.25 with demand at the load cap plus urgent_share 1.153. Concentration and raw demand both lower regret (491.75, 142.37); tight staffing widens the foresight gap instead. pytest (128 passed, 1 skipped) and name guard clean on keeps. Nothing here is a finding.
 - **Next:** test offload max, no-concentration, then day choice (pick_days) and date conditioning.
+
+## 2026-11-01: ems-stress red loop iterations 6-10 (task 014)
+- **What was tried:** max offload (#6), no concentration (#7), min offload (#8), interior load via unavailable 0.125 (#9), thin staffing with demand 1.0 (#10), each on the kept state.
+- **What happened:** best kept `regret_b1=733.07` (#10): unavailable 0.25, demand 1.0, urgent_share 1.153, offload and concentration nominal. Offload and concentration extremes both lose to nominal draws; the interior load point collapses regret to 93.13. pytest (128 passed, 1 skipped) and name guard clean on the keep. Nothing here is a finding.
+- **Next:** date conditioning (weekend/holiday thetas; b1 expectations ignore day-of-week), fixed-moderate concentration, demand below 1.0, then audit and report.
