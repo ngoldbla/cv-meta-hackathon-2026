@@ -23,7 +23,10 @@ text; this session works from the recovered plan (`3da968b` version) + Amendment
 nearer b1 than iter 10's 1.0084 but still short of 0.9971; removing hold labels did not fix the label term.
 Iter 13: pure imitation on the 875k it09-12 window reverts 1.0150 - worse than iter 11's 0.9990 on 659k;
 more iter-7-policy data did not help (training noise or compounding imitation error). Iter 14
-(seed-1 retry) reverts 1.0058: a ~1% seed swing that dwarfs the 0.3% best-vs-b1 gap.
+(seed-1 retry) reverts 1.0058: a ~1% seed swing that dwarfs the 0.3% best-vs-b1 gap. Iter 15
+(first rule change, divert_queue 2->5, no training) reverts 1.1520 - diverting less piles queues up
+(candidate divert_share ROSE to 0.057); b1's early shedding is load-bearing. Journal entry for iters
+11-15 added (branch). Best stays 0.9971 (point-estimate keep; bench CI [0.9785, 1.0158], p=0.67).
 
 ## Work done
 - Claimed task 016 on main (`ec9da1a Start task 016`, pushed).
@@ -91,6 +94,9 @@ more iter-7-policy data did not help (training noise or compounding imitation er
   `--args {"label_w": 0, "seed": 1}` (loss 0.0599 to 0.0210; wall 31.4 s, gpu 24.9 s). Bench REVERTS
   at 1.0058 (110 s). Seed swing on identical data is ~1% (1.0150 vs 1.0058); sub-b1 imitation
   results are within training noise of b1.
+- Iter 15 (`516da23`, pushed): no gen, no training. Rule change: `divert_queue` 2->5 in
+  `ems_candidate.py` (Candidate.__init__ override, kept iter-7 weights), reverted after. Bench
+  REVERTS at 1.1520 (87 s). Journal entry for iters 11-15 added on the branch.
 
 ## Results
 | iter | hypothesis | value | decision | seconds | gen | train window |
@@ -109,6 +115,7 @@ more iter-7-policy data did not help (training noise or compounding imitation er
 | 12 | unit labels (hold stripped) + imitate 100 | 1.0056 | revert | 87.0 | it12 | it09,it10,it11,it12 |
 | 13 | pure imitation (label_w 0) on it09-12 | 1.0150 | revert | 126.0 | reused | it09,it10,it11,it12 |
 | 14 | seed-1 retry of iter 13 | 1.0058 | revert | 110.0 | reused | it09,it10,it11,it12 |
+| 15 | divert_queue 2->5 (kept weights) | 1.1520 | revert | 87.0 | - | - |
 
 Values from `research/autoresearch/ems-blue-only/autoresearch.jsonl` on `ar/blue/ems-blue-only`.
 Best kept: 0.9971 (iter 7, `69b357f`).
@@ -133,7 +140,8 @@ Best kept: 0.9971 (iter 7, `69b357f`).
   ...it09,it10,it11 --args {"label_w": 0}` (659,438 / 5,606, sums exact). Iter 12: `gen (...it12
   --seed 12 ...)`; `train --data ...it09,it10,it11,it12 --args {"imitate": 100}` (874,712 / 7,393
   pre-strip, sums exact). Iter 13: no gen; `train --data ...it09-12 --args {"label_w": 0}` (same sums).
-  Iter 14: no gen; `train --data ...it09-12 --args {"label_w": 0, "seed": 1}`.
+  Iter 14: no gen; `train --data ...it09-12 --args {"label_w": 0, "seed": 1}`. Iter 15: no Modal
+  calls (rule change, kept weights).
 
 - Amendment-2 mechanism: the deployed `ems-m5` train was probe-verified (this session) to still
   serve hold labels, so the loop applies the strip in `ems_train.py` from iter 12 (same semantics as
