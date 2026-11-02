@@ -1,0 +1,4 @@
+iter33: no gen (13 Amendment-1 dirs exist; best unchanged since it32) - rule change, no training
+change: ems_candidate.py params activate_queue 2->3 (activate_n 2 kept); hypothesis: trigger surge less often
+bench: RC=0 wall 105s METRIC ratio_b1=1.4114 (catastrophic: early surge at queue 2 is load-bearing, like divert_queue 2; fewer-units-per-trigger wins but later-triggering fails - do not touch the trigger again)
+decision: REVERT - best stays 0.7745
