@@ -26,7 +26,8 @@ at 1.0727 on the mined pool. Iter 18 (gate-25 retrain with fresh it18)
 kept at 1.0344; iter 19 (decisive-only labels) reverted at 1.0376
 and iter 20 (imitate 100) reverted at 1.0378. Red iter 5 (re-mined
 top-200 vs the iter-18 keep) reverted at 4132.41: pool unchanged, no
-blue rebaseline needed. Arm spend $3.42.
+blue rebaseline needed. Iter 21 (imitate 10) kept at 1.0337.
+Arm spend $3.49.
 
 ## Work done
 - Claimed task 019 on main (`19a1f00 Start task 019`, pushed).
@@ -113,6 +114,10 @@ blue rebaseline needed. Arm spend $3.42.
   vs the iter-18 keep (mean 1332.13, top day 9399.80; committed as
   `library/regret_days_5.json`) and attacked its top 200: weaker than
   the iter-14 mining, so blue is catching up. Pool unchanged.
+- Blue iter 21 (`e61e1ac`, pushed): KEEP 1.0337. No gen (window reused);
+  one change (`imitate` 30 -> 10), trained on the latest-8 window
+  ($0.0688). pytest 141 passed + name guard clean before the kept
+  commit.
 
 ## Results
 Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`):
@@ -139,9 +144,10 @@ Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`)
 | 18 | retrain the kept gate-25 recipe on the 8-dir window incl. fresh on-pool it18 | 1.0344 | keep | 129.0 | data/full/it18 | data/full/it06,data/full/it07,data/full/it08,data/full/it10,data/full/it12,data/full/it14,data/full/it15,data/full/it18 |
 | 19 | train only on decisive labels (gain_min 0.5 -> 2.0), latest 8-dir window | 1.0376 | revert | 134.0 | data/full/it19 | data/full/it07,data/full/it08,data/full/it10,data/full/it12,data/full/it14,data/full/it15,data/full/it18,data/full/it19 |
 | 20 | stronger anchor (imitate 30 -> 100), reused window | 1.0378 | revert | 146.0 | reused | data/full/it07,data/full/it08,data/full/it10,data/full/it12,data/full/it14,data/full/it15,data/full/it18,data/full/it19 |
+| 21 | weaker anchor (imitate 30 -> 10), reused window | 1.0337 | keep | 126.0 | reused | data/full/it07,data/full/it08,data/full/it10,data/full/it12,data/full/it14,data/full/it15,data/full/it18,data/full/it19 |
 
-Best kept: iter 18's weights (gate-25 recipe, 8-dir window), 1.0344 on
-pool `28037b2fec557333` (commit `078c078`).
+Best kept: iter 21's weights (imitate 10), 1.0337 on pool
+`28037b2fec557333` (commit `e61e1ac`).
 
 Red (`research/autoresearch/ems-full-red/autoresearch.jsonl` on `ar/red/ems-full`):
 
@@ -153,7 +159,7 @@ Red (`research/autoresearch/ems-full-red/autoresearch.jsonl` on `ar/red/ems-full
 | 4 | attack the top-200 regret days mined from a 1027-day bench (library/regret_days.json) | 4306.68 | keep | 78.0 |
 | 5 | re-mine the top-200 regret days vs the iter-18 keep (library/regret_days_5.json) | 4132.41 | revert | 83.0 |
 
-Spend added by this arm: $3.421 (`runs/spend.jsonl` on main). emslearn
+Spend added by this arm: $3.490 (`runs/spend.jsonl` on main). emslearn
 commands in order (pre-Amendment regime, from the blue worktree notes):
 1. `gen` 200 days, `--out data/full/it01`, label_rate 0.05 ($0.6958);
 2. `train --data data/full/it01` x4, one per iter 1-4 ($0.0971, $0.0591,
@@ -197,7 +203,8 @@ worktree notes:
 22. `gen --n 25 --n-gen 25 --seed 19 --out data/full/it19` with the
     Amendment-1 label flags ($0.1835; rolls out the iter-18 keep);
 23. `train` on the latest 8-dir window, it06 dropped ($0.1342; iter 19);
-24. `train` on the same window ($0.1015; iter 20, imitate 100).
+24. `train` on the same window ($0.1015; iter 20, imitate 100);
+25. `train` on the same window ($0.0688; iter 21, imitate 10).
 
 ## Deviations
 - Iters 1-4 ran before Amendment 1 (21:14-21:39 CDT vs amendment 21:44 CDT),
