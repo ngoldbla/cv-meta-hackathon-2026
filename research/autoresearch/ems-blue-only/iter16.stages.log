@@ -1,0 +1,3 @@
+iter16: no gen, no training - rule change with kept iter-7 weights
+change: ems_candidate.py Candidate.__init__ passes {"divert_queue": 1} (symmetric test of iter15: earlier shedding)
+bench: RC=0 wall 99s METRIC ratio_b1=4.3631 (divert_share 0.287, same divert-happy catastrophe as iter9 4.5756; calibrated 2 is sharp: 1->4.36, 2->1.0, 5->1.15 - divert rule settled, do not touch again)
