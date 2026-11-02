@@ -36,7 +36,8 @@ kept at 1.0448; iter 28 (gate 50) reverted at 1.0521. Red iter 7
 (re-mined top-200 vs the iter-27 keep) kept at regret 4617.18; blue
 iter 29 rebaselined at 1.0976 on the new pool. Iter 30 (imitate-3
 retrain with fresh it30) kept at 1.0451; iter 31 (same with it31)
-reverted at 1.0478. Arm spend $5.30.
+reverted at 1.0478 and iter 32 (imitate 5) reverted at 1.0497.
+Arm spend $5.39.
 
 ## Work done
 - Claimed task 019 on main (`19a1f00 Start task 019`, pushed).
@@ -178,6 +179,10 @@ reverted at 1.0478. Arm spend $5.30.
   rule (b)), then retrained the unchanged imitate-3 recipe on the
   latest 8-dir window with it18 dropped (masked 5778): the retrain
   streak breaks.
+- Blue iter 32 (`7decb46`, pushed): revert 1.0497. No gen (window reused);
+  one change (`imitate` 3 -> 5), trained on the latest-8 window
+  ($0.0860): lands between 3 and 10 as expected. Journal (`69a823a`,
+  pushed).
 
 ## Results
 Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`):
@@ -215,6 +220,7 @@ Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`)
 | 29 | rebaseline after red #7 keep (re-mined library); best unchanged (imitate-3 recipe, iter 27) | 1.0976 | rebaseline | 133.0 | - | - |
 | 30 | retrain the kept imitate-3 recipe on the latest-8 window incl. fresh on-pool it30 | 1.0451 | keep | 110.0 | data/full/it30 | data/full/it18,data/full/it19,data/full/it22,data/full/it23,data/full/it26,data/full/it27,data/full/it28,data/full/it30 |
 | 31 | retrain the kept imitate-3 recipe on the latest-8 window incl. fresh on-pool it31 | 1.0478 | revert | 108.0 | data/full/it31 | data/full/it19,data/full/it22,data/full/it23,data/full/it26,data/full/it27,data/full/it28,data/full/it30,data/full/it31 |
+| 32 | fine-grained imitate probe (3 -> 5), reused window | 1.0497 | revert | 111.0 | reused | data/full/it19,data/full/it22,data/full/it23,data/full/it26,data/full/it27,data/full/it28,data/full/it30,data/full/it31 |
 
 Best kept: iter 30's weights (imitate-3 recipe), 1.0451 on pool
 `4c088d562472f880` (commit `81de581`).
@@ -231,7 +237,7 @@ Red (`research/autoresearch/ems-full-red/autoresearch.jsonl` on `ar/red/ems-full
 | 6 | re-mine the top-200 regret days vs the iter-22 keep (library/regret_days_6.json) | 4530.61 | keep | 78.0 |
 | 7 | re-mine the top-200 regret days vs the iter-27 keep (library/regret_days_7.json) | 4617.18 | keep | 76.0 |
 
-Spend added by this arm: $5.303 (`runs/spend.jsonl` on main). emslearn
+Spend added by this arm: $5.389 (`runs/spend.jsonl` on main). emslearn
 commands in order (pre-Amendment regime, from the blue worktree notes):
 1. `gen` 200 days, `--out data/full/it01`, label_rate 0.05 ($0.6958);
 2. `train --data data/full/it01` x4, one per iter 1-4 ($0.0971, $0.0591,
@@ -298,7 +304,8 @@ worktree notes:
 38. `train` on the latest 8-dir window, it15 dropped ($0.1003; iter 30);
 39. `gen --n 25 --n-gen 25 --seed 31 --out data/full/it31` with the
     Amendment-1 label flags ($0.1577; rolls out the iter-30 keep);
-40. `train` on the latest 8-dir window, it18 dropped ($0.0745; iter 31).
+40. `train` on the latest 8-dir window, it18 dropped ($0.0745; iter 31);
+41. `train` on the same window ($0.0860; iter 32, imitate 5).
 
 ## Deviations
 - Iters 1-4 ran before Amendment 1 (21:14-21:39 CDT vs amendment 21:44 CDT),
