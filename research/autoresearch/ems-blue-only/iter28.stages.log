@@ -1,0 +1,10 @@
+iter28: Amendment-1 gen (condition b: best changed at iter27) on best-kept (t3<5+t2<4 rules + iter27 weights, 0.8012)
+gen: modal-python -m emslearn.cli gen --candidate experiments/ar/ems_candidate.py --out data/blue-only/it28 --n 50 --seed 28 --label-rate 0.0093 --label-cap 40 --window 10800
+{"out": "data/blue-only/it28", "days": 50, "decisions": 222218, "labelled": 1884, "seconds": 524.1}
+change: train --args {"label_w": 0, "epochs": 4} on latest-8 window it18,it19,it20,it21,it23,it24,it25,it28 (no script-file change; stability fix for iter27's late divergence)
+{"decisions": 1787580, "labelled": 14575, "options": 17, "features": 12, "load_s": 2.9} (decisions exact; labelled 392 below gen sums - same systematic ~2.5% gap as iter27, new-policy rollouts only, labels ignored)
+train: 4 epochs, loss 0.0598 -> 0.0265 monotonic, no divergence
+{"saved": "experiments/ar/ems_candidate.npz", "gpu_seconds": 108.2, "seconds": 113.2}
+bench: RC=0 wall 112s METRIC ratio_b1=0.7898 (primary 8884 vs b1 11247; stable weights beat diverged by 1.4%)
+gates: 141 passed, 1 skipped, name guard clean
+decision: KEEP - best 0.8012 -> 0.7898
