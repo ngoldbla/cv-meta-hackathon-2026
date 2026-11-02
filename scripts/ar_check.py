@@ -15,7 +15,9 @@ from pathlib import Path
 
 REQUIRED = {"iter", "time", "commit", "hypothesis", "files", "metric", "value", "best_before", "decision",
             "evidence", "seconds"}
-DECISIONS = {"baseline", "keep", "revert", "crash"}
+DECISIONS = {"baseline", "keep", "revert", "crash", "rebaseline"}
+# rebaseline: the benchmark pool changed (the FULL arm's red loop added hard scenarios), so the current best is
+# re-measured unchanged on the new pool and its value becomes the bar; it must not change any file in scope.
 
 
 def check_log(entries: list[dict], direction: str) -> list[str]:
@@ -44,6 +46,14 @@ def check_log(entries: list[dict], direction: str) -> list[str]:
             continue
         if e["best_before"] != best:
             problems.append(f"entry {i}: best_before {e['best_before']} but the best so far is {best}")
+        if d == "rebaseline":
+            if e["files"]:
+                problems.append(f"entry {i}: a rebaseline changed files {e['files']}")
+            if e["value"] is None:
+                problems.append(f"entry {i}: a rebaseline without a value")
+            else:
+                best = e["value"]
+            continue
         if d == "crash":
             continue
         better = e["value"] < best if direction == "lower" else e["value"] > best

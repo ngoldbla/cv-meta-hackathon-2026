@@ -46,3 +46,14 @@ def test_scope_allows_only_scope_log_dir_and_journal():
                "research/journal.md", "cages/model/train.py"]
     problems = ar_check.check_scope(changed, ["experiments/ar/cages_blue_config.json"], "research/autoresearch/x")
     assert problems == ["out of scope: cages/model/train.py"]
+
+
+def test_rebaseline_resets_the_bar_and_may_not_change_files():
+    log = [_e(0, "baseline", 1.0, None), _e(1, "keep", 0.9, 1.0), _e(2, "rebaseline", 0.97, 0.9),
+           _e(3, "keep", 0.95, 0.97), _e(4, "revert", 0.96, 0.95)]
+    assert ar_check.check_log(log, "lower") == []
+    bad = _e(2, "rebaseline", 0.97, 0.9)
+    bad["files"] = ["experiments/ar/ems_candidate.py"]
+    assert any("rebaseline changed files" in p for p in ar_check.check_log(log[:2] + [bad], "lower"))
+    stale = [_e(0, "baseline", 1.0, None), _e(1, "rebaseline", 0.8, 1.0), _e(2, "keep", 0.85, 1.0)]
+    assert ar_check.check_log(stale, "lower")  # best_before must be the rebaselined value

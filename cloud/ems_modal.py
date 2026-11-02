@@ -1,10 +1,17 @@
-"""EMS judge on Modal: the frozen simulator fanned out over CPU containers (M5; dev data only).
+"""EMS judge and M5 learning tools on Modal (dev data only). Deploy once: `~/.local/bin/modal deploy cloud/ems_modal.py`.
 
 Layout inside every container mirrors the repository, so the frozen code finds its data by its own relative paths:
-/root/ems (package), /root/loopkit, /root/calibration -> Volume, /root/data/cache/days -> Volume, plus AGENTS.md and
-an empty research/ (loopkit's root marker). There is no ledger in the image, so eval_holdout cannot pass its
+/root/ems, /root/emslearn, /root/loopkit, /root/calibration -> Volume, /root/data/cache/days -> Volume, plus AGENTS.md
+and an empty research/ (loopkit's root marker). There is no ledger in the image, so eval_holdout cannot pass its
 pre-registration check here: holdout runs stay on dylan-pc by construction. The Volume holds only the calibration
-bundle and the 1,027 dev day tables (no anchor days, no holdout data).
+bundle, the 1,027 dev day tables, generated training shards (/data) and trained weights (/ckpt).
+
+Functions (all called through emslearn/cli.py, which checks and records spend in cloud/budget.py):
+- scenario: one scenario-day through the frozen evaluator, with a candidate shipped as source (+ weights).
+- rollout:  decision records (+ optional counterfactual labels) for one scenario-day, written as a shard.
+- train:    the arm's training script on an H100 against shards in the Volume; returns the weights.
+GPU waste rules (docs/superpowers/specs/2026-11-01-m5-modal-compute-design.md): the H100 container only trains,
+scales down 2 s after its call, checkpoints in the Volume and retries on preemption.
 
     ~/.local/bin/modal run cloud/ems_modal.py::stage          # create and fill the Volume (idempotent)
     ~/.local/bin/modal run cloud/ems_modal.py::check --n 48   # same scenario-days locally and on Modal: must match
@@ -22,36 +29,105 @@ ROOT = Path(__file__).resolve().parents[1]
 EMS = ROOT / "judges" / "ems"
 VOLUME = modal.Volume.from_name("ems-m5", create_if_missing=True, version=2)
 PINS = ["numpy==2.5.4", "scipy==1.18.1", "pandas==2.3.3"]  # the versions in dylan-pc's .venv
+TORCH = "torch==2.15.0"  # measured in the GPU bake-off (cu132 wheels; host driver CUDA 13.3)
+H100_PER_S = 0.001097  # Modal list price; an H100 request may be served by an H200 at this price
 
-cpu_image = (
-    modal.Image.debian_slim(python_version="3.12")
-    .uv_pip_install(*PINS)
-    .run_commands("mkdir -p /root/data /root/research",
-                  "ln -s /vol/calibration /root/calibration", "ln -s /vol/cache /root/data/cache")
-    .env({"PYTHONPATH": "/root", "OMP_NUM_THREADS": "1"})
-    .add_local_file(ROOT / "AGENTS.md", "/root/AGENTS.md")
-    .add_local_dir(ROOT / "loopkit", "/root/loopkit", ignore=["__pycache__"])
-    .add_local_dir(EMS / "ems", "/root/ems", ignore=["__pycache__"])
-)
+
+def _with_code(image: modal.Image) -> modal.Image:
+    return (image.add_local_file(ROOT / "AGENTS.md", "/root/AGENTS.md")
+            .add_local_dir(ROOT / "loopkit", "/root/loopkit", ignore=["__pycache__"])
+            .add_local_dir(EMS / "ems", "/root/ems", ignore=["__pycache__"])
+            .add_local_dir(EMS / "emslearn", "/root/emslearn", ignore=["__pycache__"]))
+
+
+base = (modal.Image.debian_slim(python_version="3.12").uv_pip_install(*PINS)
+        .run_commands("mkdir -p /root/data /root/research",
+                      "ln -s /vol/calibration /root/calibration", "ln -s /vol/cache /root/data/cache")
+        .env({"PYTHONPATH": "/root", "OMP_NUM_THREADS": "1"}))
+cpu_image = _with_code(base)
+gpu_image = _with_code(base.uv_pip_install(TORCH).env({"OMP_NUM_THREADS": "8"}))
 app = modal.App("ems-m5", image=cpu_image)
+
+
+def _candidate(src: str, weights: bytes | None) -> str:
+    """Write a shipped candidate (and its weights, next to it as the policy expects) and return its policy name."""
+    d = Path("/tmp/cand")
+    d.mkdir(exist_ok=True)
+    (d / "candidate.py").write_text(src)
+    w = d / "candidate.npz"
+    if weights:
+        w.write_bytes(weights)
+    elif w.exists():
+        w.unlink()
+    return f"file:{d / 'candidate.py'}:Candidate"
 
 
 @app.function(volumes={"/vol": VOLUME}, cpu=1.0, memory=1024, timeout=1800, retries=2)
 def scenario(args: tuple) -> dict:
-    """One scenario-day through the frozen evaluator: (iso day, theta, seed, policy name or source)."""
+    """(iso day, theta, seed, policy) where policy is a built-in name or ("src", source, weights bytes or None)."""
     from datetime import date
 
     import ems.evaluate as ev
 
     day, theta, seed, policy = args
-    if policy.startswith("src:"):  # a candidate file shipped as source text
-        path = Path("/tmp/candidate.py")
-        path.write_text(policy[4:])
-        policy = f"file:{path}:Candidate"
+    if isinstance(policy, (list, tuple)):
+        policy = _candidate(policy[1], policy[2])
     t0 = time.perf_counter()
     m = ev.run_scenario((date.fromisoformat(day), theta, seed, policy, None, None))
     m["modal_seconds"] = time.perf_counter() - t0
     return m
+
+
+@app.function(volumes={"/vol": VOLUME}, cpu=1.0, memory=2048, timeout=3600, retries=2)
+def rollout(args: tuple) -> dict:
+    """(iso day, theta, seed, source, weights, label_rate, label_cap, window_s, shard path under /vol)."""
+    from datetime import date
+
+    import numpy as np
+
+    from emslearn.rollout import run_day
+
+    day, theta, seed, src, weights, rate, cap, window_s, shard = args
+    t0 = time.perf_counter()
+    r = run_day(date.fromisoformat(day), theta, seed, _candidate(src, weights), rate, cap, window_s)
+    out = Path("/vol") / shard
+    out.parent.mkdir(parents=True, exist_ok=True)
+    np.savez_compressed(out, **r)
+    VOLUME.commit()
+    return {"day": day, "decisions": int(len(r["choice"])), "labelled": int((~np.isnan(r["delta"]).all(1)).sum()),
+            "day_primary": float(r["day_primary"]), "modal_seconds": time.perf_counter() - t0}
+
+
+@app.function(image=gpu_image, gpu="H100", volumes={"/vol": VOLUME}, timeout=3600, scaledown_window=2,
+              retries=modal.Retries(initial_delay=0.0, max_retries=3))
+def train(script: str, data_dir: str, out: str, init: bytes | None = None, args: str = "{}") -> dict:
+    """Run the arm's training script on shards in /vol/<data_dir>; it must write weights to --out (an .npz).
+
+    The script is called as: python train.py --data <dir> --out <npz> --ckpt <dir> [--init <npz>] --args <json>.
+    It should save its own checkpoints in --ckpt and resume from them, so a preempted call loses little work.
+    """
+    import subprocess
+
+    VOLUME.reload()
+    t0 = time.perf_counter()
+    work = Path("/tmp/train")
+    work.mkdir(exist_ok=True)
+    (work / "train.py").write_text(script)
+    out_path, ckpt = Path("/vol") / out, Path("/vol") / (out + ".ckpt")
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    ckpt.mkdir(parents=True, exist_ok=True)
+    cmd = ["python", str(work / "train.py"), "--data", f"/vol/{data_dir}", "--out", str(out_path), "--ckpt", str(ckpt),
+           "--args", args]
+    if init:
+        (work / "init.npz").write_bytes(init)
+        cmd += ["--init", str(work / "init.npz")]
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+    VOLUME.commit()
+    res = {"returncode": proc.returncode, "stdout_tail": proc.stdout[-4000:], "stderr_tail": proc.stderr[-4000:],
+           "gpu_seconds": time.perf_counter() - t0}
+    if proc.returncode == 0 and out_path.exists():
+        res["weights"] = out_path.read_bytes()
+    return res
 
 
 @app.local_entrypoint()
