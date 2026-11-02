@@ -1,0 +1,6 @@
+iter32: Amendment-1 gen (condition b: best changed at iter31) on best-kept (rules + activate_n 2 + iter28 weights, 0.7745)
+gen: modal-python -m emslearn.cli gen --candidate experiments/ar/ems_candidate.py --out data/blue-only/it32 --n 50 --seed 32 --label-rate 0.0093 --label-cap 40 --window 10800
+{"out": "data/blue-only/it32", "days": 50, "decisions": 215765, "labelled": 1832, "seconds": 860.5}
+change: ems_candidate.py activate_n 2->1, kept weights, no training
+bench: RC=0 wall 106s METRIC ratio_b1=0.8898 (far too few surge units; peak at 2: 3->.7898, 2->.7745, 1->.8898)
+decision: REVERT - best stays 0.7745
