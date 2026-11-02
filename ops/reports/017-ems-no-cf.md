@@ -26,8 +26,12 @@ Best is now 0.8375. Blue #18-19 reverted (tier-3 idle<6: 0.8500; 10-min
 waited escape: 0.8382 near-tie). Blue #20 reverted: fine ES (sigma 0.02, lr
 0.01, seed 20, 2,856 scenario-days) on the rule -> 0.8732. Red #5 reverted
 (max offload: 557.68, 131/200 days); pool unchanged. The hold rule (tier-3
-idle<5, tier-2 idle<4) looks like a stable optimum. Next: probe new rule
-dimensions (queue-gated hold, same-borough preference).
+idle<5, tier-2 idle<4) looks like a stable optimum. Blue #21-24 reverted in
+new dimensions: same-borough bonus 0.8537, queue-gated tier-3 hold 0.8396,
+busy-hours hold gate 0.8394, tier-1-only same-borough bonus 0.8406. Red #6
+reverted (10% unavailable: 305.07, 78/200 days — saturation kills the edge);
+pool unchanged. Best stays 0.8375. Next: moving-unit preference, ES with more
+pairs under the envelope.
 
 ## Work done
 - Claimed task 017 on main (`9a4b206 Start task 017`, pushed).
@@ -87,6 +91,15 @@ dimensions (queue-gated hold, same-borough preference).
   iters 15-20.
 - Red #5 (`b803234`, pushed): revert, max offload 1.151 -> 557.68 (159 s,
   131/200 days). Pool unchanged, no blue rebaseline.
+- Blue #21 (`19a81c8`, pushed): revert, same-borough bonus 0.1 -> 0.8537
+  (55 s).
+- Blue #22 (`6ed60b2`, pushed): revert, queue-gated tier-3 hold -> 0.8396
+  (62 s).
+- Blue #23 (`94f2dd4`, pushed): revert, busy-hours hold gate -> 0.8394 (71 s).
+- Blue #24 (`a540ec3`, pushed): revert, tier-1 same-borough bonus -> 0.8406
+  (50 s).
+- Red #6 (`93b21a6`, pushed): revert, 10% unavailable -> 305.07 (120 s, 78/200
+  days). Pool unchanged, no blue rebaseline.
 
 ## Results
 Blue (`research/autoresearch/ems-no-cf/autoresearch.jsonl` on `ar/blue/ems-no-cf`):
@@ -113,6 +126,10 @@ Blue (`research/autoresearch/ems-no-cf/autoresearch.jsonl` on `ar/blue/ems-no-cf
 | 18 | wider tier-3 hold (idle<6) on the urgent-heavy pool | 0.8500 | revert | 41 | — | — | — |
 | 19 | tier-3 hold escapes after 10 min waited | 0.8382 | revert | 67 | — | — | — |
 | 20 | fine ES on the hold rule (sigma 0.02, lr 0.01, seed 20) | 0.8732 | revert | 81 | 8 | 24 | 7 |
+| 21 | same-borough bonus (0.1) in unit choice | 0.8537 | revert | 55 | — | — | — |
+| 22 | tier-3 hold only when queue>=3 | 0.8396 | revert | 62 | — | — | — |
+| 23 | hold rule only during busy hours (06-24h) | 0.8394 | revert | 71 | — | — | — |
+| 24 | tier-1-only same-borough bonus (0.1) | 0.8406 | revert | 50 | — | — | — |
 
 Red (`research/autoresearch/ems-no-cf-red/autoresearch.jsonl` on `ar/red/ems-no-cf`):
 
@@ -123,6 +140,7 @@ Red (`research/autoresearch/ems-no-cf-red/autoresearch.jsonl` on `ar/red/ems-no-
 | 3 | higher demand (1.25) under the same concentrated surge | 717.07 | revert | 133 |
 | 4 | maximum urgent share (1.153) under the concentrated surge | 916.32 | keep | 171 |
 | 5 | maximum offload (1.151) under the urgent concentrated surge | 557.68 | revert | 159 |
+| 6 | 10% unavailable fleet under the urgent concentrated surge | 305.07 | revert | 120 |
 
 Spend so far (this arm, from `runs/spend.jsonl`): it01 $0.336, it02 $0.997,
 it03 $1.336, it04 $1.324, it05 $0.530, it13 $0.254, it20 $0.255 (other iters
