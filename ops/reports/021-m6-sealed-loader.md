@@ -1,6 +1,6 @@
 # Report 021: M6: sealed-data loader and confirm script (build and test only; no sealed run)
 Status: done
-Branch head at start: 413c47aa5b37ca143f9d77cd1d92c8b16b4920d8  ·  at finish: <sha>
+Branch head at start: 413c47aa5b37ca143f9d77cd1d92c8b16b4920d8  ·  at finish: de092560ef854831377ac9909922520950124508
 
 ## Summary
 Built `judges/ems/scripts/confirm.py`, the single script for the M6 confirmatory
