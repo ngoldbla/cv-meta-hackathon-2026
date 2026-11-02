@@ -1,0 +1,8 @@
+iter27: no gen (11 Amendment-1 dirs exist; best unchanged since it25) - refit on the window
+change: ems_train.py label_w (same as iters 13-14); train --args {"label_w": 0} on latest-8 window it12,it18,it19,it20,it21,it23,it24,it25 (pure imitation of reservation-policy choices)
+{"decisions": 1780636, "labelled": 14530, "options": 17, "features": 12, "load_s": 3.1} (decisions sum exact; labelled 340 below my gen-reported sums - reproducible across two calls, unresolved minor gap, labels ignored anyway)
+train: 20 epochs, loss 0.0597 -> 0.027 (ep3) then DIVERGES to 0.1295 (ep19, saved) - same late-epoch instability as iter8 on big pools
+{"saved": "experiments/ar/ems_candidate.npz", "gpu_seconds": 108.3, "seconds": 112.6}
+bench: RC=0 wall 205s METRIC ratio_b1=0.8012 (primary 9011 vs b1 11247)
+gates: 141 passed, 1 skipped, name guard clean
+decision: KEEP (strictly better, mechanical rule) - best 0.8016 -> 0.8012, but weights are late-diverged; next iteration must fix training stability (fewer epochs)

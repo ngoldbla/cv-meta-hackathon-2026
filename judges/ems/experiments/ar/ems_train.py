@@ -21,7 +21,8 @@ import numpy as np
 import torch
 from torch import nn
 
-DEFAULTS = {"hidden": [64, 64], "epochs": 20, "batch": 4096, "lr": 3e-3, "tau": 5.0, "imitate": 0.1, "seed": 0}
+DEFAULTS = {"hidden": [64, 64], "epochs": 20, "batch": 4096, "lr": 3e-3, "tau": 5.0, "imitate": 0.1,
+            "label_w": 1.0, "seed": 0}  # label_w 0 turns the counterfactual term off (pure imitation)
 
 
 def load(data: str):
@@ -92,7 +93,8 @@ def main() -> None:
         lab = labelled[idx]
         loss_l = -(target[idx] * logp).sum(1)
         loss_i = -logp.gather(1, choice[idx][:, None])[:, 0]
-        loss = (loss_l * lab).sum() / lab.sum().clamp(min=1) + cfg["imitate"] * loss_i.mean()
+        loss = (cfg["label_w"] * (loss_l * lab).sum() / lab.sum().clamp(min=1)
+                + cfg["imitate"] * loss_i.mean())
         opt.zero_grad(set_to_none=True)
         loss.backward()
         opt.step()
