@@ -16,7 +16,9 @@ Iters 10-11 reverted (idle<6: 0.8632; idle<4: 0.8658 — idle<5 stays optimal on
 the new pool). Iter 12 KEPT: also hold tier-2 when idle<2 (0.8533), reserving
 the last units for tier-1. Best is now 0.8533. Red #3 is due after blue 12.
 Next: red #3, then ES-tune weights on top of the hold rule under the Amendment 1
-envelope (≤3,000 scenario-days per iteration).
+envelope (≤3,000 scenario-days per iteration). Red #3 reverted: demand 1.25
+under the same concentrated surge scores 717.07 (128/200 days), below the kept
+870.87 — higher demand shrinks the oracle edge. Pool unchanged, no rebaseline.
 
 ## Work done
 - Claimed task 017 on main (`9a4b206 Start task 017`, pushed).
