@@ -1,7 +1,7 @@
 ---
 id: "021"
 title: "M6: sealed-data loader and confirm script (build and test only; no sealed run)"
-status: in_progress
+status: done
 created: 2026-11-02
 report: ops/reports/021-m6-sealed-loader.md
 ---
