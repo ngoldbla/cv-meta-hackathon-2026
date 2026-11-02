@@ -121,3 +121,8 @@ Result 1.0521 vs best 1.0448: a wider gate hurts - more imitation on moderate ga
 
 ## Iter 29 (rebaseline, 1.0976)
 Red #7 kept (re-mined top-200 vs iter-27, regret 4617.18), so the pool changed (pool_key 365e3488b85fda64 -> 4c088d562472f880). Best candidate unchanged (iter-27 imitate-3 weights): candidate primary 29576.6 vs b1 26947.0. The largest rebaseline gap yet (~10%): each re-mining finds a worse concentration for the current best. New best is 1.0976. Held 0.318 vs b1 0.313, divert 0.136 vs 0.131, t1p90 21.69 vs 21.30. Next: iter 30 starts with gen data/full/it30 (rule (c): red kept since last gen; it15 drops out), then retrain the imitate-3 recipe.
+
+## Iter 30 (KEEP, 1.0451)
+Gen data/full/it30 first (seed 30, 50 days, 203437 decisions, 1771 labels, 523 s wall, $0.1721): required by rule (c) since red #7 changed the pool. No .py change: imitate-3 recipe retrained on the latest 8-dir window, it15 dropping out ($0.1003, masked 5715, loss 5.90 -> 5.63, 62.3 GPU s).
+Result 1.0451 vs best 1.0976: fresh on-pool data closes half the gap again (candidate 28161.3 vs b1 26947.0; held 0.314 vs 0.313, divert 0.134 vs 0.131, t1p90 21.55 vs 21.30). The post-mining retrain pattern holds for the third time (1.0727->1.0344, 1.0820->1.0523, 1.0976->1.0451). pytest 141 passed + name guard clean before the kept commit.
+Next: iter 31 starts with gen data/full/it31 (rule (b): iter-30 keep; it18 drops out), then retrain unchanged again.
