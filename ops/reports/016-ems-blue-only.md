@@ -48,7 +48,8 @@ Journal entry for iters 26-30 added (branch). Iter 31 KEEPS 0.7745: activate_n 3
 (gates pass). Iter 32 reverts 0.8898 (activate_n 2->1 far too few; peak at 2). Best:
 0.7745 (`d9d42b6`). Iter 33 reverts 1.4114 (activate_queue 2->3 catastrophic; early surge
 is load-bearing). Iter 34 KEEPS 0.7744: hold only fresh calls (waited<600s; +0.0001,
-gates pass). Best: 0.7744 (`dc10c29`).
+gates pass). Iter 35 KEEPS 0.7667: hold only when global queue>=5 (gates pass, ar_check
+36 entries 0 problems). Journal entry for iters 31-35 added (branch). Best: 0.7667 (`2c478dd`).
 
 ## Work done
 - Claimed task 016 on main (`ec9da1a Start task 016`, pushed).
@@ -183,6 +184,10 @@ gates pass). Best: 0.7744 (`dc10c29`).
 - Iter 34 (`dc10c29`, pushed): no gen, no training. Rule change (KEPT): hold only fresh tier-2/3
   (waited<600s; unit-verified). Bench KEEPS at 0.7744 (133.2 s from bench output - the wall
   wrapper broke on a bad first unit-check draft; primary 8709.6; gates pass).
+- Iter 35 (`2c478dd`, pushed; journal `9eba1c6`): gen `it35` (condition b; 50 days, 226,437
+  decisions, 1,904 labels, 566.5 s, iter-34 policy). Rule change (KEPT): hold only when global
+  queue>=5 (unit-verified). Bench KEEPS at 0.7667 (107 s; primary 8623; gates pass). `ar_check`:
+  36 entries, 0 problems. Journal entry for iters 31-35 added on the branch.
 
 ## Results
 | iter | hypothesis | value | decision | seconds | gen | train window |
@@ -221,9 +226,10 @@ gates pass). Best: 0.7744 (`dc10c29`).
 | 32 | activate_n 2->1 | 0.8898 | revert | 106.0 | it32 | - |
 | 33 | activate_queue 2->3 | 1.4114 | revert | 105.0 | - | - |
 | 34 | hold only fresh (waited<600s) | 0.7744 | keep | 133.2 | - | - |
+| 35 | hold only when queue>=5 | 0.7667 | keep | 107.0 | it35 | - |
 
 Values from `research/autoresearch/ems-blue-only/autoresearch.jsonl` on `ar/blue/ems-blue-only`.
-Best kept: 0.7744 (iter 34, `dc10c29`).
+Best kept: 0.7667 (iter 35, `2c478dd`).
 
 ## Deviations
 - Collision repair commit `e86289e` (not an iteration): jsonl deduped to one baseline line, bench.log
@@ -261,7 +267,8 @@ Best kept: 0.7744 (iter 34, `dc10c29`).
   gen; `train --data ...same window... --args {"label_w": 0, "epochs": 4, "hidden": [128, 128]}`.
   Iter 31: no Modal calls (rule change, no training). Iter 32: `gen (...it32 --seed 32 ...)`
   (no train: rule change). Iter 33: no Modal calls (rule change, no training). Iter 34: no
-  Modal calls (rule change, no training).
+  Modal calls (rule change, no training). Iter 35: `gen (...it35 --seed 35 ...)` (no train:
+  rule change).
 
 - Amendment-2 mechanism: the deployed `ems-m5` train was probe-verified (this session) to still
   serve hold labels, so the loop applies the strip in `ems_train.py` from iter 12 (same semantics as
