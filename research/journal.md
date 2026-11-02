@@ -165,3 +165,8 @@
 - **What was tried:** iter 16 tested divert_queue 2->1 (revert 4.3631, same divert-happy catastrophe as iter 9 - calibrated 2 is sharp, rule settled). Iter 17 added a capacity-reservation rule (hold tier-3 when <2 idle) and KEPT 0.8702 (primary 9787 vs 11247, CI [0.8503, 0.8896], p=2.5e-17, identical determinism re-run, gates pass). Iters 18-20 climbed the threshold ladder 2->3->4->5, keeping 0.8359, 0.8089, 0.8084 (gains flattening). Each keep unlocked an Amendment-1 gen (it18/it19/it20, ~220k decisions each) rolling out the new best. Nothing from this loop is a finding.
 - **What happened:** the first rule idea to beat imitation wins big: reserving capacity for urgent calls cuts tier1_p90 from 16.13 to ~13.3 min. The learned scorer (iter-7 weights) still makes unit choices under the rule. Best: 0.8084.
 - **Next:** threshold 6; then tier-2 reservation, retraining on new-policy data, or close out.
+
+## 2026-11-01: ems-blue-only iterations 21-25 - both reservation peaks found (task 016)
+- **What was tried:** iter 21 tested tier-3 threshold 5->6 (revert 0.8168 - tier-3 peak at 5). Iter 22 extended reservation to tier-2 at <2 idle (keep 0.8066). Iters 23-25 climbed the tier-2 ladder 2->3->4->5, keeping 0.8027 and 0.8016, then reverting 0.8021 (tier-2 peak at 4). Keeps unlocked gens it23/it24/it25 (~224-232k decisions each). Nothing from this loop is a finding.
+- **What happened:** best is now 0.8016 (tier-3 <5 + tier-2 <4 + iter-7 weights): -19.8% primary vs b1. Both single-threshold peaks are mapped; remaining ideas are threshold interactions, retraining on new-policy data, and activation tweaks.
+- **Next:** tier-3 re-tune with the tier-2 rule in place (5->6 interaction check), then retrain imitation on the new-policy window.
