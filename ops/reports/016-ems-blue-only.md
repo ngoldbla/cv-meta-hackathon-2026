@@ -31,7 +31,8 @@ more iter-7-policy data did not help (training noise or compounding imitation er
 (1->4.36, 2->1.0, 5->1.15), divert rule settled. Iter 17 KEEPS 0.8702: hold tier-3 calls
 when fewer than 2 units are idle (capacity reservation; tier1_p90 16.13->14.15 min, CI [0.8503,
 0.8896], p=2.5e-17, determinism re-run identical, gates pass). Iter 18 KEEPS 0.8359:
-reservation threshold 2->3 (tier1_p90 13.31 min, gates pass). Best: 0.8359 (`64159db`).
+reservation threshold 2->3 (tier1_p90 13.31 min, gates pass). Iter 19 KEEPS 0.8089:
+threshold 3->4 (primary 9098, gates pass). Best: 0.8089 (`322494d`).
 
 ## Work done
 - Claimed task 016 on main (`ec9da1a Start task 016`, pushed).
@@ -113,6 +114,9 @@ reservation threshold 2->3 (tier1_p90 13.31 min, gates pass). Best: 0.8359 (`641
   1,866 labels, 632.0 s, rolled out by the iter-17 policy). Rule change (KEPT): reservation
   threshold 2->3, no training. Bench KEEPS at 0.8359 (92 s; primary 9401; tier1_p90 13.31 min;
   gates pass).
+- Iter 19 (`322494d`, pushed): gen `it19` (condition b; 50 days, 219,141 decisions, 1,852 labels,
+  487.4 s, threshold-3 policy). Rule change (KEPT): threshold 3->4, no training. Bench KEEPS at
+  0.8089 (87 s; primary 9098; gates pass).
 
 ## Results
 | iter | hypothesis | value | decision | seconds | gen | train window |
@@ -135,9 +139,10 @@ reservation threshold 2->3 (tier1_p90 13.31 min, gates pass). Best: 0.8359 (`641
 | 16 | divert_queue 2->1 (kept weights) | 4.3631 | revert | 99.0 | - | - |
 | 17 | hold tier-3 when idle<2 (reservation) | 0.8702 | keep | 98.0 | - | - |
 | 18 | reservation threshold 2->3 | 0.8359 | keep | 92.0 | it18 | - |
+| 19 | reservation threshold 3->4 | 0.8089 | keep | 87.0 | it19 | - |
 
 Values from `research/autoresearch/ems-blue-only/autoresearch.jsonl` on `ar/blue/ems-blue-only`.
-Best kept: 0.8359 (iter 18, `64159db`).
+Best kept: 0.8089 (iter 19, `322494d`).
 
 ## Deviations
 - Collision repair commit `e86289e` (not an iteration): jsonl deduped to one baseline line, bench.log
@@ -162,7 +167,7 @@ Best kept: 0.8359 (iter 18, `64159db`).
   Iter 14: no gen; `train --data ...it09-12 --args {"label_w": 0, "seed": 1}`. Iter 15: no Modal
   calls (rule change, kept weights). Iter 16: no Modal calls (rule change, kept weights).
   Iter 17: no Modal calls (rule change, no training). Iter 18: `gen (...it18 --seed 18 ...)`
-  (no train: rule change).
+  (no train: rule change). Iter 19: `gen (...it19 --seed 19 ...)` (no train: rule change).
 
 - Amendment-2 mechanism: the deployed `ems-m5` train was probe-verified (this session) to still
   serve hold labels, so the loop applies the strip in `ems_train.py` from iter 12 (same semantics as
