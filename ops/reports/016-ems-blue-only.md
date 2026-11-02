@@ -46,7 +46,8 @@ iter 8; kept on the mechanical rule, stability fix next). Iter 28 KEEPS 0.7898: 
 Best: 0.7898 (`9ad1171`). Iter 30 reverts 0.7997 (wider MLP fits better, benches worse).
 Journal entry for iters 26-30 added (branch). Iter 31 KEEPS 0.7745: activate_n 3->2
 (gates pass). Iter 32 reverts 0.8898 (activate_n 2->1 far too few; peak at 2). Best:
-0.7745 (`d9d42b6`).
+0.7745 (`d9d42b6`). Iter 33 reverts 1.4114 (activate_queue 2->3 catastrophic; early surge
+is load-bearing).
 
 ## Work done
 - Claimed task 016 on main (`ec9da1a Start task 016`, pushed).
@@ -176,6 +177,8 @@ Journal entry for iters 26-30 added (branch). Iter 31 KEEPS 0.7745: activate_n 3
 - Iter 32 (`62428fe`, pushed): gen `it32` (condition b; 50 days, 215,765 decisions, 1,832 labels,
   860.5 s, iter-31 policy). Rule change: `activate_n` 2->1, reverted after. Bench REVERTS at
   0.8898 (106 s).
+- Iter 33 (`5425ee9`, pushed): no gen, no training. Rule change: `activate_queue` 2->3
+  (activate_n 2 kept), reverted after. Bench REVERTS at 1.4114 (105 s).
 
 ## Results
 | iter | hypothesis | value | decision | seconds | gen | train window |
@@ -212,6 +215,7 @@ Journal entry for iters 26-30 added (branch). Iter 31 KEEPS 0.7745: activate_n 3
 | 30 | wider MLP [128,128], 4 epochs | 0.7997 | revert | 117.0 | - | it19,it20,it21,it23,it24,it25,it28,it29 |
 | 31 | activate_n 3->2 | 0.7745 | keep | 141.0 | - | - |
 | 32 | activate_n 2->1 | 0.8898 | revert | 106.0 | it32 | - |
+| 33 | activate_queue 2->3 | 1.4114 | revert | 105.0 | - | - |
 
 Values from `research/autoresearch/ems-blue-only/autoresearch.jsonl` on `ar/blue/ems-blue-only`.
 Best kept: 0.7745 (iter 31, `d9d42b6`).
@@ -251,7 +255,7 @@ Best kept: 0.7745 (iter 31, `d9d42b6`).
   `train --data ...latest-8... --args {"label_w": 0, "lr": 0.001, "epochs": 12}`. Iter 30: no
   gen; `train --data ...same window... --args {"label_w": 0, "epochs": 4, "hidden": [128, 128]}`.
   Iter 31: no Modal calls (rule change, no training). Iter 32: `gen (...it32 --seed 32 ...)`
-  (no train: rule change).
+  (no train: rule change). Iter 33: no Modal calls (rule change, no training).
 
 - Amendment-2 mechanism: the deployed `ems-m5` train was probe-verified (this session) to still
   serve hold labels, so the loop applies the strip in `ems_train.py` from iter 12 (same semantics as
