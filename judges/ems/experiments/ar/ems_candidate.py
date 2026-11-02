@@ -20,8 +20,9 @@ class Candidate(LearnedPolicy):
 
     def score(self, x: np.ndarray) -> np.ndarray:
         s = super().score(x)
+        tier2 = x[:, 4] > 0
         tier3 = x[:, 5] > 0
         idle_n = x[:, 8] * 100.0
         hold = x[:, 11] > 0
-        give_hold = tier3 & (idle_n < 5)
+        give_hold = (tier3 & (idle_n < 5)) | (tier2 & (idle_n < 2))
         return np.where(hold & give_hold, 1e9, s)
