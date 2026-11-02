@@ -1,7 +1,7 @@
 ---
 id: "015"
 title: "M5: learning tools on Modal (learned policy base, rollouts and labels, H100 trainer, ES, M5 benches)"
-status: in_progress
+status: done
 created: 2026-11-01
 report: ops/reports/015-m5-learning-tools.md
 ---
