@@ -20,7 +20,7 @@ class Candidate(LearnedPolicy):
 
     def score(self, x: np.ndarray) -> np.ndarray:
         s = super().score(x)
-        if x.shape[0] and x[0, 5] > 0 and x[0, 8] * 100 < 3:  # tier-3 call, <3 idle: hold
+        if x.shape[0] and x[0, 5] > 0 and x[0, 8] * 100 < 4:  # tier-3 call, <4 idle: hold
             s = np.full_like(s, -1e9, dtype=np.float64)
             s[x[:, 11] > 0] = 0.0
         return s

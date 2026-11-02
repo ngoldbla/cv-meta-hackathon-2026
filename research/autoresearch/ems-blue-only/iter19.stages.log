@@ -1,0 +1,7 @@
+iter19: Amendment-1 gen (condition b: best changed at iter18) on best-kept (threshold-3 rule + iter7 weights, 0.8359)
+gen: modal-python -m emslearn.cli gen --candidate experiments/ar/ems_candidate.py --out data/blue-only/it19 --n 50 --seed 19 --label-rate 0.0093 --label-cap 40 --window 10800
+{"out": "data/blue-only/it19", "days": 50, "decisions": 219141, "labelled": 1852, "seconds": 487.4}
+change: ems_candidate.py reservation threshold 3->4 (hold tier-3 when <4 idle), kept weights, no training
+bench: RC=0 wall 87s METRIC ratio_b1=0.8089 (primary 9098 vs b1 11247)
+gates: 141 passed, 1 skipped, name guard clean
+decision: KEEP - best 0.8359 -> 0.8089
