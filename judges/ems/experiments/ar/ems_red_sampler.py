@@ -14,8 +14,8 @@ import numpy as np
 
 
 def sample_theta(rng: np.random.Generator, d: date) -> dict:
-    # Concentrated surge: moderate demand with maximum spatial concentration.
-    return {"demand": 1.1, "urgent_share": 1.0, "offload": 1.05, "unavailable": 0.0,
+    # Concentrated surge: maximum urgent share with maximum spatial concentration.
+    return {"demand": 1.1, "urgent_share": 1.153, "offload": 1.05, "unavailable": 0.0,
             "concentration_calls": 104.0, "concentration_zips": 3.0}
 
 
