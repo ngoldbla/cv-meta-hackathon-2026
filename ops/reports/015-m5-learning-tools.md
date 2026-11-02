@@ -1,6 +1,6 @@
 # Report 015: M5: learning tools on Modal (learned policy base, rollouts and labels, H100 trainer, ES, M5 benches)
 Status: done
-Branch head at start: ac45acc9d3e537a2a303a3db5cd4ee893782f500  ·  at finish: <sha>
+Branch head at start: ac45acc9d3e537a2a303a3db5cd4ee893782f500  ·  at finish: 3f618a3f41f0335d87fafba44cad0df4d4e42b83
 
 ## Summary
 Task 015 done. Reviewer patch applied cleanly with no hand edits; full suite 141 passed, 1 skipped; name_guard and ruff clean. Modal app `ems-m5` deployed with scenario, rollout, train. Smoke tests all matched: gen gave 24 days / 104226 decisions / 480 labelled; H100 train returned 0 with weights saved (~15 s GPU); unweighted candidate bench gave METRIC ratio_b1=1.0000. Spend: $2.41 of $200.00.
