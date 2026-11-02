@@ -1,0 +1,1 @@
+{"iter": 0, "time": "2026-11-02T01:32:03Z", "commit": "c4407c19676c2b90017fa9eaa89445ff04b5651d", "hypothesis": "unchanged baseline", "files": [], "metric": "ratio_b1", "value": 1.0, "best_before": null, "decision": "baseline", "evidence": "research/autoresearch/ems-readable/bench.log", "seconds": 186}
