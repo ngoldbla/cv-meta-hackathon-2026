@@ -24,7 +24,9 @@ iter 16 (tau 0.5) reverted at 1.0100. Red iter 4 (regret-mined top-200
 days) kept at regret 4306.68; blue iter 17 rebaselined the iter-14 keep
 at 1.0727 on the mined pool. Iter 18 (gate-25 retrain with fresh it18)
 kept at 1.0344; iter 19 (decisive-only labels) reverted at 1.0376
-and iter 20 (imitate 100) reverted at 1.0378. Arm spend $3.42.
+and iter 20 (imitate 100) reverted at 1.0378. Red iter 5 (re-mined
+top-200 vs the iter-18 keep) reverted at 4132.41: pool unchanged, no
+blue rebaseline needed. Arm spend $3.42.
 
 ## Work done
 - Claimed task 019 on main (`19a1f00 Start task 019`, pushed).
@@ -107,6 +109,10 @@ and iter 20 (imitate 100) reverted at 1.0378. Arm spend $3.42.
 - Blue iter 20 (`ba2f750`, pushed): revert 1.0378. No gen (window reused);
   one change (`imitate` 30 -> 100), trained on the latest-8 window
   ($0.1015): stronger imitation memorizes mixed-history mistakes.
+- Red iter 5 (`c0d600e`, pushed): revert 4132.41. Re-mined all 1027 days
+  vs the iter-18 keep (mean 1332.13, top day 9399.80; committed as
+  `library/regret_days_5.json`) and attacked its top 200: weaker than
+  the iter-14 mining, so blue is catching up. Pool unchanged.
 
 ## Results
 Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`):
@@ -145,6 +151,7 @@ Red (`research/autoresearch/ems-full-red/autoresearch.jsonl` on `ar/red/ems-full
 | 2 | max offload inflation (1.151) + max geographic concentration (104 calls over 3 zips) on top of iter 1 | 1257.56 | keep | 120.0 |
 | 3 | attack the 200 busiest dev days (library/busy_days.json) with maxed thetas | 1520.87 | keep | 81.0 |
 | 4 | attack the top-200 regret days mined from a 1027-day bench (library/regret_days.json) | 4306.68 | keep | 78.0 |
+| 5 | re-mine the top-200 regret days vs the iter-18 keep (library/regret_days_5.json) | 4132.41 | revert | 83.0 |
 
 Spend added by this arm: $3.421 (`runs/spend.jsonl` on main). emslearn
 commands in order (pre-Amendment regime, from the blue worktree notes):
