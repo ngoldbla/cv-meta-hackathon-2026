@@ -101,3 +101,6 @@ Result 1.0416 vs best 1.0286: near-pure label-following drifts (held 0.325 vs b1
 ## Iter 24 (revert, 1.0370)
 No gen (8 A1 dirs, best unchanged since last gen, no red keep since): reused the latest-8 window. One change: gate_k 25 -> 10. Train ($0.0742, loss 5.97 -> 5.70, 42.2 GPU s).
 Result 1.0370 vs best 1.0286: sharper decay above the gate hurts - imitation that vanishes too fast on big (noisy) gains destabilizes the policy. gate_k stays 25. Recipe tuning looks exhausted around (imitate 3, gate 25/25, tau 1.0); next frontier is candidate/file changes (hold context features, divert rules) or fresh-data retrains as the window churns. Red iter 6 is due now (after blue iter 24).
+
+## Iter 25 (rebaseline, 1.0820)
+Red #6 kept (re-mined top-200 vs iter-22, regret 4530.61), so the pool changed (pool_key 28037b2fec557333 -> 365e3488b85fda64). Best candidate unchanged (iter-22 imitate-3 weights): candidate primary 30000.4 vs b1 27726.2. The re-mined pool again concentrates this candidate's weaknesses; new best is 1.0820. Held 0.323 vs b1 0.317, divert 0.136 vs 0.133, t1p90 21.80 vs 21.63. Next: iter 26 starts with gen data/full/it26 (rule (c): red kept since last gen; it10 drops out), then retrain the imitate-3 recipe.
