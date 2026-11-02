@@ -83,3 +83,8 @@ Result 1.0376 vs best 1.0344: decisive-only labels do not help - the near-tied l
 ## Iter 20 (revert, 1.0378)
 No gen (8 A1 dirs, best unchanged since last gen, no red keep since): reused the latest-8 window. One change: imitate 30 -> 100. Train ($0.1015, loss 54.55 -> 40.71, 63.2 GPU s).
 Result 1.0378 vs best 1.0344: stronger imitation HURTS. The window mixes rollout policies (b1-exact for old dirs, learned for new); at 100x the net memorizes logged choices including past mistakes, and the label term cannot correct. Lesson: on a mined pool, history-imitation is harmful; labels matter more. The opposite direction (imitate 10) is now worth testing. Red iter 5 is due now (after blue iter 20).
+
+## Iter 21 (KEEP, 1.0337)
+No gen (8 A1 dirs, best unchanged since last gen - red 5 reverted): reused the latest-8 window. One change: imitate 30 -> 10. Train ($0.0688, loss 11.20 -> 10.20, 38.0 GPU s).
+Result 1.0337 vs best 1.0344: weaker imitation wins by 0.0007, confirming the iter-20 lesson (imitate sweep: 100 -> 1.0378, 30 -> 1.0344, 10 -> 1.0337). Deployment: held 0.316 vs b1 0.318, divert 0.136 vs 0.134, t1p90 21.18 vs 21.55. pytest 141 passed + name guard clean before the kept commit.
+Next: push further down the imitate axis (10 -> 3); iter 22 starts with gen data/full/it22 (rule (b): iter-21 keep; it07 drops out).

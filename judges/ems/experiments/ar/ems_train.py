@@ -21,7 +21,7 @@ import numpy as np
 import torch
 from torch import nn
 
-DEFAULTS = {"hidden": [64, 64], "epochs": 20, "batch": 4096, "lr": 3e-3, "tau": 1.0, "imitate": 30.0,
+DEFAULTS = {"hidden": [64, 64], "epochs": 20, "batch": 4096, "lr": 3e-3, "tau": 1.0, "imitate": 10.0,
             "gain_min": 0.5, "gate_gain": 25.0, "gate_k": 25.0, "seed": 0}
 
 
