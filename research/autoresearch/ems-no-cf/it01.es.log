@@ -1,0 +1,6 @@
+{"generation": 0, "L_center": 10894.2, "L_best": 10804.7, "elapsed_s": 36.7}
+{"generation": 1, "L_center": 14604.2, "L_best": 14001.9, "elapsed_s": 58.5}
+{"generation": 2, "L_center": 9764.0, "L_best": 9709.9, "elapsed_s": 80.8}
+{"generation": 3, "L_center": 8386.4, "L_best": 8254.8, "elapsed_s": 103.2}
+{"generation": 4, "L_center": 10665.3, "L_best": 10391.4, "elapsed_s": 126.2}
+{"saved": "experiments/ar/ems_candidate.npz", "seconds": 126.2}
