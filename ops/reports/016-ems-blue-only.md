@@ -52,7 +52,7 @@ gates pass). Iter 35 KEEPS 0.7667: hold only when global queue>=5 (gates pass, a
 36 entries 0 problems). Journal entry for iters 31-35 added (branch). Iter 36 KEEPS 0.7618: hold only when queue>=8 (gates pass). Best: 0.7618
 (`6914421`). Iter 37 KEEPS 0.7608: hold only when queue>=12 (gates pass). Best: 0.7608
 (`a7e3b17`). Iter 38 KEEPS 0.7591: hold only when queue>=16 (gates pass). Best: 0.7591
-(`57a6b62`).
+(`57a6b62`). Iter 39 reverts 0.7593 (queue 16->20; peak at 16).
 
 ## Work done
 - Claimed task 016 on main (`ec9da1a Start task 016`, pushed).
@@ -200,6 +200,9 @@ gates pass). Iter 35 KEEPS 0.7667: hold only when global queue>=5 (gates pass, a
 - Iter 38 (`57a6b62`, pushed): gen `it38` (condition b; 50 days, 225,656 decisions, 1,883 labels,
   510.6 s, iter-37 policy). Rule change (KEPT): congestion threshold 12->16, no training. Bench
   KEEPS at 0.7591 (103 s; primary 8537; gates pass).
+- Iter 39 (`d87598a`, pushed): gen `it39` (condition b; 50 days, 220,098 decisions, 1,907 labels,
+  748.6 s, iter-38 policy). Rule change: congestion threshold 16->20, reverted after. Bench
+  REVERTS at 0.7593 (105 s).
 
 ## Results
 | iter | hypothesis | value | decision | seconds | gen | train window |
@@ -242,6 +245,7 @@ gates pass). Iter 35 KEEPS 0.7667: hold only when global queue>=5 (gates pass, a
 | 36 | hold only when queue>=8 | 0.7618 | keep | 132.0 | it36 | - |
 | 37 | hold only when queue>=12 | 0.7608 | keep | 106.0 | it37 | - |
 | 38 | hold only when queue>=16 | 0.7591 | keep | 103.0 | it38 | - |
+| 39 | hold only when queue>=20 | 0.7593 | revert | 105.0 | it39 | - |
 
 Values from `research/autoresearch/ems-blue-only/autoresearch.jsonl` on `ar/blue/ems-blue-only`.
 Best kept: 0.7591 (iter 38, `57a6b62`).
@@ -285,7 +289,7 @@ Best kept: 0.7591 (iter 38, `57a6b62`).
   Modal calls (rule change, no training). Iter 35: `gen (...it35 --seed 35 ...)` (no train:
   rule change). Iter 36: `gen (...it36 --seed 36 ...)` (no train: rule change). Iter 37:
   `gen (...it37 --seed 37 ...)` (no train: rule change). Iter 38: `gen (...it38 --seed 38 ...)`
-  (no train: rule change).
+  (no train: rule change). Iter 39: `gen (...it39 --seed 39 ...)` (no train: rule change).
 
 - Amendment-2 mechanism: the deployed `ems-m5` train was probe-verified (this session) to still
   serve hold labels, so the loop applies the strip in `ems_train.py` from iter 12 (same semantics as
