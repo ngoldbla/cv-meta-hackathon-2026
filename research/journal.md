@@ -145,3 +145,8 @@
 - **What was tried:** ES from b1-linear (iters 1-5: 5-15 gens, 48-96 days/gen, moving and fixed pools, small steps) then a hand-coded hold rule (iter 6: hold tier-3 when idle < 3).
 - **What happened:** all ES-from-scratch runs reverted (1.0043-1.0140); linear argmax sees only 4 varying features (travel, same_borough, moving, is_hold) and the hold weight is frozen at never-hold, so ES tunes ~3 live dims around an apparent local optimum. Iter 6 kept: ratio_b1=0.8439. Verified no sim gaming (no abandonment; runs to horizon+12h; lateness accrues while held).
 - **Next:** tune the hold rule (threshold, tier-2, waited escape), then ES-tune linear weights on top of it.
+
+## 2026-11-02: ems-no-cf blue iters 7-14, red iters 2-3 (task 017)
+- **What was tried:** tuned the hold rule on the nominal pool (iters 7-8: idle<5 kept at 0.8208, idle<8 reverted), then on the concentrated-surge pool after red #2 kept (iters 10-11: idle<6/idle<4 both reverted, idle<5 stands; iter 12: tier-2 hold when idle<2 kept at 0.8533; iter 14: tier-2 idle<3 kept at 0.8459). Iter 13 ran ES on top of the hold rule inside the Amendment 1 envelope (pairs 8, days 24, gens 7 = 2,856 scenario-days, seed 13). Red #3 (demand 1.25 under concentrated surge) reverted at 717.07 vs 870.87.
+- **What happened:** hand-coded hold refinements keep winning (best 0.8459); envelope ES reverted (0.8668) — 24-day pools are noisy and the linear scorer sees few live dims. One transcription error (iter 14's logged commit SHA) fixed by follow-up commit. Red pool unchanged since #2, so no blue rebaseline was needed.
+- **Next:** keep climbing the hold-rule gradient (tier-2 idle<4, waited escape), retry small-step ES on top of the rule, red #4 after blue 16.
