@@ -1,0 +1,5 @@
+iter22: no gen (8 Amendment-1 dirs exist; best unchanged since it21) - rule change, no training
+change: ems_candidate.py score: also hold tier-2 when <2 idle (tier-3 rule at <5 unchanged); unit-verified (t2 held at 1 idle, free at 2; t1 never)
+bench: RC=0 wall 184s METRIC ratio_b1=0.8066 (primary 9072 vs b1 11247)
+gates: 141 passed, 1 skipped, name guard clean
+decision: KEEP - best 0.8084 -> 0.8066
