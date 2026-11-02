@@ -1,0 +1,28 @@
+venue: local CPU gen (label_rate=0 needs no Modal fanout) + local GPU train
+gen: python local_gen.py --out runs/shards-local/loc01 --n 200 --seed 2 --label-rate 0
+{"out": "runs/shards-local/loc01", "days": 200, "decisions": 863625, "labelled": 0, "seconds": 65.8}
+gen_exit=0 wall_seconds=66
+train: python experiments/ar/ems_train.py --data runs/shards-local/loc01 --out experiments/ar/ems_candidate.npz --ckpt runs/shards-local/ckpt-it05 --args {} (imitate 0.1, unchanged file)
+{"decisions": 863625, "labelled": 0, "options": 17, "features": 12, "load_s": 2.6}
+{"epoch": 0, "loss": 0.0632, "elapsed_s": 10.5}
+{"epoch": 1, "loss": 0.025, "elapsed_s": 11.1}
+{"epoch": 2, "loss": 0.0233, "elapsed_s": 11.5}
+{"epoch": 3, "loss": 0.0226, "elapsed_s": 11.9}
+{"epoch": 4, "loss": 0.0223, "elapsed_s": 12.4}
+{"epoch": 5, "loss": 0.022, "elapsed_s": 12.8}
+{"epoch": 6, "loss": 0.0218, "elapsed_s": 13.2}
+{"epoch": 7, "loss": 0.0218, "elapsed_s": 13.6}
+{"epoch": 8, "loss": 0.0218, "elapsed_s": 14.0}
+{"epoch": 9, "loss": 0.0219, "elapsed_s": 14.4}
+{"epoch": 10, "loss": 0.0218, "elapsed_s": 14.8}
+{"epoch": 11, "loss": 0.0219, "elapsed_s": 15.2}
+{"epoch": 12, "loss": 0.0219, "elapsed_s": 15.6}
+{"epoch": 13, "loss": 0.0219, "elapsed_s": 16.0}
+{"epoch": 14, "loss": 0.022, "elapsed_s": 16.3}
+{"epoch": 15, "loss": 0.0222, "elapsed_s": 16.8}
+{"epoch": 16, "loss": 0.0223, "elapsed_s": 17.2}
+{"epoch": 17, "loss": 0.0224, "elapsed_s": 17.5}
+{"epoch": 18, "loss": 0.0229, "elapsed_s": 17.9}
+{"epoch": 19, "loss": 0.0229, "elapsed_s": 18.2}
+{"done": true, "seconds": 18.2}
+train_exit=0 wall_seconds=23
