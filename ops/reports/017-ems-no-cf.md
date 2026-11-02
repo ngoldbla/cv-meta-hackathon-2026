@@ -39,8 +39,10 @@ unchanged. Best is now 0.8371. Blue #29 KEPT tier-2 escape at 5 min (0.8324);
 #30 reverted dropping the tier-2 hold (0.8585 — the single 5-min hold cycle is
 load-bearing). Blue #31 KEPT tier-3 escape at 5 min (0.8249); #32 reverted
 tier-3 idle<6 with escape (0.8489). Red #8 reverted (nominal demand: 717.12,
-176/200 days); pool unchanged. Best is now 0.8249. Next: re-bracket tier-2
-threshold with escapes in place.
+176/200 days); pool unchanged. Best is now 0.8249. Blue #33-35 re-bracketed
+thresholds with escapes, all reverted: tier-2 idle<5 (0.8410), tier-3 idle<4
+(0.8482), tier-2 idle<3 (0.8498). Thresholds (t3:5, t2:4) are bracketed optima
+in both directions. Best stays 0.8249. Next: final ES on the escaped rule.
 
 ## Work done
 - Claimed task 017 on main (`9a4b206 Start task 017`, pushed).
@@ -130,6 +132,12 @@ threshold with escapes in place.
   (75 s).
 - Red #8 (`2705c43`, pushed): revert, nominal demand 1.0 -> 717.12 (110 s,
   176/200 days). Pool unchanged, no blue rebaseline.
+- Blue #33 (`c6afc06`, pushed): revert, tier-2 idle<5 with escape -> 0.8410
+  (40 s).
+- Blue #34 (`56f6ebe`, pushed): revert, tier-3 idle<4 with escape -> 0.8482
+  (39 s).
+- Blue #35 (`5f151dd`, pushed): revert, tier-2 idle<3 with escape -> 0.8498
+  (40 s). Journal `c181915` covers iters 31-35.
 
 ## Results
 Blue (`research/autoresearch/ems-no-cf/autoresearch.jsonl` on `ar/blue/ems-no-cf`):
@@ -168,6 +176,9 @@ Blue (`research/autoresearch/ems-no-cf/autoresearch.jsonl` on `ar/blue/ems-no-cf
 | 30 | drop the tier-2 hold entirely | 0.8585 | revert | 42 | — | — | — |
 | 31 | tier-3 hold escapes after 5 min waited | 0.8249 | keep | 39 | — | — | — |
 | 32 | wider tier-3 hold (idle<6) with the escape | 0.8489 | revert | 75 | — | — | — |
+| 33 | wider tier-2 hold (idle<5) with the escape | 0.8410 | revert | 40 | — | — | — |
+| 34 | narrower tier-3 hold (idle<4) with the escape | 0.8482 | revert | 39 | — | — | — |
+| 35 | narrower tier-2 hold (idle<3) with the escape | 0.8498 | revert | 40 | — | — | — |
 
 Red (`research/autoresearch/ems-no-cf-red/autoresearch.jsonl` on `ar/red/ems-no-cf`):
 
