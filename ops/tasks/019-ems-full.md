@@ -50,6 +50,7 @@ Role:                red
 - Red rules are as in task 014: `sample_theta(rng, d)` may use only the date, must be deterministic given `rng` and `d`, and its output must pass the bounds check.
 
 ## Rules for every arm (pre-registrations EMS1-EMS4, program spec §11)
+- **Parallel arms.** Muse sessions for the other arms (016-019) run at the same time, from the same main checkout. Never signal, kill or edit a process, worktree, branch, log or task that you did not start. If another session seems to collide with yours, record it under Blocked / questions and continue only your own work. Retry a git command in the main checkout that fails on `index.lock` after a short wait.
 - **Dev only.** Never touch a holdout window, the ledger or a frozen path. Nothing from this loop is a finding.
 - **Modal only through `emslearn`:** `~/.local/share/uv/tools/modal/bin/python -m emslearn.cli gen|train`, and for NO_CF `ems_es.py`. Each call checks and records spend in `cloud/budget.py`. Keep the default per-job caps unless the task says otherwise. Stop and report if `cloud/budget.py status` shows more than $150 spent.
 - **Use the commands from `judges/ems`,** with `export PYTHONPATH=$(git rev-parse --show-toplevel):$(git rev-parse --show-toplevel)/judges/ems:$(git rev-parse --show-toplevel)/judges/cages`, so this worktree's code is used.
