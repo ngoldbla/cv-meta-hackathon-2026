@@ -1,0 +1,7 @@
+iter38: Amendment-1 gen (condition b: best changed at iter37) on best-kept (queue>=12 rule + activate_n 2 + iter28 weights, 0.7608)
+gen: modal-python -m emslearn.cli gen --candidate experiments/ar/ems_candidate.py --out data/blue-only/it38 --n 50 --seed 38 --label-rate 0.0093 --label-cap 40 --window 10800
+{"out": "data/blue-only/it38", "days": 50, "decisions": 225656, "labelled": 1883, "seconds": 510.6}
+change: ems_candidate.py congestion threshold 12->16 (hold only when global queue>=16)
+bench: RC=0 wall 103s METRIC ratio_b1=0.7591 (primary 8537 vs b1 11247)
+gates: 141 passed, 1 skipped, name guard clean
+decision: KEEP - best 0.7608 -> 0.7591
