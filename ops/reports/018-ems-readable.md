@@ -3,9 +3,10 @@ Status: in_progress
 Branch head at start: 9a4b206  ·  at finish: TBD
 
 ## Summary
-Arm READABLE in progress: 15/40 blue hypotheses and 3/10 red iterations done,
-all committed and pushed per iteration. Blue best stays b1 at ratio_b1=1.0000
-(all 15 reverted); red best is 650.56 (demand floor 0.9, kept at red #1).
+Arm READABLE in progress: 28/40 blue hypotheses and 7/10 red iterations done,
+all committed and pushed per iteration. Blue best is ratio_b1=0.9974
+(relocation gate at 2 idle, 1/20 constants); red best is regret 785.82
+(demand floor + conc max + urgent ceiling).
 
 ## Work done
 - Claimed task 018 (this report created).
@@ -27,14 +28,24 @@ all committed and pushed per iteration. Blue best stays b1 at ratio_b1=1.0000
 - Red #1 kept (684c404): demand floor 0.9, regret 500.25->650.56 (pytest 141
   passed + name guard clean before the keep). Red #2 (urgent ceiling, 516.20)
   and #3 (unavailable ceiling, 579.82) reverted; pool unchanged since red #1.
-- Journals committed on the blue branch at hyps 5, 10, 15.
+- Journals committed on the blue branch at hyps 5, 10, 15, 20, 25 and on the
+  red branch at red iter 5.
+- Blue hyps 16-28: first keep at hyp 19 (relocation gate MIN_IDLE_RELOC=3,
+  0.9990), hyp 22 kept (proactive activation at 1.5x, 0.9944), hyp 27 kept
+  (ablated proactive on the urgent+conc pool, 0.9985), hyp 28 kept (gate 3->2,
+  0.9974). Rebaselines #22 (0.9965) and #27 (1.0037) after red #4/#6 keeps.
+  Current candidate: gate-only at 2 idle, 1/20 constants, best 0.9974.
+- Red #4 kept (conc max, 733.52), #5 reverted (unavailable on conc, 697.27),
+  #6 kept (urgent on conc, 785.82), #7 reverted (offload on corner, 623.58).
+  Scheduling note: red #4/#5 ran together after blue hyp 20 (I ran hyps
+  13-20 straight); cadence is restored (red #6 after hyp 24, #7 after hyp 28).
 
 ## Results
 Full per-iteration table at finish; current bests (from branch logs):
 | loop | best iter | metric | value | commit |
 |------|-----------|--------|-------|--------|
-| red | 1 | regret_candidate (higher better) | 650.56 | 684c404 |
-| blue | 0 | ratio_b1 (lower better) | 1.0000 | 861aab1 |
+| red | 6 | regret_candidate (higher better) | 785.82 | c015aa9 |
+| blue | 31 | ratio_b1 (lower better) | 0.9974 | 5e66613 |
 
 ## Deviations
 None yet.
