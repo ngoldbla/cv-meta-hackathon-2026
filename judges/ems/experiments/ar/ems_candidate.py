@@ -24,7 +24,7 @@ class Candidate(LearnedPolicy):
     def score(self, x: np.ndarray) -> np.ndarray:
         s = super().score(x)
         fresh = x[0, 6] < 1.0  # waited under 10 min; stale calls get assigned
-        busy = x[0, 7] >= 0.5  # global queue >= 5; hold only when congested
+        busy = x[0, 7] >= 0.8  # global queue >= 8; hold only when congested
         t3 = fresh and busy and x[0, 5] > 0 and x[0, 8] * 100 < 5  # tier-3 call, <5 idle: hold
         t2 = fresh and busy and x[0, 4] > 0 and x[0, 8] * 100 < 4  # tier-2 call, <4 idle: hold
         if x.shape[0] and (t3 or t2):
