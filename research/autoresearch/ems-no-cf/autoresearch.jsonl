@@ -1,0 +1,1 @@
+{"iter": 0, "time": "2026-11-02T01:28:03Z", "commit": "0c36159cb10d05050f769271f35c147780a9094a", "hypothesis": "baseline - learned candidate with no weights is exactly b1", "files": [], "metric": "ratio_b1", "value": 1.0, "best_before": null, "decision": "baseline", "evidence": "research/autoresearch/ems-no-cf/bench.log", "seconds": 162}
