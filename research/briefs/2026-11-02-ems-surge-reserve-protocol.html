@@ -72,14 +72,26 @@ footer { font-size: .85rem; color: var(--muted); border-top: 1px solid var(--rul
 
 <main>
   <header style="display:grid;gap:10px">
-    <span class="eyebrow">Draft for clinical review · simulated NYC EMS · 2026-11-02</span>
+    <span class="eyebrow">Failed confirmatory test · do not use · simulated NYC EMS · 2026-11-02</span>
     <h1>EMS Surge Reserve Protocol</h1>
     <p class="lede">This protocol gives three surge levels and the dispatch rules for each level. Level 2 uses a known idea, "cutoff priority" dispatch, with settings that we tested in a simulator. It is for clinical and dispatch staff to review. It is not approved for use.</p>
   </header>
 
   <div class="warn">
-    <strong style="font-family:var(--display);font-size:1.15rem">Status of this protocol</strong>
-    <p>We tested these rules only in a simulator of NYC 911 calls from 2017 to 2019. No real patient has received this protocol. Clinical staff must review the hold rule before any test. A first test must be advice only: the system suggests the action, and the dispatcher decides.</p>
+    <strong style="font-family:var(--display);font-size:1.3rem">This protocol failed its confirmatory test. Do not use it.</strong>
+    <p>On 2026-11-02 we tested the level 2 rule one time on sealed data that the study had not seen (pre-registration EMS5, ledger entry 26). The rule did not pass:</p>
+    <div class="wrap">
+      <table>
+        <thead><tr><th>Sealed pool</th><th>Lateness vs standard rules (8:3:1)</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>Omicron surge, real calls</td><td class="n worse">1.030 (3% more)</td><td>Fail</td></tr>
+          <tr><td>COVID wave 1, real calls</td><td class="n">0.986</td><td>Fail (no clear effect)</td></tr>
+          <tr><td>Normal 2016 days, real calls</td><td class="n worse">1.056 (6% more)</td><td>Fail (safety limit 1.02)</td></tr>
+          <tr><td>Generated stress days</td><td class="n better">0.734 (27% less)</td><td>Pass</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The rule helped only on days that the simulator generated with extra stress. On real surge days and real normal days, it made lateness worse. We keep this page as a record. The text below is the protocol as it was before the test.</p>
   </div>
 
   <section aria-labelledby="tiers">
