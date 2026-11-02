@@ -148,3 +148,22 @@ def test_train_script_exports_weights_the_policy_can_load(tmp_path):
     from emslearn.policy import mlp
 
     assert np.allclose(mlp(layers, x), ref, atol=1e-5)
+
+
+def test_merge_shards_union_window_and_errors(tmp_path):
+    from emslearn.shards import MAX_DIRS, merge
+
+    for d in ("data/full/it05", "data/full/it06"):
+        p = tmp_path / d
+        p.mkdir(parents=True)
+        for i in range(3):
+            np.savez(p / f"{i:05d}.npz", x=np.array([i]))
+    into = tmp_path / "merged"
+    assert merge(tmp_path, ["data/full/it05", "data/full/it06"], into) == 6
+    names = sorted(f.name for f in into.glob("*.npz"))
+    assert names[0] == "data_full_it05-00000.npz" and len(names) == 6
+    assert np.load(into / "data_full_it06-00002.npz")["x"][0] == 2
+    with pytest.raises(ValueError):
+        merge(tmp_path, [f"d{i}" for i in range(MAX_DIRS + 1)], tmp_path / "m2")
+    with pytest.raises(FileNotFoundError):
+        merge(tmp_path, ["data/full/missing"], tmp_path / "m3")

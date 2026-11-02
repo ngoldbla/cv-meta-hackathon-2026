@@ -11,7 +11,8 @@ Functions (all called through emslearn/cli.py, which checks and records spend in
 - rollout:  decision records (+ optional counterfactual labels) for one scenario-day, written as a shard.
 - train:    the arm's training script on an H100 against shards in the Volume; returns the weights.
 GPU waste rules (docs/superpowers/specs/2026-11-01-m5-modal-compute-design.md): the H100 container only trains,
-scales down 2 s after its call, checkpoints in the Volume and retries on preemption.
+scales down 2 s after its call, checkpoints in the Volume and retries on preemption. Caps (40 scenario + 56 rollout
++ 3 train = 99 of the workspace's 100 containers) keep a slot free for every train call (plan 2026-11-01-m5-pace-correction).
 
     ~/.local/bin/modal run cloud/ems_modal.py::stage          # create and fill the Volume (idempotent)
     ~/.local/bin/modal run cloud/ems_modal.py::check --n 48   # same scenario-days locally and on Modal: must match
@@ -62,7 +63,7 @@ def _candidate(src: str, weights: bytes | None) -> str:
     return f"file:{d / 'candidate.py'}:Candidate"
 
 
-@app.function(volumes={"/vol": VOLUME}, cpu=1.0, memory=1024, timeout=1800, retries=2)
+@app.function(volumes={"/vol": VOLUME}, cpu=1.0, memory=1024, timeout=1800, retries=2, max_containers=40)
 def scenario(args: tuple) -> dict:
     """(iso day, theta, seed, policy) where policy is a built-in name or ("src", source, weights bytes or None)."""
     from datetime import date
@@ -78,7 +79,7 @@ def scenario(args: tuple) -> dict:
     return m
 
 
-@app.function(volumes={"/vol": VOLUME}, cpu=1.0, memory=2048, timeout=3600, retries=2)
+@app.function(volumes={"/vol": VOLUME}, cpu=1.0, memory=2048, timeout=3600, retries=2, max_containers=56)
 def rollout(args: tuple) -> dict:
     """(iso day, theta, seed, source, weights, label_rate, label_cap, window_s, shard path under /vol)."""
     from datetime import date
@@ -99,9 +100,11 @@ def rollout(args: tuple) -> dict:
 
 
 @app.function(image=gpu_image, gpu="H100", volumes={"/vol": VOLUME}, timeout=3600, scaledown_window=2,
-              retries=modal.Retries(initial_delay=0.0, max_retries=3))
+              max_containers=3, retries=modal.Retries(initial_delay=0.0, max_retries=3))
 def train(script: str, data_dir: str, out: str, init: bytes | None = None, args: str = "{}") -> dict:
     """Run the arm's training script on shards in /vol/<data_dir>; it must write weights to --out (an .npz).
+
+    data_dir may list several directories, comma-separated (at most 8): the script then reads their union.
 
     The script is called as: python train.py --data <dir> --out <npz> --ckpt <dir> [--init <npz>] --args <json>.
     It should save its own checkpoints in --ckpt and resume from them, so a preempted call loses little work.
@@ -116,7 +119,18 @@ def train(script: str, data_dir: str, out: str, init: bytes | None = None, args:
     out_path, ckpt = Path("/vol") / out, Path("/vol") / (out + ".ckpt")
     out_path.parent.mkdir(parents=True, exist_ok=True)
     ckpt.mkdir(parents=True, exist_ok=True)
-    cmd = ["python", str(work / "train.py"), "--data", f"/vol/{data_dir}", "--out", str(out_path), "--ckpt", str(ckpt),
+    dirs = [d for d in data_dir.split(",") if d.strip()]
+    if len(dirs) > 1:  # the union of the latest iterations' shards (emslearn.shards)
+        import shutil
+
+        from emslearn.shards import merge
+
+        data = work / "data"
+        shutil.rmtree(data, ignore_errors=True)  # a retried input in the same container starts clean
+        merge(Path("/vol"), dirs, data)
+    else:
+        data = Path("/vol") / data_dir
+    cmd = ["python", str(work / "train.py"), "--data", str(data), "--out", str(out_path), "--ckpt", str(ckpt),
            "--args", args]
     if init:
         (work / "init.npz").write_bytes(init)
@@ -172,3 +186,21 @@ def check(n: int = 48, seed: int = 3, policies: str = "b0,b1"):
            "remote_cpu_s_total": round(sum(r["modal_seconds"] for r in remote), 1),
            "remote_cpu_s_max": round(max(r["modal_seconds"] for r in remote), 1)}
     print(json.dumps(out))
+
+
+@app.local_entrypoint()
+def smoke_merge(dirs: str = "data/smoke/it00,data/smoke/t015"):
+    """Train 2 epochs on the union of two Volume directories; the decision count must be the sum of both."""
+    script = (EMS / "experiments" / "ar" / "ems_train.py").read_text()
+    one = [train.remote(script, d, f"ckpt/smoke_merge_{i}.npz", None, '{"epochs": 2}') for i, d in
+           enumerate(dirs.split(","))]
+    both = train.remote(script, dirs, "ckpt/smoke_merge_union.npz", None, '{"epochs": 2}')
+    runs = one + [both]
+    assert all(r["returncode"] == 0 for r in runs), [r["stderr_tail"][-800:] for r in runs]
+
+    def count(r: dict) -> int:
+        return json.loads(next(ln for ln in r["stdout_tail"].splitlines() if '"decisions"' in ln))["decisions"]
+
+    assert count(both) == sum(count(r) for r in one), (count(both), [count(r) for r in one])
+    print(json.dumps({"union_decisions": count(both), "parts": [count(r) for r in one],
+                      "gpu_s": round(sum(r["gpu_seconds"] for r in runs), 1)}))
