@@ -41,7 +41,9 @@ to tier-2 (hold when <2 idle; gates pass). Iter 23 KEEPS 0.8027: tier-2 threshol
 added (branch). Iter 26 reverts 0.8112 (t3 5->6 with t2 rule: no interaction win). Iter 27
 KEEPS 0.8012: refit imitation on the 1.78M latest-8 window (loss diverged late 0.027->0.13 like
 iter 8; kept on the mechanical rule, stability fix next). Iter 28 KEEPS 0.7898: stable
-4-epoch refit on the latest-8 window (loss monotonic, gates pass). Best: 0.7898 (`9ad1171`).
+4-epoch refit on the latest-8 window (loss monotonic, gates pass). Iter 29 reverts 0.8072
+(12-epoch lr-1e-3 fits better at 0.0242 but benches worse: loss does not predict the day objective).
+Best: 0.7898 (`9ad1171`).
 
 ## Work done
 - Claimed task 016 on main (`ec9da1a Start task 016`, pushed).
@@ -157,6 +159,10 @@ iter 8; kept on the mechanical rule, stability fix next). Iter 28 KEEPS 0.7898: 
   on it18-21,it23-25,it28 (1,787,580 decisions, sums exact; labelled 14,575, again ~2.5% below gen
   sums on new-policy rollouts; loss 0.0598->0.0265 monotonic; wall 113.2 s, gpu 108.2 s). Bench
   KEEPS at 0.7898 (112 s; primary 8884; gates pass).
+- Iter 29 (`b87b6b1`, pushed): gen `it29` (condition b; 50 days, 222,529 decisions, 1,904 labels,
+  553.6 s, iter-28 policy). No script-file change; train with `--args {"label_w": 0, "lr": 0.001,
+  "epochs": 12}` on it19-21,it23-25,it28-29 (1,787,553 decisions, sums exact; loss 0.0875->0.0242
+  monotonic; wall 70.1 s, gpu 66.0 s). Bench REVERTS at 0.8072 (109 s).
 
 ## Results
 | iter | hypothesis | value | decision | seconds | gen | train window |
@@ -189,6 +195,7 @@ iter 8; kept on the mechanical rule, stability fix next). Iter 28 KEEPS 0.7898: 
 | 26 | t3 5->6 with t2 rule | 0.8112 | revert | 93.0 | - | - |
 | 27 | refit imitation on latest-8 window | 0.8012 | keep | 205.0 | - | it12,it18,it19,it20,it21,it23,it24,it25 |
 | 28 | stable 4-epoch refit on latest-8 | 0.7898 | keep | 112.0 | it28 | it18,it19,it20,it21,it23,it24,it25,it28 |
+| 29 | long stable schedule (lr 1e-3, 12 ep) | 0.8072 | revert | 109.0 | it29 | it19,it20,it21,it23,it24,it25,it28,it29 |
 
 Values from `research/autoresearch/ems-blue-only/autoresearch.jsonl` on `ar/blue/ems-blue-only`.
 Best kept: 0.7898 (iter 28, `9ad1171`).
@@ -224,7 +231,8 @@ Best kept: 0.7898 (iter 28, `9ad1171`).
   rule change). Iter 26: no Modal calls (rule change, no training). Iter 27: no gen;
   `train --data ...latest-8... --args {"label_w": 0}`; probes x2 (deployed strip still absent;
   8-dir labelled 14530 reproducible). Iter 28: `gen (...it28 --seed 28 ...)`; `train --data
-  ...latest-8... --args {"label_w": 0, "epochs": 4}`.
+  ...latest-8... --args {"label_w": 0, "epochs": 4}`. Iter 29: `gen (...it29 --seed 29 ...)`;
+  `train --data ...latest-8... --args {"label_w": 0, "lr": 0.001, "epochs": 12}`.
 
 - Amendment-2 mechanism: the deployed `ems-m5` train was probe-verified (this session) to still
   serve hold labels, so the loop applies the strip in `ems_train.py` from iter 12 (same semantics as
