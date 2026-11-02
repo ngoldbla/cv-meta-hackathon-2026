@@ -155,3 +155,8 @@
 - **What was tried:** tier-2 hold idle<4 kept (0.8342), idle<5 reverted (0.8417, over-holding). Red #4 kept max urgent share (regret 916.32); blue #17 rebaselined (0.8375). Tier-3 idle<6 reverted again on the new pool (0.8500); a 10-min waited escape on the tier-3 hold reverted at near-tie (0.8382 vs 0.8375). Fine envelope ES on the rule (sigma 0.02, lr 0.01, seed 20) reverted (0.8732).
 - **What happened:** the hold rule (tier-3 idle<5, tier-2 idle<4) is a stable optimum; both coarser and finer ES fail to improve the linear weights underneath it. Best is 0.8375 on the urgent-heavy pool.
 - **Next:** red #5, then probe new rule dimensions (queue-gated hold, same-borough preference) or accept the plateau.
+
+## 2026-11-02: ems-no-cf blue iters 21-25, red iter 6 (task 017)
+- **What was tried:** new rule dimensions all reverted: same-borough bonus (0.8537), queue-gated tier-3 hold (0.8396), busy-hours hold gate (0.8394), tier-1-only same-borough bonus (0.8406). Fine ES with 16 pairs / 12 days (2,772 scenario-days, seed 25) reverted (0.8430) — closer than the 8-pair runs but still short. Red #6 (10% unavailable) reverted at 305.07; pool unchanged.
+- **What happened:** best stays 0.8375 (tier-3 idle<5, tier-2 idle<4). ES keeps failing to improve the linear weights under the rule; more pairs helped slightly. Nearest-unit choice resists all preference tweaks so far.
+- **Next:** moving-unit preference for low tiers, then wider ES seeds; red #7 after blue 28.
