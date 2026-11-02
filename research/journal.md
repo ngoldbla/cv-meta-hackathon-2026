@@ -145,3 +145,8 @@
 - **What was tried:** baselines (blue ratio_b1=1.0000, red regret 500.25 vs b1), then blue hypotheses: divert less (divert_queue 2->4), divert more (2->1), adaptive demand scaling by last-hour volume (clamp 0.5-2.0), weighted-urgency dispatch, more surge units (activate_n 3->4); red #1 fixed demand at its floor 0.9. Log: `research/autoresearch/ems-readable/autoresearch.jsonl` on branch `ar/blue/ems-readable` (red: `ar/red/ems-readable`).
 - **What happened:** all 5 blue hypotheses reverted (1.1076, 4.0393, 1.0091, 1.0193, 1.0235); best stays b1 at 1.0000. Divert threshold 2 is bracketed sharply (4 -> +10.8%, 1 -> +304%: over-diverting hits the cap and floods callbacks). Red #1 kept: regret 500.25 -> 650.56, so the blue pool changed (pool_key 337fc936 -> 17e15834) and blue #5 is a rebaseline at 1.0000.
 - **Next:** blue hypotheses 6-8 (activation trigger, relocation cadence/coverage, proactive activation on observed-vs-expected volume), then red #2.
+
+## 2026-11-01: ems-readable blue hyps 6-10 + red #2 (task 018, arm READABLE)
+- **What was tried:** blue hypotheses 6-10 (log iters 7-11): activate_queue 2->3, 2->1, proactive activation at 1.5x observed-vs-expected volume, MEXCLP coverage 480s->600s, relocation every 30 min; red #2 added urgent_share=1.153 to the demand floor.
+- **What happened:** all blue reverted (1.6166, 1.3683, 1.0003, 1.0078, 1.0014); best stays b1 at 1.0000. Activation trigger 2 is bracketed sharply (3 -> +62%, 1 -> +37%). The near-tie (1.0003) was proactive activation. Red #2 reverted (516.20 < 650.56): maxing urgent share shrinks the b1-oracle gap, so the pool is unchanged and no rebaseline was needed.
+- **Next:** blue hyps 11-12 (dispatch/assignment variants), then red #3 (unavailable corner, date-conditional thetas).
