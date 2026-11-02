@@ -1,0 +1,16 @@
+{"generation": 0, "L_center": 10894.2, "L_best": 10804.7, "elapsed_s": 24.3}
+{"generation": 1, "L_center": 14604.2, "L_best": 14001.9, "elapsed_s": 46.2}
+{"generation": 2, "L_center": 9764.0, "L_best": 9709.9, "elapsed_s": 68.7}
+{"generation": 3, "L_center": 8386.4, "L_best": 8254.8, "elapsed_s": 91.4}
+{"generation": 4, "L_center": 10665.3, "L_best": 10391.4, "elapsed_s": 114.0}
+{"generation": 5, "L_center": 13928.3, "L_best": 13490.7, "elapsed_s": 136.4}
+{"generation": 6, "L_center": 9641.6, "L_best": 9374.2, "elapsed_s": 158.1}
+{"generation": 7, "L_center": 10715.8, "L_best": 10372.0, "elapsed_s": 180.2}
+{"generation": 8, "L_center": 10113.7, "L_best": 10285.4, "elapsed_s": 202.2}
+{"generation": 9, "L_center": 14043.0, "L_best": 13724.9, "elapsed_s": 223.6}
+{"generation": 10, "L_center": 10499.8, "L_best": 10488.9, "elapsed_s": 246.2}
+{"generation": 11, "L_center": 9811.6, "L_best": 9617.2, "elapsed_s": 268.7}
+{"generation": 12, "L_center": 11939.3, "L_best": 11026.6, "elapsed_s": 290.6}
+{"generation": 13, "L_center": 11708.0, "L_best": 11382.0, "elapsed_s": 312.9}
+{"generation": 14, "L_center": 12069.6, "L_best": 11785.7, "elapsed_s": 334.5}
+{"saved": "experiments/ar/ems_candidate.npz", "seconds": 334.6}
