@@ -1,0 +1,74 @@
+{
+ "b1": {
+  "tier1": {
+   "mean_min": 8.58,
+   "median_min": 6.26,
+   "p90_min": 17.7,
+   "n": 12272
+  },
+  "tier2": {
+   "mean_min": 11.12,
+   "median_min": 8.18,
+   "p90_min": 23.47,
+   "n": 288514
+  },
+  "tier3": {
+   "mean_min": 14.73,
+   "median_min": 10.21,
+   "p90_min": 28.46,
+   "n": 540616
+  },
+  "all": {
+   "mean_min": 13.4,
+   "median_min": 9.41
+  }
+ },
+ "no-cf": {
+  "tier1": {
+   "mean_min": 6.74,
+   "median_min": 5.31,
+   "p90_min": 12.55,
+   "n": 12272
+  },
+  "tier2": {
+   "mean_min": 8.58,
+   "median_min": 6.92,
+   "p90_min": 16.38,
+   "n": 288514
+  },
+  "tier3": {
+   "mean_min": 11.97,
+   "median_min": 8.84,
+   "p90_min": 20.81,
+   "n": 548380
+  },
+  "all": {
+   "mean_min": 10.74,
+   "median_min": 8.08
+  }
+ },
+ "blue-only": {
+  "tier1": {
+   "mean_min": 6.89,
+   "median_min": 5.42,
+   "p90_min": 12.87,
+   "n": 12272
+  },
+  "tier2": {
+   "mean_min": 8.67,
+   "median_min": 7.04,
+   "p90_min": 16.54,
+   "n": 288514
+  },
+  "tier3": {
+   "mean_min": 11.99,
+   "median_min": 8.97,
+   "p90_min": 20.69,
+   "n": 550989
+  },
+  "all": {
+   "mean_min": 10.79,
+   "median_min": 8.21
+  }
+ }
+}
