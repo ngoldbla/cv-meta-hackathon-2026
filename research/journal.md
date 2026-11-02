@@ -150,3 +150,8 @@
 - **What was tried:** blue hypotheses 6-10 (log iters 7-11): activate_queue 2->3, 2->1, proactive activation at 1.5x observed-vs-expected volume, MEXCLP coverage 480s->600s, relocation every 30 min; red #2 added urgent_share=1.153 to the demand floor.
 - **What happened:** all blue reverted (1.6166, 1.3683, 1.0003, 1.0078, 1.0014); best stays b1 at 1.0000. Activation trigger 2 is bracketed sharply (3 -> +62%, 1 -> +37%). The near-tie (1.0003) was proactive activation. Red #2 reverted (516.20 < 650.56): maxing urgent share shrinks the b1-oracle gap, so the pool is unchanged and no rebaseline was needed.
 - **Next:** blue hyps 11-12 (dispatch/assignment variants), then red #3 (unavailable corner, date-conditional thetas).
+
+## 2026-11-01: ems-readable blue hyps 11-15 + red #3 (task 018, arm READABLE)
+- **What was tried:** blue hyps 11-15 (log iters 12-16): prefer settled units in assignment, fixed MEXCLP busy-p 0.5, queue-aware positioning (QUEUE_W=1.0), activate_n 3->2, next-hour demand positioning; red #3 added unavailable=0.25 to the demand floor.
+- **What happened:** all blue reverted (1.2797, 1.0054, 1.0021, 1.0396, 1.0166); best stays b1 at 1.0000. Preferring settled units hurt badly (1.28): assigning relocating units is load-bearing. activate_n is now bracketed at 3 (2 -> +4.0%, 4 -> +2.4%). Red #3 reverted (579.82 < 650.56); pool unchanged.
+- **Next:** blue hyps 16-20 (divert-mix condition, demand-uniform blend, activation scaling, relocation idle-gate), then red #4.
