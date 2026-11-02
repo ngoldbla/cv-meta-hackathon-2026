@@ -32,7 +32,9 @@ at 1.0416 and iter 24 (gate_k 10) reverted at 1.0370. Red iter 6
 (re-mined top-200 vs the iter-22 keep) kept at regret 4530.61; blue
 iter 25 rebaselined at 1.0820 on the new pool. Iter 26 (imitate-3
 retrain with fresh it26) kept at 1.0523; iter 27 (same with it27)
-kept at 1.0448; iter 28 (gate 50) reverted at 1.0521. Arm spend $4.80.
+kept at 1.0448; iter 28 (gate 50) reverted at 1.0521. Red iter 7
+(re-mined top-200 vs the iter-27 keep) kept at regret 4617.18; blue
+iter 29 rebaselined at 1.0976 on the new pool. Arm spend $4.80.
 
 ## Work done
 - Claimed task 019 on main (`19a1f00 Start task 019`, pushed).
@@ -156,6 +158,14 @@ kept at 1.0448; iter 28 (gate 50) reverted at 1.0521. Arm spend $4.80.
   first (seed 28, 50 days, 205414 decisions, 1833 labels; required by
   rule (b)), then `gate_gain` 25 -> 50, trained on the latest 8-dir
   window with it14 dropped (masked 5654). Journal (`347443b`, pushed).
+- Red iter 7 (`fd508d3`, pushed): KEEP, regret 4617.18 (+1.9%). Re-mined
+  all 1027 days vs the iter-27 keep (mean 1523.37, top day 10138.43;
+  committed as `library/regret_days_7.json`) and attacked its top 200.
+  200/200 days with regret. pytest 141 passed + name guard clean.
+  `ar_check` on the red log: 8 entries, 0 problems.
+- Blue iter 29 (`1716b9a`, pushed): rebaseline 1.0976 on pool
+  `4c088d562472f880` (candidate 29576.6 vs b1 26947.0; largest
+  rebaseline gap yet).
 
 ## Results
 Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`):
@@ -190,9 +200,10 @@ Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`)
 | 26 | retrain the kept imitate-3 recipe on the latest-8 window incl. fresh on-pool it26 | 1.0523 | keep | 122.0 | data/full/it26 | data/full/it12,data/full/it14,data/full/it15,data/full/it18,data/full/it19,data/full/it22,data/full/it23,data/full/it26 |
 | 27 | retrain the kept imitate-3 recipe on the latest-8 window incl. fresh on-pool it27 | 1.0448 | keep | 113.0 | data/full/it27 | data/full/it14,data/full/it15,data/full/it18,data/full/it19,data/full/it22,data/full/it23,data/full/it26,data/full/it27 |
 | 28 | wider gate (gate_gain 25 -> 50) at imitate 3, latest 8-dir window | 1.0521 | revert | 143.0 | data/full/it28 | data/full/it15,data/full/it18,data/full/it19,data/full/it22,data/full/it23,data/full/it26,data/full/it27,data/full/it28 |
+| 29 | rebaseline after red #7 keep (re-mined library); best unchanged (imitate-3 recipe, iter 27) | 1.0976 | rebaseline | 133.0 | - | - |
 
-Best kept: iter 27's weights (imitate-3 recipe), 1.0448 on pool
-`365e3488b85fda64` (commit `7a7a44e`).
+Best kept: iter 27's weights (imitate-3 recipe), rebaselined at 1.0976
+on pool `4c088d562472f880` (rebaseline commit `1716b9a`).
 
 Red (`research/autoresearch/ems-full-red/autoresearch.jsonl` on `ar/red/ems-full`):
 
@@ -204,6 +215,7 @@ Red (`research/autoresearch/ems-full-red/autoresearch.jsonl` on `ar/red/ems-full
 | 4 | attack the top-200 regret days mined from a 1027-day bench (library/regret_days.json) | 4306.68 | keep | 78.0 |
 | 5 | re-mine the top-200 regret days vs the iter-18 keep (library/regret_days_5.json) | 4132.41 | revert | 83.0 |
 | 6 | re-mine the top-200 regret days vs the iter-22 keep (library/regret_days_6.json) | 4530.61 | keep | 78.0 |
+| 7 | re-mine the top-200 regret days vs the iter-27 keep (library/regret_days_7.json) | 4617.18 | keep | 76.0 |
 
 Spend added by this arm: $4.799 (`runs/spend.jsonl` on main). emslearn
 commands in order (pre-Amendment regime, from the blue worktree notes):
