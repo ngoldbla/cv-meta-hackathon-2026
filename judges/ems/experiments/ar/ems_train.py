@@ -22,7 +22,7 @@ import torch
 from torch import nn
 
 DEFAULTS = {"hidden": [64, 64], "epochs": 20, "batch": 4096, "lr": 3e-3, "tau": 1.0, "imitate": 30.0,
-            "gain_min": 0.5, "gate_gain": 100.0, "gate_k": 25.0, "seed": 0}
+            "gain_min": 0.5, "gate_gain": 25.0, "gate_k": 25.0, "seed": 0}
 
 
 def load(data: str):
@@ -79,6 +79,11 @@ def main() -> None:
     n, o, f = X.shape
     print(json.dumps({"decisions": n, "labelled": int(labelled.sum()), "options": o, "features": f,
                       "load_s": round(time.time() - t0, 1)}), flush=True)
+    bg = best_gain[labelled].float().cpu()  # A2: unit-only gains; diagnostic for gate calibration
+    q = torch.quantile(bg, torch.tensor([0.5, 0.75, 0.9, 0.99])) if len(bg) else torch.zeros(4)
+    print(json.dumps({"gain_q": [round(float(x), 2) for x in q],
+                      "gain_max": round(float(bg.max()) if len(bg) else 0.0, 2),
+                      "n_gt25": int((bg > 25).sum()), "n_gt100": int((bg > 100).sum())}), flush=True)
     net = model(f, cfg["hidden"]).to(dev)
     ck = Path(a.ckpt) / "state.pt"
     start = 0
