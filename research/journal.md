@@ -160,3 +160,8 @@
 - **What was tried:** new rule dimensions all reverted: same-borough bonus (0.8537), queue-gated tier-3 hold (0.8396), busy-hours hold gate (0.8394), tier-1-only same-borough bonus (0.8406). Fine ES with 16 pairs / 12 days (2,772 scenario-days, seed 25) reverted (0.8430) — closer than the 8-pair runs but still short. Red #6 (10% unavailable) reverted at 305.07; pool unchanged.
 - **What happened:** best stays 0.8375 (tier-3 idle<5, tier-2 idle<4). ES keeps failing to improve the linear weights under the rule; more pairs helped slightly. Nearest-unit choice resists all preference tweaks so far.
 - **Next:** moving-unit preference for low tiers, then wider ES seeds; red #7 after blue 28.
+
+## 2026-11-02: ems-no-cf blue iters 26-30, red iter 7 (task 017)
+- **What was tried:** tier-3 moving-unit bonus reverted (0.8473); 16-gen fine ES reverted badly (0.8872, drifted). Tier-2 waited escape kept twice: 10 min (0.8371) then 5 min (0.8324). Dropping the tier-2 hold entirely reverted (0.8585), so the single 5-min hold cycle is load-bearing. Red #7 (single-zip surge) reverted at 854.63; pool unchanged.
+- **What happened:** best is 0.8324 (tier-3 idle<5 no escape, tier-2 idle<4 with 5-min escape). The escape gradient points shorter; the next probe is whether tier-3 wants an escape too, now that tier-2 has one.
+- **Next:** tier-3 escape variants on top of the kept tier-2 escape; red #8 after blue 32.
