@@ -1,6 +1,6 @@
 # Report 019: Autoresearch blue + red loops: ems-full (M5 arm FULL)
-Status: in_progress
-Branch head at start: c4407c19676c2b90017fa9eaa89445ff04b5651d  ·  at finish: TBD
+Status: done
+Branch head at start: c4407c19676c2b90017fa9eaa89445ff04b5651d  ·  at finish: blue `5fd0b19`, red `346a461` (both loops at cap: 40 blue + 10 red iters)
 
 ## Summary
 Blue iters 1-4 (pre-Amendment) all reverted: MLP training on early-morning
@@ -46,7 +46,10 @@ iter 34 (lr 1e-3 from scratch) reverted at 1.0531; iter 35 (gain_min
 Iter 38 (K=8 options) reverted at 1.0397.
 Iter 39 (K=24 options) reverted at 1.0408.
 Iter 40 (matched no-hold retrain on it40-only) reverted at 1.0498.
-Arm spend $5.88.
+Red iter 10 (re-mined top-200 vs the iter-37 never-hold keep) reverted
+at 4309.02: pool unchanged, red done at cap. Final: best blue 1.0370
+(iter-37 never-hold config + iter-30 weights) on pool
+`4c088d562472f880`; best red regret 4617.18. Arm spend $5.88.
 
 ## Work done
 - Claimed task 019 on main (`19a1f00 Start task 019`, pushed).
@@ -240,7 +243,15 @@ Arm spend $5.88.
   kept labels): the single-dir shrink swamps the train/deploy match
   benefit. The rollout pads to MAX_OPT=17 with a mask, so mixed
   windows would stack (unused: blue cap reached). Blue loop done at
-  40 iters, best 1.0370 (iter-37 config + iter-30 weights).
+  40 iters, best 1.0370 (iter-37 config + iter-30 weights). Journal
+  (`5fd0b19`, pushed).
+- Red iter 10 (`346a461`, pushed): revert 4309.02. Re-mined all 1027
+  days vs the iter-37 never-hold keep (mean 1440.08, down from
+  1542.87: the never-hold policy is more robust overall; top days
+  unchanged, committed as `library/regret_days_10.json`) and attacked
+  its top 200: still short of 4617.18, pool unchanged. Red loop done
+  at 10 iters. Final `ar_check`: blue log 41 entries, red log 11
+  entries, 0 problems each.
 
 ## Results
 Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`):
@@ -304,6 +315,7 @@ Red (`research/autoresearch/ems-full-red/autoresearch.jsonl` on `ar/red/ems-full
 | 7 | re-mine the top-200 regret days vs the iter-27 keep (library/regret_days_7.json) | 4617.18 | keep | 76.0 |
 | 8 | re-mine the top-200 regret days vs the iter-30 keep (library/regret_days_8.json) | 4575.37 | revert | 74.0 |
 | 9 | joint day x theta-variant mining: per-date argmax over 4 stress shapes (library/regret_joint_9.json, 156 days + 44 top-up) | 4533.96 | revert | 72.1 |
+| 10 | re-mine the top-200 regret days vs the iter-37 never-hold keep (library/regret_days_10.json) | 4309.02 | revert | 71.4 |
 
 Spend added by this arm: $5.680 (`runs/spend.jsonl` on main). emslearn
 commands in order (pre-Amendment regime, from the blue worktree notes):
