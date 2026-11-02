@@ -165,3 +165,8 @@
 - **What was tried:** re-mined regret vs the iter-22 keep for red 6; blue rebaseline on the new pool; fresh-data retrains of the imitate-3 recipe (it26, it27); a gate-widening probe (gate_gain 25 -> 50) at imitate 3.
 - **What happened:** red 6 KEPT (regret 4306.68 -> 4530.61; the imitate-3 policy is less robust overall, mean regret 1468 vs 1332). Blue 25 rebaselined at 1.0820. Iters 26 (1.0523) and 27 (1.0448) KEPT on fresh-data retrains. Iter 28 (gate 50) reverted at 1.0521: wider gate pulls toward worse history, consistent with the labels-over-history lesson. Best: iter-27 weights, 1.0448. Arm spend $4.80.
 - **Next:** red 7 after blue 28 (re-mine vs the iter-27 keep); blue 29+ continue fresh-data retrains (rule (b) keeps firing on keeps).
+
+## 2026-11-02: ems-full blue iters 29-32, red iter 7 kept (task 019)
+- **What was tried:** re-mined regret vs the iter-27 keep for red 7; blue rebaseline; fresh-data retrains (it30, it31); fine-grained imitate probe (5) between the tested 3 and 10.
+- **What happened:** red 7 KEPT (regret 4530.61 -> 4617.18). Blue 29 rebaselined at 1.0976 (largest gap yet, ~10%). Iter 30 (fresh it30 retrain) KEPT at 1.0451 - the post-mining retrain pattern holds a third time. Iter 31 (fresh it31 retrain) reverted at 1.0478: the streak breaks, recipe converged near 1.045. Iter 32 (imitate 5) reverted at 1.0497, landing between 3 and 10 as expected; imitate axis exhausted, recipe fully converged at (imitate 3, gate 25/25, tau 1.0, gain_min 0.5). Best: iter-30 weights, 1.0451. Arm spend $5.39.
+- **Next:** red 8 after blue 32 (re-mine vs the iter-30 keep); blue needs a new frontier (candidate-file changes) since recipe + fresh-data gains are exhausted on this pool.
