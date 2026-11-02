@@ -1,7 +1,7 @@
 ---
 id: "019"
 title: "Autoresearch blue + red loops: ems-full (M5 arm FULL)"
-status: open
+status: in_progress
 created: 2026-11-01
 report: ops/reports/019-ems-full.md
 ---
