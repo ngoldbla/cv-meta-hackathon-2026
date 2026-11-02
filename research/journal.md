@@ -180,3 +180,8 @@
 - **What was tried:** iter 31 cut surge units per trigger 3->2 (keep 0.7745); iter 32 tried 2->1 (revert 0.8898, peak at 2). Iter 33 delayed the surge trigger 2->3 (revert 1.4114, early surge load-bearing). Iter 34 held only fresh calls (waited<600s, keep 0.7744 by 0.0001). Iter 35 held only when the global queue >= 5 (keep 0.7667). Gens it32/it35 rolled out the successive bests. Nothing from this loop is a finding.
 - **What happened:** best is 0.7667: reservation (tier-3<5, tier-2<4, fresh, congested) + activate_n 2 + stable 4-epoch refit weights. Five iterations remain.
 - **Next:** queue-threshold tune, waited-threshold tune, final refit, close out with audit.
+
+## 2026-11-02: ems-blue-only iterations 36-40 - queue peak at 16, final refit keeps, loop at cap (task 016)
+- **What was tried:** iters 36-39 climbed the congestion qualifier 5->8->12->16->20, keeping 0.7618, 0.7608, 0.7591, then reverting 0.7593 (peak at 16). Iter 40 refit 4-epoch imitation on the newest latest-8 window (it28-39, 1.78M decisions, loss 0.056->0.021) and kept 0.7533. Gens it36-it39 rolled out the successive bests. Nothing from this loop is a finding.
+- **What happened:** final best is 0.7533 (primary 8472 vs b1 11247, -24.7%): reservation rules (tier-3<5, tier-2<4, fresh, queue>=16) + activate_n 2 + stable refit weights. Counterfactual labels never helped in any form; every kept point past iter 7 came from rules or stable imitation refits. Loop complete at 40/40; branch pushed, report done.
+- **Next:** reviewer hashes the final candidate into a protocol_note; confirm/preregister steps are out of this task's scope.

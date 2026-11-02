@@ -1,0 +1,8 @@
+iter40 (CAP): no gen (19 Amendment-1 dirs exist; best unchanged since it39) - final refit, no script-file change
+change: train --args {"label_w": 0, "epochs": 4} on newest latest-8 window it28,it29,it32,it35,it36,it37,it38,it39 (4-epoch stable schedule)
+{"decisions": 1780276, "labelled": 14628, "options": 17, "features": 12, "load_s": 2.9} (decisions exact)
+train: 4 epochs, loss 0.0561 -> 0.0212 monotonic, no divergence
+{"saved": "experiments/ar/ems_candidate.npz", "gpu_seconds": 115.1, "seconds": 116.6}
+bench: RC=0 wall 112s METRIC ratio_b1=0.7533 (primary 8472 vs b1 11247; newest-policy refit wins)
+gates: 141 passed, 1 skipped, name guard clean
+decision: KEEP - best 0.7591 -> 0.7533. LOOP AT CAP (40/40).
