@@ -13,8 +13,9 @@ imitation (iter 8) is the first keep at 0.9943. Red iter 2 kept (offload +
 concentration, regret 1257.56), so the pool changed again; blue iter 9
 rebaselined the iter-8 keep at 1.0021 on the new pool. Iter 10 (first
 Amendment-2 train) reverted at 1.0134; the hold-label strip is verified
-active on the deployed app (masked 40.9% of raw vs 61.8% pre-A2).
-Arm spend $1.87.
+active on the deployed app (masked 40.9% of raw vs 61.8% pre-A2). Iter 11
+(gate_gain 100 -> 25 on the reused window) kept at 1.0015, the first
+Amendment-2 keep. Arm spend $1.93.
 
 ## Work done
 - Claimed task 019 on main (`19a1f00 Start task 019`, pushed).
@@ -49,6 +50,10 @@ Arm spend $1.87.
   (seed 10, 50 days, 201587 decisions, 1735 labels), then retrained the
   unchanged iter-8 recipe on it06+it07+it08+it10 (masked 2854/6972).
   Journal (`d733a12`, pushed).
+- Blue iter 11 (`62adc2e`, pushed): KEEP 1.0015. No gen (window reused);
+  one change (`gate_gain` 100 -> 25 + gain-quantile diagnostic, which
+  showed unit-only gains p50/p75/p90/p99 = 35/99/203/482). pytest 141
+  passed + name guard clean before the kept commit.
 
 ## Results
 Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`):
@@ -65,9 +70,10 @@ Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`)
 | 8 | gain-gated imitation (gate_gain 100, gate_k 25, imitate 30): clone b1 except where a label shows a big win (window it06+it07+it08) | 0.9943 | keep | 218.0 | data/full/it08 | data/full/it06,data/full/it07,data/full/it08 |
 | 9 | rebaseline after red #2 keep (offload+concentration library); best unchanged (gain-gated imitation, iter 8) | 1.0021 | rebaseline | 231.0 | - | - |
 | 10 | iter-8 recipe retrained on the 4-dir window under Amendment 2 (no hold labels) | 1.0134 | revert | 227.0 | data/full/it10 | data/full/it06,data/full/it07,data/full/it08,data/full/it10 |
+| 11 | recalibrate gate for A2 unit-only gains (gate_gain 100 -> 25), reused window | 1.0015 | keep | 152.0 | reused | data/full/it06,data/full/it07,data/full/it08,data/full/it10 |
 
-Best kept: iter 8's weights (gain-gated imitation), rebaselined at 1.0021
-on pool `3ec06df3526a27f0` (rebaseline commit `1712b9b`).
+Best kept: iter 11's weights (gate_gain 25), 1.0015 on pool
+`3ec06df3526a27f0` (commit `62adc2e`).
 
 Red (`research/autoresearch/ems-full-red/autoresearch.jsonl` on `ar/red/ems-full`):
 
@@ -76,7 +82,7 @@ Red (`research/autoresearch/ems-full-red/autoresearch.jsonl` on `ar/red/ems-full
 | 1 | max combined load (unavailable 0.25, demand at cap) + max urgent_share on all days | 694.06 | keep | 152.0 |
 | 2 | max offload inflation (1.151) + max geographic concentration (104 calls over 3 zips) on top of iter 1 | 1257.56 | keep | 120.0 |
 
-Spend added by this arm: $1.871 (`runs/spend.jsonl` on main). emslearn
+Spend added by this arm: $1.928 (`runs/spend.jsonl` on main). emslearn
 commands in order (pre-Amendment regime, from the blue worktree notes):
 1. `gen` 200 days, `--out data/full/it01`, label_rate 0.05 ($0.6958);
 2. `train --data data/full/it01` x4, one per iter 1-4 ($0.0971, $0.0591,
@@ -101,7 +107,8 @@ worktree notes:
     Amendment-1 label flags ($0.1853);
 11. `train --data data/full/it06,data/full/it07,data/full/it08,data/full/it10`
     ($0.0605; first Amendment-2 train: masked 2854/6972 = 40.9% of raw,
-    vs 61.8% pre-A2, confirming the deployed strip).
+    vs 61.8% pre-A2, confirming the deployed strip);
+12. `train` on the same 4-dir window ($0.0572; iter 11, gate 25).
 
 ## Deviations
 - Iters 1-4 ran before Amendment 1 (21:14-21:39 CDT vs amendment 21:44 CDT),
