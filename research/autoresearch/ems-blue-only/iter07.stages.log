@@ -1,0 +1,26 @@
+gen: local_gen.py --out runs/shards-local/loc02 --n 200 --seed 3 --label-rate 0
+{"out": "runs/shards-local/loc02", "days": 200, "decisions": 853352, "labelled": 0, "seconds": 37.7}
+train: ems_train.py --data runs/shards-local/loc12 (400 days combined) --args {}
+{"decisions": 1716977, "labelled": 0, "options": 17, "features": 12, "load_s": 2.7}
+{"epoch": 0, "loss": 0.043, "elapsed_s": 6.5}
+{"epoch": 1, "loss": 0.0216, "elapsed_s": 7.3}
+{"epoch": 2, "loss": 0.0208, "elapsed_s": 8.1}
+{"epoch": 3, "loss": 0.0206, "elapsed_s": 8.8}
+{"epoch": 4, "loss": 0.0206, "elapsed_s": 9.6}
+{"epoch": 5, "loss": 0.0208, "elapsed_s": 10.5}
+{"epoch": 6, "loss": 0.0209, "elapsed_s": 11.3}
+{"epoch": 7, "loss": 0.021, "elapsed_s": 12.1}
+{"epoch": 8, "loss": 0.0213, "elapsed_s": 12.9}
+{"epoch": 9, "loss": 0.0214, "elapsed_s": 13.7}
+{"epoch": 10, "loss": 0.0221, "elapsed_s": 14.5}
+{"epoch": 11, "loss": 0.0234, "elapsed_s": 15.2}
+{"epoch": 12, "loss": 0.0258, "elapsed_s": 16.1}
+{"epoch": 13, "loss": 0.0307, "elapsed_s": 16.8}
+{"epoch": 14, "loss": 0.0404, "elapsed_s": 17.6}
+{"epoch": 15, "loss": 0.0533, "elapsed_s": 18.4}
+{"epoch": 16, "loss": 0.0817, "elapsed_s": 19.2}
+{"epoch": 17, "loss": 0.1269, "elapsed_s": 20.0}
+{"epoch": 18, "loss": 0.1799, "elapsed_s": 20.8}
+{"epoch": 19, "loss": 0.2817, "elapsed_s": 21.6}
+{"done": true, "seconds": 21.6}
+train_exit=0 wall_seconds=25
