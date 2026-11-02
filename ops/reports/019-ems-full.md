@@ -45,7 +45,8 @@ iter 34 (lr 1e-3 from scratch) reverted at 1.0531; iter 35 (gain_min
 4533.96: pool unchanged. Iter 37 (never-hold ablation) KEPT at 1.0370.
 Iter 38 (K=8 options) reverted at 1.0397.
 Iter 39 (K=24 options) reverted at 1.0408.
-Arm spend $5.68.
+Iter 40 (matched no-hold retrain on it40-only) reverted at 1.0498.
+Arm spend $5.88.
 
 ## Work done
 - Claimed task 019 on main (`19a1f00 Start task 019`, pushed).
@@ -233,6 +234,13 @@ Arm spend $5.68.
   (no gen/train): widen options to the 24 nearest units with hold
   still masked. K is U-shaped (8: 1.0397, 16: 1.0370, 24: 1.0408):
   16 stands.
+- Blue iter 40 (`c7e9919`, pushed): revert 1.0498. Removed hold from
+  options, gen `data/full/it40` (seed 40, 50 days, 201528 decisions,
+  1708 labels, $0.1551), retrained imitate-3 on it40-only ($0.048, 707
+  kept labels): the single-dir shrink swamps the train/deploy match
+  benefit. The rollout pads to MAX_OPT=17 with a mask, so mixed
+  windows would stack (unused: blue cap reached). Blue loop done at
+  40 iters, best 1.0370 (iter-37 config + iter-30 weights).
 
 ## Results
 Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`):
@@ -278,6 +286,7 @@ Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`)
 | 37 | never-hold ablation: mask the hold row in Candidate.score (deployment-only, iter-30 weights) | 1.0370 | keep | 67.8 | - | - |
 | 38 | restrict options to the 8 nearest units (deployment-only, hold still masked) | 1.0397 | revert | 64.7 | - | - |
 | 39 | widen options to the 24 nearest units (deployment-only, hold still masked) | 1.0408 | revert | 71.2 | - | - |
+| 40 | matched no-hold retrain: drop hold from options, gen it40, train imitate-3 on it40-only (707 kept labels) | 1.0498 | revert | 69.2 | data/full/it40 | data/full/it40 |
 
 Best kept: iter 30's weights (imitate-3 recipe), 1.0451 on pool
 `4c088d562472f880` (commit `81de581`).
@@ -368,7 +377,11 @@ worktree notes:
 42. `train` on the same window ($0.0697; iter 33, fine-tune);
 43. `train` on the same window ($0.0636; iter 34, lr 1e-3);
 44. `train` on the same window ($0.0638; iter 35, gain_min 1.0);
-45. `train` on the same window ($0.0938; iter 36, lr 1e-3 x 60).
+45. `train` on the same window ($0.0938; iter 36, lr 1e-3 x 60);
+46. `gen --n 25 --n-gen 25 --seed 40 --out data/full/it40` with the
+    Amendment-1 label flags ($0.1551; rolls out the no-hold iter-40
+    candidate);
+47. `train` on it40-only ($0.048; iter 40, matched no-hold retrain).
 
 ## Deviations
 - Iters 1-4 ran before Amendment 1 (21:14-21:39 CDT vs amendment 21:44 CDT),
