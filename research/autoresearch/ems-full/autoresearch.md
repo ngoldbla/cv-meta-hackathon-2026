@@ -109,3 +109,8 @@ Red #6 kept (re-mined top-200 vs iter-22, regret 4530.61), so the pool changed (
 Gen data/full/it26 first (seed 26, 50 days, 203775 decisions, 1782 labels, 451 s wall, $0.1656): required by rule (c) since red #6 changed the pool. No .py change: imitate-3 recipe retrained on the latest 8-dir window, it10 dropping out ($0.0741, masked 5567, loss 5.92 -> 5.66, 42.1 GPU s).
 Result 1.0523 vs best 1.0820: fresh on-pool data closes a third of the re-mined gap (candidate 29177.6 vs b1 27726.2; held 0.319 vs 0.317, divert 0.136 vs 0.133, t1p90 21.61 vs 21.63). pytest 141 passed + name guard clean before the kept commit.
 Next: iter 27 starts with gen data/full/it27 (rule (b): iter-26 keep; it12 drops out). Recipe is stable; the loop now advances by fresh-data retrains against each red mining.
+
+## Iter 27 (KEEP, 1.0448)
+Gen data/full/it27 first (seed 27, 50 days, 206109 decisions, 1766 labels, 740 s wall - slowest yet, sibling contention - $0.1562): required by rule (b) after the iter-26 keep. No .py change: imitate-3 recipe retrained on the latest 8-dir window, it12 dropping out ($0.0844, masked 5620, loss 5.89 -> 5.63, 50.1 GPU s).
+Result 1.0448 vs best 1.0523: fresh on-pool data keeps winning (candidate 28968.7 vs b1 27726.2; held 0.319 vs 0.317, divert 0.136 vs 0.133, t1p90 21.59 vs 21.63). pytest 141 passed + name guard clean before the kept commit.
+Next: iter 28 starts with gen data/full/it28 (rule (b): iter-27 keep; it14 drops out), then the gate_gain 25 -> 50 probe at imitate 3.
