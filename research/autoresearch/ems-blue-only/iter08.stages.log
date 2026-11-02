@@ -1,0 +1,26 @@
+gen loc03 (seed 4) + loc04 (seed 5), combine loc01-04 (800d), train, bench
+{"out": "runs/shards-local/loc03", "days": 200, "decisions": 863955, "labelled": 0, "seconds": 103.9}
+{"out": "runs/shards-local/loc04", "days": 200, "decisions": 851623, "labelled": 0, "seconds": 49.9}
+{"decisions": 3432555, "labelled": 0, "options": 17, "features": 12, "load_s": 32.3}
+{"epoch": 0, "loss": 0.0314, "elapsed_s": 41.1}
+{"epoch": 1, "loss": 0.0191, "elapsed_s": 44.2}
+{"epoch": 2, "loss": 0.0189, "elapsed_s": 47.2}
+{"epoch": 3, "loss": 0.0188, "elapsed_s": 50.0}
+{"epoch": 4, "loss": 0.019, "elapsed_s": 53.0}
+{"epoch": 5, "loss": 0.0194, "elapsed_s": 55.9}
+{"epoch": 6, "loss": 0.0206, "elapsed_s": 58.4}
+{"epoch": 7, "loss": 0.0246, "elapsed_s": 60.4}
+{"epoch": 8, "loss": 0.0357, "elapsed_s": 62.5}
+{"epoch": 9, "loss": 0.0718, "elapsed_s": 65.1}
+{"epoch": 10, "loss": 0.1443, "elapsed_s": 67.7}
+{"epoch": 11, "loss": 0.2947, "elapsed_s": 70.8}
+{"epoch": 12, "loss": 0.4722, "elapsed_s": 74.1}
+{"epoch": 13, "loss": 0.8869, "elapsed_s": 76.8}
+{"epoch": 14, "loss": 1.5521, "elapsed_s": 79.4}
+{"epoch": 15, "loss": 2.0284, "elapsed_s": 81.7}
+{"epoch": 16, "loss": 2.3023, "elapsed_s": 84.7}
+{"epoch": 17, "loss": 3.129, "elapsed_s": 87.3}
+{"epoch": 18, "loss": 3.8589, "elapsed_s": 89.2}
+{"epoch": 19, "loss": 5.0434, "elapsed_s": 90.9}
+{"done": true, "seconds": 90.9}
+train_exit=0 wall_seconds=100
