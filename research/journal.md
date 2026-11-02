@@ -170,3 +170,8 @@
 - **What was tried:** tier-3 escape at 5 min kept (0.8249) — the escape that failed alone (#19) wins on top of the tier-2 escape. Re-bracketed both thresholds with escapes: tier-3 idle<6 (0.8489) and idle<4 (0.8482) reverted; tier-2 idle<5 (0.8410) and idle<3 (0.8498) reverted. Red #8 (nominal demand) reverted at 717.12; pool unchanged.
 - **What happened:** best is 0.8249 (tier-3 idle<5 + 5-min escape, tier-2 idle<4 + 5-min escape). Thresholds are bracketed optima in both directions with escapes in place. 5 iterations of blue cap left.
 - **Next:** final probes (tier-1 never-hold sanity is structural; ES on the escaped rule with a fresh seed), red #9 after blue 36, then audit and finish.
+
+## 2026-11-02: ems-no-cf blue iters 36-40, red iter 9 - loop at cap (task 017)
+- **What was tried:** ES on the escaped rule reverted (0.8785); asymmetric tier-3 10-min escape reverted (0.8314); tier-1 stationed bonus reverted (0.8282); queue gate and busy-hours gate retested with escapes, both reverted (0.8396, 0.8471). Red #9 (two-zip surge) reverted at 797.19; pool unchanged.
+- **What happened:** blue reached the 40-iteration cap. Best is #31 (0.8249): hold tier-3 when idle<5, tier-2 when idle<4, both escaping after 5 min waited; nearest-unit choice; no learned weights (every ES run reverted). 9 keeps, 29 reverts, 2 rebaselines.
+- **Next:** red #10 (final, due after blue 40), then ar_check audits and the final report.
