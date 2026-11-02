@@ -12,11 +12,11 @@ from datetime import date
 
 import numpy as np
 
-from ems.scenarios.sampler import sample_theta as nominal_theta
-
 
 def sample_theta(rng: np.random.Generator, d: date) -> dict:
-    return nominal_theta(rng)
+    # Concentrated surge: moderate demand with maximum spatial concentration.
+    return {"demand": 1.1, "urgent_share": 1.0, "offload": 1.05, "unavailable": 0.0,
+            "concentration_calls": 104.0, "concentration_zips": 3.0}
 
 
 def pick_days(rng: np.random.Generator, days: list[date], n: int) -> list[date]:
