@@ -12,7 +12,11 @@ vs b1. Verified no sim gaming (no abandonment; runs to horizon+12h). Iter 7 kept
 idle<5 (0.8208); iter 8 (idle<8, 0.8336) reverted. Red iter 1 reverted (max-stress
 114.33: saturation destroys the oracle edge); red iter 2 KEPT concentrated-surge
 thetas (regret 870.87, 165/200 days). Blue rebaselined on the new pool (0.8580).
-Next: tune the hold rule on the new pool, then ES-tune weights on top of it.
+Iters 10-11 reverted (idle<6: 0.8632; idle<4: 0.8658 — idle<5 stays optimal on
+the new pool). Iter 12 KEPT: also hold tier-2 when idle<2 (0.8533), reserving
+the last units for tier-1. Best is now 0.8533. Red #3 is due after blue 12.
+Next: red #3, then ES-tune weights on top of the hold rule under the Amendment 1
+envelope (≤3,000 scenario-days per iteration).
 
 ## Work done
 - Claimed task 017 on main (`9a4b206 Start task 017`, pushed).
@@ -47,6 +51,10 @@ Next: tune the hold rule on the new pool, then ES-tune weights on top of it.
   Unused-import cleanup folded into the kept sampler (pre-commit hook).
 - Blue #9 (`cfdba40`, pushed): rebaseline after red #2 keep -> 0.8580 (116 s).
   New best on the new pool.
+- Blue #10 (`157209a`, pushed): revert, idle<6 -> 0.8632 (79 s).
+- Blue #11 (`103d051`, pushed): revert, idle<4 -> 0.8658 (118 s).
+- Blue #12 (`a91c945`, pushed): KEEP, also hold tier-2 when idle<2 -> 0.8533
+  (84 s). Keep checks pass (suite + name guard on the branch).
 
 ## Results
 Blue (`research/autoresearch/ems-no-cf/autoresearch.jsonl` on `ar/blue/ems-no-cf`):
@@ -62,6 +70,9 @@ Blue (`research/autoresearch/ems-no-cf/autoresearch.jsonl` on `ar/blue/ems-no-cf
 | 7 | hold tier-3 more aggressively (idle<5) | 0.8208 | keep | 71 |
 | 8 | hold tier-3 even more (idle<8) | 0.8336 | revert | 76 |
 | 9 | rebaseline after red #2 keep; best unchanged | 0.8580 | rebaseline | 116 |
+| 10 | hold threshold idle<6 refines the optimum on the new pool | 0.8632 | revert | 79 |
+| 11 | hold threshold idle<4 refines the optimum on the new pool | 0.8658 | revert | 118 |
+| 12 | hold tier-2 under deep shortage (idle<2), last units for tier-1 | 0.8533 | keep | 84 |
 
 Red (`research/autoresearch/ems-no-cf-red/autoresearch.jsonl` on `ar/red/ems-no-cf`):
 
