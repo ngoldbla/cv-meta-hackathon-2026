@@ -28,7 +28,7 @@ and iter 20 (imitate 100) reverted at 1.0378. Red iter 5 (re-mined
 top-200 vs the iter-18 keep) reverted at 4132.41: pool unchanged, no
 blue rebaseline needed. Iter 21 (imitate 10) kept at 1.0337;
 iter 22 (imitate 3) kept at 1.0286; iter 23 (imitate 1) reverted
-at 1.0416. Arm spend $3.98.
+at 1.0416 and iter 24 (gate_k 10) reverted at 1.0370. Arm spend $4.05.
 
 ## Work done
 - Claimed task 019 on main (`19a1f00 Start task 019`, pushed).
@@ -128,6 +128,9 @@ at 1.0416. Arm spend $3.98.
   first (seed 23, 50 days, 199117 decisions, 1761 labels; required by
   rule (b)), then `imitate` 3 -> 1, trained on the latest 8-dir window
   with it08 dropped (masked 5495): near-pure label-following drifts.
+- Blue iter 24 (`9ec3599`, pushed): revert 1.0370. No gen (window reused);
+  one change (`gate_k` 25 -> 10), trained on the latest-8 window
+  ($0.0742). Journal (`2b4dcb4`, pushed).
 
 ## Results
 Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`):
@@ -157,6 +160,7 @@ Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`)
 | 21 | weaker anchor (imitate 30 -> 10), reused window | 1.0337 | keep | 126.0 | reused | data/full/it07,data/full/it08,data/full/it10,data/full/it12,data/full/it14,data/full/it15,data/full/it18,data/full/it19 |
 | 22 | weaker anchor (imitate 10 -> 3), latest 8-dir window | 1.0286 | keep | 107.0 | data/full/it22 | data/full/it08,data/full/it10,data/full/it12,data/full/it14,data/full/it15,data/full/it18,data/full/it19,data/full/it22 |
 | 23 | near-pure label-following (imitate 3 -> 1), latest 8-dir window | 1.0416 | revert | 115.0 | data/full/it23 | data/full/it10,data/full/it12,data/full/it14,data/full/it15,data/full/it18,data/full/it19,data/full/it22,data/full/it23 |
+| 24 | sharper imitation decay (gate_k 25 -> 10), reused window | 1.0370 | revert | 127.0 | reused | data/full/it10,data/full/it12,data/full/it14,data/full/it15,data/full/it18,data/full/it19,data/full/it22,data/full/it23 |
 
 Best kept: iter 22's weights (imitate 3), 1.0286 on pool
 `28037b2fec557333` (commit `108ddbe`).
@@ -171,7 +175,7 @@ Red (`research/autoresearch/ems-full-red/autoresearch.jsonl` on `ar/red/ems-full
 | 4 | attack the top-200 regret days mined from a 1027-day bench (library/regret_days.json) | 4306.68 | keep | 78.0 |
 | 5 | re-mine the top-200 regret days vs the iter-18 keep (library/regret_days_5.json) | 4132.41 | revert | 83.0 |
 
-Spend added by this arm: $3.977 (`runs/spend.jsonl` on main). emslearn
+Spend added by this arm: $4.051 (`runs/spend.jsonl` on main). emslearn
 commands in order (pre-Amendment regime, from the blue worktree notes):
 1. `gen` 200 days, `--out data/full/it01`, label_rate 0.05 ($0.6958);
 2. `train --data data/full/it01` x4, one per iter 1-4 ($0.0971, $0.0591,
@@ -222,7 +226,8 @@ worktree notes:
 27. `train` on the latest 8-dir window, it07 dropped ($0.0779; iter 22);
 28. `gen --n 25 --n-gen 25 --seed 23 --out data/full/it23` with the
     Amendment-1 label flags ($0.1548; rolls out the iter-22 keep);
-29. `train` on the latest 8-dir window, it08 dropped ($0.0685; iter 23).
+29. `train` on the latest 8-dir window, it08 dropped ($0.0685; iter 23);
+30. `train` on the same window ($0.0742; iter 24, gate_k 10).
 
 ## Deviations
 - Iters 1-4 ran before Amendment 1 (21:14-21:39 CDT vs amendment 21:44 CDT),
