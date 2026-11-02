@@ -104,12 +104,16 @@ def rollout(args: tuple) -> dict:
 def train(script: str, data_dir: str, out: str, init: bytes | None = None, args: str = "{}") -> dict:
     """Run the arm's training script on shards in /vol/<data_dir>; it must write weights to --out (an .npz).
 
-    data_dir may list several directories, comma-separated (at most 8): the script then reads their union.
+    data_dir may list several directories, comma-separated (at most 8): the script then reads their union. Hold
+    options carry no labels (emslearn.shards.drop_hold_labels, Amendment 2).
 
     The script is called as: python train.py --data <dir> --out <npz> --ckpt <dir> [--init <npz>] --args <json>.
     It should save its own checkpoints in --ckpt and resume from them, so a preempted call loses little work.
     """
+    import shutil
     import subprocess
+
+    from emslearn.shards import drop_hold_labels, merge
 
     VOLUME.reload()
     t0 = time.perf_counter()
@@ -119,17 +123,10 @@ def train(script: str, data_dir: str, out: str, init: bytes | None = None, args:
     out_path, ckpt = Path("/vol") / out, Path("/vol") / (out + ".ckpt")
     out_path.parent.mkdir(parents=True, exist_ok=True)
     ckpt.mkdir(parents=True, exist_ok=True)
-    dirs = [d for d in data_dir.split(",") if d.strip()]
-    if len(dirs) > 1:  # the union of the latest iterations' shards (emslearn.shards)
-        import shutil
-
-        from emslearn.shards import merge
-
-        data = work / "data"
-        shutil.rmtree(data, ignore_errors=True)  # a retried input in the same container starts clean
-        merge(Path("/vol"), dirs, data)
-    else:
-        data = Path("/vol") / data_dir
+    # the union of the latest iterations' shards, without hold labels (Amendment 2; emslearn.shards)
+    data = work / "data"
+    shutil.rmtree(data, ignore_errors=True)  # a retried input in the same container starts clean
+    merge(Path("/vol"), [d for d in data_dir.split(",") if d.strip()], data, transform=drop_hold_labels)
     cmd = ["python", str(work / "train.py"), "--data", str(data), "--out", str(out_path), "--ckpt", str(ckpt),
            "--args", args]
     if init:

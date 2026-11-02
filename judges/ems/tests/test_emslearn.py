@@ -167,3 +167,26 @@ def test_merge_shards_union_window_and_errors(tmp_path):
         merge(tmp_path, [f"d{i}" for i in range(MAX_DIRS + 1)], tmp_path / "m2")
     with pytest.raises(FileNotFoundError):
         merge(tmp_path, ["data/full/missing"], tmp_path / "m3")
+
+
+def test_drop_hold_labels_masks_hold_and_hold_choices(tmp_path):
+    from emslearn.policy import FEATURES
+    from emslearn.shards import drop_hold_labels, merge
+
+    h = FEATURES.index("is_hold")
+    X = np.zeros((3, 4, len(FEATURES)), np.float32)
+    X[:, 2, h] = 1.0  # option 2 is hold, option 3 is padding
+    delta = np.array([[0.0, -5.0, -9.0, np.nan],  # chose unit 0: hold label dropped, unit label kept
+                      [3.0, 0.0, 1.0, np.nan],  # chose unit 1
+                      [4.0, 2.0, 0.0, np.nan]], np.float32)  # chose hold: whole label dropped
+    shard = {"X": X, "delta": delta, "choice": np.array([0, 1, 2], np.int16), "mask": X[:, :, 0] == 0}
+    out = drop_hold_labels(shard)
+    assert np.isnan(out["delta"][:, 2]).all() and np.isnan(out["delta"][2]).all()
+    assert out["delta"][0, 1] == -5.0 and out["delta"][1, 0] == 3.0
+    assert np.array_equal(out["X"], X) and not np.isnan(shard["delta"][0, 2])  # input left as it was
+    d = tmp_path / "data/full/it06"
+    d.mkdir(parents=True)
+    np.savez(d / "00000.npz", **shard)
+    assert merge(tmp_path, ["data/full/it06"], tmp_path / "m", transform=drop_hold_labels) == 1
+    got = np.load(tmp_path / "m" / "data_full_it06-00000.npz")
+    assert not (tmp_path / "m" / "data_full_it06-00000.npz").is_symlink() and np.isnan(got["delta"][0, 2])
