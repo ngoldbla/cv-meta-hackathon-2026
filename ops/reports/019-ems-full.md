@@ -41,7 +41,8 @@ Red iter 8 (re-mined top-200 vs the iter-30 keep) reverted at 4575.37:
 pool unchanged. Iter 33 (fine-tune from best) reverted at 1.0502;
 iter 34 (lr 1e-3 from scratch) reverted at 1.0531; iter 35 (gain_min
 1.0) reverted at 1.0614; iter 36 (lr 1e-3 x 60 epochs) reverted at
-1.0636. Arm spend $5.68.
+1.0636. Red iter 9 (joint day x theta-variant mining) reverted at
+4533.96: pool unchanged. Arm spend $5.68.
 
 ## Work done
 - Claimed task 019 on main (`19a1f00 Start task 019`, pushed).
@@ -208,6 +209,13 @@ iter 34 (lr 1e-3 from scratch) reverted at 1.0531; iter 35 (gain_min
   latest-8 window ($0.0938): low lr genuinely worse. `train-it36.log`
   lost its head to a `tee | head` race (weights unaffected, verified
   by completion markers + sane bench).
+- Red iter 9 (`37a647b`, pushed): revert 4533.96. Mined a 321-day x
+  4-variant grid vs the iter-30 keep (top-200 split 100/37/36/27
+  across all-maxed/urgency/offload/concentration; committed deduped to
+  156 per-date argmax thetas as `library/regret_joint_9.json`, mined
+  mean 5665.1) and attacked it with per-date thetas: focused stress
+  does not transfer across pool seeds, blanket-max stands, pool
+  unchanged. `ar_check` on the red log: 10 entries, 0 problems.
 
 ## Results
 Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`):
@@ -266,6 +274,7 @@ Red (`research/autoresearch/ems-full-red/autoresearch.jsonl` on `ar/red/ems-full
 | 6 | re-mine the top-200 regret days vs the iter-22 keep (library/regret_days_6.json) | 4530.61 | keep | 78.0 |
 | 7 | re-mine the top-200 regret days vs the iter-27 keep (library/regret_days_7.json) | 4617.18 | keep | 76.0 |
 | 8 | re-mine the top-200 regret days vs the iter-30 keep (library/regret_days_8.json) | 4575.37 | revert | 74.0 |
+| 9 | joint day x theta-variant mining: per-date argmax over 4 stress shapes (library/regret_joint_9.json, 156 days + 44 top-up) | 4533.96 | revert | 72.1 |
 
 Spend added by this arm: $5.680 (`runs/spend.jsonl` on main). emslearn
 commands in order (pre-Amendment regime, from the blue worktree notes):
