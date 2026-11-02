@@ -1,0 +1,25 @@
+{"decisions": 1625586, "labelled": 5778, "options": 17, "features": 12, "load_s": 3.1}
+{"gain_q": [36.78, 100.19, 205.33, 496.8], "gain_max": 1060.0, "n_gt25": 3293, "n_gt100": 1450}
+{"epoch": 0, "loss": 7.4673, "elapsed_s": 11.8}
+{"epoch": 1, "loss": 7.0821, "elapsed_s": 12.5}
+{"epoch": 2, "loss": 7.076, "elapsed_s": 13.2}
+{"epoch": 3, "loss": 7.0445, "elapsed_s": 14.0}
+{"epoch": 4, "loss": 7.0533, "elapsed_s": 14.7}
+{"epoch": 5, "loss": 7.052, "elapsed_s": 15.5}
+{"epoch": 6, "loss": 7.0383, "elapsed_s": 16.3}
+{"epoch": 7, "loss": 7.0405, "elapsed_s": 17.0}
+{"epoch": 8, "loss": 7.0464, "elapsed_s": 17.8}
+{"epoch": 9, "loss": 7.0325, "elapsed_s": 18.5}
+{"epoch": 10, "loss": 7.0182, "elapsed_s": 19.3}
+{"epoch": 11, "loss": 7.0274, "elapsed_s": 20.0}
+{"epoch": 12, "loss": 7.0268, "elapsed_s": 20.7}
+{"epoch": 13, "loss": 7.0191, "elapsed_s": 21.5}
+{"epoch": 14, "loss": 7.0202, "elapsed_s": 22.2}
+{"epoch": 15, "loss": 7.0261, "elapsed_s": 23.0}
+{"epoch": 16, "loss": 7.0151, "elapsed_s": 23.7}
+{"epoch": 17, "loss": 7.0173, "elapsed_s": 24.4}
+{"epoch": 18, "loss": 7.0116, "elapsed_s": 25.2}
+{"epoch": 19, "loss": 7.011, "elapsed_s": 25.9}
+{"done": true, "seconds": 25.9}
+
+{"saved": "/home/ndgold/cv-meta-hackathon-2026-ar-blue-ems-full/judges/ems/experiments/ar/ems_candidate.npz", "gpu_seconds": 51.3, "seconds": 56.2}

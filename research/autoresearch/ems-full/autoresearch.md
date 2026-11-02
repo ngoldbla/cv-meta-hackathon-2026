@@ -130,3 +130,7 @@ Next: iter 31 starts with gen data/full/it31 (rule (b): iter-30 keep; it18 drops
 ## Iter 31 (revert, 1.0478)
 Gen data/full/it31 first (seed 31, 50 days, 203036 decisions, 1760 labels, 472 s wall, $0.1577): required by rule (b) after the iter-30 keep. No .py change: imitate-3 recipe retrained on the latest 8-dir window, it18 dropping out ($0.0745, masked 5778, loss 5.86 -> 5.60, 42.4 GPU s).
 Result 1.0478 vs best 1.0451: the fresh-data retrain streak breaks - window churn no longer helps; the recipe has converged near 1.045 on this pool. Reverted. Next: fine-grained imitate probe between 3 and 10 (imitate 5) on the reused window.
+
+## Iter 32 (revert, 1.0497)
+No gen (8 A1 dirs, best unchanged since last gen, no red keep since): reused the latest-8 window. One change: imitate 3 -> 5. Train ($0.0860, loss 7.47 -> 7.01, 51.3 GPU s).
+Result 1.0497 vs best 1.0451: imitate 5 lands between 3 and 10 as expected - minimum confirmed near 3, imitate axis exhausted. Recipe fully converged at (imitate 3, gate 25/25, tau 1.0, gain_min 0.5). Red iter 8 is due now (after blue iter 32).
