@@ -1,0 +1,3 @@
+iter15: no gen (4 Amendment-1 dirs exist; best unchanged) - rule change with kept iter-7 weights, no training
+change: ems_candidate.py Candidate.__init__ passes {"divert_queue": 5} (b1 calibration: 2); hypothesis: diverting is punished (iter9), so divert tier-3 less
+bench: RC=0 wall 87s METRIC ratio_b1=1.1520 (diverting LESS is catastrophic: candidate divert_share ROSE to 0.057 vs b1 0.050 - delayed diverts pile queues up and divert more later; b1's aggressive early shedding at queue>=2 is load-bearing)
