@@ -138,3 +138,7 @@ Result 1.0497 vs best 1.0451: imitate 5 lands between 3 and 10 as expected - min
 ## Iter 33 (revert, 1.0502)
 No gen (8 A1 dirs, best unchanged since last gen, red 8 reverted): reused the latest-8 window. One coherent change: fine-tune procedure - ems_train.py learns to load --init weights (plumbing existed in CLI/Modal but the script ignored the flag) plus lr 3e-3 -> 1e-3, training from the iter-30 best ($0.0697, loss starts 5.60 vs 5.9 from scratch, ends 5.57, 38.7 GPU s).
 Result 1.0502 vs best 1.0451: warm start converges to a nearby but slightly worse optimum - from-scratch noise helps. Reverted (loader code removed with the revert; re-add if warm-start is revisited). Next: ablate the bundle - lr 1e-3 from scratch (no --init) on the reused window.
+
+## Iter 34 (revert, 1.0531)
+No gen (8 A1 dirs, best unchanged since last gen, red 8 reverted): reused the latest-8 window. One change: lr 3e-3 -> 1e-3 from scratch. Train ($0.0636, loss 6.13 -> 5.59, 34.0 GPU s).
+Result 1.0531 vs best 1.0451: low lr underfits in 20 epochs. Ablation complete: neither fine-tune part helps (init 1.0502, low-lr 1.0531). Note train loss 5.59 BEATS the iter-30 keep's 5.63 yet deploys worse - train loss does not predict deployment here. Caveat: lr 1e-3 x 20 epochs confounds rate with budget; a proper low-lr test needs more epochs. Next: gain_min 1.0 (last untried neighbor between kept 0.5 and reverted 2.0), then lr 1e-3 x 60 epochs.
