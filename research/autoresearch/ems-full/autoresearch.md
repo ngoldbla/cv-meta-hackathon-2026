@@ -13,3 +13,6 @@ gen data/full/it01: 200 days, 859823 decisions, 8000 labelled (33 min wall, 3 st
 
 ## Iter 2 (revert, 2.0545)
 imitate 1.0, reuse it01, train loss -> 3.1269 (imitate term dominates). Better than iter 1 (2.8685) but still far off b1: held 0.171, divert 0.128. Direction confirmed: push imitation higher.
+
+## Iter 3 (revert, 1.4986)
+imitate 10, reuse it01, train loss -> 7.459. Trend 2.87 -> 2.05 -> 1.50: imitation helps but even at 10x the policy holds/diverts too much (held 0.158, divert 0.089). Suspect: on labelled decisions with flat deltas, softmax(-delta/5) is near-uniform and pulls the net off b1's choice. Next: inspect it01 label stats from the Volume, then fix the label term.
