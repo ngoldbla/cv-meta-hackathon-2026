@@ -1,0 +1,1392 @@
+{
+ "meta": {
+  "notice": "No API key, so this request shares one free daily budget ($0.10) with everyone on your network's IP address. Get a free key with its own $1/day at https://openalex.org/settings/api and add api_key=YOUR_KEY to your requests. An AI agent can get one for its user in one call: POST https://api.openalex.org/api-keys with {\"email\": \"<your user's email>\"}; we email them a link, and the key works once they click it. Docs for agents: https://help.openalex.org/llms.txt",
+  "count": 393,
+  "db_response_time_ms": 153,
+  "page": 1,
+  "per_page": 5,
+  "groups_count": null,
+  "x_query": {
+   "oql": "get works with (Reserved Optimisation handling incident priorities emergency response) in the full text",
+   "x_new_oql": "get works with (Reserved Optimisation handling incident priorities emergency response) in the full text",
+   "oqo": {
+    "get_rows": "works",
+    "filter_rows": [
+     {
+      "column_id": "fulltext.search",
+      "value": "Reserved Optimisation handling incident priorities emergency response",
+      "operator": "has"
+     }
+    ]
+   },
+   "url": "/works?filter=fulltext.search:Reserved Optimisation handling incident priorities emergency response&per_page=5",
+   "order": "best matches first",
+   "order_default": true
+  },
+  "cost_usd": 0.001,
+  "note": "slimmed by task 020 to relied-upon records only; full response had 1 results shown of 393 total"
+ },
+ "results": [
+  {
+   "id": "https://openalex.org/W2810301166",
+   "doi": "https://doi.org/10.1609/icaps.v28i1.13915",
+   "title": "Reserved Optimisation: Handling Incident Priorities in Emergency Response Systems",
+   "display_name": "Reserved Optimisation: Handling Incident Priorities in Emergency Response Systems",
+   "relevance_score": 195.45398,
+   "publication_year": 2018,
+   "publication_date": "2018-06-15",
+   "ids": {
+    "openalex": "https://openalex.org/W2810301166",
+    "doi": "https://doi.org/10.1609/icaps.v28i1.13915",
+    "mag": "2810301166"
+   },
+   "language": "en",
+   "primary_location": {
+    "id": "doi:10.1609/icaps.v28i1.13915",
+    "doi": "https://doi.org/10.1609/icaps.v28i1.13915",
+    "is_oa": true,
+    "landing_page_url": "https://doi.org/10.1609/icaps.v28i1.13915",
+    "pdf_url": "https://ojs.aaai.org/index.php/ICAPS/article/download/13915/13764",
+    "source": {
+     "id": "https://openalex.org/S4387283601",
+     "display_name": "Proceedings of the International Conference on Automated Planning and Scheduling",
+     "issn_l": "2334-0835",
+     "issn": [
+      "2334-0835",
+      "2334-0843"
+     ],
+     "is_oa": true,
+     "is_in_doaj": false,
+     "is_core": true,
+     "listed_in": [
+      "cwts-core",
+      "jufo-1"
+     ],
+     "host_organization": "https://openalex.org/P4310320058",
+     "host_organization_name": "Association for the Advancement of Artificial Intelligence",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310320058"
+     ],
+     "host_organization_lineage_names": [
+      "Association for the Advancement of Artificial Intelligence"
+     ],
+     "type": "journal"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "Proceedings of the International Conference on Automated Planning and Scheduling",
+    "raw_type": "journal-article"
+   },
+   "volume": null,
+   "type": "conference-paper",
+   "indexed_in": [
+    "crossref"
+   ],
+   "open_access": {
+    "is_oa": true,
+    "oa_status": "diamond",
+    "oa_url": "https://ojs.aaai.org/index.php/ICAPS/article/download/13915/13764",
+    "any_repository_has_fulltext": true
+   },
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": "https://openalex.org/A5080455920",
+      "display_name": "Muralidhar Konda",
+      "orcid": null,
+      "observed_orcids": []
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I79891267",
+       "display_name": "Singapore Management University",
+       "ror": "https://ror.org/050qmg959",
+       "country_code": "SG",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I79891267"
+       ]
+      }
+     ],
+     "countries": [
+      "SG"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Muralidhar Konda",
+     "raw_affiliation_strings": [
+      "Singapore Management University"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Singapore Management University",
+       "institution_ids": [
+        "https://openalex.org/I79891267"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5101775931",
+      "display_name": "Supriyo Ghosh",
+      "orcid": "https://orcid.org/0000-0001-7275-3296",
+      "observed_orcids": [
+       "https://orcid.org/0000-0001-7275-3296",
+       "https://orcid.org/0000-0001-9888-7292"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I79891267",
+       "display_name": "Singapore Management University",
+       "ror": "https://ror.org/050qmg959",
+       "country_code": "SG",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I79891267"
+       ]
+      }
+     ],
+     "countries": [
+      "SG"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Supriyo Ghosh",
+     "raw_affiliation_strings": [
+      "Singapore Management University"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Singapore Management University",
+       "institution_ids": [
+        "https://openalex.org/I79891267"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "last",
+     "author": {
+      "id": "https://openalex.org/A5089113099",
+      "display_name": "Pradeep Reddy Varakantham",
+      "orcid": "https://orcid.org/0000-0001-7342-5745",
+      "observed_orcids": [
+       "https://orcid.org/0000-0001-7342-5745"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I79891267",
+       "display_name": "Singapore Management University",
+       "ror": "https://ror.org/050qmg959",
+       "country_code": "SG",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I79891267"
+       ]
+      }
+     ],
+     "countries": [
+      "SG"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Pradeep Varakantham",
+     "raw_affiliation_strings": [
+      "Singapore Management University"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Singapore Management University",
+       "institution_ids": [
+        "https://openalex.org/I79891267"
+       ]
+      }
+     ]
+    }
+   ],
+   "institutions": [],
+   "countries_distinct_count": 1,
+   "institutions_distinct_count": 1,
+   "corresponding_author_ids": [],
+   "corresponding_institution_ids": [
+    "https://openalex.org/I79891267"
+   ],
+   "apc_list": null,
+   "apc_paid": null,
+   "fwci": 4.2677,
+   "has_fulltext": true,
+   "cited_by_count": 3,
+   "citation_normalized_percentile": {
+    "value": 0.9347327,
+    "is_in_top_1_percent": false,
+    "is_in_top_10_percent": true
+   },
+   "cited_by_percentile_year": {
+    "min": 89,
+    "max": 95
+   },
+   "biblio": {
+    "volume": "28",
+    "issue": null,
+    "first_page": "330",
+    "last_page": "338"
+   },
+   "is_retracted": false,
+   "is_paratext": false,
+   "is_xpac": false,
+   "primary_topic": {
+    "id": "https://openalex.org/T11502",
+    "display_name": "Facility Location and Emergency Management",
+    "score": 0.9980000257492065,
+    "subfield": {
+     "id": "https://openalex.org/subfields/1407",
+     "display_name": "Organizational Behavior and Human Resource Management"
+    },
+    "field": {
+     "id": "https://openalex.org/fields/14",
+     "display_name": "Business, Management and Accounting"
+    },
+    "domain": {
+     "id": "https://openalex.org/domains/2",
+     "display_name": "Social Sciences"
+    }
+   },
+   "topics": [
+    {
+     "id": "https://openalex.org/T11502",
+     "display_name": "Facility Location and Emergency Management",
+     "score": 0.9980000257492065,
+     "subfield": {
+      "id": "https://openalex.org/subfields/1407",
+      "display_name": "Organizational Behavior and Human Resource Management"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/14",
+      "display_name": "Business, Management and Accounting"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/2",
+      "display_name": "Social Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T14410",
+     "display_name": "Safety and Risk Management",
+     "score": 0.0013000000035390258,
+     "subfield": {
+      "id": "https://openalex.org/subfields/1407",
+      "display_name": "Organizational Behavior and Human Resource Management"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/14",
+      "display_name": "Business, Management and Accounting"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/2",
+      "display_name": "Social Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T10567",
+     "display_name": "Vehicle Routing Optimization Methods",
+     "score": 0.00019999999494757503,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2209",
+      "display_name": "Industrial and Manufacturing Engineering"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/22",
+      "display_name": "Engineering"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    }
+   ],
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/emergency-response-systems",
+     "display_name": "emergency response systems",
+     "score": 0.8619999885559082
+    },
+    {
+     "id": "https://openalex.org/keywords/triage",
+     "display_name": "triage",
+     "score": 0.6769999861717224
+    },
+    {
+     "id": "https://openalex.org/keywords/dispatch-strategy",
+     "display_name": "dispatch strategy",
+     "score": 0.6970000267028809
+    },
+    {
+     "id": "https://openalex.org/keywords/response-time-emergency-services",
+     "display_name": "response time (emergency services)",
+     "score": 0.5
+    },
+    {
+     "id": "https://openalex.org/keywords/spatiotemporal-uncertainty",
+     "display_name": "spatiotemporal uncertainty",
+     "score": 0.8740000128746033
+    },
+    {
+     "id": "https://openalex.org/keywords/emergency-medical-services",
+     "display_name": "emergency medical services",
+     "score": 0.5960000157356262
+    }
+   ],
+   "concepts": [
+    {
+     "id": "https://openalex.org/C127705205",
+     "wikidata": "https://www.wikidata.org/wiki/Q5748245",
+     "display_name": "Heuristics",
+     "level": 2,
+     "score": 0.7056360244750977
+    },
+    {
+     "id": "https://openalex.org/C41008148",
+     "wikidata": "https://www.wikidata.org/wiki/Q21198",
+     "display_name": "Computer science",
+     "level": 0,
+     "score": 0.6902471780776978
+    },
+    {
+     "id": "https://openalex.org/C2780598303",
+     "wikidata": "https://www.wikidata.org/wiki/Q65921492",
+     "display_name": "Flexibility (engineering)",
+     "level": 2,
+     "score": 0.6457951068878174
+    },
+    {
+     "id": "https://openalex.org/C2780952636",
+     "wikidata": "https://www.wikidata.org/wiki/Q13479512",
+     "display_name": "Incident management",
+     "level": 2,
+     "score": 0.5634668469429016
+    },
+    {
+     "id": "https://openalex.org/C42475967",
+     "wikidata": "https://www.wikidata.org/wiki/Q194292",
+     "display_name": "Operations research",
+     "level": 1,
+     "score": 0.5468655228614807
+    },
+    {
+     "id": "https://openalex.org/C177264268",
+     "wikidata": "https://www.wikidata.org/wiki/Q1514741",
+     "display_name": "Set (abstract data type)",
+     "level": 2,
+     "score": 0.5350505113601685
+    },
+    {
+     "id": "https://openalex.org/C3017997152",
+     "wikidata": "https://www.wikidata.org/wiki/Q814610",
+     "display_name": "Emergency response",
+     "level": 2,
+     "score": 0.43997669219970703
+    },
+    {
+     "id": "https://openalex.org/C2776544517",
+     "wikidata": "https://www.wikidata.org/wiki/Q189447",
+     "display_name": "Unexpected events",
+     "level": 2,
+     "score": 0.4139784276485443
+    },
+    {
+     "id": "https://openalex.org/C112930515",
+     "wikidata": "https://www.wikidata.org/wiki/Q4389547",
+     "display_name": "Risk analysis (engineering)",
+     "level": 1,
+     "score": 0.36461561918258667
+    },
+    {
+     "id": "https://openalex.org/C38652104",
+     "wikidata": "https://www.wikidata.org/wiki/Q3510521",
+     "display_name": "Computer security",
+     "level": 1,
+     "score": 0.3361095190048218
+    },
+    {
+     "id": "https://openalex.org/C144133560",
+     "wikidata": "https://www.wikidata.org/wiki/Q4830453",
+     "display_name": "Business",
+     "level": 0,
+     "score": 0.14853355288505554
+    },
+    {
+     "id": "https://openalex.org/C545542383",
+     "wikidata": "https://www.wikidata.org/wiki/Q2751242",
+     "display_name": "Medical emergency",
+     "level": 1,
+     "score": 0.1251150667667389
+    },
+    {
+     "id": "https://openalex.org/C127413603",
+     "wikidata": "https://www.wikidata.org/wiki/Q11023",
+     "display_name": "Engineering",
+     "level": 0,
+     "score": 0.12354695796966553
+    },
+    {
+     "id": "https://openalex.org/C200601418",
+     "wikidata": "https://www.wikidata.org/wiki/Q2193887",
+     "display_name": "Reliability engineering",
+     "level": 1,
+     "score": 0.12137013673782349
+    },
+    {
+     "id": "https://openalex.org/C105795698",
+     "wikidata": "https://www.wikidata.org/wiki/Q12483",
+     "display_name": "Statistics",
+     "level": 1,
+     "score": 0.0
+    },
+    {
+     "id": "https://openalex.org/C111919701",
+     "wikidata": "https://www.wikidata.org/wiki/Q9135",
+     "display_name": "Operating system",
+     "level": 1,
+     "score": 0.0
+    },
+    {
+     "id": "https://openalex.org/C199360897",
+     "wikidata": "https://www.wikidata.org/wiki/Q9143",
+     "display_name": "Programming language",
+     "level": 1,
+     "score": 0.0
+    },
+    {
+     "id": "https://openalex.org/C71924100",
+     "wikidata": "https://www.wikidata.org/wiki/Q11190",
+     "display_name": "Medicine",
+     "level": 0,
+     "score": 0.0
+    },
+    {
+     "id": "https://openalex.org/C33923547",
+     "wikidata": "https://www.wikidata.org/wiki/Q395",
+     "display_name": "Mathematics",
+     "level": 0,
+     "score": 0.0
+    }
+   ],
+   "mesh": [],
+   "locations_count": 3,
+   "locations": [
+    {
+     "id": "doi:10.1609/icaps.v28i1.13915",
+     "doi": "https://doi.org/10.1609/icaps.v28i1.13915",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.1609/icaps.v28i1.13915",
+     "pdf_url": "https://ojs.aaai.org/index.php/ICAPS/article/download/13915/13764",
+     "source": {
+      "id": "https://openalex.org/S4387283601",
+      "display_name": "Proceedings of the International Conference on Automated Planning and Scheduling",
+      "issn_l": "2334-0835",
+      "issn": [
+       "2334-0835",
+       "2334-0843"
+      ],
+      "is_oa": true,
+      "is_in_doaj": false,
+      "is_core": true,
+      "listed_in": [
+       "cwts-core",
+       "jufo-1"
+      ],
+      "host_organization": "https://openalex.org/P4310320058",
+      "host_organization_name": "Association for the Advancement of Artificial Intelligence",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310320058"
+      ],
+      "host_organization_lineage_names": [
+       "Association for the Advancement of Artificial Intelligence"
+      ],
+      "type": "journal"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Proceedings of the International Conference on Automated Planning and Scheduling",
+     "raw_type": "journal-article"
+    },
+    {
+     "id": "pmh:oai:ojs.aaai.org:article/13915",
+     "doi": null,
+     "is_oa": true,
+     "landing_page_url": "https://ojs.aaai.org/index.php/ICAPS/article/view/13915",
+     "pdf_url": "https://ojs.aaai.org/index.php/ICAPS/article/view/13915",
+     "source": {
+      "id": "https://openalex.org/S4306400155",
+      "display_name": "AAAI Publications (The Association for the Advancement of Artificial Intelligence (AAAI))",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I2801652627",
+      "host_organization_name": "Association for the Advancement of Artificial Intelligence",
+      "host_organization_lineage": [
+       "https://openalex.org/I2801652627"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": "Proceedings of the International Conference on Automated Planning and Scheduling; Vol. 28 No. 1 (2018): Twenty-Eighth International Conference on Automated Planning and Scheduling",
+     "raw_type": "info:eu-repo/semantics/article"
+    },
+    {
+     "id": "pmh:oai:ink.library.smu.edu.sg:sis_research-5253",
+     "doi": null,
+     "is_oa": true,
+     "landing_page_url": "https://ink.library.smu.edu.sg/sis_research/4250",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4306401925",
+      "display_name": "Singapore Management University Institutional Knowledge (InK) (Singapore Management University)",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I79891267",
+      "host_organization_name": "Singapore Management University",
+      "host_organization_lineage": [
+       "https://openalex.org/I79891267"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": "other-oa",
+     "license_id": "https://openalex.org/licenses/other-oa",
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": "https://doi.org/10.1609/icaps.v28i1.13915",
+     "raw_type": "Conference Proceeding Article"
+    }
+   ],
+   "best_oa_location": {
+    "id": "doi:10.1609/icaps.v28i1.13915",
+    "doi": "https://doi.org/10.1609/icaps.v28i1.13915",
+    "is_oa": true,
+    "landing_page_url": "https://doi.org/10.1609/icaps.v28i1.13915",
+    "pdf_url": "https://ojs.aaai.org/index.php/ICAPS/article/download/13915/13764",
+    "source": {
+     "id": "https://openalex.org/S4387283601",
+     "display_name": "Proceedings of the International Conference on Automated Planning and Scheduling",
+     "issn_l": "2334-0835",
+     "issn": [
+      "2334-0835",
+      "2334-0843"
+     ],
+     "is_oa": true,
+     "is_in_doaj": false,
+     "is_core": true,
+     "listed_in": [
+      "cwts-core",
+      "jufo-1"
+     ],
+     "host_organization": "https://openalex.org/P4310320058",
+     "host_organization_name": "Association for the Advancement of Artificial Intelligence",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310320058"
+     ],
+     "host_organization_lineage_names": [
+      "Association for the Advancement of Artificial Intelligence"
+     ],
+     "type": "journal"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "Proceedings of the International Conference on Automated Planning and Scheduling",
+    "raw_type": "journal-article"
+   },
+   "sustainable_development_goals": [
+    {
+     "score": 0.47999998927116394,
+     "display_name": "Sustainable cities and communities",
+     "id": "https://metadata.un.org/sdg/11"
+    }
+   ],
+   "sustainable_development_goals_aurora": [
+    {
+     "score": 0.4399999976158142,
+     "display_name": "Peace, justice, and strong institutions",
+     "id": "https://metadata.un.org/sdg/16"
+    }
+   ],
+   "study_designs": [],
+   "awards": [],
+   "funders": [
+    {
+     "id": "https://openalex.org/F4320322724",
+     "display_name": "Ministry of Education, India",
+     "ror": "https://ror.org/048xjjh50"
+    }
+   ],
+   "has_content": {
+    "grobid_xml": true,
+    "pdf": true
+   },
+   "content_urls": {
+    "pdf": "https://content.openalex.org/works/W2810301166.pdf",
+    "grobid_xml": "https://content.openalex.org/works/W2810301166.grobid-xml"
+   },
+   "referenced_works_count": 15,
+   "referenced_works": [
+    "https://openalex.org/W87132700",
+    "https://openalex.org/W1976122053",
+    "https://openalex.org/W1977661382",
+    "https://openalex.org/W1988963644",
+    "https://openalex.org/W2010752075",
+    "https://openalex.org/W2039371732",
+    "https://openalex.org/W2071820192",
+    "https://openalex.org/W2075936903",
+    "https://openalex.org/W2088363515",
+    "https://openalex.org/W2089677243",
+    "https://openalex.org/W2091455125",
+    "https://openalex.org/W2396342393",
+    "https://openalex.org/W2404187890",
+    "https://openalex.org/W2578717903",
+    "https://openalex.org/W4241437235"
+   ],
+   "related_works": [
+    "https://openalex.org/W7131670871",
+    "https://openalex.org/W7099436419",
+    "https://openalex.org/W1598399595",
+    "https://openalex.org/W7029435271",
+    "https://openalex.org/W2185824241",
+    "https://openalex.org/W3829510",
+    "https://openalex.org/W2183527832",
+    "https://openalex.org/W2082716940",
+    "https://openalex.org/W2464768908",
+    "https://openalex.org/W2118205679"
+   ],
+   "abstract_inverted_index": {
+    "Emergency": [
+     0
+    ],
+    "(medical,": [
+     1
+    ],
+    "fire": [
+     2
+    ],
+    "or": [
+     3,
+     97
+    ],
+    "criminal)": [
+     4
+    ],
+    "Management": [
+     5
+    ],
+    "Systems": [
+     6
+    ],
+    "(EMSs)": [
+     7
+    ],
+    "are": [
+     8,
+     44,
+     102,
+     130
+    ],
+    "crucial": [
+     9
+    ],
+    "for": [
+     10,
+     56,
+     92,
+     177,
+     225,
+     244
+    ],
+    "ensuring": [
+     11,
+     173
+    ],
+    "public": [
+     12
+    ],
+    "safety": [
+     13
+    ],
+    "and": [
+     14,
+     35,
+     47,
+     122,
+     211,
+     259,
+     294
+    ],
+    "security.": [
+     15
+    ],
+    "Typically": [
+     16
+    ],
+    "in": [
+     17,
+     52,
+     105,
+     141,
+     213,
+     233
+    ],
+    "many": [
+     18
+    ],
+    "cities,": [
+     19
+    ],
+    "less": [
+     20,
+     45
+    ],
+    "than": [
+     21
+    ],
+    "20%": [
+     22
+    ],
+    "of": [
+     23,
+     40,
+     59,
+     120,
+     149,
+     162,
+     200,
+     215,
+     223,
+     242,
+     289
+    ],
+    "the": [
+     24,
+     31,
+     41,
+     138,
+     160,
+     184,
+     197,
+     280,
+     287,
+     312
+    ],
+    "cases": [
+     25
+    ],
+    "received": [
+     26
+    ],
+    "by": [
+     27
+    ],
+    "EMSs": [
+     28,
+     63
+    ],
+    "belong": [
+     29
+    ],
+    "to": [
+     30,
+     125,
+     238,
+     253,
+     286
+    ],
+    "extremely": [
+     32
+    ],
+    "serious": [
+     33,
+     46
+    ],
+    "category": [
+     34
+    ],
+    "require": [
+     36
+    ],
+    "immediate": [
+     37
+    ],
+    "help.": [
+     38
+    ],
+    "Rest": [
+     39
+    ],
+    "incidents": [
+     42,
+     96,
+     129,
+     165,
+     202,
+     247,
+     293
+    ],
+    "typically": [
+     43
+    ],
+    "thereby": [
+     48
+    ],
+    "allow": [
+     49
+    ],
+    "more": [
+     50
+    ],
+    "flexibility": [
+     51
+    ],
+    "response": [
+     53,
+     85,
+     170,
+     175
+    ],
+    "time.": [
+     54
+    ],
+    "Therefore,": [
+     55
+    ],
+    "efficient": [
+     57
+    ],
+    "management": [
+     58
+    ],
+    "EMS": [
+     60,
+     265
+    ],
+    "requests,": [
+     61
+    ],
+    "several": [
+     62
+    ],
+    "now": [
+     64
+    ],
+    "categorise": [
+     65
+    ],
+    "an": [
+     66,
+     155
+    ],
+    "incoming": [
+     67
+    ],
+    "emergency": [
+     68,
+     84
+    ],
+    "request": [
+     69
+    ],
+    "into": [
+     70
+    ],
+    "a": [
+     71,
+     146,
+     168,
+     191,
+     221,
+     240,
+     250,
+     263,
+     275,
+     304
+    ],
+    "priority": [
+     72,
+     128,
+     164,
+     179,
+     217,
+     227,
+     246,
+     292
+    ],
+    "level": [
+     73
+    ],
+    "based": [
+     74
+    ],
+    "on": [
+     75,
+     82,
+     89,
+     98
+    ],
+    "well": [
+     76
+    ],
+    "studied": [
+     77
+    ],
+    "``triaging\"": [
+     78
+    ],
+    "methods.": [
+     79
+    ],
+    "Leading": [
+     80
+    ],
+    "research": [
+     81
+    ],
+    "optimising": [
+     83,
+     183
+    ],
+    "has": [
+     86
+    ],
+    "either": [
+     87
+    ],
+    "focussed": [
+     88
+    ],
+    "data-driven": [
+     90,
+     114
+    ],
+    "models": [
+     91,
+     115
+    ],
+    "settings": [
+     93
+    ],
+    "with": [
+     94,
+     274,
+     299,
+     308
+    ],
+    "homogenous": [
+     95
+    ],
+    "generic": [
+     99
+    ],
+    "heuristics": [
+     100
+    ],
+    "(that": [
+     101
+    ],
+    "not": [
+     103
+    ],
+    "data-driven)": [
+     104
+    ],
+    "multi-priority": [
+     106
+    ],
+    "incident": [
+     107
+    ],
+    "settings.": [
+     108
+    ],
+    "In": [
+     109
+    ],
+    "this": [
+     110,
+     142,
+     186
+    ],
+    "paper,": [
+     111
+    ],
+    "we": [
+     112,
+     136,
+     152,
+     219,
+     268,
+     301
+    ],
+    "provide": [
+     113,
+     154
+    ],
+    "that": [
+     116,
+     134,
+     158,
+     195,
+     271,
+     303
+    ],
+    "employ": [
+     117
+    ],
+    "tiered": [
+     118
+    ],
+    "optimisation": [
+     119,
+     156,
+     187,
+     236
+    ],
+    "allocation": [
+     121
+    ],
+    "dispatch": [
+     123,
+     193,
+     257,
+     277,
+     306,
+     314
+    ],
+    "simultaneously": [
+     124
+    ],
+    "ensure": [
+     126
+    ],
+    "high": [
+     127,
+     208,
+     216,
+     226,
+     245,
+     291
+    ],
+    "served": [
+     131,
+     166
+    ],
+    "effectively.": [
+     132
+    ],
+    "To": [
+     133,
+     205
+    ],
+    "end,": [
+     135
+    ],
+    "make": [
+     137
+    ],
+    "following": [
+     139
+    ],
+    "contributions": [
+     140
+    ],
+    "paper:": [
+     143
+    ],
+    "(1)": [
+     144
+    ],
+    "For": [
+     145
+    ],
+    "given": [
+     147,
+     198
+    ],
+    "dataset": [
+     148
+    ],
+    "historical": [
+     150,
+     201
+    ],
+    "incidents,": [
+     151,
+     218
+    ],
+    "first": [
+     153
+    ],
+    "model": [
+     157,
+     188,
+     237
+    ],
+    "maximises": [
+     159
+    ],
+    "percentage": [
+     161
+    ],
+    "highest": [
+     163
+    ],
+    "within": [
+     167
+    ],
+    "threshold": [
+     169,
+     174
+    ],
+    "time,": [
+     171
+    ],
+    "while": [
+     172,
+     248
+    ],
+    "times": [
+     176
+    ],
+    "other": [
+     178
+    ],
+    "incidents.": [
+     180,
+     228
+    ],
+    "Apart": [
+     181
+    ],
+    "from": [
+     182
+    ],
+    "allocation,": [
+     185
+    ],
+    "also": [
+     189
+    ],
+    "provides": [
+     190
+    ],
+    "detailed": [
+     192,
+     276,
+     313
+    ],
+    "strategy": [
+     194,
+     278,
+     307
+    ],
+    "fits": [
+     196
+    ],
+    "set": [
+     199,
+     222
+    ],
+    "well;": [
+     203
+    ],
+    "(2)": [
+     204
+    ],
+    "better": [
+     206
+    ],
+    "handle": [
+     207
+    ],
+    "variance": [
+     209
+    ],
+    "(spatial": [
+     210
+    ],
+    "temporal)": [
+     212
+    ],
+    "arrival": [
+     214
+    ],
+    "reserve": [
+     220,
+     239
+    ],
+    "ERVs": [
+     224,
+     243,
+     310
+    ],
+    "Our": [
+     229
+    ],
+    "second": [
+     230
+    ],
+    "contribution": [
+     231
+    ],
+    "is": [
+     232
+    ],
+    "modifying": [
+     234
+    ],
+    "our": [
+     235,
+     272
+    ],
+    "subset": [
+     241
+    ],
+    "considering": [
+     249
+    ],
+    "minor": [
+     251
+    ],
+    "modification": [
+     252
+    ],
+    "nearest": [
+     254
+    ],
+    "available": [
+     255
+    ],
+    "ERV": [
+     256
+    ],
+    "strategy;": [
+     258
+    ],
+    "(3)": [
+     260
+    ],
+    "Finally,": [
+     261
+    ],
+    "using": [
+     262
+    ],
+    "real-world": [
+     264
+    ],
+    "data": [
+     266
+    ],
+    "set,": [
+     267
+    ],
+    "experimentally": [
+     269
+    ],
+    "demonstrate": [
+     270
+    ],
+    "solution": [
+     273
+    ],
+    "outperforms": [
+     279,
+     311
+    ],
+    "existing": [
+     281
+    ],
+    "benchmark": [
+     282
+    ],
+    "approach.": [
+     283
+    ],
+    "Moreover,": [
+     284
+    ],
+    "due": [
+     285
+    ],
+    "presence": [
+     288
+    ],
+    "few": [
+     290
+    ],
+    "significant": [
+     295
+    ],
+    "spatio-temporal": [
+     296
+    ],
+    "uncertainty": [
+     297
+    ],
+    "associated": [
+     298
+    ],
+    "them,": [
+     300
+    ],
+    "show": [
+     302
+    ],
+    "simple": [
+     305
+    ],
+    "reserved": [
+     309
+    ],
+    "strategy.": [
+     315
+    ]
+   },
+   "counts_by_year": [
+    {
+     "year": 2021,
+     "cited_by_count": 2
+    },
+    {
+     "year": 2019,
+     "cited_by_count": 1
+    }
+   ],
+   "updated_date": "2026-10-16T09:59:22.235173",
+   "created_date": "2018-07-10T00:00:00"
+  }
+ ],
+ "group_by": []
+}

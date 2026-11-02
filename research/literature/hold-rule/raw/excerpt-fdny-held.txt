@@ -1,0 +1,16 @@
+Source: Firefighter Close Calls ("The Secret List"), "What's behind increase in
+9-1-1 response times?", reporting FDNY statements on a delayed EMS call in
+New York City (article page fetched 2026-11-02):
+https://www.firefighterclosecalls.com/whats-behind-increase-in-9-1-1-response-times/
+
+Verbatim passage (page text after tag stripping):
+"According to the FDNY, the call was entered into the dispatch system at 2:50 am
+and was coded as 'unknown.' The FDNY said the call was held for 31 minutes due
+to a big spike in calls and limited units available. The call was assigned to a unit
+at 3:21 and EMS workers arrived at 3:28."
+
+Context in the article: the caller waited for her father's medical emergency; he was
+transported in stable condition and later died at the hospital after going into
+cardiac arrest; the family awaited autopsy results. No causal link between the hold
+and the death is established in the article. FDNY also stated it responds to an
+average of 100 to 150 calls an hour.

@@ -1,0 +1,43 @@
+Source: Jagtenberg, C.J. "Efficiency and fairness in ambulance planning", PhD thesis,
+Vrije Universiteit Amsterdam, 2017. Open-access full text (CC):
+https://ir.cwi.nl/pub/25403/ThesisCJagtenberg.pdf
+Accessed: 2026-11-02. Line numbers below refer to a pdftotext extraction of the PDF.
+
+--- p.15-16, Chapter 2 introduction (closest-idle already known suboptimal) ---
+"The vast majority of the papers on dynamic ambulance management focus on how
+to redeploy idle vehicles (e.g., [2, 77, 118]). Perhaps in order not to overcomplicate
+things, they assume a basic dispatch rule: whenever an incident occurs, they send
+the ambulance that is closest to the incident (in time). Although this is a common
+dispatch policy, it was already shown to be suboptimal in 1972 [29]. Regardless,
+most authors make this assumption without much discussion or motivation."
+
+--- p.16 (prioritized-dispatch literature: trade urgent against non-urgent waits) ---
+"There exists a series of papers that considers a dispatch problem with priori-
+tized patients [4, 80, 81]. Their main idea is to allow increased response times for
+the non-urgent patients, such that shorter response times can be realized for the
+urgent patients."
+
+--- p.19 (prior MDP work: Jarvis costs unexplained; Bandara tiny instances) ---
+"A few authors have previously used MDPs
+to solve the dispatch problem. In [56] the authors define 'costs' in their MDP,
+but they do not discuss the meaning or interpretation of this. In their numerical
+work, they use randomly drawn instances. Moreover, they do not compare their
+solution with the closest-idle method. The authors of [4] maximize patient sur-
+vivability, and furthermore use extremely small problem instances: two vehicles
+and two or three demand nodes. We conclude that neither [56] nor [4] analyzes
+the fraction of late arrivals."
+
+--- References (identifier key) ---
+"[4] D. Bandara, M.E. Mayorga, and L.A. McLay. Optimal dispatching strategies
+for emergency vehicles to increase patient survivability. International Journal of
+Operational Research, 15(2):195-214, 2012."
+"[29] G. Carter, J. Chaiken, and E. Ignall. Response areas for two emergency units.
+Operations Research, 20(3):571-594, 1972."
+"[56] J.P. Jarvis. Optimal assignments in a Markovian queueing system. Computers &
+Operations Research, 8(1):17-23, 1981."
+"[80] L.A. McLay and M.E. Mayorga. A model for optimally dispatching ambulances to
+emergency calls with classification errors in patient priorities. IIE Transactions,
+45(1):1-24, 2013."
+"[81] L.A. McLay and M.E. Mayorga. A dispatching model for server-to-customer
+systems that balances efficiency and equity. Manufacturing and Service Operations
+Management, 15(2):205-220, 2013."

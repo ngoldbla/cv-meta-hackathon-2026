@@ -1,0 +1,2000 @@
+{
+ "meta": {
+  "notice": "No API key, so this request shares one free daily budget ($0.10) with everyone on your network's IP address. Get a free key with its own $1/day at https://openalex.org/settings/api and add api_key=YOUR_KEY to your requests. An AI agent can get one for its user in one call: POST https://api.openalex.org/api-keys with {\"email\": \"<your user's email>\"}; we email them a link, and the key works once they click it. Docs for agents: https://help.openalex.org/llms.txt",
+  "count": 1791,
+  "db_response_time_ms": 215,
+  "page": 1,
+  "per_page": 10,
+  "groups_count": null,
+  "x_query": {
+   "oql": "get works with (Optimal dispatching strategies emergency vehicles patient survivability) in the full text",
+   "x_new_oql": "get works with (Optimal dispatching strategies emergency vehicles patient survivability) in the full text",
+   "oqo": {
+    "get_rows": "works",
+    "filter_rows": [
+     {
+      "column_id": "fulltext.search",
+      "value": "Optimal dispatching strategies emergency vehicles patient survivability",
+      "operator": "has"
+     }
+    ]
+   },
+   "url": "/works?filter=fulltext.search:Optimal dispatching strategies emergency vehicles patient survivability&per_page=10",
+   "order": "best matches first",
+   "order_default": true
+  },
+  "cost_usd": 0.001,
+  "note": "slimmed by task 020 to relied-upon records only; full response had 2 results shown of 1791 total"
+ },
+ "results": [
+  {
+   "id": "https://openalex.org/W1971816561",
+   "doi": "https://doi.org/10.1504/ijor.2012.048867",
+   "title": "Optimal dispatching strategies for emergency vehicles to increase patient survivability",
+   "display_name": "Optimal dispatching strategies for emergency vehicles to increase patient survivability",
+   "relevance_score": 184.22919,
+   "publication_year": 2012,
+   "publication_date": "2012-01-01",
+   "ids": {
+    "openalex": "https://openalex.org/W1971816561",
+    "doi": "https://doi.org/10.1504/ijor.2012.048867",
+    "mag": "1971816561"
+   },
+   "language": "en",
+   "primary_location": {
+    "id": "doi:10.1504/ijor.2012.048867",
+    "doi": "https://doi.org/10.1504/ijor.2012.048867",
+    "is_oa": false,
+    "landing_page_url": "https://doi.org/10.1504/ijor.2012.048867",
+    "pdf_url": null,
+    "source": {
+     "id": "https://openalex.org/S129952182",
+     "display_name": "International Journal of Operational Research",
+     "issn_l": "1745-7645",
+     "issn": [
+      "1745-7645",
+      "1745-7653"
+     ],
+     "is_oa": false,
+     "is_in_doaj": false,
+     "is_core": true,
+     "listed_in": [
+      "anvur-scientific",
+      "cwts-core",
+      "jufo-1",
+      "norway-1",
+      "poland-40",
+      "russia-white-list-2"
+     ],
+     "host_organization": "https://openalex.org/P4310317825",
+     "host_organization_name": "Inderscience Publishers",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310317825"
+     ],
+     "host_organization_lineage_names": [
+      "Inderscience Publishers"
+     ],
+     "type": "journal"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "International Journal of Operational Research",
+    "raw_type": "journal-article"
+   },
+   "volume": null,
+   "type": "article",
+   "indexed_in": [
+    "crossref"
+   ],
+   "open_access": {
+    "is_oa": false,
+    "oa_status": "closed",
+    "oa_url": null,
+    "any_repository_has_fulltext": false
+   },
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": "https://openalex.org/A5090232655",
+      "display_name": "Damitha Bandara",
+      "orcid": null,
+      "observed_orcids": []
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I8078737",
+       "display_name": "Clemson University",
+       "ror": "https://ror.org/037s24f05",
+       "country_code": "US",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I8078737"
+       ]
+      }
+     ],
+     "countries": [
+      "US"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Damitha Bandara",
+     "raw_affiliation_strings": [
+      "Department of Industrial Engineering, Clemson University, 110 Freeman Hall, Clemson, SC 29634, USA",
+      "Department of Industrial Engineering, Clemson University, 110 Freeman Hall, Clemson, SC 29634, USA#TAB#"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Industrial Engineering, Clemson University, 110 Freeman Hall, Clemson, SC 29634, USA",
+       "institution_ids": [
+        "https://openalex.org/I8078737"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Department of Industrial Engineering, Clemson University, 110 Freeman Hall, Clemson, SC 29634, USA#TAB#",
+       "institution_ids": [
+        "https://openalex.org/I8078737"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5048011759",
+      "display_name": "Mar\u00eda E. Mayorga",
+      "orcid": "https://orcid.org/0000-0002-6399-2153",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-6399-2153"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I8078737",
+       "display_name": "Clemson University",
+       "ror": "https://ror.org/037s24f05",
+       "country_code": "US",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I8078737"
+       ]
+      }
+     ],
+     "countries": [
+      "US"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Maria E. Mayorga",
+     "raw_affiliation_strings": [
+      "Department of Industrial Engineering, Clemson University, 110 Freeman Hall, Clemson, SC 29634, USA",
+      "Department of Industrial Engineering, Clemson University, 110 Freeman Hall, Clemson, SC 29634, USA#TAB#"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Industrial Engineering, Clemson University, 110 Freeman Hall, Clemson, SC 29634, USA",
+       "institution_ids": [
+        "https://openalex.org/I8078737"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Department of Industrial Engineering, Clemson University, 110 Freeman Hall, Clemson, SC 29634, USA#TAB#",
+       "institution_ids": [
+        "https://openalex.org/I8078737"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "last",
+     "author": {
+      "id": "https://openalex.org/A5029528465",
+      "display_name": "Laura A. Albert",
+      "orcid": "https://orcid.org/0000-0001-7079-4473",
+      "observed_orcids": [
+       "https://orcid.org/0000-0001-7079-4473"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I184840846",
+       "display_name": "Virginia Commonwealth University",
+       "ror": "https://ror.org/02nkdxk79",
+       "country_code": "US",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I184840846"
+       ]
+      }
+     ],
+     "countries": [
+      "US"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Laura A. McLay",
+     "raw_affiliation_strings": [
+      "Department of Statistical Sciences and Operations Research, Virginia Commonwealth University, 1015 Floyd Avenue, Richmond, VA 23284, USA"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Statistical Sciences and Operations Research, Virginia Commonwealth University, 1015 Floyd Avenue, Richmond, VA 23284, USA",
+       "institution_ids": [
+        "https://openalex.org/I184840846"
+       ]
+      }
+     ]
+    }
+   ],
+   "institutions": [],
+   "countries_distinct_count": 1,
+   "institutions_distinct_count": 2,
+   "corresponding_author_ids": [],
+   "corresponding_institution_ids": [],
+   "apc_list": null,
+   "apc_paid": null,
+   "fwci": 7.8099,
+   "has_fulltext": false,
+   "cited_by_count": 55,
+   "citation_normalized_percentile": {
+    "value": 0.96509788,
+    "is_in_top_1_percent": false,
+    "is_in_top_10_percent": true
+   },
+   "cited_by_percentile_year": {
+    "min": 90,
+    "max": 99
+   },
+   "biblio": {
+    "volume": "15",
+    "issue": "2",
+    "first_page": "195",
+    "last_page": "195"
+   },
+   "is_retracted": false,
+   "is_paratext": false,
+   "is_xpac": false,
+   "primary_topic": {
+    "id": "https://openalex.org/T11502",
+    "display_name": "Facility Location and Emergency Management",
+    "score": 0.9976000189781189,
+    "subfield": {
+     "id": "https://openalex.org/subfields/1407",
+     "display_name": "Organizational Behavior and Human Resource Management"
+    },
+    "field": {
+     "id": "https://openalex.org/fields/14",
+     "display_name": "Business, Management and Accounting"
+    },
+    "domain": {
+     "id": "https://openalex.org/domains/2",
+     "display_name": "Social Sciences"
+    }
+   },
+   "topics": [
+    {
+     "id": "https://openalex.org/T11502",
+     "display_name": "Facility Location and Emergency Management",
+     "score": 0.9976000189781189,
+     "subfield": {
+      "id": "https://openalex.org/subfields/1407",
+      "display_name": "Organizational Behavior and Human Resource Management"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/14",
+      "display_name": "Business, Management and Accounting"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/2",
+      "display_name": "Social Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T11095",
+     "display_name": "Emergency and Acute Care Studies",
+     "score": 0.000699999975040555,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2711",
+      "display_name": "Emergency Medicine"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/27",
+      "display_name": "Medicine"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/4",
+      "display_name": "Health Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T10567",
+     "display_name": "Vehicle Routing Optimization Methods",
+     "score": 0.0005000000237487257,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2209",
+      "display_name": "Industrial and Manufacturing Engineering"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/22",
+      "display_name": "Engineering"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    }
+   ],
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/ambulance-dispatch",
+     "display_name": "ambulance dispatch",
+     "score": 0.6510000228881836
+    },
+    {
+     "id": "https://openalex.org/keywords/survival-probability",
+     "display_name": "survival probability",
+     "score": 0.8339999914169312
+    },
+    {
+     "id": "https://openalex.org/keywords/emergency-medical-services",
+     "display_name": "emergency medical services",
+     "score": 0.8330000042915344
+    },
+    {
+     "id": "https://openalex.org/keywords/markov-decision-process",
+     "display_name": "Markov decision process",
+     "score": 0.8659999966621399
+    },
+    {
+     "id": "https://openalex.org/keywords/dispatching-policies",
+     "display_name": "dispatching policies",
+     "score": 0.828000009059906
+    },
+    {
+     "id": "https://openalex.org/keywords/response-time-emergency-services",
+     "display_name": "response time (emergency services)",
+     "score": 0.4959999918937683
+    }
+   ],
+   "concepts": [
+    {
+     "id": "https://openalex.org/C2781133158",
+     "wikidata": "https://www.wikidata.org/wiki/Q1088669",
+     "display_name": "Survivability",
+     "level": 2,
+     "score": 0.8750040531158447
+    },
+    {
+     "id": "https://openalex.org/C106189395",
+     "wikidata": "https://www.wikidata.org/wiki/Q176789",
+     "display_name": "Markov decision process",
+     "level": 3,
+     "score": 0.7322643995285034
+    },
+    {
+     "id": "https://openalex.org/C41008148",
+     "wikidata": "https://www.wikidata.org/wiki/Q21198",
+     "display_name": "Computer science",
+     "level": 0,
+     "score": 0.6448051929473877
+    },
+    {
+     "id": "https://openalex.org/C42475967",
+     "wikidata": "https://www.wikidata.org/wiki/Q194292",
+     "display_name": "Operations research",
+     "level": 1,
+     "score": 0.6130433678627014
+    },
+    {
+     "id": "https://openalex.org/C159886148",
+     "wikidata": "https://www.wikidata.org/wiki/Q176645",
+     "display_name": "Markov process",
+     "level": 2,
+     "score": 0.4775049090385437
+    },
+    {
+     "id": "https://openalex.org/C98045186",
+     "wikidata": "https://www.wikidata.org/wiki/Q205663",
+     "display_name": "Process (computing)",
+     "level": 2,
+     "score": 0.46764111518859863
+    },
+    {
+     "id": "https://openalex.org/C2780378061",
+     "wikidata": "https://www.wikidata.org/wiki/Q25351891",
+     "display_name": "Service (business)",
+     "level": 2,
+     "score": 0.4403921663761139
+    },
+    {
+     "id": "https://openalex.org/C98763669",
+     "wikidata": "https://www.wikidata.org/wiki/Q176645",
+     "display_name": "Markov chain",
+     "level": 2,
+     "score": 0.41348570585250854
+    },
+    {
+     "id": "https://openalex.org/C2781249084",
+     "wikidata": "https://www.wikidata.org/wiki/Q908656",
+     "display_name": "Preference",
+     "level": 2,
+     "score": 0.412274569272995
+    },
+    {
+     "id": "https://openalex.org/C21547014",
+     "wikidata": "https://www.wikidata.org/wiki/Q1423657",
+     "display_name": "Operations management",
+     "level": 1,
+     "score": 0.32675379514694214
+    },
+    {
+     "id": "https://openalex.org/C144133560",
+     "wikidata": "https://www.wikidata.org/wiki/Q4830453",
+     "display_name": "Business",
+     "level": 0,
+     "score": 0.2023329734802246
+    },
+    {
+     "id": "https://openalex.org/C31258907",
+     "wikidata": "https://www.wikidata.org/wiki/Q1301371",
+     "display_name": "Computer network",
+     "level": 1,
+     "score": 0.19416314363479614
+    },
+    {
+     "id": "https://openalex.org/C127413603",
+     "wikidata": "https://www.wikidata.org/wiki/Q11023",
+     "display_name": "Engineering",
+     "level": 0,
+     "score": 0.15045896172523499
+    },
+    {
+     "id": "https://openalex.org/C162324750",
+     "wikidata": "https://www.wikidata.org/wiki/Q8134",
+     "display_name": "Economics",
+     "level": 0,
+     "score": 0.11151105165481567
+    },
+    {
+     "id": "https://openalex.org/C33923547",
+     "wikidata": "https://www.wikidata.org/wiki/Q395",
+     "display_name": "Mathematics",
+     "level": 0,
+     "score": 0.08380427956581116
+    },
+    {
+     "id": "https://openalex.org/C105795698",
+     "wikidata": "https://www.wikidata.org/wiki/Q12483",
+     "display_name": "Statistics",
+     "level": 1,
+     "score": 0.0
+    },
+    {
+     "id": "https://openalex.org/C111919701",
+     "wikidata": "https://www.wikidata.org/wiki/Q9135",
+     "display_name": "Operating system",
+     "level": 1,
+     "score": 0.0
+    },
+    {
+     "id": "https://openalex.org/C119857082",
+     "wikidata": "https://www.wikidata.org/wiki/Q2539",
+     "display_name": "Machine learning",
+     "level": 1,
+     "score": 0.0
+    },
+    {
+     "id": "https://openalex.org/C175444787",
+     "wikidata": "https://www.wikidata.org/wiki/Q39072",
+     "display_name": "Microeconomics",
+     "level": 1,
+     "score": 0.0
+    },
+    {
+     "id": "https://openalex.org/C162853370",
+     "wikidata": "https://www.wikidata.org/wiki/Q39809",
+     "display_name": "Marketing",
+     "level": 1,
+     "score": 0.0
+    }
+   ],
+   "mesh": [],
+   "locations_count": 2,
+   "locations": [
+    {
+     "id": "doi:10.1504/ijor.2012.048867",
+     "doi": "https://doi.org/10.1504/ijor.2012.048867",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1504/ijor.2012.048867",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S129952182",
+      "display_name": "International Journal of Operational Research",
+      "issn_l": "1745-7645",
+      "issn": [
+       "1745-7645",
+       "1745-7653"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "listed_in": [
+       "anvur-scientific",
+       "cwts-core",
+       "jufo-1",
+       "norway-1",
+       "poland-40",
+       "russia-white-list-2"
+      ],
+      "host_organization": "https://openalex.org/P4310317825",
+      "host_organization_name": "Inderscience Publishers",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310317825"
+      ],
+      "host_organization_lineage_names": [
+       "Inderscience Publishers"
+      ],
+      "type": "journal"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "International Journal of Operational Research",
+     "raw_type": "journal-article"
+    },
+    {
+     "id": "pmh:oai:RePEc:ids:ijores:v:15:y:2012:i:2:p:195-214",
+     "doi": null,
+     "is_oa": false,
+     "landing_page_url": "http://www.inderscience.com/link.php?id=48867",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4306401271",
+      "display_name": "RePEc: Research Papers in Economics",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I77793887",
+      "host_organization_name": "Federal Reserve Bank of St. Louis",
+      "host_organization_lineage": [
+       "https://openalex.org/I77793887"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": null,
+     "raw_type": "article"
+    }
+   ],
+   "best_oa_location": null,
+   "sustainable_development_goals": [
+    {
+     "score": 0.5683000087738037,
+     "id": "https://metadata.un.org/sdg/3",
+     "display_name": "Good health and well-being"
+    }
+   ],
+   "sustainable_development_goals_aurora": [
+    {
+     "score": 0.550000011920929,
+     "id": "https://metadata.un.org/sdg/16",
+     "display_name": "Peace, justice, and strong institutions"
+    }
+   ],
+   "study_designs": [],
+   "awards": [],
+   "funders": [],
+   "has_content": {
+    "grobid_xml": false,
+    "pdf": false
+   },
+   "content_urls": null,
+   "referenced_works_count": 18,
+   "referenced_works": [
+    "https://openalex.org/W1976122053",
+    "https://openalex.org/W1979677633",
+    "https://openalex.org/W1994976571",
+    "https://openalex.org/W2001169532",
+    "https://openalex.org/W2006831765",
+    "https://openalex.org/W2032074274",
+    "https://openalex.org/W2038933051",
+    "https://openalex.org/W2050000782",
+    "https://openalex.org/W2051026770",
+    "https://openalex.org/W2061811998",
+    "https://openalex.org/W2064143351",
+    "https://openalex.org/W2075936903",
+    "https://openalex.org/W2088363515",
+    "https://openalex.org/W2093228967",
+    "https://openalex.org/W2098428248",
+    "https://openalex.org/W2129060502",
+    "https://openalex.org/W2133613508",
+    "https://openalex.org/W2133676848"
+   ],
+   "related_works": [
+    "https://openalex.org/W2031621632",
+    "https://openalex.org/W391232507",
+    "https://openalex.org/W4389896943",
+    "https://openalex.org/W1598399595",
+    "https://openalex.org/W2090939985",
+    "https://openalex.org/W2067889056",
+    "https://openalex.org/W3214716338",
+    "https://openalex.org/W4361802715",
+    "https://openalex.org/W2013636369",
+    "https://openalex.org/W3192305788"
+   ],
+   "abstract_inverted_index": {
+    "A": [
+     0
+    ],
+    "major": [
+     1
+    ],
+    "focus": [
+     2
+    ],
+    "of": [
+     3,
+     18,
+     25,
+     66,
+     69,
+     81,
+     87,
+     96,
+     133,
+     145
+    ],
+    "emergency": [
+     4,
+     20,
+     38
+    ],
+    "medical": [
+     5
+    ],
+    "service": [
+     6
+    ],
+    "(EMS)": [
+     7
+    ],
+    "systems": [
+     8
+    ],
+    "is": [
+     9,
+     28,
+     92,
+     122
+    ],
+    "to": [
+     10,
+     14,
+     29,
+     32,
+     37,
+     40,
+     52,
+     83,
+     137
+    ],
+    "save": [
+     11
+    ],
+    "lives": [
+     12
+    ],
+    "and": [
+     13,
+     126
+    ],
+    "minimise": [
+     15
+    ],
+    "the": [
+     16,
+     46,
+     54,
+     64,
+     67,
+     70,
+     88,
+     102,
+     119,
+     131,
+     134,
+     141
+    ],
+    "effect": [
+     17
+    ],
+    "an": [
+     19,
+     76,
+     138
+    ],
+    "health": [
+     21
+    ],
+    "incident.": [
+     22
+    ],
+    "The": [
+     23,
+     72,
+     85
+    ],
+    "objective": [
+     24
+    ],
+    "this": [
+     26
+    ],
+    "research": [
+     27
+    ],
+    "determine": [
+     30
+    ],
+    "how": [
+     31
+    ],
+    "optimally": [
+     33
+    ],
+    "dispatch": [
+     34
+    ],
+    "paramedic": [
+     35
+    ],
+    "units": [
+     36
+    ],
+    "calls": [
+     39
+    ],
+    "maximise": [
+     41
+    ],
+    "patients\u2019": [
+     42,
+     97
+    ],
+    "survivability.": [
+     43
+    ],
+    "We": [
+     44
+    ],
+    "formulate": [
+     45
+    ],
+    "problem": [
+     47
+    ],
+    "as": [
+     48,
+     106
+    ],
+    "Markov": [
+     49
+    ],
+    "decision": [
+     50
+    ],
+    "process": [
+     51
+    ],
+    "obtain": [
+     53
+    ],
+    "optimal": [
+     55,
+     73,
+     125
+    ],
+    "dispatching": [
+     56,
+     59,
+     90,
+     118,
+     128
+    ],
+    "policies.": [
+     57
+    ],
+    "These": [
+     58
+    ],
+    "policies": [
+     60
+    ],
+    "are": [
+     61
+    ],
+    "developed": [
+     62
+    ],
+    "incorporating": [
+     63
+    ],
+    "degree": [
+     65
+    ],
+    "urgency": [
+     68
+    ],
+    "call.": [
+     71
+    ],
+    "policy": [
+     74
+    ],
+    "provides": [
+     75
+    ],
+    "ordered": [
+     77
+    ],
+    "preference": [
+     78
+    ],
+    "(priority)": [
+     79
+    ],
+    "list": [
+     80
+    ],
+    "ambulances": [
+     82
+    ],
+    "dispatch.": [
+     84
+    ],
+    "performance": [
+     86
+    ],
+    "proposed": [
+     89
+    ],
+    "rules": [
+     91
+    ],
+    "evaluated": [
+     93
+    ],
+    "in": [
+     94,
+     140
+    ],
+    "terms": [
+     95
+    ],
+    "survivability": [
+     98
+    ],
+    "rather": [
+     99
+    ],
+    "than": [
+     100
+    ],
+    "measuring": [
+     101
+    ],
+    "response": [
+     103
+    ],
+    "time": [
+     104
+    ],
+    "thresholds,": [
+     105
+    ],
+    "survival": [
+     107,
+     143
+    ],
+    "probability": [
+     108,
+     144
+    ],
+    "more": [
+     109
+    ],
+    "directly": [
+     110
+    ],
+    "mirrors": [
+     111
+    ],
+    "patient": [
+     112
+    ],
+    "outcomes.": [
+     113
+    ],
+    "Computational": [
+     114
+    ],
+    "examples": [
+     115
+    ],
+    "show": [
+     116
+    ],
+    "that": [
+     117,
+     127
+    ],
+    "closest": [
+     120
+    ],
+    "vehicle": [
+     121
+    ],
+    "not": [
+     123
+    ],
+    "always": [
+     124
+    ],
+    "vehicles": [
+     129
+    ],
+    "considering": [
+     130
+    ],
+    "priority": [
+     132
+    ],
+    "call": [
+     135
+    ],
+    "leads": [
+     136
+    ],
+    "increase": [
+     139
+    ],
+    "average": [
+     142
+    ],
+    "patients.": [
+     146
+    ]
+   },
+   "counts_by_year": [
+    {
+     "year": 2026,
+     "cited_by_count": 5
+    },
+    {
+     "year": 2025,
+     "cited_by_count": 1
+    },
+    {
+     "year": 2024,
+     "cited_by_count": 4
+    },
+    {
+     "year": 2023,
+     "cited_by_count": 3
+    },
+    {
+     "year": 2022,
+     "cited_by_count": 3
+    },
+    {
+     "year": 2021,
+     "cited_by_count": 6
+    },
+    {
+     "year": 2020,
+     "cited_by_count": 7
+    },
+    {
+     "year": 2019,
+     "cited_by_count": 5
+    },
+    {
+     "year": 2018,
+     "cited_by_count": 3
+    },
+    {
+     "year": 2016,
+     "cited_by_count": 6
+    },
+    {
+     "year": 2015,
+     "cited_by_count": 2
+    },
+    {
+     "year": 2014,
+     "cited_by_count": 6
+    },
+    {
+     "year": 2013,
+     "cited_by_count": 4
+    }
+   ],
+   "updated_date": "2026-10-09T09:14:12.587421",
+   "created_date": "2016-06-24T00:00:00"
+  },
+  {
+   "id": "https://openalex.org/W391232507",
+   "doi": null,
+   "title": "DISTRICTING AND DISPATCHING POLICIES TO IMPROVE THE EFFICIENCY OF EMERGENCY MEDICAL SERVICE (EMS) SYSTEMS",
+   "display_name": "DISTRICTING AND DISPATCHING POLICIES TO IMPROVE THE EFFICIENCY OF EMERGENCY MEDICAL SERVICE (EMS) SYSTEMS",
+   "relevance_score": 51.850433,
+   "publication_year": 2012,
+   "publication_date": "2012-01-01",
+   "ids": {
+    "openalex": "https://openalex.org/W391232507",
+    "mag": "391232507"
+   },
+   "language": "en",
+   "primary_location": {
+    "id": "pmh:oai:tigerprints.clemson.edu:all_dissertations-1228",
+    "doi": null,
+    "is_oa": true,
+    "landing_page_url": "https://tigerprints.clemson.edu/all_dissertations/228",
+    "pdf_url": "https://tigerprints.clemson.edu/all_dissertations/228",
+    "source": {
+     "id": "https://openalex.org/S4377196397",
+     "display_name": "TigerPrints (Clemson University)",
+     "issn_l": null,
+     "issn": null,
+     "is_oa": false,
+     "is_in_doaj": false,
+     "is_core": false,
+     "listed_in": [],
+     "host_organization": "https://openalex.org/I8078737",
+     "host_organization_name": "Clemson University",
+     "host_organization_lineage": [
+      "https://openalex.org/I8078737"
+     ],
+     "host_organization_lineage_names": [],
+     "type": "repository"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "submittedVersion",
+    "is_accepted": false,
+    "is_published": false,
+    "raw_source_name": "All Dissertations",
+    "raw_type": "text"
+   },
+   "volume": null,
+   "type": "dissertation",
+   "indexed_in": [],
+   "open_access": {
+    "is_oa": true,
+    "oa_status": "green",
+    "oa_url": "https://tigerprints.clemson.edu/all_dissertations/228",
+    "any_repository_has_fulltext": true
+   },
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": "https://openalex.org/A5090232655",
+      "display_name": "Damitha Bandara",
+      "orcid": null,
+      "observed_orcids": []
+     },
+     "institutions": [],
+     "countries": [],
+     "is_corresponding": true,
+     "raw_author_name": "Damitha Bandara",
+     "raw_affiliation_strings": [],
+     "raw_orcid": null,
+     "affiliations": []
+    }
+   ],
+   "institutions": [],
+   "countries_distinct_count": 0,
+   "institutions_distinct_count": 0,
+   "corresponding_author_ids": [
+    "https://openalex.org/A5090232655"
+   ],
+   "corresponding_institution_ids": [],
+   "apc_list": null,
+   "apc_paid": null,
+   "fwci": null,
+   "has_fulltext": true,
+   "cited_by_count": 7,
+   "citation_normalized_percentile": null,
+   "cited_by_percentile_year": null,
+   "biblio": {
+    "volume": null,
+    "issue": null,
+    "first_page": null,
+    "last_page": null
+   },
+   "is_retracted": false,
+   "is_paratext": false,
+   "is_xpac": false,
+   "primary_topic": {
+    "id": "https://openalex.org/T11502",
+    "display_name": "Facility Location and Emergency Management",
+    "score": 0.9990000128746033,
+    "subfield": {
+     "id": "https://openalex.org/subfields/1407",
+     "display_name": "Organizational Behavior and Human Resource Management"
+    },
+    "field": {
+     "id": "https://openalex.org/fields/14",
+     "display_name": "Business, Management and Accounting"
+    },
+    "domain": {
+     "id": "https://openalex.org/domains/2",
+     "display_name": "Social Sciences"
+    }
+   },
+   "topics": [
+    {
+     "id": "https://openalex.org/T11502",
+     "display_name": "Facility Location and Emergency Management",
+     "score": 0.9990000128746033,
+     "subfield": {
+      "id": "https://openalex.org/subfields/1407",
+      "display_name": "Organizational Behavior and Human Resource Management"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/14",
+      "display_name": "Business, Management and Accounting"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/2",
+      "display_name": "Social Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T11095",
+     "display_name": "Emergency and Acute Care Studies",
+     "score": 0.00039999998989515007,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2711",
+      "display_name": "Emergency Medicine"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/27",
+      "display_name": "Medicine"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/4",
+      "display_name": "Health Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T14410",
+     "display_name": "Safety and Risk Management",
+     "score": 0.00019999999494757503,
+     "subfield": {
+      "id": "https://openalex.org/subfields/1407",
+      "display_name": "Organizational Behavior and Human Resource Management"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/14",
+      "display_name": "Business, Management and Accounting"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/2",
+      "display_name": "Social Sciences"
+     }
+    }
+   ],
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/emergency-medical-services",
+     "display_name": "emergency medical services",
+     "score": 0.9850000143051147
+    },
+    {
+     "id": "https://openalex.org/keywords/ambulance-dispatch",
+     "display_name": "ambulance dispatch",
+     "score": 0.9020000100135803
+    },
+    {
+     "id": "https://openalex.org/keywords/markov-decision-process",
+     "display_name": "Markov decision process",
+     "score": 0.7730000019073486
+    },
+    {
+     "id": "https://openalex.org/keywords/dispatching-rules",
+     "display_name": "dispatching rules",
+     "score": 0.6129999756813049
+    },
+    {
+     "id": "https://openalex.org/keywords/ambulance-location",
+     "display_name": "ambulance location",
+     "score": 0.3109999895095825
+    }
+   ],
+   "concepts": [
+    {
+     "id": "https://openalex.org/C2780378061",
+     "wikidata": "https://www.wikidata.org/wiki/Q25351891",
+     "display_name": "Service (business)",
+     "level": 2,
+     "score": 0.5574498176574707
+    },
+    {
+     "id": "https://openalex.org/C42475967",
+     "wikidata": "https://www.wikidata.org/wiki/Q194292",
+     "display_name": "Operations research",
+     "level": 1,
+     "score": 0.4939959645271301
+    },
+    {
+     "id": "https://openalex.org/C21547014",
+     "wikidata": "https://www.wikidata.org/wiki/Q1423657",
+     "display_name": "Operations management",
+     "level": 1,
+     "score": 0.4503525495529175
+    },
+    {
+     "id": "https://openalex.org/C41008148",
+     "wikidata": "https://www.wikidata.org/wiki/Q21198",
+     "display_name": "Computer science",
+     "level": 0,
+     "score": 0.4422048032283783
+    },
+    {
+     "id": "https://openalex.org/C144133560",
+     "wikidata": "https://www.wikidata.org/wiki/Q4830453",
+     "display_name": "Business",
+     "level": 0,
+     "score": 0.4413061738014221
+    },
+    {
+     "id": "https://openalex.org/C112930515",
+     "wikidata": "https://www.wikidata.org/wiki/Q4389547",
+     "display_name": "Risk analysis (engineering)",
+     "level": 1,
+     "score": 0.32625237107276917
+    },
+    {
+     "id": "https://openalex.org/C127413603",
+     "wikidata": "https://www.wikidata.org/wiki/Q11023",
+     "display_name": "Engineering",
+     "level": 0,
+     "score": 0.2989060878753662
+    },
+    {
+     "id": "https://openalex.org/C162853370",
+     "wikidata": "https://www.wikidata.org/wiki/Q39809",
+     "display_name": "Marketing",
+     "level": 1,
+     "score": 0.12957516312599182
+    }
+   ],
+   "mesh": [],
+   "locations_count": 3,
+   "locations": [
+    {
+     "id": "pmh:oai:tigerprints.clemson.edu:all_dissertations-1228",
+     "doi": null,
+     "is_oa": true,
+     "landing_page_url": "https://tigerprints.clemson.edu/all_dissertations/228",
+     "pdf_url": "https://tigerprints.clemson.edu/all_dissertations/228",
+     "source": {
+      "id": "https://openalex.org/S4377196397",
+      "display_name": "TigerPrints (Clemson University)",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I8078737",
+      "host_organization_name": "Clemson University",
+      "host_organization_lineage": [
+       "https://openalex.org/I8078737"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": "All Dissertations",
+     "raw_type": "text"
+    },
+    {
+     "id": "pmh:oai:open.clemson.edu:all_dissertations-1228",
+     "doi": null,
+     "is_oa": false,
+     "landing_page_url": "https://open.clemson.edu/all_dissertations/228",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4377196397",
+      "display_name": "TigerPrints (Clemson University)",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I8078737",
+      "host_organization_name": "Clemson University",
+      "host_organization_lineage": [
+       "https://openalex.org/I8078737"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": "All Dissertations",
+     "raw_type": "text"
+    },
+    {
+     "id": "mag:391232507",
+     "doi": null,
+     "is_oa": false,
+     "landing_page_url": "https://tigerprints.clemson.edu/all_dissertations/228/",
+     "pdf_url": null,
+     "source": null,
+     "license": null,
+     "license_id": null,
+     "version": null,
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": null,
+     "raw_type": null
+    }
+   ],
+   "best_oa_location": {
+    "id": "pmh:oai:tigerprints.clemson.edu:all_dissertations-1228",
+    "doi": null,
+    "is_oa": true,
+    "landing_page_url": "https://tigerprints.clemson.edu/all_dissertations/228",
+    "pdf_url": "https://tigerprints.clemson.edu/all_dissertations/228",
+    "source": {
+     "id": "https://openalex.org/S4377196397",
+     "display_name": "TigerPrints (Clemson University)",
+     "issn_l": null,
+     "issn": null,
+     "is_oa": false,
+     "is_in_doaj": false,
+     "is_core": false,
+     "listed_in": [],
+     "host_organization": "https://openalex.org/I8078737",
+     "host_organization_name": "Clemson University",
+     "host_organization_lineage": [
+      "https://openalex.org/I8078737"
+     ],
+     "host_organization_lineage_names": [],
+     "type": "repository"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "submittedVersion",
+    "is_accepted": false,
+    "is_published": false,
+    "raw_source_name": "All Dissertations",
+    "raw_type": "text"
+   },
+   "sustainable_development_goals": [
+    {
+     "score": 0.46810001134872437,
+     "id": "https://metadata.un.org/sdg/3",
+     "display_name": "Good health and well-being"
+    }
+   ],
+   "sustainable_development_goals_aurora": [],
+   "study_designs": [],
+   "awards": [],
+   "funders": [],
+   "has_content": {
+    "grobid_xml": true,
+    "pdf": true
+   },
+   "content_urls": {
+    "pdf": "https://content.openalex.org/works/W391232507.pdf",
+    "grobid_xml": "https://content.openalex.org/works/W391232507.grobid-xml"
+   },
+   "referenced_works_count": 0,
+   "referenced_works": [],
+   "related_works": [
+    "https://openalex.org/W2090939985",
+    "https://openalex.org/W2031621632",
+    "https://openalex.org/W1971816561",
+    "https://openalex.org/W3829510",
+    "https://openalex.org/W7096631637",
+    "https://openalex.org/W7029435271",
+    "https://openalex.org/W1598399595",
+    "https://openalex.org/W4361802715",
+    "https://openalex.org/W2067889056",
+    "https://openalex.org/W4389896943"
+   ],
+   "abstract_inverted_index": {
+    "The": [
+     0,
+     22,
+     55,
+     69
+    ],
+    "major": [
+     1,
+     30
+    ],
+    "focus": [
+     2
+    ],
+    "of": [
+     3,
+     18,
+     24,
+     42,
+     52,
+     57,
+     66,
+     71,
+     78,
+     117,
+     120,
+     185,
+     196,
+     210
+    ],
+    "Emergency": [
+     4
+    ],
+    "Medical": [
+     5
+    ],
+    "Service": [
+     6
+    ],
+    "(EMS)": [
+     7
+    ],
+    "systems": [
+     8,
+     27,
+     80,
+     96
+    ],
+    "is": [
+     9,
+     28,
+     60,
+     81,
+     85,
+     100,
+     129,
+     143,
+     190,
+     206
+    ],
+    "to": [
+     10,
+     14,
+     48,
+     62,
+     86,
+     101,
+     131,
+     145,
+     165,
+     177,
+     192
+    ],
+    "save": [
+     11
+    ],
+    "lives": [
+     12
+    ],
+    "and": [
+     13,
+     97,
+     159,
+     183
+    ],
+    "minimize": [
+     15
+    ],
+    "the": [
+     16,
+     25,
+     35,
+     50,
+     64,
+     76,
+     98,
+     103,
+     115,
+     118,
+     121,
+     194,
+     197,
+     217,
+     225
+    ],
+    "effects": [
+     17
+    ],
+    "emergency": [
+     19
+    ],
+    "health": [
+     20
+    ],
+    "incidents.": [
+     21
+    ],
+    "efficiency": [
+     23
+    ],
+    "EMS": [
+     26,
+     53,
+     67,
+     79,
+     95,
+     107,
+     198
+    ],
+    "a": [
+     29,
+     39,
+     160
+    ],
+    "public": [
+     31
+    ],
+    "concern.": [
+     32
+    ],
+    "Thus,": [
+     33
+    ],
+    "over": [
+     34
+    ],
+    "past": [
+     36
+    ],
+    "three": [
+     37
+    ],
+    "decades": [
+     38
+    ],
+    "significant": [
+     40
+    ],
+    "amount": [
+     41
+    ],
+    "research": [
+     43,
+     73
+    ],
+    "studies": [
+     44
+    ],
+    "have": [
+     45
+    ],
+    "been": [
+     46
+    ],
+    "conducted": [
+     47
+    ],
+    "improve": [
+     49,
+     63
+    ],
+    "performance": [
+     51,
+     65,
+     77,
+     195
+    ],
+    "systems.": [
+     54
+    ],
+    "purpose": [
+     56
+    ],
+    "this": [
+     58,
+     72,
+     153
+    ],
+    "study": [
+     59
+    ],
+    "also": [
+     61
+    ],
+    "system.": [
+     68
+    ],
+    "contribution": [
+     70
+    ],
+    "towards": [
+     74
+    ],
+    "improving": [
+     75
+    ],
+    "twofold.": [
+     82
+    ],
+    "One": [
+     83
+    ],
+    "area": [
+     84
+    ],
+    "implement": [
+     87
+    ],
+    "optimal": [
+     88,
+     91,
+     133
+    ],
+    "or": [
+     89,
+     169
+    ],
+    "near": [
+     90
+    ],
+    "dispatching": [
+     92,
+     110,
+     134,
+     175,
+     203,
+     243
+    ],
+    "strategies": [
+     93,
+     111,
+     135
+    ],
+    "for": [
+     94,
+     106,
+     148,
+     171
+    ],
+    "other": [
+     99
+    ],
+    "determine": [
+     102,
+     166
+    ],
+    "response": [
+     104,
+     167,
+     218
+    ],
+    "boundaries": [
+     105
+    ],
+    "vehicles.": [
+     108
+    ],
+    "Proposed": [
+     109
+    ],
+    "are": [
+     112,
+     163,
+     187,
+     230,
+     245
+    ],
+    "implemented": [
+     113
+    ],
+    "incorporating": [
+     114
+    ],
+    "degree": [
+     116
+    ],
+    "urgency": [
+     119
+    ],
+    "call.": [
+     122
+    ],
+    "A": [
+     123,
+     140
+    ],
+    "Markov": [
+     124
+    ],
+    "decision": [
+     125
+    ],
+    "process": [
+     126
+    ],
+    "(MDP)": [
+     127
+    ],
+    "model": [
+     128
+    ],
+    "developed": [
+     130
+    ],
+    "obtain": [
+     132
+    ],
+    "in": [
+     136,
+     208,
+     247
+    ],
+    "less": [
+     137
+    ],
+    "complex": [
+     138,
+     150
+    ],
+    "models.": [
+     139,
+     151
+    ],
+    "heuristic": [
+     141,
+     162
+    ],
+    "algorithm": [
+     142
+    ],
+    "proposed": [
+     144,
+     164,
+     202,
+     242
+    ],
+    "dispatch": [
+     146,
+     178
+    ],
+    "ambulances": [
+     147
+    ],
+    "more": [
+     149
+    ],
+    "In": [
+     152
+    ],
+    "study,": [
+     154
+    ],
+    "an": [
+     155
+    ],
+    "integer": [
+     156
+    ],
+    "programming": [
+     157
+    ],
+    "formulation": [
+     158
+    ],
+    "constructive": [
+     161
+    ],
+    "areas": [
+     168
+    ],
+    "districts": [
+     170,
+     182,
+     186
+    ],
+    "each": [
+     172
+    ],
+    "ambulance.": [
+     173
+    ],
+    "Additionally,": [
+     174
+    ],
+    "rules": [
+     176,
+     244
+    ],
+    "paramedic": [
+     179
+    ],
+    "units": [
+     180
+    ],
+    "within": [
+     181
+    ],
+    "out": [
+     184
+    ],
+    "examined.": [
+     188
+    ],
+    "Simulation": [
+     189
+    ],
+    "used": [
+     191
+    ],
+    "evaluate": [
+     193
+    ],
+    "system": [
+     199
+    ],
+    "after": [
+     200
+    ],
+    "introducing": [
+     201
+    ],
+    "policies.": [
+     204
+    ],
+    "Performance": [
+     205
+    ],
+    "measured": [
+     207
+    ],
+    "terms": [
+     209
+    ],
+    "patients'": [
+     211,
+     226,
+     249
+    ],
+    "survival": [
+     212,
+     222
+    ],
+    "probability": [
+     213,
+     223
+    ],
+    "rather": [
+     214
+    ],
+    "than": [
+     215
+    ],
+    "measuring": [
+     216
+    ],
+    "time": [
+     219
+    ],
+    "thresholds,": [
+     220
+    ],
+    "since": [
+     221
+    ],
+    "reflects": [
+     224
+    ],
+    "outcome": [
+     227
+    ],
+    "directly.": [
+     228
+    ],
+    "Results": [
+     229,
+     239
+    ],
+    "illustrated": [
+     231
+    ],
+    "using": [
+     232
+    ],
+    "real-data": [
+     233
+    ],
+    "collected": [
+     234
+    ],
+    "from": [
+     235
+    ],
+    "Hanover": [
+     236
+    ],
+    "county": [
+     237
+    ],
+    "Virginia.": [
+     238
+    ],
+    "show": [
+     240
+    ],
+    "that": [
+     241
+    ],
+    "valuable": [
+     246
+    ],
+    "increasing": [
+     248
+    ],
+    "survivability": [
+     250
+    ]
+   },
+   "counts_by_year": [
+    {
+     "year": 2026,
+     "cited_by_count": 1
+    },
+    {
+     "year": 2020,
+     "cited_by_count": 2
+    },
+    {
+     "year": 2018,
+     "cited_by_count": 1
+    },
+    {
+     "year": 2017,
+     "cited_by_count": 1
+    },
+    {
+     "year": 2016,
+     "cited_by_count": 1
+    },
+    {
+     "year": 2015,
+     "cited_by_count": 1
+    }
+   ],
+   "updated_date": "2026-08-30T07:30:35.949966",
+   "created_date": "2016-06-24T00:00:00"
+  }
+ ],
+ "group_by": []
+}

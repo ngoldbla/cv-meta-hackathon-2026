@@ -1,0 +1,18 @@
+Source: UK House of Lords Public Services Committee, "Corrected oral evidence:
+Access to emergency services", Evidence Session No. 1, 12 October 2022.
+Witness: Professor Peter Murphy (Nottingham Business School).
+Fetched 2026-11-02 via the NTU eprints mirror of the evidence PDF:
+https://ntu.eprints-hosting.org/id/eprint/47258/1/1609777_a2304_Murphy.pdf
+(original: https://committees.parliament.uk/oralevidence/10937/html - fetch blocked,
+HTTP 403; this mirror carries the same transcript text)
+
+Verbatim passage (rejoined across a page break in the PDF):
+"It could be improved; I suspect that there could be more clinical capacity
+in the Emergency Operations Centre. Almost certainly, there could be
+more in 111 as it is very risk averse and does not have the clinical
+capacity to make difficult decisions, so it defaults to making what it sees
+as the safest decision. Ultimately, that might not be safe, because if you
+are stacking up hundreds or thousands of low-acuity calls you are tying
+up the service and it cannot get to the category 1 calls. The risk
+management is not right, and to get it correct you need a lot of clinical
+ability at triage level."

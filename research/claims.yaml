@@ -30,3 +30,110 @@
   source: MLB, Mets ballpark transportation pages (Willets Point / subway)
   verdict: supported (operator practice for scheduled events, not emergencies)
   evidence: 'mlb.com/mets/ballpark/transportation/willets-point'
+# Task 020 (2026-11-02): prior art for the EMS surge hold rule. Raw API responses in
+# research/literature/hold-rule/raw/. "McLay" papers are indexed under "Laura A. Albert" (current name) by OpenAlex.
+- id: holdrule-carter1972-suboptimal
+  claim: Sending the closest unit to each emergency call was already shown to be suboptimal in 1972, by Carter, Chaiken & Ignall
+  source: Carter, Chaiken & Ignall, Operations Research 20(3) (1972) 571-594, doi:10.1287/opre.20.3.571; content via Jagtenberg PhD thesis (VU Amsterdam, 2017), OA full text https://ir.cwi.nl/pub/25403/ThesisCJagtenberg.pdf
+  verdict: supported (bibliographic record confirmed; result via secondary source; primary abstract and full text not accessed, paywalled)
+  evidence: '"Although this is a common dispatch policy, it was already shown to be suboptimal in 1972 [29]" where [29] is Carter, Chaiken & Ignall (thesis pp.15-16)'
+- id: holdrule-jarvis1981-mdp
+  claim: Jarvis (1981) generalized the hypercube queueing model to distinguishable servers and multiple customer types and solved the dispatch MDP by successive approximations / Howard's method
+  source: Jarvis, Computers & Operations Research 8(1) (1981) 17-23, doi:10.1016/0305-0548(81)90028-9
+  verdict: supported-bibliographic (citation confirmed; content only via machine-generated TLDR; primary abstract and full text not accessed, paywalled)
+  evidence: 'Semantic Scholar TLDR (machine-generated): "A generalization of the Hypercube queueing model for exponential queueing systems ... allows for distinguishable servers and multiple types of customers and combines the method of successive approximations and Howard''s method"'
+- id: holdrule-mclay2013-classification
+  claim: McLay & Mayorga built an MDP for optimally dispatching ambulances to prioritized patients under classification errors, maximizing coverage of true high-risk patients, and compared optimal policies against a myopic policy
+  source: McLay & Mayorga, IIE Transactions 45(1) (2013) 1-24, doi:10.1080/0740817x.2012.665200, abstract
+  verdict: supported (abstract; full text not checked)
+  evidence: '"a Markov Decision Process (MDP) model is developed that captures how to optimally dispatch ambulances (servers) to prioritized patients (customers)"; "The optimal policies under different classification strategies are compared to a myopic policy"'
+- id: holdrule-mclay2013-equity
+  claim: McLay & Mayorga formulated equity-constrained optimal dispatch of distinguishable servers to prioritized customers, applied to EMS dispatch
+  source: McLay & Mayorga, Manufacturing & Service Operations Management 15(2) (2013) 205-220, doi:10.1287/msom.1120.0411, abstract
+  verdict: supported (abstract; full text not checked)
+  evidence: '"we formulate a model for determining how to optimally dispatch distinguishable servers to prioritized customers given a set of equity constraints"; MDPs "formulated as equity-constrained linear programming models"'
+- id: holdrule-priority-tradeoff-series
+  claim: The prioritized-dispatch literature (Bandara/McLay/Mayorga papers) trades longer waits for non-urgent patients against shorter waits for urgent ones
+  source: Jagtenberg PhD thesis (2017), OA full text, p.16, summarising refs [4, 80, 81]
+  verdict: supported (secondary source, open full text)
+  evidence: '"Their main idea is to allow increased response times for the non-urgent patients, such that shorter response times can be realized for the urgent patients"'
+- id: holdrule-bandara2012-closest
+  claim: Dispatching the closest vehicle is not always optimal; dispatching by call priority raises average patient survival probability
+  source: Bandara, Mayorga & McLay, Int. J. Operational Research 15(2) (2012) 195-214, doi:10.1504/ijor.2012.048867, abstract
+  verdict: supported (abstract; full text not checked)
+  evidence: '"Computational examples show that dispatching the closest vehicle is not always optimal and that dispatching vehicles considering the priority of the call leads to an increase in the average survival probability of patients"'
+- id: holdrule-bandara2012-tiny
+  claim: 'The Bandara et al. (2012) MDP results used extremely small instances: two vehicles and two or three demand nodes'
+  source: Jagtenberg PhD thesis (2017), OA full text, p.19
+  verdict: supported (secondary source, open full text)
+  evidence: '"use extremely small problem instances: two vehicles and two or three demand nodes"'
+- id: holdrule-jagtenberg2017-closest
+  claim: The closest-idle rule is not near-optimal for minimizing late arrivals; an alternative heuristic cut late arrivals by 18% vs closest-idle but raised average response time by 37% on a Dutch EMS region
+  source: Jagtenberg, Bhulai & van der Mei, Health Care Management Science 20(4) (2017) 517-531, doi:10.1007/s10729-016-9368-0, abstract via PubMed PMID 27206518 (paper is bronze OA; abstract only read)
+  verdict: supported (abstract; full text not checked)
+  evidence: '"our heuristic reduces the fraction of late arrivals by 18% compared to the closest idle benchmark policy"; "this heuristic increases the average response time (for this problem instance with 37%)"'
+- id: holdrule-schmid2012-adp
+  claim: Deviating from classical dispatch rules with approximate dynamic programming cut average response time from 4.60 to 4.01 minutes (12.89%) on Vienna data
+  source: Schmid, European J. Operational Research 219(3) (2012) 611-621, doi:10.1016/j.ejor.2011.10.043, abstract
+  verdict: supported (abstract; full text not checked)
+  evidence: '"by deviating from the classical dispatching rules the average response time can be decreased from 4.60 to 4.01 minutes, which corresponds to an improvement of 12.89%"'
+- id: holdrule-schaack1986-cutoff
+  claim: In a cutoff-priority queue, low-priority customers are deliberately queued whenever the number of busy servers reaches a priority-dependent cutoff, saving servers for higher priorities
+  source: Schaack & Larson, Operations Research 34(2) (1986) 257-266, doi:10.1287/opre.34.2.257, abstract
+  verdict: supported (abstract; full text not checked)
+  evidence: '"the system deliberately queues arriving lower priority customers whenever the number of busy servers equals or exceeds a given priority-dependent cutoff number"'
+- id: holdrule-taylor1980-ambulance
+  claim: A cutoff service discipline (refuse immediate service to low-priority arrivals when enough servers are busy, keeping servers free for high priority) was applied to sizing an urban ambulance fleet serving emergencies plus low-priority transfers
+  source: Taylor & Templeton, Operations Research 28(5) (1980) 1168, doi:10.1287/opre.28.5.1168, abstract
+  verdict: supported (abstract; full text not checked)
+  evidence: '"Low priority arrivals are ''cut off'' (refused immediate service) and placed in a queue whenever N1 or more servers are busy, in order to keep N-N1 servers free for high priority arrivals"; applied to "an urban fleet which serves both emergency calls and low priority patients transfers"'
+- id: holdrule-konda2018-reserve
+  claim: Reserving a subset of emergency vehicles for high-priority incidents beats nearest-available dispatch and even a detailed optimized dispatch strategy under spatio-temporal uncertainty
+  source: Konda, Ghosh & Varakantham, Proc. ICAPS 28 (2018), doi:10.1609/icaps.v28i1.13915, abstract
+  verdict: supported (abstract; full text not checked)
+  evidence: '"we reserve a set of ERVs for high priority incidents"; "we show that a simple dispatch strategy with reserved ERVs outperforms the detailed dispatch strategy"'
+- id: holdrule-gp2023-availability
+  claim: Genetic-programming-learned EMS dispatch rules favour maximizing fleet availability over considering emergency urgency; learning all five dispatch decisions improved performance 69% on a large synthetic dataset
+  source: MacLachlan, Mei & Zhang, Proc. GECCO (2023), doi:10.1145/3583131.3590434, abstract
+  verdict: supported (abstract; full text not checked)
+  evidence: '"we find that emergency urgency is not necessarily considered when dispatching idle ambulances in favour of maximising fleet availability"; "improving performance by 69% on the largest novel dataset"'
+- id: holdrule-raise2026-nonet
+  claim: RAISE is LLM-based automated heuristic design with adversarial instance search, evaluated on online bin packing, job-shop scheduling and vehicle routing - not on EMS dispatch
+  source: Liu, Figalli, Owen & Serra, arXiv 2606.31801 (30 Jun 2026), abstract
+  verdict: supported (abstract; full text not checked)
+  evidence: '"Comprehensive experiments on Online Bin Packing (OBP), Online Job Shop Scheduling (OJSP), and Online Vehicle Routing (OVRP)"; EMS dispatch not mentioned'
+- id: holdrule-uk-arp-tiers
+  claim: 'Under NHS England Ambulance Response Programme calls are tiered with differentiated targets: Cat1 life-threatening 7-min mean / 15-min 90th; Cat2 emergency 18-min mean / 40-min 90th; Cat3 urgent 90% in 120 min; Cat4 less-urgent 90% in 180 min'
+  source: IAED Journal article on the University of Sheffield ARP evaluation (Turner), https://www.iaedjournal.org/time-is-on-emergency-dispatchers-side
+  verdict: supported (trade-press summary of the evaluation; the Sheffield report itself not read)
+  evidence: '"Category 3 (urgent calls): non-life-threatening problems ... with 90 percent responded to within 120 minutes. Category 4 (less urgent calls): ... 90 percent responded to within 180 minutes"'
+- id: holdrule-uk-stacking
+  claim: UK ambulance services "stack" low-acuity calls during demand surges, which witnesses say can leave the service unable to reach category-1 calls
+  source: House of Lords Public Services Committee oral evidence, 12 Oct 2022 (Prof. P. Murphy), via NTU eprints mirror of the transcript
+  verdict: supported (parliamentary transcript via mirror; original page blocked by 403)
+  evidence: '"if you are stacking up hundreds or thousands of low-acuity calls you are tying up the service and it cannot get to the category 1 calls"'
+- id: holdrule-scas-stack-protocol
+  claim: South Central Ambulance Service's demand plan says that at high demand (OPEL 3+), calls up to and including Category 2 go through demand management (alternative conveyance), with an ambulance sent by clinical priority when available
+  source: SCAS Demand Management Plan via document mirror https://www.readkong.com/page/demand-management-plan-south-central-ambulance-service-9256549
+  verdict: supported-with-caveat (mirror copy; original not located, authenticity unverified)
+  evidence: '"a resource will be sent, according to the relative clinical priority, when available"'
+- id: holdrule-fdny-held31
+  claim: FDNY has held a 911 call in the dispatch queue for 31 minutes during a call spike with limited units available
+  source: Firefighter Close Calls article quoting FDNY, https://www.firefighterclosecalls.com/whats-behind-increase-in-9-1-1-response-times/
+  verdict: supported (single reported incident quoting FDNY; no published holding policy found)
+  evidence: '"The FDNY said the call was held for 31 minutes due to a big spike in calls and limited units available"'
+- id: holdrule-hear-treat
+  claim: Ambulance services divert low-acuity callers to "hear and treat" / "hear and refer" pathways staffed with nurses and allied health professionals, and low-acuity patients appear to benefit
+  source: Nadarajan, Fu & Teo, BMC Emergency Medicine (2026), doi:10.1186/s12873-026-01672-y, scoping-review abstract (59 articles)
+  verdict: supported (abstract; full text not checked)
+  evidence: '"Five themes of care were identified - hear and treat, hear and refer, see and treat, see and refer"; "Low-acuity patients ... appear to benefit from these alternative care service pathways"'
+- id: holdrule-nonconvey-variation
+  claim: In England about half of 999 patients given a response were not taken to an emergency department; calls ending in telephone advice varied 5-17% across services
+  source: O'Cathain et al., Health Services and Delivery Research 6(19) (2018), doi:10.3310/hsdr06190, abstract
+  verdict: supported (abstract; full text not checked)
+  evidence: '"half of the patients receiving a response by telephone or face to face were not conveyed to an emergency department"; "rates of calls ending in telephone advice varied between 5% and 17%"'
+- id: holdrule-harm-meta2025
+  claim: A 115-study meta-analysis (691,056 patients) found a lack of evidence for any association between EMS response time and patient survival, with very low certainty; evidence is sparse except for cardiac arrest and trauma
+  source: Hansen, Nielsen & Rehn, PLoS ONE (2025), doi:10.1371/journal.pone.0335665, abstract
+  verdict: supported (abstract; full text not checked)
+  evidence: '"found lack of evidence to infer an association between the EMS response time and patient survival, with very low certainty of evidence"; "Only sparse scientific evidence supports the notion that the shortest possible response time relates to improved patient outcomes ... other than out-of-hospital cardiac arrest and trauma"'

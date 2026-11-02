@@ -1,0 +1,7054 @@
+{
+ "meta": {
+  "notice": "No API key, so this request shares one free daily budget ($0.10) with everyone on your network's IP address. Get a free key with its own $1/day at https://openalex.org/settings/api and add api_key=YOUR_KEY to your requests. An AI agent can get one for its user in one call: POST https://api.openalex.org/api-keys with {\"email\": \"<your user's email>\"}; we email them a link, and the key works once they click it. Docs for agents: https://help.openalex.org/llms.txt",
+  "count": 175,
+  "db_response_time_ms": 190,
+  "page": 1,
+  "per_page": 10,
+  "groups_count": null,
+  "x_query": {
+   "oql": "get works with (ambulance hear \"and\" treat secondary triage low acuity evaluation) in the full text",
+   "x_new_oql": "get works with (ambulance hear \"and\" treat secondary triage low acuity evaluation) in the full text",
+   "oqo": {
+    "get_rows": "works",
+    "filter_rows": [
+     {
+      "column_id": "fulltext.search",
+      "value": "ambulance hear and treat secondary triage low acuity evaluation",
+      "operator": "has"
+     }
+    ]
+   },
+   "url": "/works?filter=fulltext.search:ambulance hear and treat secondary triage low acuity evaluation&per_page=10",
+   "order": "best matches first",
+   "order_default": true
+  },
+  "cost_usd": 0.001,
+  "note": "slimmed by task 020 to relied-upon records only; full response had 3 results shown of 175 total"
+ },
+ "results": [
+  {
+   "id": "https://openalex.org/W1605143970",
+   "doi": "https://doi.org/10.3310/hsdr03210",
+   "title": "Patient safety in ambulance services: a scoping review",
+   "display_name": "Patient safety in ambulance services: a scoping review",
+   "relevance_score": 33.47508,
+   "publication_year": 2015,
+   "publication_date": "2015-05-01",
+   "ids": {
+    "openalex": "https://openalex.org/W1605143970",
+    "doi": "https://doi.org/10.3310/hsdr03210",
+    "mag": "1605143970"
+   },
+   "language": "en",
+   "primary_location": {
+    "id": "doi:10.3310/hsdr03210",
+    "doi": "https://doi.org/10.3310/hsdr03210",
+    "is_oa": true,
+    "landing_page_url": "https://doi.org/10.3310/hsdr03210",
+    "pdf_url": "https://njl-admin.nihr.ac.uk/document/download/2003770",
+    "source": {
+     "id": "https://openalex.org/S2764367346",
+     "display_name": "Health Services and Delivery Research",
+     "issn_l": "2050-4349",
+     "issn": [
+      "2050-4349",
+      "2050-4357"
+     ],
+     "is_oa": true,
+     "is_in_doaj": true,
+     "is_core": true,
+     "listed_in": [
+      "cwts-core",
+      "doaj"
+     ],
+     "host_organization": "https://openalex.org/P4310311817",
+     "host_organization_name": "NIHR Journals Library",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310311817"
+     ],
+     "host_organization_lineage_names": [
+      "NIHR Journals Library"
+     ],
+     "type": "journal"
+    },
+    "license": "other-oa",
+    "license_id": "https://openalex.org/licenses/other-oa",
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "Health Services and Delivery Research",
+    "raw_type": "journal-article"
+   },
+   "volume": null,
+   "type": "article",
+   "indexed_in": [
+    "crossref",
+    "doaj"
+   ],
+   "open_access": {
+    "is_oa": true,
+    "oa_status": "diamond",
+    "oa_url": "https://njl-admin.nihr.ac.uk/document/download/2003770",
+    "any_repository_has_fulltext": true
+   },
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": "https://openalex.org/A5081477043",
+      "display_name": "Joanne D. Fisher",
+      "orcid": "https://orcid.org/0000-0003-0002-2149",
+      "observed_orcids": [
+       "https://orcid.org/0000-0003-0002-2149"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I39555362",
+       "display_name": "University of Warwick",
+       "ror": "https://ror.org/01a77tt86",
+       "country_code": "GB",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I39555362"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Joanne D Fisher",
+     "raw_affiliation_strings": [
+      "Department of Health Sciences, Warwick Medical School, Coventry, UK"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Health Sciences, Warwick Medical School, Coventry, UK",
+       "institution_ids": [
+        "https://openalex.org/I39555362"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5084035555",
+      "display_name": "Karoline Freeman",
+      "orcid": "https://orcid.org/0000-0002-9963-2918",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-9963-2918"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I39555362",
+       "display_name": "University of Warwick",
+       "ror": "https://ror.org/01a77tt86",
+       "country_code": "GB",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I39555362"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Karoline Freeman",
+     "raw_affiliation_strings": [
+      "Department of Health Sciences, Warwick Medical School, Coventry, UK"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Health Sciences, Warwick Medical School, Coventry, UK",
+       "institution_ids": [
+        "https://openalex.org/I39555362"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5086633752",
+      "display_name": "Aileen Clarke",
+      "orcid": "https://orcid.org/0000-0001-8299-3146",
+      "observed_orcids": [
+       "https://orcid.org/0000-0001-8299-3146"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I39555362",
+       "display_name": "University of Warwick",
+       "ror": "https://ror.org/01a77tt86",
+       "country_code": "GB",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I39555362"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Aileen Clarke",
+     "raw_affiliation_strings": [
+      "Department of Health Sciences, Warwick Medical School, Coventry, UK"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Health Sciences, Warwick Medical School, Coventry, UK",
+       "institution_ids": [
+        "https://openalex.org/I39555362"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5053284309",
+      "display_name": "Peter C. Spurgeon",
+      "orcid": null,
+      "observed_orcids": []
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I39555362",
+       "display_name": "University of Warwick",
+       "ror": "https://ror.org/01a77tt86",
+       "country_code": "GB",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I39555362"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Peter Spurgeon",
+     "raw_affiliation_strings": [
+      "Department of Health Sciences, Warwick Medical School, Coventry, UK"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Health Sciences, Warwick Medical School, Coventry, UK",
+       "institution_ids": [
+        "https://openalex.org/I39555362"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5110268583",
+      "display_name": "Mike Smyth",
+      "orcid": null,
+      "observed_orcids": []
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I4405261474",
+       "display_name": "West Midlands Ambulance Service University NHS Foundation Trust",
+       "ror": "https://ror.org/05bsaay65",
+       "country_code": "GB",
+       "type": "healthcare",
+       "lineage": [
+        "https://openalex.org/I4405261474"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Mike Smyth",
+     "raw_affiliation_strings": [
+      "West Midlands Ambulance Service, Millennium Point, Waterfront Business Park, Brierley Hill, West Midlands, UK"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "West Midlands Ambulance Service, Millennium Point, Waterfront Business Park, Brierley Hill, West Midlands, UK",
+       "institution_ids": [
+        "https://openalex.org/I4405261474"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5079381636",
+      "display_name": "Gavin D. Perkins",
+      "orcid": "https://orcid.org/0000-0003-3027-7548",
+      "observed_orcids": [
+       "https://orcid.org/0000-0003-3027-7548"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I39555362",
+       "display_name": "University of Warwick",
+       "ror": "https://ror.org/01a77tt86",
+       "country_code": "GB",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I39555362"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Gavin D Perkins",
+     "raw_affiliation_strings": [
+      "Department of Health Sciences, Warwick Medical School, Coventry, UK"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Health Sciences, Warwick Medical School, Coventry, UK",
+       "institution_ids": [
+        "https://openalex.org/I39555362"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5023832609",
+      "display_name": "Mark Alexander Sujan",
+      "orcid": "https://orcid.org/0000-0001-6895-946X",
+      "observed_orcids": [
+       "https://orcid.org/0000-0001-6895-946X"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I39555362",
+       "display_name": "University of Warwick",
+       "ror": "https://ror.org/01a77tt86",
+       "country_code": "GB",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I39555362"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Mark-Alexander Sujan",
+     "raw_affiliation_strings": [
+      "Department of Health Sciences, Warwick Medical School, Coventry, UK"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Health Sciences, Warwick Medical School, Coventry, UK",
+       "institution_ids": [
+        "https://openalex.org/I39555362"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "last",
+     "author": {
+      "id": "https://openalex.org/A5014373313",
+      "display_name": "Matthew W Cooke",
+      "orcid": "https://orcid.org/0000-0002-1038-3821",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-1038-3821"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I39555362",
+       "display_name": "University of Warwick",
+       "ror": "https://ror.org/01a77tt86",
+       "country_code": "GB",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I39555362"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Matthew W Cooke",
+     "raw_affiliation_strings": [
+      "Department of Health Sciences, Warwick Medical School, Coventry, UK"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Health Sciences, Warwick Medical School, Coventry, UK",
+       "institution_ids": [
+        "https://openalex.org/I39555362"
+       ]
+      }
+     ]
+    }
+   ],
+   "institutions": [],
+   "countries_distinct_count": 1,
+   "institutions_distinct_count": 2,
+   "corresponding_author_ids": [],
+   "corresponding_institution_ids": [],
+   "apc_list": null,
+   "apc_paid": null,
+   "fwci": 6.9083,
+   "has_fulltext": true,
+   "cited_by_count": 54,
+   "citation_normalized_percentile": {
+    "value": 0.96322109,
+    "is_in_top_1_percent": false,
+    "is_in_top_10_percent": true
+   },
+   "cited_by_percentile_year": {
+    "min": 89,
+    "max": 99
+   },
+   "biblio": {
+    "volume": "3",
+    "issue": "21",
+    "first_page": "1",
+    "last_page": "250"
+   },
+   "is_retracted": false,
+   "is_paratext": false,
+   "is_xpac": false,
+   "primary_topic": {
+    "id": "https://openalex.org/T10508",
+    "display_name": "Patient Safety and Medication Errors",
+    "score": 0.8842999935150146,
+    "subfield": {
+     "id": "https://openalex.org/subfields/3604",
+     "display_name": "Emergency Medical Services"
+    },
+    "field": {
+     "id": "https://openalex.org/fields/36",
+     "display_name": "Health Professions"
+    },
+    "domain": {
+     "id": "https://openalex.org/domains/4",
+     "display_name": "Health Sciences"
+    }
+   },
+   "topics": [
+    {
+     "id": "https://openalex.org/T10508",
+     "display_name": "Patient Safety and Medication Errors",
+     "score": 0.8842999935150146,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3604",
+      "display_name": "Emergency Medical Services"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/36",
+      "display_name": "Health Professions"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/4",
+      "display_name": "Health Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T11467",
+     "display_name": "Trauma and Emergency Care Studies",
+     "score": 0.08969999849796295,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2711",
+      "display_name": "Emergency Medicine"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/27",
+      "display_name": "Medicine"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/4",
+      "display_name": "Health Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T11095",
+     "display_name": "Emergency and Acute Care Studies",
+     "score": 0.018699999898672104,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2711",
+      "display_name": "Emergency Medicine"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/27",
+      "display_name": "Medicine"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/4",
+      "display_name": "Health Sciences"
+     }
+    }
+   ],
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/patient-safety",
+     "display_name": "patient safety",
+     "score": 0.7689999938011169
+    },
+    {
+     "id": "https://openalex.org/keywords/ambulance-services",
+     "display_name": "ambulance services",
+     "score": 0.9959999918937683
+    },
+    {
+     "id": "https://openalex.org/keywords/prehospital-care",
+     "display_name": "prehospital care",
+     "score": 0.6930000185966492
+    },
+    {
+     "id": "https://openalex.org/keywords/paramedics",
+     "display_name": "paramedics",
+     "score": 0.9169999957084656
+    },
+    {
+     "id": "https://openalex.org/keywords/adverse-events",
+     "display_name": "adverse events",
+     "score": 0.8529999852180481
+    },
+    {
+     "id": "https://openalex.org/keywords/ambulance-personnel",
+     "display_name": "ambulance personnel",
+     "score": 0.3100000023841858
+    },
+    {
+     "id": "https://openalex.org/keywords/coroner-reports",
+     "display_name": "coroner reports",
+     "score": 0.7599999904632568
+    },
+    {
+     "id": "https://openalex.org/keywords/incident-reporting",
+     "display_name": "incident reporting",
+     "score": 0.5770000219345093
+    },
+    {
+     "id": "https://openalex.org/keywords/patient-safety-culture",
+     "display_name": "patient safety culture",
+     "score": 0.4309999942779541
+    },
+    {
+     "id": "https://openalex.org/keywords/emergency-medical-services",
+     "display_name": "emergency medical services",
+     "score": 0.4580000042915344
+    },
+    {
+     "id": "https://openalex.org/keywords/research-priorities",
+     "display_name": "research priorities",
+     "score": 0.48399999737739563
+    },
+    {
+     "id": "https://openalex.org/keywords/delphi-method",
+     "display_name": "Delphi method",
+     "score": 0.48500001430511475
+    },
+    {
+     "id": "https://openalex.org/keywords/united-kingdom",
+     "display_name": "United Kingdom",
+     "score": 0.36000001430511475
+    }
+   ],
+   "concepts": [
+    {
+     "id": "https://openalex.org/C2781145037",
+     "wikidata": "https://www.wikidata.org/wiki/Q5011772",
+     "display_name": "CINAHL",
+     "level": 3,
+     "score": 0.6832985877990723
+    },
+    {
+     "id": "https://openalex.org/C2779549880",
+     "wikidata": "https://www.wikidata.org/wiki/Q5542226",
+     "display_name": "PsycINFO",
+     "level": 3,
+     "score": 0.5622779130935669
+    },
+    {
+     "id": "https://openalex.org/C56666940",
+     "wikidata": "https://www.wikidata.org/wiki/Q788790",
+     "display_name": "Documentation",
+     "level": 2,
+     "score": 0.5254506468772888
+    },
+    {
+     "id": "https://openalex.org/C2779473830",
+     "wikidata": "https://www.wikidata.org/wiki/Q1540899",
+     "display_name": "MEDLINE",
+     "level": 2,
+     "score": 0.5193749070167542
+    },
+    {
+     "id": "https://openalex.org/C71924100",
+     "wikidata": "https://www.wikidata.org/wiki/Q11190",
+     "display_name": "Medicine",
+     "level": 0,
+     "score": 0.4955664873123169
+    },
+    {
+     "id": "https://openalex.org/C2779328685",
+     "wikidata": "https://www.wikidata.org/wiki/Q1475557",
+     "display_name": "Patient safety",
+     "level": 3,
+     "score": 0.44182658195495605
+    },
+    {
+     "id": "https://openalex.org/C2776478404",
+     "wikidata": "https://www.wikidata.org/wiki/Q1105187",
+     "display_name": "Cochrane Library",
+     "level": 3,
+     "score": 0.41748112440109253
+    },
+    {
+     "id": "https://openalex.org/C189708586",
+     "wikidata": "https://www.wikidata.org/wiki/Q1504425",
+     "display_name": "Systematic review",
+     "level": 3,
+     "score": 0.41150206327438354
+    },
+    {
+     "id": "https://openalex.org/C27415008",
+     "wikidata": "https://www.wikidata.org/wiki/Q7256382",
+     "display_name": "Psychological intervention",
+     "level": 2,
+     "score": 0.3661215305328369
+    },
+    {
+     "id": "https://openalex.org/C160735492",
+     "wikidata": "https://www.wikidata.org/wiki/Q31207",
+     "display_name": "Health care",
+     "level": 2,
+     "score": 0.3614081144332886
+    },
+    {
+     "id": "https://openalex.org/C545542383",
+     "wikidata": "https://www.wikidata.org/wiki/Q2751242",
+     "display_name": "Medical emergency",
+     "level": 1,
+     "score": 0.34085193276405334
+    },
+    {
+     "id": "https://openalex.org/C159110408",
+     "wikidata": "https://www.wikidata.org/wiki/Q121176",
+     "display_name": "Nursing",
+     "level": 1,
+     "score": 0.27760034799575806
+    },
+    {
+     "id": "https://openalex.org/C41008148",
+     "wikidata": "https://www.wikidata.org/wiki/Q21198",
+     "display_name": "Computer science",
+     "level": 0,
+     "score": 0.17392617464065552
+    },
+    {
+     "id": "https://openalex.org/C204787440",
+     "wikidata": "https://www.wikidata.org/wiki/Q188504",
+     "display_name": "Alternative medicine",
+     "level": 2,
+     "score": 0.14767038822174072
+    },
+    {
+     "id": "https://openalex.org/C17744445",
+     "wikidata": "https://www.wikidata.org/wiki/Q36442",
+     "display_name": "Political science",
+     "level": 0,
+     "score": 0.09629654884338379
+    },
+    {
+     "id": "https://openalex.org/C199360897",
+     "wikidata": "https://www.wikidata.org/wiki/Q9143",
+     "display_name": "Programming language",
+     "level": 1,
+     "score": 0.0
+    },
+    {
+     "id": "https://openalex.org/C199539241",
+     "wikidata": "https://www.wikidata.org/wiki/Q7748",
+     "display_name": "Law",
+     "level": 1,
+     "score": 0.0
+    },
+    {
+     "id": "https://openalex.org/C142724271",
+     "wikidata": "https://www.wikidata.org/wiki/Q7208",
+     "display_name": "Pathology",
+     "level": 1,
+     "score": 0.0
+    }
+   ],
+   "mesh": [],
+   "locations_count": 4,
+   "locations": [
+    {
+     "id": "doi:10.3310/hsdr03210",
+     "doi": "https://doi.org/10.3310/hsdr03210",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.3310/hsdr03210",
+     "pdf_url": "https://njl-admin.nihr.ac.uk/document/download/2003770",
+     "source": {
+      "id": "https://openalex.org/S2764367346",
+      "display_name": "Health Services and Delivery Research",
+      "issn_l": "2050-4349",
+      "issn": [
+       "2050-4349",
+       "2050-4357"
+      ],
+      "is_oa": true,
+      "is_in_doaj": true,
+      "is_core": true,
+      "listed_in": [
+       "cwts-core",
+       "doaj"
+      ],
+      "host_organization": "https://openalex.org/P4310311817",
+      "host_organization_name": "NIHR Journals Library",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310311817"
+      ],
+      "host_organization_lineage_names": [
+       "NIHR Journals Library"
+      ],
+      "type": "journal"
+     },
+     "license": "other-oa",
+     "license_id": "https://openalex.org/licenses/other-oa",
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Health Services and Delivery Research",
+     "raw_type": "journal-article"
+    },
+    {
+     "id": "pmh:oai:wrap.warwick.ac.uk:69584",
+     "doi": null,
+     "is_oa": false,
+     "landing_page_url": "http://wrap.warwick.ac.uk/69584/1/WRAP-Patient-safety-in-ambulance-services-Perkins-2015.pdf",
+     "pdf_url": "http://wrap.warwick.ac.uk/69584/1/WRAP-Patient-safety-in-ambulance-services-Perkins-2015.pdf",
+     "source": {
+      "id": "https://openalex.org/S4306400665",
+      "display_name": "Warwick Research Archive Portal (University of Warwick)",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I39555362",
+      "host_organization_name": "University of Warwick",
+      "host_organization_lineage": [
+       "https://openalex.org/I39555362"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "acceptedVersion",
+     "is_accepted": true,
+     "is_published": false,
+     "raw_source_name": "",
+     "raw_type": "Journal Article"
+    },
+    {
+     "id": "pmh:oai:doaj.org/article:b66d9a26812148348a09ad181e34fc80",
+     "doi": null,
+     "is_oa": true,
+     "landing_page_url": "https://doaj.org/article/b66d9a26812148348a09ad181e34fc80",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4306401280",
+      "display_name": "DOAJ (DOAJ: Directory of Open Access Journals)",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": null,
+      "host_organization_name": null,
+      "host_organization_lineage": [],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": "cc-by-sa",
+     "license_id": "https://openalex.org/licenses/cc-by-sa",
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": "Health Services and Delivery Research, Vol 3, Iss 21 (2015)",
+     "raw_type": "article"
+    },
+    {
+     "id": "pmh:oai:null:20.500.12417/316",
+     "doi": null,
+     "is_oa": false,
+     "landing_page_url": "http://hdl.handle.net/20.500.12417/316",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S7407055443",
+      "display_name": "amber - ambulance research repository",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": null,
+      "host_organization_name": null,
+      "host_organization_lineage": [],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": "Health Services and Delivery Research",
+     "raw_type": "Journal Article/Review"
+    }
+   ],
+   "best_oa_location": {
+    "id": "doi:10.3310/hsdr03210",
+    "doi": "https://doi.org/10.3310/hsdr03210",
+    "is_oa": true,
+    "landing_page_url": "https://doi.org/10.3310/hsdr03210",
+    "pdf_url": "https://njl-admin.nihr.ac.uk/document/download/2003770",
+    "source": {
+     "id": "https://openalex.org/S2764367346",
+     "display_name": "Health Services and Delivery Research",
+     "issn_l": "2050-4349",
+     "issn": [
+      "2050-4349",
+      "2050-4357"
+     ],
+     "is_oa": true,
+     "is_in_doaj": true,
+     "is_core": true,
+     "listed_in": [
+      "cwts-core",
+      "doaj"
+     ],
+     "host_organization": "https://openalex.org/P4310311817",
+     "host_organization_name": "NIHR Journals Library",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310311817"
+     ],
+     "host_organization_lineage_names": [
+      "NIHR Journals Library"
+     ],
+     "type": "journal"
+    },
+    "license": "other-oa",
+    "license_id": "https://openalex.org/licenses/other-oa",
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "Health Services and Delivery Research",
+    "raw_type": "journal-article"
+   },
+   "sustainable_development_goals": [
+    {
+     "display_name": "Good health and well-being",
+     "score": 0.9537000060081482,
+     "id": "https://metadata.un.org/sdg/3"
+    }
+   ],
+   "sustainable_development_goals_aurora": [],
+   "study_designs": [
+    {
+     "display_name": "Systematic Review",
+     "id": "https://openalex.org/study-designs/systematic-review"
+    }
+   ],
+   "awards": [
+    {
+     "id": "https://openalex.org/G6106171632",
+     "display_name": "Patient Safety in UK Ambulance Services - a scoping review",
+     "funder_award_id": "10/1008/12",
+     "funder_id": "https://openalex.org/F4320319990",
+     "funder_display_name": "National Institute for Health and Care Research"
+    },
+    {
+     "id": "https://openalex.org/G8399072131",
+     "display_name": null,
+     "funder_award_id": "10/1008/12",
+     "funder_id": "https://openalex.org/F4320334785",
+     "funder_display_name": "Health Services and Delivery Research Programme"
+    }
+   ],
+   "funders": [
+    {
+     "id": "https://openalex.org/F4320319990",
+     "display_name": "National Institute for Health and Care Research",
+     "ror": "https://ror.org/0187kwz08"
+    },
+    {
+     "id": "https://openalex.org/F4320320277",
+     "display_name": "University of Southampton",
+     "ror": "https://ror.org/01ryk1543"
+    },
+    {
+     "id": "https://openalex.org/F4320320279",
+     "display_name": "University of Warwick",
+     "ror": "https://ror.org/01a77tt86"
+    },
+    {
+     "id": "https://openalex.org/F4320320342",
+     "display_name": "University of Sheffield",
+     "ror": "https://ror.org/05krs5044"
+    },
+    {
+     "id": "https://openalex.org/F4320328564",
+     "display_name": "Welsh Ambulance Services NHS Trust",
+     "ror": "https://ror.org/017qpw206"
+    },
+    {
+     "id": "https://openalex.org/F4320332161",
+     "display_name": "National Institutes of Health",
+     "ror": "https://ror.org/01cwqze88"
+    },
+    {
+     "id": "https://openalex.org/F4320334785",
+     "display_name": "Health Services and Delivery Research Programme",
+     "ror": "https://ror.org/0187kwz08"
+    }
+   ],
+   "has_content": {
+    "grobid_xml": true,
+    "pdf": true
+   },
+   "content_urls": {
+    "pdf": "https://content.openalex.org/works/W1605143970.pdf",
+    "grobid_xml": "https://content.openalex.org/works/W1605143970.grobid-xml"
+   },
+   "referenced_works_count": 529,
+   "referenced_works": [
+    "https://openalex.org/W8820996",
+    "https://openalex.org/W11866531",
+    "https://openalex.org/W18939118",
+    "https://openalex.org/W33208920",
+    "https://openalex.org/W42157787",
+    "https://openalex.org/W43393912",
+    "https://openalex.org/W48082200",
+    "https://openalex.org/W70929929",
+    "https://openalex.org/W74506638",
+    "https://openalex.org/W75725584",
+    "https://openalex.org/W76506283",
+    "https://openalex.org/W77840266",
+    "https://openalex.org/W93548211",
+    "https://openalex.org/W96613928",
+    "https://openalex.org/W127418812",
+    "https://openalex.org/W129537336",
+    "https://openalex.org/W135704462",
+    "https://openalex.org/W136652048",
+    "https://openalex.org/W165049288",
+    "https://openalex.org/W260161074",
+    "https://openalex.org/W788483193",
+    "https://openalex.org/W1487727533",
+    "https://openalex.org/W1504565187",
+    "https://openalex.org/W1515696596",
+    "https://openalex.org/W1518479447",
+    "https://openalex.org/W1526256364",
+    "https://openalex.org/W1530156650",
+    "https://openalex.org/W1534444714",
+    "https://openalex.org/W1550872100",
+    "https://openalex.org/W1564970589",
+    "https://openalex.org/W1573961846",
+    "https://openalex.org/W1581108483",
+    "https://openalex.org/W1584616554",
+    "https://openalex.org/W1585022449",
+    "https://openalex.org/W1587846482",
+    "https://openalex.org/W1588754488",
+    "https://openalex.org/W1593824353",
+    "https://openalex.org/W1620299991",
+    "https://openalex.org/W1642310120",
+    "https://openalex.org/W1712757310",
+    "https://openalex.org/W1722059781",
+    "https://openalex.org/W1777107686",
+    "https://openalex.org/W1789286020",
+    "https://openalex.org/W1855125895",
+    "https://openalex.org/W1861790559",
+    "https://openalex.org/W1884458772",
+    "https://openalex.org/W1890742376",
+    "https://openalex.org/W1894658510",
+    "https://openalex.org/W1933989653",
+    "https://openalex.org/W1963486625",
+    "https://openalex.org/W1964672158",
+    "https://openalex.org/W1964793110",
+    "https://openalex.org/W1964919807",
+    "https://openalex.org/W1965178506",
+    "https://openalex.org/W1965548995",
+    "https://openalex.org/W1966804608",
+    "https://openalex.org/W1967198282",
+    "https://openalex.org/W1967251749",
+    "https://openalex.org/W1967830489",
+    "https://openalex.org/W1968075063",
+    "https://openalex.org/W1968422764",
+    "https://openalex.org/W1968964442",
+    "https://openalex.org/W1969072090",
+    "https://openalex.org/W1969345365",
+    "https://openalex.org/W1970242771",
+    "https://openalex.org/W1970337644",
+    "https://openalex.org/W1970588955",
+    "https://openalex.org/W1972002856",
+    "https://openalex.org/W1972843051",
+    "https://openalex.org/W1972850536",
+    "https://openalex.org/W1972886576",
+    "https://openalex.org/W1973165025",
+    "https://openalex.org/W1973255326",
+    "https://openalex.org/W1973966602",
+    "https://openalex.org/W1973995337",
+    "https://openalex.org/W1974102503",
+    "https://openalex.org/W1976113132",
+    "https://openalex.org/W1976353835",
+    "https://openalex.org/W1977136058",
+    "https://openalex.org/W1977375911",
+    "https://openalex.org/W1977516214",
+    "https://openalex.org/W1978649980",
+    "https://openalex.org/W1979005664",
+    "https://openalex.org/W1979141999",
+    "https://openalex.org/W1980279699",
+    "https://openalex.org/W1980588864",
+    "https://openalex.org/W1980904422",
+    "https://openalex.org/W1981428665",
+    "https://openalex.org/W1982034628",
+    "https://openalex.org/W1982604606",
+    "https://openalex.org/W1983160055",
+    "https://openalex.org/W1984392924",
+    "https://openalex.org/W1984398421",
+    "https://openalex.org/W1984623429",
+    "https://openalex.org/W1984874587",
+    "https://openalex.org/W1985025897",
+    "https://openalex.org/W1985476543",
+    "https://openalex.org/W1985572461",
+    "https://openalex.org/W1985889706",
+    "https://openalex.org/W1986152416",
+    "https://openalex.org/W1986712994",
+    "https://openalex.org/W1986724852",
+    "https://openalex.org/W1986796606",
+    "https://openalex.org/W1986824210",
+    "https://openalex.org/W1987216770",
+    "https://openalex.org/W1987232526",
+    "https://openalex.org/W1987830999",
+    "https://openalex.org/W1988471082",
+    "https://openalex.org/W1989156638",
+    "https://openalex.org/W1989391884",
+    "https://openalex.org/W1990243423",
+    "https://openalex.org/W1990284280",
+    "https://openalex.org/W1990634863",
+    "https://openalex.org/W1991071742",
+    "https://openalex.org/W1991258648",
+    "https://openalex.org/W1991352015",
+    "https://openalex.org/W1991567056",
+    "https://openalex.org/W1991577632",
+    "https://openalex.org/W1992282197",
+    "https://openalex.org/W1992950670",
+    "https://openalex.org/W1993153680",
+    "https://openalex.org/W1993158820",
+    "https://openalex.org/W1993219489",
+    "https://openalex.org/W1994752355",
+    "https://openalex.org/W1994795759",
+    "https://openalex.org/W1995151391",
+    "https://openalex.org/W1995482648",
+    "https://openalex.org/W1996349572",
+    "https://openalex.org/W1996665496",
+    "https://openalex.org/W1996669893",
+    "https://openalex.org/W1996729302",
+    "https://openalex.org/W1996731847",
+    "https://openalex.org/W1997392485",
+    "https://openalex.org/W1997568439",
+    "https://openalex.org/W1998843321",
+    "https://openalex.org/W1999166911",
+    "https://openalex.org/W2000808992",
+    "https://openalex.org/W2000896360",
+    "https://openalex.org/W2001034298",
+    "https://openalex.org/W2002466063",
+    "https://openalex.org/W2004181661",
+    "https://openalex.org/W2004241408",
+    "https://openalex.org/W2004412089",
+    "https://openalex.org/W2004684289",
+    "https://openalex.org/W2004833181",
+    "https://openalex.org/W2005098256",
+    "https://openalex.org/W2006633115",
+    "https://openalex.org/W2007728968",
+    "https://openalex.org/W2008539726",
+    "https://openalex.org/W2009014219",
+    "https://openalex.org/W2009813433",
+    "https://openalex.org/W2009885450",
+    "https://openalex.org/W2010058402",
+    "https://openalex.org/W2011851264",
+    "https://openalex.org/W2012301431",
+    "https://openalex.org/W2012551589",
+    "https://openalex.org/W2013371829",
+    "https://openalex.org/W2014087770",
+    "https://openalex.org/W2014535140",
+    "https://openalex.org/W2015232380",
+    "https://openalex.org/W2015665165",
+    "https://openalex.org/W2015989076",
+    "https://openalex.org/W2016029678",
+    "https://openalex.org/W2016797330",
+    "https://openalex.org/W2017744124",
+    "https://openalex.org/W2017881433",
+    "https://openalex.org/W2018218157",
+    "https://openalex.org/W2019221526",
+    "https://openalex.org/W2020093629",
+    "https://openalex.org/W2020295846",
+    "https://openalex.org/W2021066459",
+    "https://openalex.org/W2021360813",
+    "https://openalex.org/W2021388924",
+    "https://openalex.org/W2021948093",
+    "https://openalex.org/W2022819467",
+    "https://openalex.org/W2023062229",
+    "https://openalex.org/W2023147888",
+    "https://openalex.org/W2023316055",
+    "https://openalex.org/W2023923147",
+    "https://openalex.org/W2024057608",
+    "https://openalex.org/W2024902831",
+    "https://openalex.org/W2025174531",
+    "https://openalex.org/W2026021489",
+    "https://openalex.org/W2026815166",
+    "https://openalex.org/W2026838104",
+    "https://openalex.org/W2026953851",
+    "https://openalex.org/W2027058837",
+    "https://openalex.org/W2027230650",
+    "https://openalex.org/W2029627195",
+    "https://openalex.org/W2029910174",
+    "https://openalex.org/W2030937084",
+    "https://openalex.org/W2032631592",
+    "https://openalex.org/W2035120205",
+    "https://openalex.org/W2035722229",
+    "https://openalex.org/W2036774018",
+    "https://openalex.org/W2037520103",
+    "https://openalex.org/W2038040442",
+    "https://openalex.org/W2039347178",
+    "https://openalex.org/W2041225086",
+    "https://openalex.org/W2041640036",
+    "https://openalex.org/W2041837324",
+    "https://openalex.org/W2041947223",
+    "https://openalex.org/W2042031049",
+    "https://openalex.org/W2042265613",
+    "https://openalex.org/W2042743522",
+    "https://openalex.org/W2042757857",
+    "https://openalex.org/W2043572460",
+    "https://openalex.org/W2043848123",
+    "https://openalex.org/W2043962240",
+    "https://openalex.org/W2044110051",
+    "https://openalex.org/W2044483834",
+    "https://openalex.org/W2045133435",
+    "https://openalex.org/W2045396525",
+    "https://openalex.org/W2045578281",
+    "https://openalex.org/W2045720977",
+    "https://openalex.org/W2045838842",
+    "https://openalex.org/W2046894564",
+    "https://openalex.org/W2046956268",
+    "https://openalex.org/W2046981843",
+    "https://openalex.org/W2047617549",
+    "https://openalex.org/W2048454349",
+    "https://openalex.org/W2048932078",
+    "https://openalex.org/W2048955629",
+    "https://openalex.org/W2049623321",
+    "https://openalex.org/W2051255325",
+    "https://openalex.org/W2051255679",
+    "https://openalex.org/W2051340169",
+    "https://openalex.org/W2051414218",
+    "https://openalex.org/W2051530883",
+    "https://openalex.org/W2052380010",
+    "https://openalex.org/W2052945001",
+    "https://openalex.org/W2053084191",
+    "https://openalex.org/W2053797879",
+    "https://openalex.org/W2053925241",
+    "https://openalex.org/W2054133749",
+    "https://openalex.org/W2054378591",
+    "https://openalex.org/W2054489873",
+    "https://openalex.org/W2054830829",
+    "https://openalex.org/W2055010519",
+    "https://openalex.org/W2055312197",
+    "https://openalex.org/W2055887659",
+    "https://openalex.org/W2056110973",
+    "https://openalex.org/W2056114588",
+    "https://openalex.org/W2056670023",
+    "https://openalex.org/W2056746919",
+    "https://openalex.org/W2057884103",
+    "https://openalex.org/W2057893680",
+    "https://openalex.org/W2058450032",
+    "https://openalex.org/W2058760997",
+    "https://openalex.org/W2059786249",
+    "https://openalex.org/W2060392417",
+    "https://openalex.org/W2060541280",
+    "https://openalex.org/W2060915801",
+    "https://openalex.org/W2061077632",
+    "https://openalex.org/W2061092481",
+    "https://openalex.org/W2061450595",
+    "https://openalex.org/W2061686056",
+    "https://openalex.org/W2063325845",
+    "https://openalex.org/W2063366869",
+    "https://openalex.org/W2063505606",
+    "https://openalex.org/W2063854487",
+    "https://openalex.org/W2064280496",
+    "https://openalex.org/W2064357382",
+    "https://openalex.org/W2064820654",
+    "https://openalex.org/W2065210754",
+    "https://openalex.org/W2065239403",
+    "https://openalex.org/W2065713520",
+    "https://openalex.org/W2065774815",
+    "https://openalex.org/W2065886984",
+    "https://openalex.org/W2066137044",
+    "https://openalex.org/W2066439639",
+    "https://openalex.org/W2066652090",
+    "https://openalex.org/W2066663643",
+    "https://openalex.org/W2067852307",
+    "https://openalex.org/W2068023202",
+    "https://openalex.org/W2068179906",
+    "https://openalex.org/W2068582116",
+    "https://openalex.org/W2068606178",
+    "https://openalex.org/W2069043353",
+    "https://openalex.org/W2069091447",
+    "https://openalex.org/W2069477652",
+    "https://openalex.org/W2069687434",
+    "https://openalex.org/W2069804091",
+    "https://openalex.org/W2070333842",
+    "https://openalex.org/W2070651858",
+    "https://openalex.org/W2070766371",
+    "https://openalex.org/W2071216724",
+    "https://openalex.org/W2071948451",
+    "https://openalex.org/W2071962986",
+    "https://openalex.org/W2072187003",
+    "https://openalex.org/W2072398857",
+    "https://openalex.org/W2074101470",
+    "https://openalex.org/W2075713307",
+    "https://openalex.org/W2076378792",
+    "https://openalex.org/W2076462857",
+    "https://openalex.org/W2078897787",
+    "https://openalex.org/W2078940044",
+    "https://openalex.org/W2079550136",
+    "https://openalex.org/W2080054056",
+    "https://openalex.org/W2082799013",
+    "https://openalex.org/W2082873199",
+    "https://openalex.org/W2082983063",
+    "https://openalex.org/W2083158899",
+    "https://openalex.org/W2083394580",
+    "https://openalex.org/W2083744045",
+    "https://openalex.org/W2084410304",
+    "https://openalex.org/W2084813212",
+    "https://openalex.org/W2085542262",
+    "https://openalex.org/W2085543140",
+    "https://openalex.org/W2086339826",
+    "https://openalex.org/W2086506650",
+    "https://openalex.org/W2087247777",
+    "https://openalex.org/W2088206345",
+    "https://openalex.org/W2088582690",
+    "https://openalex.org/W2088819351",
+    "https://openalex.org/W2089964481",
+    "https://openalex.org/W2091049030",
+    "https://openalex.org/W2092014512",
+    "https://openalex.org/W2092601980",
+    "https://openalex.org/W2092840992",
+    "https://openalex.org/W2093507895",
+    "https://openalex.org/W2093898108",
+    "https://openalex.org/W2095002287",
+    "https://openalex.org/W2096460790",
+    "https://openalex.org/W2096485324",
+    "https://openalex.org/W2096591359",
+    "https://openalex.org/W2096984170",
+    "https://openalex.org/W2097164729",
+    "https://openalex.org/W2098051651",
+    "https://openalex.org/W2099320275",
+    "https://openalex.org/W2099624855",
+    "https://openalex.org/W2100260065",
+    "https://openalex.org/W2100289753",
+    "https://openalex.org/W2100673063",
+    "https://openalex.org/W2101236533",
+    "https://openalex.org/W2101599218",
+    "https://openalex.org/W2102782293",
+    "https://openalex.org/W2103784846",
+    "https://openalex.org/W2104749917",
+    "https://openalex.org/W2106342293",
+    "https://openalex.org/W2106579879",
+    "https://openalex.org/W2106677708",
+    "https://openalex.org/W2107629864",
+    "https://openalex.org/W2108592901",
+    "https://openalex.org/W2109923213",
+    "https://openalex.org/W2111345884",
+    "https://openalex.org/W2112740133",
+    "https://openalex.org/W2113141832",
+    "https://openalex.org/W2114325287",
+    "https://openalex.org/W2114545194",
+    "https://openalex.org/W2114796524",
+    "https://openalex.org/W2115385268",
+    "https://openalex.org/W2116532552",
+    "https://openalex.org/W2116971285",
+    "https://openalex.org/W2117693432",
+    "https://openalex.org/W2117804641",
+    "https://openalex.org/W2119428793",
+    "https://openalex.org/W2120652270",
+    "https://openalex.org/W2122894279",
+    "https://openalex.org/W2123117662",
+    "https://openalex.org/W2123194965",
+    "https://openalex.org/W2123209875",
+    "https://openalex.org/W2123356103",
+    "https://openalex.org/W2124277610",
+    "https://openalex.org/W2124462016",
+    "https://openalex.org/W2126916474",
+    "https://openalex.org/W2129117200",
+    "https://openalex.org/W2129185479",
+    "https://openalex.org/W2129576923",
+    "https://openalex.org/W2129684903",
+    "https://openalex.org/W2130205120",
+    "https://openalex.org/W2130661998",
+    "https://openalex.org/W2130709195",
+    "https://openalex.org/W2132140244",
+    "https://openalex.org/W2132285662",
+    "https://openalex.org/W2132309888",
+    "https://openalex.org/W2133037643",
+    "https://openalex.org/W2135211932",
+    "https://openalex.org/W2136139643",
+    "https://openalex.org/W2136430467",
+    "https://openalex.org/W2136670111",
+    "https://openalex.org/W2136703956",
+    "https://openalex.org/W2137885986",
+    "https://openalex.org/W2138501896",
+    "https://openalex.org/W2139178484",
+    "https://openalex.org/W2139705086",
+    "https://openalex.org/W2140615154",
+    "https://openalex.org/W2141109496",
+    "https://openalex.org/W2141766651",
+    "https://openalex.org/W2142265711",
+    "https://openalex.org/W2142405401",
+    "https://openalex.org/W2142482705",
+    "https://openalex.org/W2142948887",
+    "https://openalex.org/W2144639262",
+    "https://openalex.org/W2144853127",
+    "https://openalex.org/W2145981708",
+    "https://openalex.org/W2146337825",
+    "https://openalex.org/W2147790056",
+    "https://openalex.org/W2147991866",
+    "https://openalex.org/W2148504146",
+    "https://openalex.org/W2148700667",
+    "https://openalex.org/W2148857710",
+    "https://openalex.org/W2149253665",
+    "https://openalex.org/W2149293668",
+    "https://openalex.org/W2150489430",
+    "https://openalex.org/W2151539226",
+    "https://openalex.org/W2151932277",
+    "https://openalex.org/W2152694793",
+    "https://openalex.org/W2153376681",
+    "https://openalex.org/W2154558887",
+    "https://openalex.org/W2154811872",
+    "https://openalex.org/W2155564244",
+    "https://openalex.org/W2156061806",
+    "https://openalex.org/W2156159037",
+    "https://openalex.org/W2156275813",
+    "https://openalex.org/W2156783487",
+    "https://openalex.org/W2157628983",
+    "https://openalex.org/W2159940583",
+    "https://openalex.org/W2159972731",
+    "https://openalex.org/W2161436956",
+    "https://openalex.org/W2162268589",
+    "https://openalex.org/W2162447479",
+    "https://openalex.org/W2164066050",
+    "https://openalex.org/W2164086521",
+    "https://openalex.org/W2165180287",
+    "https://openalex.org/W2165599108",
+    "https://openalex.org/W2165784624",
+    "https://openalex.org/W2165880260",
+    "https://openalex.org/W2166540111",
+    "https://openalex.org/W2166844857",
+    "https://openalex.org/W2166858912",
+    "https://openalex.org/W2167045969",
+    "https://openalex.org/W2167230292",
+    "https://openalex.org/W2167366186",
+    "https://openalex.org/W2167751610",
+    "https://openalex.org/W2167804828",
+    "https://openalex.org/W2167812962",
+    "https://openalex.org/W2167966853",
+    "https://openalex.org/W2168546696",
+    "https://openalex.org/W2171322577",
+    "https://openalex.org/W2175698964",
+    "https://openalex.org/W2179337010",
+    "https://openalex.org/W2204396561",
+    "https://openalex.org/W2216450483",
+    "https://openalex.org/W2217491465",
+    "https://openalex.org/W2226498311",
+    "https://openalex.org/W2228054904",
+    "https://openalex.org/W2230426398",
+    "https://openalex.org/W2244641063",
+    "https://openalex.org/W2255028498",
+    "https://openalex.org/W2265245802",
+    "https://openalex.org/W2266289947",
+    "https://openalex.org/W2266953754",
+    "https://openalex.org/W2267820548",
+    "https://openalex.org/W2270628554",
+    "https://openalex.org/W2287956742",
+    "https://openalex.org/W2288802409",
+    "https://openalex.org/W2299953240",
+    "https://openalex.org/W2312857706",
+    "https://openalex.org/W2313033980",
+    "https://openalex.org/W2326917810",
+    "https://openalex.org/W2331995577",
+    "https://openalex.org/W2337702808",
+    "https://openalex.org/W2339184504",
+    "https://openalex.org/W2342537420",
+    "https://openalex.org/W2347155667",
+    "https://openalex.org/W2394607716",
+    "https://openalex.org/W2400524706",
+    "https://openalex.org/W2401177145",
+    "https://openalex.org/W2401348687",
+    "https://openalex.org/W2402405569",
+    "https://openalex.org/W2405788328",
+    "https://openalex.org/W2409339407",
+    "https://openalex.org/W2410717802",
+    "https://openalex.org/W2411602914",
+    "https://openalex.org/W2412517568",
+    "https://openalex.org/W2412740009",
+    "https://openalex.org/W2412808772",
+    "https://openalex.org/W2413418728",
+    "https://openalex.org/W2414778812",
+    "https://openalex.org/W2414794327",
+    "https://openalex.org/W2415882729",
+    "https://openalex.org/W2415959330",
+    "https://openalex.org/W2418311545",
+    "https://openalex.org/W2438774766",
+    "https://openalex.org/W2441366595",
+    "https://openalex.org/W2463443984",
+    "https://openalex.org/W2467981626",
+    "https://openalex.org/W2473119967",
+    "https://openalex.org/W2493183462",
+    "https://openalex.org/W2509097450",
+    "https://openalex.org/W2510322990",
+    "https://openalex.org/W2612846755",
+    "https://openalex.org/W2746589797",
+    "https://openalex.org/W2749026985",
+    "https://openalex.org/W2749396436",
+    "https://openalex.org/W2884971427",
+    "https://openalex.org/W2915759289",
+    "https://openalex.org/W2985159231",
+    "https://openalex.org/W2992423630",
+    "https://openalex.org/W2992661272",
+    "https://openalex.org/W2994431942",
+    "https://openalex.org/W2994568825",
+    "https://openalex.org/W2999231696",
+    "https://openalex.org/W3022456911",
+    "https://openalex.org/W3022641852",
+    "https://openalex.org/W3022903699",
+    "https://openalex.org/W3023389718",
+    "https://openalex.org/W3147917334",
+    "https://openalex.org/W4237352931",
+    "https://openalex.org/W4237759153",
+    "https://openalex.org/W4243691196",
+    "https://openalex.org/W4246323379",
+    "https://openalex.org/W4246551867",
+    "https://openalex.org/W4253356786",
+    "https://openalex.org/W4291960070",
+    "https://openalex.org/W4292000387",
+    "https://openalex.org/W4298871531",
+    "https://openalex.org/W4299129211",
+    "https://openalex.org/W4299399434",
+    "https://openalex.org/W4300030796",
+    "https://openalex.org/W4301435912",
+    "https://openalex.org/W6603082103",
+    "https://openalex.org/W6646015344",
+    "https://openalex.org/W6666499996",
+    "https://openalex.org/W6680419464",
+    "https://openalex.org/W6713166856",
+    "https://openalex.org/W6716873853",
+    "https://openalex.org/W6845677653"
+   ],
+   "related_works": [
+    "https://openalex.org/W2892400793",
+    "https://openalex.org/W4213448908",
+    "https://openalex.org/W7111967656",
+    "https://openalex.org/W2410396825",
+    "https://openalex.org/W2342537420",
+    "https://openalex.org/W2266289947",
+    "https://openalex.org/W3045020169",
+    "https://openalex.org/W4301772247",
+    "https://openalex.org/W3119038863",
+    "https://openalex.org/W2994006479"
+   ],
+   "abstract_inverted_index": {
+    "Background": [
+     0
+    ],
+    "The": [
+     1,
+     31,
+     179,
+     402,
+     641
+    ],
+    "role": [
+     2
+    ],
+    "of": [
+     3,
+     17,
+     33,
+     113,
+     144,
+     193,
+     216,
+     232,
+     236,
+     238,
+     240,
+     262,
+     284,
+     320,
+     380,
+     389,
+     404,
+     411,
+     417,
+     426,
+     430,
+     453,
+     477,
+     490,
+     517,
+     520,
+     528,
+     538,
+     542,
+     546,
+     561,
+     576
+    ],
+    "ambulance": [
+     4,
+     65,
+     88,
+     103,
+     114,
+     323,
+     443,
+     504,
+     584
+    ],
+    "services": [
+     5
+    ],
+    "has": [
+     6
+    ],
+    "changed": [
+     7
+    ],
+    "dramatically": [
+     8
+    ],
+    "over": [
+     9
+    ],
+    "the": [
+     10,
+     15,
+     80,
+     160,
+     177,
+     217,
+     251,
+     409,
+     514,
+     539,
+     599,
+     607
+    ],
+    "last": [
+     11
+    ],
+    "few": [
+     12
+    ],
+    "decades": [
+     13
+    ],
+    "with": [
+     14,
+     39,
+     44,
+     117,
+     348,
+     434,
+     626
+    ],
+    "introduction": [
+     16
+    ],
+    "paramedics": [
+     18
+    ],
+    "able": [
+     19
+    ],
+    "to": [
+     20,
+     25,
+     37,
+     78,
+     98,
+     169,
+     185,
+     292,
+     371,
+     375,
+     397,
+     437,
+     450,
+     483,
+     497,
+     549,
+     573,
+     583,
+     598,
+     620,
+     638
+    ],
+    "provide": [
+     21
+    ],
+    "life-saving": [
+     22
+    ],
+    "interventions,": [
+     23
+    ],
+    "thanks": [
+     24
+    ],
+    "sophisticated": [
+     26
+    ],
+    "equipment": [
+     27,
+     614
+    ],
+    "and": [
+     28,
+     93,
+     111,
+     128,
+     134,
+     156,
+     159,
+     166,
+     187,
+     207,
+     266,
+     277,
+     299,
+     312,
+     318,
+     325,
+     352,
+     363,
+     378,
+     387,
+     415,
+     433,
+     459,
+     481,
+     512,
+     526,
+     532,
+     564,
+     587,
+     615,
+     622,
+     624,
+     633,
+     649
+    ],
+    "treatments": [
+     29
+    ],
+    "available.": [
+     30
+    ],
+    "number": [
+     32,
+     377
+    ],
+    "999": [
+     34
+    ],
+    "calls": [
+     35
+    ],
+    "continues": [
+     36
+    ],
+    "increase,": [
+     38
+    ],
+    "adverse": [
+     40
+    ],
+    "events": [
+     41
+    ],
+    "theoretically": [
+     42
+    ],
+    "possible": [
+     43
+    ],
+    "each": [
+     45
+    ],
+    "one.": [
+     46
+    ],
+    "Most": [
+     47
+    ],
+    "patient": [
+     48,
+     61,
+     84,
+     99,
+     454,
+     472,
+     484,
+     612
+    ],
+    "safety": [
+     49,
+     62,
+     85,
+     100,
+     349,
+     400,
+     455,
+     468,
+     495,
+     540,
+     608
+    ],
+    "research": [
+     50,
+     121
+    ],
+    "is": [
+     51,
+     58,
+     74,
+     406,
+     571
+    ],
+    "based": [
+     52
+    ],
+    "on": [
+     53,
+     271,
+     479,
+     593
+    ],
+    "hospital": [
+     54
+    ],
+    "data,": [
+     55
+    ],
+    "but": [
+     56
+    ],
+    "little": [
+     57,
+     435
+    ],
+    "known": [
+     59
+    ],
+    "concerning": [
+     60
+    ],
+    "when": [
+     63,
+     67,
+     101
+    ],
+    "using": [
+     64,
+     102,
+     123,
+     338,
+     354,
+     366,
+     394
+    ],
+    "services,": [
+     66,
+     131,
+     505
+    ],
+    "things": [
+     68
+    ],
+    "can": [
+     69
+    ],
+    "be": [
+     70
+    ],
+    "very": [
+     71
+    ],
+    "different.": [
+     72
+    ],
+    "There": [
+     73,
+     474
+    ],
+    "an": [
+     75,
+     565
+    ],
+    "urgent": [
+     76
+    ],
+    "need": [
+     77,
+     534,
+     629
+    ],
+    "characterise": [
+     79
+    ],
+    "evidence": [
+     81,
+     96,
+     436,
+     563
+    ],
+    "base": [
+     82
+    ],
+    "for": [
+     83,
+     119,
+     257,
+     269,
+     503,
+     630,
+     635,
+     644
+    ],
+    "in": [
+     86,
+     137,
+     176,
+     274,
+     456,
+     580,
+     618
+    ],
+    "NHS": [
+     87,
+     161,
+     228,
+     243,
+     308
+    ],
+    "services.": [
+     89,
+     104,
+     444
+    ],
+    "Objective": [
+     90
+    ],
+    "To": [
+     91
+    ],
+    "identify": [
+     92,
+     376,
+     398
+    ],
+    "map": [
+     94
+    ],
+    "available": [
+     95,
+     297
+    ],
+    "relating": [
+     97
+    ],
+    "Design": [
+     105
+    ],
+    "Mixed-methods": [
+     106
+    ],
+    "design": [
+     107
+    ],
+    "including": [
+     108,
+     510
+    ],
+    "systematic": [
+     109
+    ],
+    "review": [
+     110,
+     112
+    ],
+    "service": [
+     115,
+     135,
+     326,
+     585
+    ],
+    "documentation,": [
+     116
+    ],
+    "areas": [
+     118
+    ],
+    "future": [
+     120
+    ],
+    "prioritised": [
+     122
+    ],
+    "a": [
+     124,
+     412,
+     488,
+     499,
+     535,
+     550,
+     559,
+     627
+    ],
+    "Delphi": [
+     125
+    ],
+    "process.": [
+     126
+    ],
+    "Setting": [
+     127
+    ],
+    "participants": [
+     129
+    ],
+    "Ambulance": [
+     130
+    ],
+    "their": [
+     132
+    ],
+    "staff": [
+     133,
+     324
+    ],
+    "users": [
+     136,
+     327
+    ],
+    "UK.": [
+     138
+    ],
+    "Data": [
+     139,
+     332
+    ],
+    "sources": [
+     140,
+     146
+    ],
+    "A": [
+     141
+    ],
+    "wide": [
+     142
+    ],
+    "range": [
+     143
+    ],
+    "data": [
+     145,
+     173,
+     342,
+     360
+    ],
+    "were": [
+     147,
+     164,
+     174,
+     286,
+     315,
+     328,
+     333,
+     346,
+     361,
+     373,
+     392,
+     429,
+     465
+    ],
+    "explored.": [
+     148
+    ],
+    "Multiple": [
+     149
+    ],
+    "databases,": [
+     150
+    ],
+    "reference": [
+     151
+    ],
+    "lists": [
+     152
+    ],
+    "from": [
+     153,
+     288,
+     335,
+     343,
+     382,
+     555
+    ],
+    "key": [
+     154
+    ],
+    "papers": [
+     155
+    ],
+    "citations,": [
+     157
+    ],
+    "Google": [
+     158
+    ],
+    "Confederation": [
+     162
+    ],
+    "website": [
+     163
+    ],
+    "searched,": [
+     165
+    ],
+    "experts": [
+     167
+    ],
+    "contacted": [
+     168
+    ],
+    "ensure": [
+     170
+    ],
+    "that": [
+     171,
+     462
+    ],
+    "new": [
+     172,
+     518,
+     544
+    ],
+    "included": [
+     175
+    ],
+    "review.": [
+     178
+    ],
+    "databases": [
+     180
+    ],
+    "MEDLINE,": [
+     181
+    ],
+    "EMBASE,": [
+     182
+    ],
+    "Cumulative": [
+     183
+    ],
+    "Index": [
+     184,
+     206
+    ],
+    "Nursing": [
+     186
+    ],
+    "Allied": [
+     188
+    ],
+    "Health": [
+     189,
+     223,
+     258,
+     645,
+     647
+    ],
+    "Literature": [
+     190,
+     273
+    ],
+    "(CINAHL),": [
+     191
+    ],
+    "Web": [
+     192
+    ],
+    "Science,": [
+     194
+    ],
+    "Science": [
+     195
+    ],
+    "Direct,": [
+     196
+    ],
+    "Emerald,": [
+     197
+    ],
+    "Education": [
+     198
+    ],
+    "Resources": [
+     199
+    ],
+    "Information": [
+     200,
+     225,
+     270
+    ],
+    "Center": [
+     201
+    ],
+    "(ERIC),": [
+     202
+    ],
+    "Applied": [
+     203
+    ],
+    "Social": [
+     204,
+     209,
+     218
+    ],
+    "Sciences": [
+     205,
+     219
+    ],
+    "Abstracts,": [
+     208,
+     211,
+     213
+    ],
+    "Services": [
+     210,
+     648
+    ],
+    "Sociological": [
+     212
+    ],
+    "International": [
+     214
+    ],
+    "Bibliography": [
+     215
+    ],
+    "(IBSS),": [
+     220
+    ],
+    "PsycINFO,": [
+     221
+    ],
+    "PsycARTICLES,": [
+     222
+    ],
+    "Management": [
+     224
+    ],
+    "Consortium": [
+     226
+    ],
+    "(HMIC),": [
+     227
+    ],
+    "Evidence,": [
+     229
+    ],
+    "Cochrane": [
+     230
+    ],
+    "Database": [
+     231,
+     235,
+     246
+    ],
+    "Systematic": [
+     233
+    ],
+    "Reviews,": [
+     234
+    ],
+    "Abstracts": [
+     237
+    ],
+    "Reviews": [
+     239
+    ],
+    "Effects": [
+     241
+    ],
+    "(DARE),": [
+     242
+    ],
+    "Economic": [
+     244
+    ],
+    "Evaluation": [
+     245
+    ],
+    "(NHS": [
+     247
+    ],
+    "EED),Health": [
+     248
+    ],
+    "Technology": [
+     249
+    ],
+    "Assessment,": [
+     250
+    ],
+    "FADE": [
+     252
+    ],
+    "library,": [
+     253
+    ],
+    "Current": [
+     254
+    ],
+    "Awareness": [
+     255
+    ],
+    "Service": [
+     256
+    ],
+    "(CASH),": [
+     259
+    ],
+    "OpenDOAR": [
+     260
+    ],
+    "(Directory": [
+     261
+    ],
+    "Open": [
+     263,
+     267
+    ],
+    "Access": [
+     264
+    ],
+    "Repositories)": [
+     265
+    ],
+    "System": [
+     268
+    ],
+    "Grey": [
+     272
+    ],
+    "Europe": [
+     275
+    ],
+    "(OpenSIGLE)": [
+     276
+    ],
+    "Zetoc": [
+     278
+    ],
+    "(The": [
+     279
+    ],
+    "British": [
+     280
+    ],
+    "Library's": [
+     281
+    ],
+    "Electronic": [
+     282
+    ],
+    "Table": [
+     283
+    ],
+    "Contents)": [
+     285
+    ],
+    "searched": [
+     287
+    ],
+    "1": [
+     289
+    ],
+    "January": [
+     290
+    ],
+    "1980": [
+     291
+    ],
+    "12": [
+     293
+    ],
+    "October": [
+     294
+    ],
+    "2011.": [
+     295
+    ],
+    "Publicly": [
+     296
+    ],
+    "documents": [
+     298
+    ],
+    "issues": [
+     300,
+     452
+    ],
+    "identified": [
+     301,
+     421
+    ],
+    "by": [
+     302,
+     408,
+     442,
+     487
+    ],
+    "National": [
+     303,
+     642
+    ],
+    "Patient": [
+     304,
+     494
+    ],
+    "Safety": [
+     305
+    ],
+    "Agency": [
+     306
+    ],
+    "(NPSA),": [
+     307
+    ],
+    "Litigation": [
+     309
+    ],
+    "Authority": [
+     310
+    ],
+    "(NHSLA)": [
+     311
+    ],
+    "coroners\u2019": [
+     313,
+     390
+    ],
+    "reports": [
+     314,
+     337,
+     391
+    ],
+    "considered.": [
+     316
+    ],
+    "Opinions": [
+     317
+    ],
+    "perceptions": [
+     319
+    ],
+    "senior": [
+     321
+    ],
+    "managers,": [
+     322
+    ],
+    "solicited.": [
+     329
+    ],
+    "Review": [
+     330
+    ],
+    "methods": [
+     331
+    ],
+    "extracted": [
+     334
+    ],
+    "annual": [
+     336
+    ],
+    "two-stage": [
+     339
+    ],
+    "thematic": [
+     340,
+     355,
+     395
+    ],
+    "analysis,": [
+     341,
+     356
+    ],
+    "quality": [
+     344,
+     432
+    ],
+    "accounts": [
+     345
+    ],
+    "collated": [
+     347,
+     362
+    ],
+    "priorities": [
+     350,
+     464
+    ],
+    "tabulated": [
+     351
+    ],
+    "considered": [
+     353
+    ],
+    "NPSA": [
+     357
+    ],
+    "incident": [
+     358
+    ],
+    "report": [
+     359
+    ],
+    "displayed": [
+     364
+    ],
+    "comparatively": [
+     365
+    ],
+    "descriptive": [
+     367
+    ],
+    "statistics,": [
+     368
+    ],
+    "claims": [
+     369,
+     381
+    ],
+    "reported": [
+     370
+    ],
+    "NHSLA": [
+     372
+    ],
+    "analysed": [
+     374
+    ],
+    "cost": [
+     379
+    ],
+    "mistakes": [
+     383
+    ],
+    "and/or": [
+     384
+    ],
+    "poor": [
+     385
+    ],
+    "service,": [
+     386,
+     458
+    ],
+    "summaries": [
+     388
+    ],
+    "assessed": [
+     393
+    ],
+    "analysis": [
+     396,
+     405
+    ],
+    "underlying": [
+     399
+    ],
+    "issues.": [
+     401
+    ],
+    "depth": [
+     403
+    ],
+    "limited": [
+     407
+    ],
+    "remit": [
+     410
+    ],
+    "scoping": [
+     413
+    ],
+    "exercise": [
+     414
+    ],
+    "availability": [
+     416
+    ],
+    "data.": [
+     418
+    ],
+    "Results": [
+     419
+    ],
+    "We": [
+     420
+    ],
+    "studies": [
+     422,
+     447,
+     578
+    ],
+    "exploring": [
+     423
+    ],
+    "different": [
+     424
+    ],
+    "aspects": [
+     425
+    ],
+    "safety,": [
+     427,
+     485
+    ],
+    "which": [
+     428,
+     557
+    ],
+    "variable": [
+     431
+    ],
+    "support": [
+     438
+    ],
+    "activities": [
+     439
+    ],
+    "currently": [
+     440
+    ],
+    "undertaken": [
+     441,
+     579
+    ],
+    "Adequately": [
+     445
+    ],
+    "powered": [
+     446
+    ],
+    "are": [
+     448
+    ],
+    "required": [
+     449
+    ],
+    "address": [
+     451
+    ],
+    "this": [
+     457
+    ],
+    "it": [
+     460
+    ],
+    "appeared": [
+     461
+    ],
+    "national": [
+     463,
+     589
+    ],
+    "what": [
+     466
+    ],
+    "determined": [
+     467
+    ],
+    "activities,": [
+     469
+    ],
+    "rather": [
+     470,
+     506
+    ],
+    "than": [
+     471,
+     507
+    ],
+    "need.": [
+     473
+    ],
+    "was": [
+     475
+    ],
+    "inconsistency": [
+     476
+    ],
+    "information": [
+     478
+    ],
+    "attitudes": [
+     480
+    ],
+    "approaches": [
+     482
+    ],
+    "exacerbated": [
+     486
+    ],
+    "lack": [
+     489
+    ],
+    "common": [
+     491
+    ],
+    "terminology.": [
+     492
+    ],
+    "Conclusion": [
+     493
+    ],
+    "needs": [
+     496
+    ],
+    "become": [
+     498
+    ],
+    "more": [
+     500
+    ],
+    "prominent": [
+     501
+    ],
+    "consideration": [
+     502
+    ],
+    "operational": [
+     508
+    ],
+    "pressures,": [
+     509
+    ],
+    "targets": [
+     511
+    ],
+    "driving": [
+     513
+    ],
+    "service.": [
+     515
+    ],
+    "Development": [
+     516
+    ],
+    "models": [
+     519,
+     545
+    ],
+    "working": [
+     521
+    ],
+    "must": [
+     522
+    ],
+    "include": [
+     523,
+     606
+    ],
+    "adequate": [
+     524
+    ],
+    "training": [
+     525,
+     634
+    ],
+    "monitoring": [
+     527
+    ],
+    "clinical": [
+     529,
+     577
+    ],
+    "risks.": [
+     530
+    ],
+    "Providers": [
+     531
+    ],
+    "commissioners": [
+     533
+    ],
+    "full": [
+     536
+    ],
+    "understanding": [
+     537
+    ],
+    "implications": [
+     541
+    ],
+    "introducing": [
+     543
+    ],
+    "care,": [
+     547
+    ],
+    "particularly": [
+     548
+    ],
+    "mobile": [
+     551
+    ],
+    "workforce": [
+     552
+    ],
+    "often": [
+     553,
+     591
+    ],
+    "isolated": [
+     554
+    ],
+    "colleagues,": [
+     556
+    ],
+    "requires": [
+     558
+    ],
+    "body": [
+     560
+    ],
+    "supportive": [
+     562
+    ],
+    "inherent": [
+     566
+    ],
+    "critical": [
+     567
+    ],
+    "evaluation": [
+     568
+    ],
+    "culture.": [
+     569
+    ],
+    "It": [
+     570
+    ],
+    "difficult": [
+     572
+    ],
+    "extrapolate": [
+     574
+    ],
+    "findings": [
+     575
+    ],
+    "secondary": [
+     581
+    ],
+    "care": [
+     582
+    ],
+    "practice": [
+     586
+    ],
+    "current": [
+     588
+    ],
+    "guidelines": [
+     590
+    ],
+    "rely": [
+     592
+    ],
+    "consensus": [
+     594
+    ],
+    "opinion": [
+     595
+    ],
+    "regarding": [
+     596
+    ],
+    "applicability": [
+     597
+    ],
+    "pre-hospital": [
+     600
+    ],
+    "environment.": [
+     601
+    ],
+    "Areas": [
+     602
+    ],
+    "requiring": [
+     603
+    ],
+    "further": [
+     604
+    ],
+    "work": [
+     605
+    ],
+    "surrounding": [
+     609
+    ],
+    "discharging": [
+     610
+    ],
+    "patients,": [
+     611
+    ],
+    "accidents,": [
+     613
+    ],
+    "treatment,": [
+     616
+    ],
+    "delays": [
+     617
+    ],
+    "transfer/admission": [
+     619
+    ],
+    "hospital,": [
+     621
+    ],
+    "treatment": [
+     623
+    ],
+    "diagnosis,": [
+     625
+    ],
+    "clear": [
+     628
+    ],
+    "increased": [
+     631
+    ],
+    "reliability": [
+     632
+    ],
+    "improving": [
+     636
+    ],
+    "handover": [
+     637
+    ],
+    "hospital.": [
+     639
+    ],
+    "Funding": [
+     640
+    ],
+    "Institute": [
+     643
+    ],
+    "Research": [
+     646,
+     651
+    ],
+    "Delivery": [
+     650
+    ],
+    "programme.": [
+     652
+    ]
+   },
+   "counts_by_year": [
+    {
+     "year": 2026,
+     "cited_by_count": 1
+    },
+    {
+     "year": 2025,
+     "cited_by_count": 3
+    },
+    {
+     "year": 2024,
+     "cited_by_count": 8
+    },
+    {
+     "year": 2023,
+     "cited_by_count": 5
+    },
+    {
+     "year": 2022,
+     "cited_by_count": 9
+    },
+    {
+     "year": 2021,
+     "cited_by_count": 4
+    },
+    {
+     "year": 2020,
+     "cited_by_count": 5
+    },
+    {
+     "year": 2019,
+     "cited_by_count": 6
+    },
+    {
+     "year": 2018,
+     "cited_by_count": 4
+    },
+    {
+     "year": 2017,
+     "cited_by_count": 3
+    },
+    {
+     "year": 2016,
+     "cited_by_count": 4
+    },
+    {
+     "year": 2015,
+     "cited_by_count": 1
+    },
+    {
+     "year": 2014,
+     "cited_by_count": 1
+    }
+   ],
+   "updated_date": "2026-10-16T09:59:22.235173",
+   "created_date": "2016-06-24T00:00:00"
+  },
+  {
+   "id": "https://openalex.org/W7169222219",
+   "doi": "https://doi.org/10.1186/s12873-026-01672-y",
+   "title": "Scoping review on alternative care options for patients calling the ambulance",
+   "display_name": "Scoping review on alternative care options for patients calling the ambulance",
+   "relevance_score": 30.45392,
+   "publication_year": 2026,
+   "publication_date": "2026-07-17",
+   "ids": {
+    "openalex": "https://openalex.org/W7169222219",
+    "doi": "https://doi.org/10.1186/s12873-026-01672-y",
+    "pmid": "https://pubmed.ncbi.nlm.nih.gov/42464145",
+    "pmcid": "https://www.ncbi.nlm.nih.gov/pmc/articles/13670535"
+   },
+   "language": "en",
+   "primary_location": {
+    "id": "doi:10.1186/s12873-026-01672-y",
+    "doi": "https://doi.org/10.1186/s12873-026-01672-y",
+    "is_oa": true,
+    "landing_page_url": "https://doi.org/10.1186/s12873-026-01672-y",
+    "pdf_url": "https://link.springer.com/content/pdf/10.1186/s12873-026-01672-y.pdf",
+    "source": {
+     "id": "https://openalex.org/S260102",
+     "display_name": "BMC Emergency Medicine",
+     "issn_l": "1471-227X",
+     "issn": [
+      "1471-227X"
+     ],
+     "is_oa": true,
+     "is_in_doaj": true,
+     "is_core": true,
+     "listed_in": [
+      "cwts-core",
+      "doaj",
+      "dongbi-d",
+      "doyens",
+      "jufo-1",
+      "ki-jl-1",
+      "medline",
+      "norway-1",
+      "oarl",
+      "poland-70",
+      "russia-white-list-2",
+      "vabb-shw"
+     ],
+     "host_organization": "https://openalex.org/P4310320256",
+     "host_organization_name": "BioMed Central",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310320256",
+      "https://openalex.org/P4310319965"
+     ],
+     "host_organization_lineage_names": [
+      "BioMed Central",
+      "Springer Nature"
+     ],
+     "type": "journal"
+    },
+    "license": "cc-by-nc-nd",
+    "license_id": "https://openalex.org/licenses/cc-by-nc-nd",
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "BMC Emergency Medicine",
+    "raw_type": "journal-article"
+   },
+   "volume": null,
+   "type": "review",
+   "indexed_in": [
+    "crossref",
+    "doaj",
+    "pubmed"
+   ],
+   "open_access": {
+    "is_oa": true,
+    "oa_status": "gold",
+    "oa_url": "https://link.springer.com/content/pdf/10.1186/s12873-026-01672-y.pdf",
+    "any_repository_has_fulltext": true
+   },
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": "https://openalex.org/A5070074839",
+      "display_name": "Gayathri Devi Nadarajan",
+      "orcid": "https://orcid.org/0000-0001-8811-7374",
+      "observed_orcids": [
+       "https://orcid.org/0000-0001-8811-7374"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I157582758",
+       "display_name": "SingHealth",
+       "ror": "https://ror.org/04me94w47",
+       "country_code": "SG",
+       "type": "healthcare",
+       "lineage": [
+        "https://openalex.org/I157582758"
+       ]
+      },
+      {
+       "id": "https://openalex.org/I2251586001",
+       "display_name": "Singapore General Hospital",
+       "ror": "https://ror.org/036j6sg82",
+       "country_code": "SG",
+       "type": "healthcare",
+       "lineage": [
+        "https://openalex.org/I2251586001"
+       ]
+      },
+      {
+       "id": "https://openalex.org/I4210126319",
+       "display_name": "Duke-NUS Medical School",
+       "ror": "https://ror.org/02j1m6098",
+       "country_code": "SG",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I165932596",
+        "https://openalex.org/I170897317",
+        "https://openalex.org/I4210126319"
+       ]
+      }
+     ],
+     "countries": [
+      "SG"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Gayathri Devi Nadarajan",
+     "raw_affiliation_strings": [
+      "Department of Emergency Medicine, Singapore General Hospital, Singapore, Singapore",
+      "Pre-hospital and Emergency Research Centre, Duke-NUS Medical School, Singapore, Singapore"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0001-8811-7374",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Emergency Medicine, Singapore General Hospital, Singapore, Singapore",
+       "institution_ids": [
+        "https://openalex.org/I157582758",
+        "https://openalex.org/I2251586001"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Pre-hospital and Emergency Research Centre, Duke-NUS Medical School, Singapore, Singapore",
+       "institution_ids": [
+        "https://openalex.org/I4210126319"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5141025047",
+      "display_name": "Brian Fu",
+      "orcid": null,
+      "observed_orcids": []
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I4210126319",
+       "display_name": "Duke-NUS Medical School",
+       "ror": "https://ror.org/02j1m6098",
+       "country_code": "SG",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I165932596",
+        "https://openalex.org/I170897317",
+        "https://openalex.org/I4210126319"
+       ]
+      }
+     ],
+     "countries": [
+      "SG"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Brian Fu",
+     "raw_affiliation_strings": [
+      "Duke-NUS Medical School, Singapore, Singapore"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Duke-NUS Medical School, Singapore, Singapore",
+       "institution_ids": [
+        "https://openalex.org/I4210126319"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5140964909",
+      "display_name": "Jemima Teo",
+      "orcid": null,
+      "observed_orcids": []
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I165932596",
+       "display_name": "National University of Singapore",
+       "ror": "https://ror.org/01tgyzw49",
+       "country_code": "SG",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I165932596"
+       ]
+      }
+     ],
+     "countries": [
+      "SG"
+     ],
+     "is_corresponding": true,
+     "raw_author_name": "Jemima Teo",
+     "raw_affiliation_strings": [
+      "Yong Loo Lin School of Medicine, National University of Singapore, Singapore, Singapore. jemimateo@hotmail.com"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Yong Loo Lin School of Medicine, National University of Singapore, Singapore, Singapore. jemimateo@hotmail.com",
+       "institution_ids": [
+        "https://openalex.org/I165932596"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5126266549",
+      "display_name": "Yean Lyi Lim",
+      "orcid": null,
+      "observed_orcids": []
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I172675005",
+       "display_name": "Nanyang Technological University",
+       "ror": "https://ror.org/02e7b5302",
+       "country_code": "SG",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I172675005"
+       ]
+      }
+     ],
+     "countries": [
+      "SG"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Yean Lyi Lim",
+     "raw_affiliation_strings": [
+      "Lee Kong Chian School of Medicine, Nanyang Technological University, Singapore, Singapore"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Lee Kong Chian School of Medicine, Nanyang Technological University, Singapore, Singapore",
+       "institution_ids": [
+        "https://openalex.org/I172675005"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5052541871",
+      "display_name": "Benjamin Leong",
+      "orcid": null,
+      "observed_orcids": []
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I4210126319",
+       "display_name": "Duke-NUS Medical School",
+       "ror": "https://ror.org/02j1m6098",
+       "country_code": "SG",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I165932596",
+        "https://openalex.org/I170897317",
+        "https://openalex.org/I4210126319"
+       ]
+      },
+      {
+       "id": "https://openalex.org/I4210146690",
+       "display_name": "National University Hospital",
+       "ror": "https://ror.org/04fp9fm22",
+       "country_code": "SG",
+       "type": "healthcare",
+       "lineage": [
+        "https://openalex.org/I165932596",
+        "https://openalex.org/I4210146690",
+        "https://openalex.org/I4210150261"
+       ]
+      }
+     ],
+     "countries": [
+      "SG"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Benjamin Leong",
+     "raw_affiliation_strings": [
+      "Department of Emergency Medicine, National University Hospital, Singapore, Singapore",
+      "Pre-hospital and Emergency Research Centre, Duke-NUS Medical School, Singapore, Singapore"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Emergency Medicine, National University Hospital, Singapore, Singapore",
+       "institution_ids": [
+        "https://openalex.org/I4210146690"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Pre-hospital and Emergency Research Centre, Duke-NUS Medical School, Singapore, Singapore",
+       "institution_ids": [
+        "https://openalex.org/I4210126319"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "last",
+     "author": {
+      "id": "https://openalex.org/A5087685316",
+      "display_name": "Marcus Eng Hock Ong",
+      "orcid": "https://orcid.org/0000-0001-7874-7612",
+      "observed_orcids": [
+       "https://orcid.org/0000-0001-7874-7612"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I157582758",
+       "display_name": "SingHealth",
+       "ror": "https://ror.org/04me94w47",
+       "country_code": "SG",
+       "type": "healthcare",
+       "lineage": [
+        "https://openalex.org/I157582758"
+       ]
+      },
+      {
+       "id": "https://openalex.org/I2251586001",
+       "display_name": "Singapore General Hospital",
+       "ror": "https://ror.org/036j6sg82",
+       "country_code": "SG",
+       "type": "healthcare",
+       "lineage": [
+        "https://openalex.org/I2251586001"
+       ]
+      },
+      {
+       "id": "https://openalex.org/I4210126319",
+       "display_name": "Duke-NUS Medical School",
+       "ror": "https://ror.org/02j1m6098",
+       "country_code": "SG",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I165932596",
+        "https://openalex.org/I170897317",
+        "https://openalex.org/I4210126319"
+       ]
+      }
+     ],
+     "countries": [
+      "SG"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Marcus Eng Hock Ong",
+     "raw_affiliation_strings": [
+      "Department of Emergency Medicine, Singapore General Hospital, Singapore, Singapore",
+      "Health Services and Systems Research, Duke-NUS Medical School, Singapore, Singapore",
+      "Pre-hospital and Emergency Research Centre, Duke-NUS Medical School, Singapore, Singapore"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0001-7874-7612",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Emergency Medicine, Singapore General Hospital, Singapore, Singapore",
+       "institution_ids": [
+        "https://openalex.org/I157582758",
+        "https://openalex.org/I2251586001"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Health Services and Systems Research, Duke-NUS Medical School, Singapore, Singapore",
+       "institution_ids": [
+        "https://openalex.org/I4210126319"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Pre-hospital and Emergency Research Centre, Duke-NUS Medical School, Singapore, Singapore",
+       "institution_ids": [
+        "https://openalex.org/I4210126319"
+       ]
+      }
+     ]
+    }
+   ],
+   "institutions": [],
+   "countries_distinct_count": 1,
+   "institutions_distinct_count": 6,
+   "corresponding_author_ids": [
+    "https://openalex.org/A5140964909"
+   ],
+   "corresponding_institution_ids": [
+    "https://openalex.org/I165932596"
+   ],
+   "apc_list": {
+    "value": 2790,
+    "currency": "USD",
+    "value_usd": 2790
+   },
+   "apc_paid": {
+    "value": 2790,
+    "currency": "USD",
+    "value_usd": 2790
+   },
+   "fwci": 0.0,
+   "has_fulltext": true,
+   "cited_by_count": 0,
+   "citation_normalized_percentile": {
+    "value": 0.41282051,
+    "is_in_top_1_percent": false,
+    "is_in_top_10_percent": false
+   },
+   "cited_by_percentile_year": null,
+   "biblio": {
+    "volume": "26",
+    "issue": "1",
+    "first_page": null,
+    "last_page": null
+   },
+   "is_retracted": false,
+   "is_paratext": false,
+   "is_xpac": false,
+   "primary_topic": {
+    "id": "https://openalex.org/T11095",
+    "display_name": "Emergency and Acute Care Studies",
+    "score": 0.9746000170707703,
+    "subfield": {
+     "id": "https://openalex.org/subfields/2711",
+     "display_name": "Emergency Medicine"
+    },
+    "field": {
+     "id": "https://openalex.org/fields/27",
+     "display_name": "Medicine"
+    },
+    "domain": {
+     "id": "https://openalex.org/domains/4",
+     "display_name": "Health Sciences"
+    }
+   },
+   "topics": [
+    {
+     "id": "https://openalex.org/T11095",
+     "display_name": "Emergency and Acute Care Studies",
+     "score": 0.9746000170707703,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2711",
+      "display_name": "Emergency Medicine"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/27",
+      "display_name": "Medicine"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/4",
+      "display_name": "Health Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T11467",
+     "display_name": "Trauma and Emergency Care Studies",
+     "score": 0.02459999918937683,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2711",
+      "display_name": "Emergency Medicine"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/27",
+      "display_name": "Medicine"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/4",
+      "display_name": "Health Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T14354",
+     "display_name": "Emergency Medicine Education and Research",
+     "score": 9.999999747378752e-05,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2711",
+      "display_name": "Emergency Medicine"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/27",
+      "display_name": "Medicine"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/4",
+      "display_name": "Health Sciences"
+     }
+    }
+   ],
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/emergency-department-crowding",
+     "display_name": "emergency department overcrowding",
+     "score": 0.7310000061988831
+    },
+    {
+     "id": "https://openalex.org/keywords/prehospital-care",
+     "display_name": "prehospital care",
+     "score": 0.7319999933242798
+    },
+    {
+     "id": "https://openalex.org/keywords/non-conveyance",
+     "display_name": "non-conveyance",
+     "score": 0.7509999871253967
+    },
+    {
+     "id": "https://openalex.org/keywords/paramedics",
+     "display_name": "paramedics",
+     "score": 0.7300000190734863
+    },
+    {
+     "id": "https://openalex.org/keywords/community-based-care",
+     "display_name": "community-based care",
+     "score": 0.6769999861717224
+    },
+    {
+     "id": "https://openalex.org/keywords/low-acuity-patients",
+     "display_name": "low-acuity patients",
+     "score": 0.7739999890327454
+    },
+    {
+     "id": "https://openalex.org/keywords/palliative-care",
+     "display_name": "palliative care",
+     "score": 0.7390000224113464
+    },
+    {
+     "id": "https://openalex.org/keywords/psychiatric-patients",
+     "display_name": "psychiatric patients",
+     "score": 0.8659999966621399
+    },
+    {
+     "id": "https://openalex.org/keywords/frequent-attenders",
+     "display_name": "frequent attenders",
+     "score": 0.9359999895095825
+    },
+    {
+     "id": "https://openalex.org/keywords/allied-health-professionals",
+     "display_name": "allied health professionals",
+     "score": 0.699999988079071
+    }
+   ],
+   "concepts": [
+    {
+     "id": "https://openalex.org/C71924100",
+     "wikidata": "https://www.wikidata.org/wiki/Q11190",
+     "display_name": "Medicine",
+     "level": 0,
+     "score": 0.9287999868392944
+    },
+    {
+     "id": "https://openalex.org/C545542383",
+     "wikidata": "https://www.wikidata.org/wiki/Q2751242",
+     "display_name": "Medical emergency",
+     "level": 1,
+     "score": 0.5209000110626221
+    },
+    {
+     "id": "https://openalex.org/C2779473830",
+     "wikidata": "https://www.wikidata.org/wiki/Q1540899",
+     "display_name": "MEDLINE",
+     "level": 2,
+     "score": 0.44359999895095825
+    },
+    {
+     "id": "https://openalex.org/C160735492",
+     "wikidata": "https://www.wikidata.org/wiki/Q31207",
+     "display_name": "Health care",
+     "level": 2,
+     "score": 0.36570000648498535
+    },
+    {
+     "id": "https://openalex.org/C545288138",
+     "wikidata": "https://www.wikidata.org/wiki/Q860447",
+     "display_name": "Emergency medical services",
+     "level": 2,
+     "score": 0.3531999886035919
+    },
+    {
+     "id": "https://openalex.org/C204787440",
+     "wikidata": "https://www.wikidata.org/wiki/Q188504",
+     "display_name": "Alternative medicine",
+     "level": 2,
+     "score": 0.3149999976158142
+    },
+    {
+     "id": "https://openalex.org/C159110408",
+     "wikidata": "https://www.wikidata.org/wiki/Q121176",
+     "display_name": "Nursing",
+     "level": 1,
+     "score": 0.30059999227523804
+    },
+    {
+     "id": "https://openalex.org/C177713679",
+     "wikidata": "https://www.wikidata.org/wiki/Q679690",
+     "display_name": "Intensive care medicine",
+     "level": 1,
+     "score": 0.298799991607666
+    },
+    {
+     "id": "https://openalex.org/C512399662",
+     "wikidata": "https://www.wikidata.org/wiki/Q3505712",
+     "display_name": "Family medicine",
+     "level": 1,
+     "score": 0.27959999442100525
+    },
+    {
+     "id": "https://openalex.org/C2989236134",
+     "wikidata": "https://www.wikidata.org/wiki/Q31207",
+     "display_name": "Patient care",
+     "level": 2,
+     "score": 0.2791000008583069
+    },
+    {
+     "id": "https://openalex.org/C194828623",
+     "wikidata": "https://www.wikidata.org/wiki/Q2861470",
+     "display_name": "Emergency medicine",
+     "level": 1,
+     "score": 0.27239999175071716
+    },
+    {
+     "id": "https://openalex.org/C2780877353",
+     "wikidata": "https://www.wikidata.org/wiki/Q2518253",
+     "display_name": "Health services research",
+     "level": 3,
+     "score": 0.25279998779296875
+    },
+    {
+     "id": "https://openalex.org/C27415008",
+     "wikidata": "https://www.wikidata.org/wiki/Q7256382",
+     "display_name": "Psychological intervention",
+     "level": 2,
+     "score": 0.2526000142097473
+    }
+   ],
+   "mesh": [
+    {
+     "descriptor_ui": "D000094783",
+     "descriptor_name": "Paramedics",
+     "qualifier_ui": null,
+     "qualifier_name": null,
+     "is_major_topic": false
+    },
+    {
+     "descriptor_ui": "D000552",
+     "descriptor_name": "Ambulances",
+     "qualifier_ui": null,
+     "qualifier_name": null,
+     "is_major_topic": true
+    },
+    {
+     "descriptor_ui": "D004632",
+     "descriptor_name": "Emergency Medical Services",
+     "qualifier_ui": null,
+     "qualifier_name": null,
+     "is_major_topic": true
+    },
+    {
+     "descriptor_ui": "D006801",
+     "descriptor_name": "Humans",
+     "qualifier_ui": null,
+     "qualifier_name": null,
+     "is_major_topic": false
+    }
+   ],
+   "locations_count": 4,
+   "locations": [
+    {
+     "id": "doi:10.1186/s12873-026-01672-y",
+     "doi": "https://doi.org/10.1186/s12873-026-01672-y",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.1186/s12873-026-01672-y",
+     "pdf_url": "https://link.springer.com/content/pdf/10.1186/s12873-026-01672-y.pdf",
+     "source": {
+      "id": "https://openalex.org/S260102",
+      "display_name": "BMC Emergency Medicine",
+      "issn_l": "1471-227X",
+      "issn": [
+       "1471-227X"
+      ],
+      "is_oa": true,
+      "is_in_doaj": true,
+      "is_core": true,
+      "listed_in": [
+       "cwts-core",
+       "doaj",
+       "dongbi-d",
+       "doyens",
+       "jufo-1",
+       "ki-jl-1",
+       "medline",
+       "norway-1",
+       "oarl",
+       "poland-70",
+       "russia-white-list-2",
+       "vabb-shw"
+      ],
+      "host_organization": "https://openalex.org/P4310320256",
+      "host_organization_name": "BioMed Central",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310320256",
+       "https://openalex.org/P4310319965"
+      ],
+      "host_organization_lineage_names": [
+       "BioMed Central",
+       "Springer Nature"
+      ],
+      "type": "journal"
+     },
+     "license": "cc-by-nc-nd",
+     "license_id": "https://openalex.org/licenses/cc-by-nc-nd",
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "BMC Emergency Medicine",
+     "raw_type": "journal-article"
+    },
+    {
+     "id": "pmh:oai:pubmedcentral.nih.gov:13670535",
+     "doi": null,
+     "is_oa": true,
+     "landing_page_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13670535/",
+     "pdf_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13670535/pdf/12873_2026_Article_1672.pdf",
+     "source": {
+      "id": "https://openalex.org/S2764455111",
+      "display_name": "PubMed Central",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": true,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I1299303238",
+      "host_organization_name": "National Institutes of Health",
+      "host_organization_lineage": [
+       "https://openalex.org/I1299303238"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": "cc-by-nc-nd",
+     "license_id": "https://openalex.org/licenses/cc-by-nc-nd",
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "BMC Emerg Med",
+     "raw_type": "Text"
+    },
+    {
+     "id": "pmid:42464145",
+     "doi": null,
+     "is_oa": false,
+     "landing_page_url": "https://pubmed.ncbi.nlm.nih.gov/42464145",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4306525036",
+      "display_name": "PubMed",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I1299303238",
+      "host_organization_name": "National Institutes of Health",
+      "host_organization_lineage": [
+       "https://openalex.org/I1299303238"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "BMC emergency medicine",
+     "raw_type": "Journal Article"
+    },
+    {
+     "id": "pmh:oai:doaj.org/article:ab8578ed195144248326ec5be620e3d4",
+     "doi": null,
+     "is_oa": false,
+     "landing_page_url": "https://doaj.org/article/ab8578ed195144248326ec5be620e3d4",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4306401280",
+      "display_name": "DOAJ (DOAJ: Directory of Open Access Journals)",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": null,
+      "host_organization_name": null,
+      "host_organization_lineage": [],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": "BMC Emergency Medicine, Vol 26, Iss 1 (2026)",
+     "raw_type": "article"
+    }
+   ],
+   "best_oa_location": {
+    "id": "doi:10.1186/s12873-026-01672-y",
+    "doi": "https://doi.org/10.1186/s12873-026-01672-y",
+    "is_oa": true,
+    "landing_page_url": "https://doi.org/10.1186/s12873-026-01672-y",
+    "pdf_url": "https://link.springer.com/content/pdf/10.1186/s12873-026-01672-y.pdf",
+    "source": {
+     "id": "https://openalex.org/S260102",
+     "display_name": "BMC Emergency Medicine",
+     "issn_l": "1471-227X",
+     "issn": [
+      "1471-227X"
+     ],
+     "is_oa": true,
+     "is_in_doaj": true,
+     "is_core": true,
+     "listed_in": [
+      "cwts-core",
+      "doaj",
+      "dongbi-d",
+      "doyens",
+      "jufo-1",
+      "ki-jl-1",
+      "medline",
+      "norway-1",
+      "oarl",
+      "poland-70",
+      "russia-white-list-2",
+      "vabb-shw"
+     ],
+     "host_organization": "https://openalex.org/P4310320256",
+     "host_organization_name": "BioMed Central",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310320256",
+      "https://openalex.org/P4310319965"
+     ],
+     "host_organization_lineage_names": [
+      "BioMed Central",
+      "Springer Nature"
+     ],
+     "type": "journal"
+    },
+    "license": "cc-by-nc-nd",
+    "license_id": "https://openalex.org/licenses/cc-by-nc-nd",
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "BMC Emergency Medicine",
+    "raw_type": "journal-article"
+   },
+   "sustainable_development_goals": [
+    {
+     "display_name": "Good health and well-being",
+     "score": 0.98580002784729,
+     "id": "https://metadata.un.org/sdg/3"
+    }
+   ],
+   "sustainable_development_goals_aurora": [],
+   "study_designs": [
+    {
+     "display_name": "Systematic Review",
+     "id": "https://openalex.org/study-designs/systematic-review"
+    }
+   ],
+   "awards": [],
+   "funders": [],
+   "has_content": {
+    "grobid_xml": true,
+    "pdf": true
+   },
+   "content_urls": {
+    "pdf": "https://content.openalex.org/works/W7169222219.pdf",
+    "grobid_xml": "https://content.openalex.org/works/W7169222219.grobid-xml"
+   },
+   "referenced_works_count": 68,
+   "referenced_works": [
+    "https://openalex.org/W1986326264",
+    "https://openalex.org/W2000282534",
+    "https://openalex.org/W2038673219",
+    "https://openalex.org/W2088931936",
+    "https://openalex.org/W2143649626",
+    "https://openalex.org/W2149754557",
+    "https://openalex.org/W2163049037",
+    "https://openalex.org/W2171103506",
+    "https://openalex.org/W2174265856",
+    "https://openalex.org/W2346292157",
+    "https://openalex.org/W2594593696",
+    "https://openalex.org/W2626467388",
+    "https://openalex.org/W2769994083",
+    "https://openalex.org/W2781608790",
+    "https://openalex.org/W2785692388",
+    "https://openalex.org/W2791009126",
+    "https://openalex.org/W2804077113",
+    "https://openalex.org/W2886561928",
+    "https://openalex.org/W2886852891",
+    "https://openalex.org/W2888970663",
+    "https://openalex.org/W2891227226",
+    "https://openalex.org/W2903462674",
+    "https://openalex.org/W2909186047",
+    "https://openalex.org/W2909228267",
+    "https://openalex.org/W2913094625",
+    "https://openalex.org/W2925816504",
+    "https://openalex.org/W2945960456",
+    "https://openalex.org/W2946119463",
+    "https://openalex.org/W2955403623",
+    "https://openalex.org/W2976383436",
+    "https://openalex.org/W2981278662",
+    "https://openalex.org/W2994173056",
+    "https://openalex.org/W2994935636",
+    "https://openalex.org/W2997178015",
+    "https://openalex.org/W2999128097",
+    "https://openalex.org/W3029379298",
+    "https://openalex.org/W3035671959",
+    "https://openalex.org/W3048415066",
+    "https://openalex.org/W3083322062",
+    "https://openalex.org/W3083449915",
+    "https://openalex.org/W3088240570",
+    "https://openalex.org/W3095582585",
+    "https://openalex.org/W3097019356",
+    "https://openalex.org/W3097471013",
+    "https://openalex.org/W3098374703",
+    "https://openalex.org/W3101930818",
+    "https://openalex.org/W3111179460",
+    "https://openalex.org/W3114415502",
+    "https://openalex.org/W3119038863",
+    "https://openalex.org/W3133790146",
+    "https://openalex.org/W3137462440",
+    "https://openalex.org/W3163250729",
+    "https://openalex.org/W3172871923",
+    "https://openalex.org/W3172947715",
+    "https://openalex.org/W3199700565",
+    "https://openalex.org/W3205631628",
+    "https://openalex.org/W3212771719",
+    "https://openalex.org/W4205470182",
+    "https://openalex.org/W4213375813",
+    "https://openalex.org/W4226103785",
+    "https://openalex.org/W4229049048",
+    "https://openalex.org/W4281294799",
+    "https://openalex.org/W4281650802",
+    "https://openalex.org/W4282570862",
+    "https://openalex.org/W4283398091",
+    "https://openalex.org/W4283696330",
+    "https://openalex.org/W4310462734",
+    "https://openalex.org/W4315705388"
+   ],
+   "related_works": [
+    "https://openalex.org/W3119038863",
+    "https://openalex.org/W3212771719",
+    "https://openalex.org/W2626467388",
+    "https://openalex.org/W2116732865",
+    "https://openalex.org/W7167585673",
+    "https://openalex.org/W7143346091",
+    "https://openalex.org/W7213432053",
+    "https://openalex.org/W3110628973",
+    "https://openalex.org/W2875570789",
+    "https://openalex.org/W6976865135"
+   ],
+   "abstract_inverted_index": {
+    "BACKGROUND:": [
+     0
+    ],
+    "The": [
+     1,
+     64,
+     81
+    ],
+    "modern-day": [
+     2
+    ],
+    "population": [
+     3,
+     82
+    ],
+    "with": [
+     4,
+     192
+    ],
+    "more": [
+     5
+    ],
+    "chronic,": [
+     6
+    ],
+    "complex": [
+     7
+    ],
+    "medical": [
+     8
+    ],
+    "and": [
+     9,
+     16,
+     29,
+     60,
+     68,
+     71,
+     109,
+     129,
+     132,
+     135,
+     138,
+     140,
+     142,
+     153,
+     166,
+     189,
+     217,
+     223,
+     231,
+     244
+    ],
+    "social": [
+     10,
+     185
+    ],
+    "comorbidities": [
+     11
+    ],
+    "is": [
+     12
+    ],
+    "increasing": [
+     13
+    ],
+    "ambulance": [
+     14,
+     25,
+     47
+    ],
+    "utilisation": [
+     15
+    ],
+    "conveyance": [
+     17,
+     206
+    ],
+    "to": [
+     18,
+     24,
+     38,
+     76,
+     99,
+     144,
+     170,
+     194,
+     227,
+     247
+    ],
+    "emergency": [
+     19,
+     89,
+     238
+    ],
+    "departments": [
+     20
+    ],
+    "(ED).": [
+     21
+    ],
+    "This": [
+     22,
+     34
+    ],
+    "contributes": [
+     23
+    ],
+    "ramping,": [
+     26
+    ],
+    "ED": [
+     27,
+     101
+    ],
+    "overcrowding": [
+     28
+    ],
+    "increased": [
+     30
+    ],
+    "hospital": [
+     31
+    ],
+    "bed": [
+     32
+    ],
+    "utilisation.": [
+     33
+    ],
+    "scoping": [
+     35
+    ],
+    "review": [
+     36
+    ],
+    "aims": [
+     37
+    ],
+    "identify": [
+     39
+    ],
+    "alternative": [
+     40,
+     174
+    ],
+    "care": [
+     41,
+     124,
+     175,
+     197,
+     243
+    ],
+    "paths": [
+     42
+    ],
+    "for": [
+     43,
+     46
+    ],
+    "patients": [
+     44,
+     200,
+     246
+    ],
+    "calling": [
+     45,
+     86
+    ],
+    "services.": [
+     48,
+     249
+    ],
+    "METHODS:": [
+     49
+    ],
+    "A": [
+     50
+    ],
+    "total": [
+     51
+    ],
+    "of": [
+     52,
+     123,
+     162,
+     198
+    ],
+    "4902": [
+     53
+    ],
+    "articles": [
+     54,
+     115
+    ],
+    "were": [
+     55,
+     74,
+     117,
+     125
+    ],
+    "identified": [
+     56,
+     126
+    ],
+    "through": [
+     57
+    ],
+    "four": [
+     58
+    ],
+    "databases": [
+     59
+    ],
+    "the": [
+     61,
+     78,
+     87,
+     92,
+     106,
+     196,
+     202
+    ],
+    "gray": [
+     62
+    ],
+    "literature.": [
+     63
+    ],
+    "terms": [
+     65
+    ],
+    "'paramedic',": [
+     66
+    ],
+    "'ambulance'": [
+     67
+    ],
+    "'non-conveyance',": [
+     69
+    ],
+    "'alternative'": [
+     70
+    ],
+    "'community": [
+     72
+    ],
+    "care'": [
+     73
+    ],
+    "combined": [
+     75
+    ],
+    "yield": [
+     77
+    ],
+    "search": [
+     79
+    ],
+    "terms.": [
+     80
+    ],
+    "studied": [
+     83
+    ],
+    "includes": [
+     84
+    ],
+    "individuals": [
+     85
+    ],
+    "national": [
+     88
+    ],
+    "number": [
+     90
+    ],
+    "while": [
+     91
+    ],
+    "intervention": [
+     93
+    ],
+    "focuses": [
+     94
+    ],
+    "on": [
+     95,
+     237
+    ],
+    "prehospital": [
+     96,
+     203
+    ],
+    "services": [
+     97,
+     239
+    ],
+    "designed": [
+     98
+    ],
+    "avoid": [
+     100
+    ],
+    "conveyance.": [
+     102
+    ],
+    "Independent": [
+     103
+    ],
+    "researchers": [
+     104
+    ],
+    "screened": [
+     105
+    ],
+    "titles,": [
+     107
+    ],
+    "abstracts": [
+     108
+    ],
+    "full": [
+     110
+    ],
+    "texts,": [
+     111
+    ],
+    "yielding": [
+     112
+    ],
+    "59": [
+     113
+    ],
+    "relevant": [
+     114
+    ],
+    "which": [
+     116
+    ],
+    "then": [
+     118
+    ],
+    "meta-synthesised.": [
+     119
+    ],
+    "RESULTS:": [
+     120
+    ],
+    "Five": [
+     121
+    ],
+    "themes": [
+     122
+    ],
+    "-": [
+     127
+    ],
+    "hear": [
+     128,
+     131
+    ],
+    "treat,": [
+     130,
+     136
+    ],
+    "refer,": [
+     133
+    ],
+    "see": [
+     134,
+     137,
+     141
+    ],
+    "refer": [
+     139
+    ],
+    "convey": [
+     143
+    ],
+    "a": [
+     145
+    ],
+    "non-ED": [
+     146
+    ],
+    "facility.": [
+     147
+    ],
+    "Low-acuity": [
+     148
+    ],
+    "patients,": [
+     149,
+     151,
+     155
+    ],
+    "older": [
+     150
+    ],
+    "palliative": [
+     152
+    ],
+    "psychiatric": [
+     154
+    ],
+    "as": [
+     156,
+     158,
+     183
+    ],
+    "well": [
+     157
+    ],
+    "those": [
+     159
+    ],
+    "facing": [
+     160
+    ],
+    "exacerbation": [
+     161
+    ],
+    "chronic": [
+     163
+    ],
+    "conditions,": [
+     164
+    ],
+    "alcoholic": [
+     165
+    ],
+    "frequent": [
+     167
+    ],
+    "attenders": [
+     168
+    ],
+    "appear": [
+     169
+    ],
+    "benefit": [
+     171
+    ],
+    "from": [
+     172
+    ],
+    "these": [
+     173,
+     199
+    ],
+    "service": [
+     176,
+     229
+    ],
+    "pathways": [
+     177
+    ],
+    "(ACSPs).": [
+     178
+    ],
+    "Allied": [
+     179
+    ],
+    "health": [
+     180
+    ],
+    "professionals": [
+     181
+    ],
+    "such": [
+     182
+    ],
+    "nurses,": [
+     184
+    ],
+    "workers,": [
+     186
+    ],
+    "occupational": [
+     187
+    ],
+    "therapists,": [
+     188
+    ],
+    "physiotherapists": [
+     190
+    ],
+    "collaborate": [
+     191
+    ],
+    "paramedics": [
+     193
+    ],
+    "frontload": [
+     195
+    ],
+    "in": [
+     201
+    ],
+    "setting.": [
+     204
+    ],
+    "Alternative": [
+     205
+    ],
+    "destinations": [
+     207
+    ],
+    "include": [
+     208
+    ],
+    "general": [
+     209
+    ],
+    "practices,": [
+     210
+    ],
+    "geriatric": [
+     211
+    ],
+    "wards,": [
+     212
+    ],
+    "toxicology": [
+     213
+    ],
+    "units,": [
+     214
+    ],
+    "sobering": [
+     215
+    ],
+    "centres": [
+     216
+    ],
+    "community": [
+     218
+    ],
+    "hospitals.": [
+     219
+    ],
+    "CONCLUSIONS:": [
+     220
+    ],
+    "Implementing": [
+     221
+    ],
+    "ACSPs": [
+     222
+    ],
+    "integrating": [
+     224
+    ],
+    "healthcare": [
+     225
+    ],
+    "approaches": [
+     226
+    ],
+    "enhance": [
+     228
+    ],
+    "efficiency": [
+     230
+    ],
+    "patient": [
+     232
+    ],
+    "outcomes": [
+     233
+    ],
+    "can": [
+     234
+    ],
+    "alleviate": [
+     235
+    ],
+    "pressure": [
+     236
+    ],
+    "by": [
+     240
+    ],
+    "providing": [
+     241
+    ],
+    "timely": [
+     242
+    ],
+    "directing": [
+     245
+    ],
+    "appropriate": [
+     248
+    ]
+   },
+   "counts_by_year": [],
+   "updated_date": "2026-10-31T12:09:11.096373",
+   "created_date": "2026-07-17T00:00:00"
+  },
+  {
+   "id": "https://openalex.org/W2805039741",
+   "doi": "https://doi.org/10.3310/hsdr06190",
+   "title": "Understanding variation in ambulance service non-conveyance rates: a mixed methods study",
+   "display_name": "Understanding variation in ambulance service non-conveyance rates: a mixed methods study",
+   "relevance_score": 30.135412,
+   "publication_year": 2018,
+   "publication_date": "2018-05-01",
+   "ids": {
+    "openalex": "https://openalex.org/W2805039741",
+    "doi": "https://doi.org/10.3310/hsdr06190",
+    "mag": "2805039741"
+   },
+   "language": "en",
+   "primary_location": {
+    "id": "doi:10.3310/hsdr06190",
+    "doi": "https://doi.org/10.3310/hsdr06190",
+    "is_oa": true,
+    "landing_page_url": "https://doi.org/10.3310/hsdr06190",
+    "pdf_url": "https://njl-admin.nihr.ac.uk/document/download/2014543",
+    "source": {
+     "id": "https://openalex.org/S2764367346",
+     "display_name": "Health Services and Delivery Research",
+     "issn_l": "2050-4349",
+     "issn": [
+      "2050-4349",
+      "2050-4357"
+     ],
+     "is_oa": true,
+     "is_in_doaj": true,
+     "is_core": true,
+     "listed_in": [
+      "cwts-core",
+      "doaj"
+     ],
+     "host_organization": "https://openalex.org/P4310311817",
+     "host_organization_name": "NIHR Journals Library",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310311817"
+     ],
+     "host_organization_lineage_names": [
+      "NIHR Journals Library"
+     ],
+     "type": "journal"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "Health Services and Delivery Research",
+    "raw_type": "journal-article"
+   },
+   "volume": null,
+   "type": "article",
+   "indexed_in": [
+    "crossref",
+    "doaj"
+   ],
+   "open_access": {
+    "is_oa": true,
+    "oa_status": "diamond",
+    "oa_url": "https://njl-admin.nihr.ac.uk/document/download/2014543",
+    "any_repository_has_fulltext": true
+   },
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": "https://openalex.org/A5048169605",
+      "display_name": "Alicia O\u2019Cathain",
+      "orcid": "https://orcid.org/0000-0003-4033-506X",
+      "observed_orcids": [
+       "https://orcid.org/0000-0003-4033-506X"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I91136226",
+       "display_name": "University of Sheffield",
+       "ror": "https://ror.org/05krs5044",
+       "country_code": "GB",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Alicia O\u2019Cathain",
+     "raw_affiliation_strings": [
+      "School of Health and Related Research (ScHARR), University of Sheffield, Sheffield, UK"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0003-4033-506X",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "School of Health and Related Research (ScHARR), University of Sheffield, Sheffield, UK",
+       "institution_ids": [
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5101876480",
+      "display_name": "Emma Knowles",
+      "orcid": "https://orcid.org/0000-0003-3372-1245",
+      "observed_orcids": [
+       "https://orcid.org/0000-0003-3372-1245"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I91136226",
+       "display_name": "University of Sheffield",
+       "ror": "https://ror.org/05krs5044",
+       "country_code": "GB",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Emma Knowles",
+     "raw_affiliation_strings": [
+      "School of Health and Related Research (ScHARR), University of Sheffield, Sheffield, UK"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0003-3372-1245",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "School of Health and Related Research (ScHARR), University of Sheffield, Sheffield, UK",
+       "institution_ids": [
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5062481394",
+      "display_name": "Lindsey Bishop\u2010Edwards",
+      "orcid": "https://orcid.org/0000-0002-2136-5557",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-2136-5557"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I91136226",
+       "display_name": "University of Sheffield",
+       "ror": "https://ror.org/05krs5044",
+       "country_code": "GB",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Lindsey Bishop-Edwards",
+     "raw_affiliation_strings": [
+      "School of Health and Related Research (ScHARR), University of Sheffield, Sheffield, UK"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0002-2136-5557",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "School of Health and Related Research (ScHARR), University of Sheffield, Sheffield, UK",
+       "institution_ids": [
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5060489860",
+      "display_name": "Joanne E. Coster",
+      "orcid": "https://orcid.org/0000-0002-0599-4222",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-0599-4222"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I91136226",
+       "display_name": "University of Sheffield",
+       "ror": "https://ror.org/05krs5044",
+       "country_code": "GB",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Joanne Coster",
+     "raw_affiliation_strings": [
+      "School of Health and Related Research (ScHARR), University of Sheffield, Sheffield, UK"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0002-0599-4222",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "School of Health and Related Research (ScHARR), University of Sheffield, Sheffield, UK",
+       "institution_ids": [
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5025218593",
+      "display_name": "Annabel Crum",
+      "orcid": "https://orcid.org/0000-0001-9310-8536",
+      "observed_orcids": [
+       "https://orcid.org/0000-0001-9310-8536"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I91136226",
+       "display_name": "University of Sheffield",
+       "ror": "https://ror.org/05krs5044",
+       "country_code": "GB",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Annabel Crum",
+     "raw_affiliation_strings": [
+      "School of Health and Related Research (ScHARR), University of Sheffield, Sheffield, UK"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0001-9310-8536",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "School of Health and Related Research (ScHARR), University of Sheffield, Sheffield, UK",
+       "institution_ids": [
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5053944752",
+      "display_name": "Richard Jacques",
+      "orcid": "https://orcid.org/0000-0001-6710-5403",
+      "observed_orcids": [
+       "https://orcid.org/0000-0001-6710-5403"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I91136226",
+       "display_name": "University of Sheffield",
+       "ror": "https://ror.org/05krs5044",
+       "country_code": "GB",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Richard Jacques",
+     "raw_affiliation_strings": [
+      "School of Health and Related Research (ScHARR), University of Sheffield, Sheffield, UK"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0001-6710-5403",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "School of Health and Related Research (ScHARR), University of Sheffield, Sheffield, UK",
+       "institution_ids": [
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5103946579",
+      "display_name": "Cathryn James",
+      "orcid": "https://orcid.org/0000-0003-1845-3123",
+      "observed_orcids": [
+       "https://orcid.org/0000-0003-1845-3123"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I4210112554",
+       "display_name": "Yorkshire Ambulance Service NHS Trust",
+       "ror": "https://ror.org/01sawky49",
+       "country_code": "GB",
+       "type": "healthcare",
+       "lineage": [
+        "https://openalex.org/I4210112554"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Cathryn James",
+     "raw_affiliation_strings": [
+      "Association of Ambulance Chief Executives, London, UK",
+      "Yorkshire Ambulance Service NHS Trust, Wakefield, UK",
+      "Association of Ambulance Chief Executives, London, UK; Yorkshire Ambulance Service NHS Trust, Wakefield, UK"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0003-1845-3123",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Association of Ambulance Chief Executives, London, UK",
+       "institution_ids": []
+      },
+      {
+       "raw_affiliation_string": "Yorkshire Ambulance Service NHS Trust, Wakefield, UK",
+       "institution_ids": [
+        "https://openalex.org/I4210112554"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Association of Ambulance Chief Executives, London, UK; Yorkshire Ambulance Service NHS Trust, Wakefield, UK",
+       "institution_ids": [
+        "https://openalex.org/I4210112554"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5074308997",
+      "display_name": "Rod A. Lawson",
+      "orcid": "https://orcid.org/0000-0003-2860-8619",
+      "observed_orcids": [
+       "https://orcid.org/0000-0003-2860-8619"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I4210102902",
+       "display_name": "Sheffield Teaching Hospitals NHS Foundation Trust",
+       "ror": "https://ror.org/018hjpz25",
+       "country_code": "GB",
+       "type": "funder",
+       "lineage": [
+        "https://openalex.org/I4210102902"
+       ]
+      },
+      {
+       "id": "https://openalex.org/I91136226",
+       "display_name": "University of Sheffield",
+       "ror": "https://ror.org/05krs5044",
+       "country_code": "GB",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Rod Lawson",
+     "raw_affiliation_strings": [
+      "Medical Humanities Sheffield, University of Sheffield, Sheffield, UK",
+      "Sheffield Teaching Hospitals NHS Foundation Trust, Sheffield, UK",
+      "Medical Humanities Sheffield, University of Sheffield, Sheffield, UK; Sheffield Teaching Hospitals NHS Foundation Trust, Sheffield, UK"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0003-2860-8619",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Medical Humanities Sheffield, University of Sheffield, Sheffield, UK",
+       "institution_ids": [
+        "https://openalex.org/I91136226"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Sheffield Teaching Hospitals NHS Foundation Trust, Sheffield, UK",
+       "institution_ids": [
+        "https://openalex.org/I4210102902"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Medical Humanities Sheffield, University of Sheffield, Sheffield, UK; Sheffield Teaching Hospitals NHS Foundation Trust, Sheffield, UK",
+       "institution_ids": [
+        "https://openalex.org/I4210102902",
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5112367932",
+      "display_name": "Maggie Marsh",
+      "orcid": "https://orcid.org/0000-0001-9881-0105",
+      "observed_orcids": [
+       "https://orcid.org/0000-0001-9881-0105"
+      ]
+     },
+     "institutions": [],
+     "countries": [],
+     "is_corresponding": false,
+     "raw_author_name": "Maggie Marsh",
+     "raw_affiliation_strings": [
+      "Sheffield Emergency Care Forum, Sheffield, UK"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0001-9881-0105",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Sheffield Emergency Care Forum, Sheffield, UK",
+       "institution_ids": []
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5045874041",
+      "display_name": "Rachel O\u2019Hara",
+      "orcid": "https://orcid.org/0000-0003-4074-6854",
+      "observed_orcids": [
+       "https://orcid.org/0000-0003-4074-6854"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I91136226",
+       "display_name": "University of Sheffield",
+       "ror": "https://ror.org/05krs5044",
+       "country_code": "GB",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Rachel O\u2019Hara",
+     "raw_affiliation_strings": [
+      "School of Health and Related Research (ScHARR), University of Sheffield, Sheffield, UK"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0003-4074-6854",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "School of Health and Related Research (ScHARR), University of Sheffield, Sheffield, UK",
+       "institution_ids": [
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5051700651",
+      "display_name": "Aloysius Niroshan Siriwardena",
+      "orcid": "https://orcid.org/0000-0003-2484-8201",
+      "observed_orcids": [
+       "https://orcid.org/0000-0003-2484-8201"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I51532219",
+       "display_name": "University of Lincoln",
+       "ror": "https://ror.org/03yeq9x20",
+       "country_code": "GB",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I51532219"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Aloysius Niroshan Siriwardena",
+     "raw_affiliation_strings": [
+      "School of Health and Social Care, University of Lincoln, Lincoln, UK"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0003-2484-8201",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "School of Health and Social Care, University of Lincoln, Lincoln, UK",
+       "institution_ids": [
+        "https://openalex.org/I51532219"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": null,
+      "display_name": "Tony Stone",
+      "orcid": "https://orcid.org/0000-0002-0167-3800",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-0167-3800"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I91136226",
+       "display_name": "University of Sheffield",
+       "ror": "https://ror.org/05krs5044",
+       "country_code": "GB",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Tony Stone",
+     "raw_affiliation_strings": [
+      "School of Health and Related Research (ScHARR), University of Sheffield, Sheffield, UK"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0002-0167-3800",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "School of Health and Related Research (ScHARR), University of Sheffield, Sheffield, UK",
+       "institution_ids": [
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5101611594",
+      "display_name": "Janette Turner",
+      "orcid": "https://orcid.org/0000-0003-3884-7875",
+      "observed_orcids": [
+       "https://orcid.org/0000-0003-3884-7875"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I91136226",
+       "display_name": "University of Sheffield",
+       "ror": "https://ror.org/05krs5044",
+       "country_code": "GB",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Janette Turner",
+     "raw_affiliation_strings": [
+      "School of Health and Related Research (ScHARR), University of Sheffield, Sheffield, UK"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0003-3884-7875",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "School of Health and Related Research (ScHARR), University of Sheffield, Sheffield, UK",
+       "institution_ids": [
+        "https://openalex.org/I91136226"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "last",
+     "author": {
+      "id": "https://openalex.org/A5010307105",
+      "display_name": "Julia Williams",
+      "orcid": "https://orcid.org/0000-0003-0796-5465",
+      "observed_orcids": [
+       "https://orcid.org/0000-0003-0796-5465"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I141584323",
+       "display_name": "University of Hertfordshire",
+       "ror": "https://ror.org/0267vjk41",
+       "country_code": "GB",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I141584323"
+       ]
+      },
+      {
+       "id": "https://openalex.org/I4402554058",
+       "display_name": "South East Coast Ambulance Service NHS Foundation Trust",
+       "ror": "https://ror.org/05eytha84",
+       "country_code": "GB",
+       "type": "healthcare",
+       "lineage": [
+        "https://openalex.org/I4402554058"
+       ]
+      }
+     ],
+     "countries": [
+      "GB"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Julia Williams",
+     "raw_affiliation_strings": [
+      "School of Health and Social Work, University of Hertfordshire, Hatfield, UK",
+      "South East Coast Ambulance Service NHS Foundation Trust, Crawley, UK",
+      "School of Health and Social Work, University of Hertfordshire, Hatfield, UK; South East Coast Ambulance Service NHS Foundation Trust, Crawley, UK"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0003-0796-5465",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "School of Health and Social Work, University of Hertfordshire, Hatfield, UK",
+       "institution_ids": [
+        "https://openalex.org/I141584323"
+       ]
+      },
+      {
+       "raw_affiliation_string": "South East Coast Ambulance Service NHS Foundation Trust, Crawley, UK",
+       "institution_ids": [
+        "https://openalex.org/I4402554058"
+       ]
+      },
+      {
+       "raw_affiliation_string": "School of Health and Social Work, University of Hertfordshire, Hatfield, UK; South East Coast Ambulance Service NHS Foundation Trust, Crawley, UK",
+       "institution_ids": [
+        "https://openalex.org/I141584323",
+        "https://openalex.org/I4402554058"
+       ]
+      }
+     ]
+    }
+   ],
+   "institutions": [],
+   "countries_distinct_count": 1,
+   "institutions_distinct_count": 6,
+   "corresponding_author_ids": [],
+   "corresponding_institution_ids": [],
+   "apc_list": null,
+   "apc_paid": null,
+   "fwci": 10.4819,
+   "has_fulltext": true,
+   "cited_by_count": 99,
+   "citation_normalized_percentile": {
+    "value": 0.98859946,
+    "is_in_top_1_percent": false,
+    "is_in_top_10_percent": true
+   },
+   "cited_by_percentile_year": {
+    "min": 97,
+    "max": 100
+   },
+   "biblio": {
+    "volume": "6",
+    "issue": "19",
+    "first_page": "1",
+    "last_page": "192"
+   },
+   "is_retracted": false,
+   "is_paratext": false,
+   "is_xpac": false,
+   "primary_topic": {
+    "id": "https://openalex.org/T11095",
+    "display_name": "Emergency and Acute Care Studies",
+    "score": 0.9688000082969666,
+    "subfield": {
+     "id": "https://openalex.org/subfields/2711",
+     "display_name": "Emergency Medicine"
+    },
+    "field": {
+     "id": "https://openalex.org/fields/27",
+     "display_name": "Medicine"
+    },
+    "domain": {
+     "id": "https://openalex.org/domains/4",
+     "display_name": "Health Sciences"
+    }
+   },
+   "topics": [
+    {
+     "id": "https://openalex.org/T11095",
+     "display_name": "Emergency and Acute Care Studies",
+     "score": 0.9688000082969666,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2711",
+      "display_name": "Emergency Medicine"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/27",
+      "display_name": "Medicine"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/4",
+      "display_name": "Health Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T11467",
+     "display_name": "Trauma and Emergency Care Studies",
+     "score": 0.02930000051856041,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2711",
+      "display_name": "Emergency Medicine"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/27",
+      "display_name": "Medicine"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/4",
+      "display_name": "Health Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T12871",
+     "display_name": "Healthcare Quality and Management",
+     "score": 0.0005000000237487257,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3605",
+      "display_name": "Health Information Management"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/36",
+      "display_name": "Health Professions"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/4",
+      "display_name": "Health Sciences"
+     }
+    }
+   ],
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/telephone-advice",
+     "display_name": "telephone advice",
+     "score": 0.800000011920929
+    },
+    {
+     "id": "https://openalex.org/keywords/emergency-department-visits",
+     "display_name": "emergency department visits",
+     "score": 0.9150000214576721
+    },
+    {
+     "id": "https://openalex.org/keywords/ambulance-personnel",
+     "display_name": "ambulance personnel",
+     "score": 0.3070000112056732
+    },
+    {
+     "id": "https://openalex.org/keywords/advanced-paramedics",
+     "display_name": "advanced paramedics",
+     "score": 0.8669999837875366
+    },
+    {
+     "id": "https://openalex.org/keywords/patient-factors",
+     "display_name": "patient factors",
+     "score": 0.492000013589859
+    },
+    {
+     "id": "https://openalex.org/keywords/hospitalization",
+     "display_name": "hospitalization",
+     "score": 0.6060000061988831
+    },
+    {
+     "id": "https://openalex.org/keywords/mortality",
+     "display_name": "mortality",
+     "score": 0.8040000200271606
+    },
+    {
+     "id": "https://openalex.org/keywords/999-calls",
+     "display_name": "999 calls",
+     "score": 0.7419999837875366
+    },
+    {
+     "id": "https://openalex.org/keywords/breathing-problems",
+     "display_name": "breathing problems",
+     "score": 0.7139999866485596
+    },
+    {
+     "id": "https://openalex.org/keywords/emergency-medical-services",
+     "display_name": "emergency medical services",
+     "score": 0.3199999928474426
+    }
+   ],
+   "concepts": [
+    {
+     "id": "https://openalex.org/C3017724717",
+     "wikidata": "https://www.wikidata.org/wiki/Q860447",
+     "display_name": "Ambulance service",
+     "level": 2,
+     "score": 0.831790030002594
+    },
+    {
+     "id": "https://openalex.org/C545542383",
+     "wikidata": "https://www.wikidata.org/wiki/Q2751242",
+     "display_name": "Medical emergency",
+     "level": 1,
+     "score": 0.6443228125572205
+    },
+    {
+     "id": "https://openalex.org/C71924100",
+     "wikidata": "https://www.wikidata.org/wiki/Q11190",
+     "display_name": "Medicine",
+     "level": 0,
+     "score": 0.6401618719100952
+    },
+    {
+     "id": "https://openalex.org/C2780724011",
+     "wikidata": "https://www.wikidata.org/wiki/Q1295316",
+     "display_name": "Emergency department",
+     "level": 2,
+     "score": 0.6106099486351013
+    },
+    {
+     "id": "https://openalex.org/C2778173179",
+     "wikidata": "https://www.wikidata.org/wiki/Q25339289",
+     "display_name": "Attendance",
+     "level": 2,
+     "score": 0.5954872369766235
+    },
+    {
+     "id": "https://openalex.org/C545288138",
+     "wikidata": "https://www.wikidata.org/wiki/Q860447",
+     "display_name": "Emergency medical services",
+     "level": 2,
+     "score": 0.5596543550491333
+    },
+    {
+     "id": "https://openalex.org/C2908647359",
+     "wikidata": "https://www.wikidata.org/wiki/Q2625603",
+     "display_name": "Population",
+     "level": 2,
+     "score": 0.4914613962173462
+    },
+    {
+     "id": "https://openalex.org/C2780378061",
+     "wikidata": "https://www.wikidata.org/wiki/Q25351891",
+     "display_name": "Service (business)",
+     "level": 2,
+     "score": 0.4182318449020386
+    },
+    {
+     "id": "https://openalex.org/C194828623",
+     "wikidata": "https://www.wikidata.org/wiki/Q2861470",
+     "display_name": "Emergency medicine",
+     "level": 1,
+     "score": 0.39607205986976624
+    },
+    {
+     "id": "https://openalex.org/C159110408",
+     "wikidata": "https://www.wikidata.org/wiki/Q121176",
+     "display_name": "Nursing",
+     "level": 1,
+     "score": 0.1704760491847992
+    },
+    {
+     "id": "https://openalex.org/C162324750",
+     "wikidata": "https://www.wikidata.org/wiki/Q8134",
+     "display_name": "Economics",
+     "level": 0,
+     "score": 0.0
+    },
+    {
+     "id": "https://openalex.org/C136264566",
+     "wikidata": "https://www.wikidata.org/wiki/Q159810",
+     "display_name": "Economy",
+     "level": 1,
+     "score": 0.0
+    },
+    {
+     "id": "https://openalex.org/C99454951",
+     "wikidata": "https://www.wikidata.org/wiki/Q932068",
+     "display_name": "Environmental health",
+     "level": 1,
+     "score": 0.0
+    },
+    {
+     "id": "https://openalex.org/C50522688",
+     "wikidata": "https://www.wikidata.org/wiki/Q189833",
+     "display_name": "Economic growth",
+     "level": 1,
+     "score": 0.0
+    }
+   ],
+   "mesh": [],
+   "locations_count": 8,
+   "locations": [
+    {
+     "id": "doi:10.3310/hsdr06190",
+     "doi": "https://doi.org/10.3310/hsdr06190",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.3310/hsdr06190",
+     "pdf_url": "https://njl-admin.nihr.ac.uk/document/download/2014543",
+     "source": {
+      "id": "https://openalex.org/S2764367346",
+      "display_name": "Health Services and Delivery Research",
+      "issn_l": "2050-4349",
+      "issn": [
+       "2050-4349",
+       "2050-4357"
+      ],
+      "is_oa": true,
+      "is_in_doaj": true,
+      "is_core": true,
+      "listed_in": [
+       "cwts-core",
+       "doaj"
+      ],
+      "host_organization": "https://openalex.org/P4310311817",
+      "host_organization_name": "NIHR Journals Library",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310311817"
+      ],
+      "host_organization_lineage_names": [
+       "NIHR Journals Library"
+      ],
+      "type": "journal"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Health Services and Delivery Research",
+     "raw_type": "journal-article"
+    },
+    {
+     "id": "pmh:oai:eprints.whiterose.ac.uk:132286",
+     "doi": null,
+     "is_oa": false,
+     "landing_page_url": "http://eprints.whiterose.ac.uk/132286/1/VAN%20HSDR%20report%202018.pdf",
+     "pdf_url": "http://eprints.whiterose.ac.uk/132286/1/VAN%20HSDR%20report%202018.pdf",
+     "source": {
+      "id": "https://openalex.org/S4306400854",
+      "display_name": "White Rose Research Online (University of Leeds, The University of Sheffield, University of York)",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I2800616092",
+      "host_organization_name": "White Rose University Consortium",
+      "host_organization_lineage": [
+       "https://openalex.org/I2800616092"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "acceptedVersion",
+     "is_accepted": true,
+     "is_published": false,
+     "raw_source_name": "",
+     "raw_type": "Article"
+    },
+    {
+     "id": "pmh:oai:uhra.herts.ac.uk:7258",
+     "doi": null,
+     "is_oa": true,
+     "landing_page_url": "https://uhra.herts.ac.uk/view/author_id/j=2Ewilliams=40herts=2Eac=2Euk.html>",
+     "pdf_url": "https://uhra.herts.ac.uk/id/eprint/7258/1/O_Cathain_et_al_2018.pdf",
+     "source": {
+      "id": "https://openalex.org/S4306400241",
+      "display_name": "University of Hertfordshire Research Archive (University of Hertfordshire)",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I141584323",
+      "host_organization_name": "University of Hertfordshire",
+      "host_organization_lineage": [
+       "https://openalex.org/I141584323"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": null,
+     "raw_type": "Article"
+    },
+    {
+     "id": "pmh:oai:doaj.org/article:7b85301f749d4ecc83f8c5b43e59d6d9",
+     "doi": null,
+     "is_oa": true,
+     "landing_page_url": "https://doaj.org/article/7b85301f749d4ecc83f8c5b43e59d6d9",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4306401280",
+      "display_name": "DOAJ (DOAJ: Directory of Open Access Journals)",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": null,
+      "host_organization_name": null,
+      "host_organization_lineage": [],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": "cc-by-sa",
+     "license_id": "https://openalex.org/licenses/cc-by-sa",
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": "Health Services and Delivery Research, Vol 6, Iss 19 (2018)",
+     "raw_type": "article"
+    },
+    {
+     "id": "pmh:oai:eprints.lincoln.ac.uk:32337",
+     "doi": null,
+     "is_oa": false,
+     "landing_page_url": "http://eprints.lincoln.ac.uk/id/eprint/32337/1/hsdr06190",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4377196275",
+      "display_name": "Lincoln Repository (University of Lincoln)",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I51532219",
+      "host_organization_name": "University of Lincoln",
+      "host_organization_lineage": [
+       "https://openalex.org/I51532219"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": "",
+     "raw_type": "Article"
+    },
+    {
+     "id": "pmh:oai:figshare.com:article/24371626",
+     "doi": null,
+     "is_oa": true,
+     "landing_page_url": "https://figshare.com/articles/journal_contribution/Understanding_variation_in_ambulance_service_non-conveyance_rates_a_mixed_methods_study/24371626",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4377196282",
+      "display_name": "Figshare",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I4210132348",
+      "host_organization_name": "Figshare (United Kingdom)",
+      "host_organization_lineage": [
+       "https://openalex.org/I4210132348"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": "cc-by",
+     "license_id": "https://openalex.org/licenses/cc-by",
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": null,
+     "raw_type": "Text"
+    },
+    {
+     "id": "pmh:oai:null:20.500.12417/140",
+     "doi": null,
+     "is_oa": false,
+     "landing_page_url": "http://hdl.handle.net/20.500.12417/140",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S7407055443",
+      "display_name": "amber - ambulance research repository",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": null,
+      "host_organization_name": null,
+      "host_organization_lineage": [],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": "Health Services and Delivery Research",
+     "raw_type": "Journal Article/Review"
+    },
+    {
+     "id": "pmh:oai:uhra.herts.ac.uk:2299/20208",
+     "doi": null,
+     "is_oa": false,
+     "landing_page_url": "http://hdl.handle.net/2299/20208",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4306400241",
+      "display_name": "University of Hertfordshire Research Archive (University of Hertfordshire)",
+      "issn_l": null,
+      "issn": null,
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": false,
+      "listed_in": [],
+      "host_organization": "https://openalex.org/I141584323",
+      "host_organization_name": "University of Hertfordshire",
+      "host_organization_lineage": [
+       "https://openalex.org/I141584323"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": null,
+     "raw_type": null
+    }
+   ],
+   "best_oa_location": {
+    "id": "doi:10.3310/hsdr06190",
+    "doi": "https://doi.org/10.3310/hsdr06190",
+    "is_oa": true,
+    "landing_page_url": "https://doi.org/10.3310/hsdr06190",
+    "pdf_url": "https://njl-admin.nihr.ac.uk/document/download/2014543",
+    "source": {
+     "id": "https://openalex.org/S2764367346",
+     "display_name": "Health Services and Delivery Research",
+     "issn_l": "2050-4349",
+     "issn": [
+      "2050-4349",
+      "2050-4357"
+     ],
+     "is_oa": true,
+     "is_in_doaj": true,
+     "is_core": true,
+     "listed_in": [
+      "cwts-core",
+      "doaj"
+     ],
+     "host_organization": "https://openalex.org/P4310311817",
+     "host_organization_name": "NIHR Journals Library",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310311817"
+     ],
+     "host_organization_lineage_names": [
+      "NIHR Journals Library"
+     ],
+     "type": "journal"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "Health Services and Delivery Research",
+    "raw_type": "journal-article"
+   },
+   "sustainable_development_goals": [
+    {
+     "display_name": "Good health and well-being",
+     "score": 0.9537000060081482,
+     "id": "https://metadata.un.org/sdg/3"
+    }
+   ],
+   "sustainable_development_goals_aurora": [
+    {
+     "display_name": "Good health and well-being",
+     "score": 0.6200000047683716,
+     "id": "https://metadata.un.org/sdg/3"
+    }
+   ],
+   "study_designs": [
+    {
+     "display_name": "Observational Study",
+     "id": "https://openalex.org/study-designs/observational-study"
+    }
+   ],
+   "awards": [
+    {
+     "id": "https://openalex.org/G4728569269",
+     "display_name": null,
+     "funder_award_id": "13/54/75",
+     "funder_id": "https://openalex.org/F4320334785",
+     "funder_display_name": "Health Services and Delivery Research Programme"
+    }
+   ],
+   "funders": [
+    {
+     "id": "https://openalex.org/F4320311904",
+     "display_name": "Wellcome Trust",
+     "ror": "https://ror.org/029chgv08"
+    },
+    {
+     "id": "https://openalex.org/F4320319990",
+     "display_name": "National Institute for Health and Care Research",
+     "ror": "https://ror.org/0187kwz08"
+    },
+    {
+     "id": "https://openalex.org/F4320319992",
+     "display_name": "British Heart Foundation",
+     "ror": "https://ror.org/02wdwnk04"
+    },
+    {
+     "id": "https://openalex.org/F4320324557",
+     "display_name": "Falck Foundation",
+     "ror": "https://ror.org/04y55ke86"
+    },
+    {
+     "id": "https://openalex.org/F4320334626",
+     "display_name": "Medical Research Council",
+     "ror": "https://ror.org/03x94j517"
+    },
+    {
+     "id": "https://openalex.org/F4320334785",
+     "display_name": "Health Services and Delivery Research Programme",
+     "ror": "https://ror.org/0187kwz08"
+    }
+   ],
+   "has_content": {
+    "grobid_xml": true,
+    "pdf": true
+   },
+   "content_urls": {
+    "pdf": "https://content.openalex.org/works/W2805039741.pdf",
+    "grobid_xml": "https://content.openalex.org/works/W2805039741.grobid-xml"
+   },
+   "referenced_works_count": 62,
+   "referenced_works": [
+    "https://openalex.org/W15489711",
+    "https://openalex.org/W122971724",
+    "https://openalex.org/W619503743",
+    "https://openalex.org/W1486624602",
+    "https://openalex.org/W1594483145",
+    "https://openalex.org/W1598345549",
+    "https://openalex.org/W1605143970",
+    "https://openalex.org/W1809553497",
+    "https://openalex.org/W1913104614",
+    "https://openalex.org/W1925530867",
+    "https://openalex.org/W1949866985",
+    "https://openalex.org/W1951724000",
+    "https://openalex.org/W1964732995",
+    "https://openalex.org/W1969309082",
+    "https://openalex.org/W1976252546",
+    "https://openalex.org/W1978065605",
+    "https://openalex.org/W1982697841",
+    "https://openalex.org/W1983136600",
+    "https://openalex.org/W1986152416",
+    "https://openalex.org/W1986326264",
+    "https://openalex.org/W1986684549",
+    "https://openalex.org/W2006479099",
+    "https://openalex.org/W2010015737",
+    "https://openalex.org/W2021840359",
+    "https://openalex.org/W2036432008",
+    "https://openalex.org/W2041837324",
+    "https://openalex.org/W2044658421",
+    "https://openalex.org/W2052945001",
+    "https://openalex.org/W2054103341",
+    "https://openalex.org/W2060541280",
+    "https://openalex.org/W2061527032",
+    "https://openalex.org/W2064735447",
+    "https://openalex.org/W2067210658",
+    "https://openalex.org/W2073201370",
+    "https://openalex.org/W2076662174",
+    "https://openalex.org/W2079193779",
+    "https://openalex.org/W2101288585",
+    "https://openalex.org/W2101766327",
+    "https://openalex.org/W2101821686",
+    "https://openalex.org/W2101916887",
+    "https://openalex.org/W2116732865",
+    "https://openalex.org/W2117247366",
+    "https://openalex.org/W2132309888",
+    "https://openalex.org/W2136703956",
+    "https://openalex.org/W2137425011",
+    "https://openalex.org/W2139933252",
+    "https://openalex.org/W2147991866",
+    "https://openalex.org/W2148621962",
+    "https://openalex.org/W2150880750",
+    "https://openalex.org/W2151932277",
+    "https://openalex.org/W2155471963",
+    "https://openalex.org/W2163049037",
+    "https://openalex.org/W2174265856",
+    "https://openalex.org/W2178634243",
+    "https://openalex.org/W2189435848",
+    "https://openalex.org/W2303242544",
+    "https://openalex.org/W2305232968",
+    "https://openalex.org/W2514442132",
+    "https://openalex.org/W2523521908",
+    "https://openalex.org/W2579942960",
+    "https://openalex.org/W2584093269",
+    "https://openalex.org/W2613932856"
+   ],
+   "related_works": [
+    "https://openalex.org/W2903462674",
+    "https://openalex.org/W2886704496",
+    "https://openalex.org/W2515944791",
+    "https://openalex.org/W4405154951",
+    "https://openalex.org/W2759269864",
+    "https://openalex.org/W7160539796",
+    "https://openalex.org/W2899154745",
+    "https://openalex.org/W3110628973",
+    "https://openalex.org/W2892121229",
+    "https://openalex.org/W2735239011"
+   ],
+   "abstract_inverted_index": {
+    "Background": [
+     0
+    ],
+    "In": [
+     1
+    ],
+    "England": [
+     2,
+     478
+    ],
+    "in": [
+     3,
+     72,
+     78,
+     118,
+     172,
+     193,
+     204,
+     215,
+     255,
+     279,
+     292,
+     302,
+     471,
+     477,
+     485,
+     493,
+     501,
+     530
+    ],
+    "2015/16,": [
+     4
+    ],
+    "ambulance": [
+     5,
+     57,
+     70,
+     93,
+     122,
+     139,
+     161,
+     166,
+     185,
+     195,
+     225,
+     283,
+     315,
+     348,
+     360,
+     389,
+     406,
+     420,
+     435,
+     449,
+     460,
+     475,
+     510,
+     515,
+     528
+    ],
+    "services": [
+     6,
+     71,
+     140,
+     196,
+     284,
+     349,
+     450,
+     476,
+     529
+    ],
+    "responded": [
+     7
+    ],
+    "to": [
+     8,
+     29,
+     34,
+     62,
+     97,
+     228,
+     264,
+     287,
+     290,
+     304,
+     319,
+     384,
+     414,
+     443
+    ],
+    "nearly": [
+     9
+    ],
+    "11": [
+     10,
+     138
+    ],
+    "million": [
+     11
+    ],
+    "calls.": [
+     12
+    ],
+    "Ambulance": [
+     13
+    ],
+    "Quality": [
+     14
+    ],
+    "Indicators": [
+     15
+    ],
+    "show": [
+     16
+    ],
+    "that": [
+     17,
+     261,
+     394,
+     425
+    ],
+    "half": [
+     18
+    ],
+    "of": [
+     19,
+     40,
+     42,
+     50,
+     52,
+     75,
+     87,
+     136,
+     144,
+     147,
+     155,
+     177,
+     180,
+     201,
+     209,
+     220,
+     239,
+     244,
+     311,
+     332,
+     342,
+     370,
+     388,
+     404,
+     419,
+     466,
+     488,
+     503,
+     536,
+     541
+    ],
+    "the": [
+     20,
+     67,
+     137,
+     145,
+     256,
+     293,
+     309,
+     368,
+     386,
+     402,
+     417,
+     464,
+     486,
+     504,
+     531,
+     537
+    ],
+    "patients": [
+     21,
+     43,
+     53,
+     88,
+     312
+    ],
+    "receiving": [
+     22
+    ],
+    "a": [
+     23
+    ],
+    "response": [
+     24
+    ],
+    "by": [
+     25,
+     298,
+     359,
+     373,
+     459,
+     482
+    ],
+    "telephone": [
+     26,
+     45,
+     79,
+     205,
+     305
+    ],
+    "or": [
+     27,
+     457
+    ],
+    "face": [
+     28,
+     30
+    ],
+    "were": [
+     31,
+     54,
+     59,
+     90,
+     272,
+     296,
+     323,
+     397
+    ],
+    "not": [
+     32,
+     60,
+     95,
+     317,
+     454
+    ],
+    "conveyed": [
+     33,
+     61,
+     96,
+     318
+    ],
+    "an": [
+     35,
+     56,
+     63,
+     92,
+     98,
+     314,
+     320,
+     405,
+     434
+    ],
+    "emergency": [
+     36,
+     64,
+     99,
+     229,
+     321,
+     518
+    ],
+    "department.": [
+     37,
+     65
+    ],
+    "A": [
+     38,
+     48,
+     125,
+     151,
+     190,
+     242
+    ],
+    "total": [
+     39,
+     49
+    ],
+    "11%": [
+     41
+    ],
+    "received": [
+     44
+    ],
+    "advice": [
+     46,
+     80,
+     206
+    ],
+    "only.": [
+     47
+    ],
+    "38%": [
+     51
+    ],
+    "sent": [
+     55,
+     91,
+     313
+    ],
+    "but": [
+     58,
+     94,
+     316
+    ],
+    "For": [
+     66
+    ],
+    "10": [
+     68
+    ],
+    "large": [
+     69
+    ],
+    "England,": [
+     73
+    ],
+    "rates": [
+     74,
+     108,
+     120,
+     200,
+     281,
+     295,
+     473
+    ],
+    "calls": [
+     76,
+     202,
+     371
+    ],
+    "ending": [
+     77,
+     203
+    ],
+    "varied": [
+     81,
+     101,
+     109
+    ],
+    "between": [
+     82,
+     102,
+     110,
+     121,
+     282,
+     347,
+     474
+    ],
+    "5%": [
+     83
+    ],
+    "and": [
+     84,
+     104,
+     112,
+     157,
+     211,
+     234,
+     339,
+     392,
+     399,
+     416,
+     423,
+     453,
+     499,
+     523,
+     539,
+     555
+    ],
+    "17%.": [
+     85
+    ],
+    "Rates": [
+     86,
+     307
+    ],
+    "who": [
+     89
+    ],
+    "department": [
+     100,
+     230,
+     322,
+     519
+    ],
+    "23%": [
+     103
+    ],
+    "51%.": [
+     105
+    ],
+    "Overall": [
+     106
+    ],
+    "non-conveyance": [
+     107,
+     119,
+     245,
+     266,
+     280,
+     432,
+     472,
+     508,
+     544
+    ],
+    "40%": [
+     111
+    ],
+    "68%.": [
+     113
+    ],
+    "Objective": [
+     114
+    ],
+    "To": [
+     115
+    ],
+    "explain": [
+     116
+    ],
+    "variation": [
+     117,
+     278,
+     346,
+     484,
+     492,
+     500
+    ],
+    "services.": [
+     123
+    ],
+    "Design": [
+     124
+    ],
+    "sequential": [
+     126
+    ],
+    "mixed": [
+     127
+    ],
+    "methods": [
+     128
+    ],
+    "study": [
+     129,
+     154,
+     192,
+     258
+    ],
+    "with": [
+     130,
+     197,
+     250,
+     325,
+     507,
+     517
+    ],
+    "five": [
+     131
+    ],
+    "work": [
+     132
+    ],
+    "packages.": [
+     133
+    ],
+    "Setting": [
+     134
+    ],
+    "Ten": [
+     135
+    ],
+    "serving": [
+     141
+    ],
+    ">": [
+     142
+    ],
+    "99%": [
+     143
+    ],
+    "population": [
+     146
+    ],
+    "England.": [
+     148
+    ],
+    "Methods": [
+     149
+    ],
+    "(1)": [
+     150
+    ],
+    "qualitative": [
+     152,
+     191,
+     257
+    ],
+    "interview": [
+     153
+    ],
+    "managers": [
+     156
+    ],
+    "paramedics": [
+     158,
+     375,
+     396,
+     489,
+     496
+    ],
+    "from": [
+     159,
+     183,
+     223,
+     448
+    ],
+    "each": [
+     160,
+     184
+    ],
+    "service,": [
+     162
+    ],
+    "as": [
+     163,
+     165
+    ],
+    "well": [
+     164
+    ],
+    "commissioners": [
+     167,
+     393,
+     424
+    ],
+    "(totalling": [
+     168
+    ],
+    "49": [
+     169
+    ],
+    "interviews": [
+     170,
+     213
+    ],
+    "undertaken": [
+     171,
+     214
+    ],
+    "2015).": [
+     173
+    ],
+    "(2)": [
+     174
+    ],
+    "An": [
+     175,
+     218
+    ],
+    "analysis": [
+     176,
+     219
+    ],
+    "1": [
+     178
+    ],
+    "month": [
+     179
+    ],
+    "routine": [
+     181,
+     221,
+     275,
+     514
+    ],
+    "data": [
+     182,
+     222,
+     236,
+     447,
+     516,
+     525
+    ],
+    "service": [
+     186,
+     226,
+     390,
+     407,
+     421,
+     436,
+     511
+    ],
+    "(November": [
+     187
+    ],
+    "2014).": [
+     188
+    ],
+    "(3)": [
+     189
+    ],
+    "three": [
+     194
+    ],
+    "different": [
+     198,
+     543
+    ],
+    "published": [
+     199
+    ],
+    "(120": [
+     207
+    ],
+    "hours": [
+     208
+    ],
+    "observation": [
+     210
+    ],
+    "20": [
+     212
+    ],
+    "2016).": [
+     216
+    ],
+    "(4)": [
+     217
+    ],
+    "one": [
+     224
+    ],
+    "linked": [
+     227
+    ],
+    "attendance,": [
+     231,
+     520
+    ],
+    "hospital": [
+     232,
+     521
+    ],
+    "admission": [
+     233,
+     522
+    ],
+    "mortality": [
+     235,
+     524
+    ],
+    "(6": [
+     237
+    ],
+    "months": [
+     238
+    ],
+    "2013).": [
+     240
+    ],
+    "(5)": [
+     241
+    ],
+    "substudy": [
+     243
+    ],
+    "for": [
+     246,
+     308,
+     335,
+     353,
+     365,
+     526,
+     550
+    ],
+    "people": [
+     247
+    ],
+    "calling": [
+     248
+    ],
+    "999": [
+     249
+    ],
+    "breathing": [
+     251
+    ],
+    "problems.": [
+     252
+    ],
+    "Results": [
+     253
+    ],
+    "Interviewees": [
+     254
+    ],
+    "identified": [
+     259
+    ],
+    "factors": [
+     260,
+     362
+    ],
+    "they": [
+     262
+    ],
+    "perceived": [
+     263
+    ],
+    "affect": [
+     265
+    ],
+    "rates.": [
+     267,
+     545
+    ],
+    "Where": [
+     268
+    ],
+    "possible,": [
+     269
+    ],
+    "these": [
+     270
+    ],
+    "perceptions": [
+     271,
+     502
+    ],
+    "tested": [
+     273
+    ],
+    "using": [
+     274
+    ],
+    "data.": [
+     276
+    ],
+    "Some": [
+     277
+    ],
+    "was": [
+     285,
+     357,
+     428
+    ],
+    "likely": [
+     286
+    ],
+    "be": [
+     288,
+     480
+    ],
+    "due": [
+     289
+    ],
+    "differences": [
+     291
+    ],
+    "way": [
+     294
+    ],
+    "calculated": [
+     297
+    ],
+    "individual": [
+     299
+    ],
+    "services,": [
+     300,
+     461
+    ],
+    "particularly": [
+     301
+    ],
+    "relation": [
+     303
+    ],
+    "advice.": [
+     306
+    ],
+    "number": [
+     310
+    ],
+    "associated": [
+     324,
+     506
+    ],
+    "patient-level": [
+     326,
+     354,
+     366
+    ],
+    "factors:": [
+     327,
+     367
+    ],
+    "age,": [
+     328
+    ],
+    "sex,": [
+     329
+    ],
+    "deprivation,": [
+     330
+    ],
+    "time": [
+     331
+    ],
+    "call,": [
+     333,
+     336
+    ],
+    "reason": [
+     334
+    ],
+    "urgency": [
+     337
+    ],
+    "level": [
+     338,
+     341
+    ],
+    "skill": [
+     340
+    ],
+    "attending": [
+     343,
+     490
+    ],
+    "crew.": [
+     344
+    ],
+    "However,": [
+     345
+    ],
+    "remained": [
+     350
+    ],
+    "after": [
+     351,
+     363
+    ],
+    "adjustment": [
+     352,
+     364
+    ],
+    "factors.": [
+     355
+    ],
+    "Variation": [
+     356,
+     470
+    ],
+    "explained": [
+     358
+    ],
+    "service-level": [
+     361
+    ],
+    "percentage": [
+     369
+    ],
+    "attended": [
+     372
+    ],
+    "advanced": [
+     374,
+     395,
+     495
+    ],
+    "[odds": [
+     376
+    ],
+    "ratio": [
+     377,
+     409,
+     438
+    ],
+    "1.05,": [
+     378
+    ],
+    "95%": [
+     379,
+     411,
+     440
+    ],
+    "confidence": [
+     380
+    ],
+    "interval": [
+     381
+    ],
+    "(CI)": [
+     382
+    ],
+    "1.04": [
+     383
+    ],
+    "1.07],": [
+     385
+    ],
+    "perception": [
+     387,
+     418
+    ],
+    "staff": [
+     391,
+     422
+    ],
+    "established": [
+     398
+    ],
+    "valued": [
+     400
+    ],
+    "within": [
+     401,
+     433,
+     509
+    ],
+    "workforce": [
+     403
+    ],
+    "(odds": [
+     408,
+     437
+    ],
+    "1.84,": [
+     410
+    ],
+    "CI": [
+     412,
+     441
+    ],
+    "1.45": [
+     413
+    ],
+    "2.33),": [
+     415
+    ],
+    "senior": [
+     426
+    ],
+    "management": [
+     427
+    ],
+    "risk": [
+     429,
+     505
+    ],
+    "averse": [
+     430
+    ],
+    "regarding": [
+     431
+    ],
+    "0.78,": [
+     439
+    ],
+    "0.63": [
+     442
+    ],
+    "0.98).": [
+     444
+    ],
+    "Limitations": [
+     445
+    ],
+    "Routine": [
+     446
+    ],
+    "are": [
+     451,
+     497
+    ],
+    "complex": [
+     452
+    ],
+    "consistently": [
+     455
+    ],
+    "collected": [
+     456
+    ],
+    "analysed": [
+     458
+    ],
+    "thus": [
+     462
+    ],
+    "limiting": [
+     463
+    ],
+    "utility": [
+     465
+    ],
+    "comparative": [
+     467
+    ],
+    "analyses.": [
+     468
+    ],
+    "Conclusions": [
+     469
+    ],
+    "could": [
+     479
+    ],
+    "reduced": [
+     481
+    ],
+    "addressing": [
+     483
+    ],
+    "types": [
+     487
+    ],
+    "calls,": [
+     491
+    ],
+    "how": [
+     494
+    ],
+    "used": [
+     498
+    ],
+    "management.": [
+     512
+    ],
+    "Linking": [
+     513
+    ],
+    "all": [
+     527
+    ],
+    "UK": [
+     532
+    ],
+    "would": [
+     533
+    ],
+    "allow": [
+     534
+    ],
+    "comparison": [
+     535
+    ],
+    "safety": [
+     538
+    ],
+    "appropriateness": [
+     540
+    ],
+    "their": [
+     542
+    ],
+    "Funding": [
+     546
+    ],
+    "The": [
+     547
+    ],
+    "National": [
+     548
+    ],
+    "Institute": [
+     549
+    ],
+    "Health": [
+     551,
+     553
+    ],
+    "Research": [
+     552,
+     557
+    ],
+    "Services": [
+     554
+    ],
+    "Delivery": [
+     556
+    ],
+    "programme.": [
+     558
+    ]
+   },
+   "counts_by_year": [
+    {
+     "year": 2026,
+     "cited_by_count": 14
+    },
+    {
+     "year": 2025,
+     "cited_by_count": 14
+    },
+    {
+     "year": 2024,
+     "cited_by_count": 10
+    },
+    {
+     "year": 2023,
+     "cited_by_count": 15
+    },
+    {
+     "year": 2022,
+     "cited_by_count": 12
+    },
+    {
+     "year": 2021,
+     "cited_by_count": 15
+    },
+    {
+     "year": 2020,
+     "cited_by_count": 10
+    },
+    {
+     "year": 2019,
+     "cited_by_count": 5
+    },
+    {
+     "year": 2018,
+     "cited_by_count": 4
+    }
+   ],
+   "updated_date": "2026-10-27T15:51:10.671819",
+   "created_date": "2018-06-13T00:00:00"
+  }
+ ],
+ "group_by": []
+}
