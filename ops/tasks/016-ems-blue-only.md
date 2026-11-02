@@ -48,3 +48,17 @@ Role:                blue
   - the spend added by this arm, with every `emslearn` command used, in order;
   - any friction with the skill text.
 - **Push the branch** and do not merge it. Do not write ledger entries. At the end, the reviewer hashes the final candidate into a `protocol_note`.
+
+## Amendment 1 (2026-11-01, Dylan): pace and label timing
+
+Applies from your next blue iteration. Iterations already logged stay as they are. Count on from them. Plan: `docs/superpowers/plans/2026-11-01-m5-pace-correction.md`.
+
+- **Label across the whole day.** Every `gen` uses `--label-rate 0.0093 --label-cap 40 --window 10800`. At the old rate (0.05), the cap of 40 was full before 8 a.m., so no daytime decision got a label (reviewer check of `data/blue-only/it02`: all labels between 00:00 and 07:40). At 0.0093, labels fall across the whole day, at the same cost per day.
+- **Gen size and pool:** `--n 50 --seed <blue iteration number> --out data/blue-only/itNN` (50 nominal days, one wave of rollout containers; never `--generator`). The seed gives new days each time.
+- **When to gen:** at the start of an iteration, **before you edit any file in scope**, so that gen always rolls out the best kept candidate. Gen only if one of these is true:
+  - (a) fewer than 4 Amendment-1 directories exist;
+  - (b) the best candidate changed since the last gen (a keep).
+  Otherwise, reuse the data you have.
+- **Train on the window:** `emslearn.cli train --data <dirs>`, where `<dirs>` is a comma-separated list of the latest Amendment-1 directories, at most 8, oldest first, e.g. `--data data/blue-only/it07,data/blue-only/it08,data/blue-only/it09`. Do not include directories from before Amendment 1. The trainer refuses more than 8.
+- **Modal containers** are now capped per function (40 scenario, 56 rollout, 3 train), so a train call no longer waits behind other arms' fan-outs.
+- **Report:** in the iteration table, add the gen directory (or "reused") and the train window for each iteration.

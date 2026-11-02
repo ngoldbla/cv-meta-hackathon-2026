@@ -68,3 +68,7 @@ Role:                red
 - **Push the branch** and do not merge it. Do not write ledger entries. At the end, the reviewer hashes the final candidate into a `protocol_note`.
 
 - Also audit the red loop: `.venv/bin/python scripts/ar_check.py --log research/autoresearch/ems-readable-red/autoresearch.jsonl --direction higher --scope judges/ems/experiments/ar/ems_red_sampler.py --branch ar/red/ems-readable --base main`, in the red worktree.
+
+## Amendment 1 (2026-11-01, Dylan)
+
+Amendment 1 (pace and label timing, tasks 016, 017 and 019) does not apply to READABLE. Continue as before.

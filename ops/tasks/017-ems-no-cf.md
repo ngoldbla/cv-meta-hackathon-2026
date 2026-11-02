@@ -68,3 +68,11 @@ Role:                red
 - **Push the branch** and do not merge it. Do not write ledger entries. At the end, the reviewer hashes the final candidate into a `protocol_note`.
 
 - Also audit the red loop: `.venv/bin/python scripts/ar_check.py --log research/autoresearch/ems-no-cf-red/autoresearch.jsonl --direction higher --scope judges/ems/experiments/ar/ems_red_sampler.py --branch ar/red/ems-no-cf --base main`, in the red worktree.
+
+## Amendment 1 (2026-11-01, Dylan): pace and equal compute
+
+Applies from your next blue iteration. Iterations already logged stay as they are. Count on from them. Plan: `docs/superpowers/plans/2026-11-01-m5-pace-correction.md`.
+
+- **Compute envelope:** each iteration's ES may score at most **3,000 scenario-days** in all: (2 × pairs + 1) × days × generations ≤ 3,000, e.g. pairs 8, days 24, generations 7 (2,856). This equals the CPU that FULL's 50-day labelled gen uses, so EMS3 compares the two training signals at about equal compute.
+- **Why:** NO_CF's 16,320 scenario-days per iteration filled the shared 100-container limit and held up the other arms. The `scenario` function is now capped at 40 containers, so a larger ES would also be slow for you.
+- **Report:** add pairs, days and generations to each iteration's row.
