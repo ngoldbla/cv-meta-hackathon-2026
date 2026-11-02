@@ -22,7 +22,12 @@ envelope (≤3,000 scenario-days per iteration). Red #3 reverted (demand 1.25:
 0.8533). Blue #14-15 KEPT (tier-2 hold idle<3: 0.8459; idle<4: 0.8342); #16
 reverted (idle<5: 0.8417, over-holding). Red #4 KEPT max urgent share 1.153
 (regret 916.32, 168/200 days); blue #17 rebaselined on the new pool (0.8375).
-Best is now 0.8375. Next: keep tuning the hold rule on the new pool.
+Best is now 0.8375. Blue #18-19 reverted (tier-3 idle<6: 0.8500; 10-min
+waited escape: 0.8382 near-tie). Blue #20 reverted: fine ES (sigma 0.02, lr
+0.01, seed 20, 2,856 scenario-days) on the rule -> 0.8732. Red #5 reverted
+(max offload: 557.68, 131/200 days); pool unchanged. The hold rule (tier-3
+idle<5, tier-2 idle<4) looks like a stable optimum. Next: probe new rule
+dimensions (queue-gated hold, same-borough preference).
 
 ## Work done
 - Claimed task 017 on main (`9a4b206 Start task 017`, pushed).
@@ -74,6 +79,14 @@ Best is now 0.8375. Next: keep tuning the hold rule on the new pool.
 - Red #4 (`1faeb94`, pushed): KEEP, max urgent share 1.153 -> regret 916.32
   (171 s, 168/200 days). Keep checks pass.
 - Blue #17 (`096f551`, pushed): rebaseline after red #4 keep -> 0.8375 (100 s).
+- Blue #18 (`fb61fd2`, pushed): revert, tier-3 hold idle<6 -> 0.8500 (41 s).
+- Blue #19 (`71cf236`, pushed): revert, tier-3 waited escape 10 min -> 0.8382
+  (67 s).
+- Blue #20 (`5141a34`, pushed): revert, fine ES (sigma 0.02, lr 0.01, seed 20;
+  2,856 scenario-days, 234 s train) -> 0.8732 (81 s). Journal `6d8c78b` covers
+  iters 15-20.
+- Red #5 (`b803234`, pushed): revert, max offload 1.151 -> 557.68 (159 s,
+  131/200 days). Pool unchanged, no blue rebaseline.
 
 ## Results
 Blue (`research/autoresearch/ems-no-cf/autoresearch.jsonl` on `ar/blue/ems-no-cf`):
@@ -97,6 +110,9 @@ Blue (`research/autoresearch/ems-no-cf/autoresearch.jsonl` on `ar/blue/ems-no-cf
 | 15 | hold tier-2 more aggressively (idle<4) | 0.8342 | keep | 104 | — | — | — |
 | 16 | hold tier-2 at idle<5 (match tier-3 threshold) | 0.8417 | revert | 47 | — | — | — |
 | 17 | rebaseline after red #4 keep; best unchanged | 0.8375 | rebaseline | 100 | — | — | — |
+| 18 | wider tier-3 hold (idle<6) on the urgent-heavy pool | 0.8500 | revert | 41 | — | — | — |
+| 19 | tier-3 hold escapes after 10 min waited | 0.8382 | revert | 67 | — | — | — |
+| 20 | fine ES on the hold rule (sigma 0.02, lr 0.01, seed 20) | 0.8732 | revert | 81 | 8 | 24 | 7 |
 
 Red (`research/autoresearch/ems-no-cf-red/autoresearch.jsonl` on `ar/red/ems-no-cf`):
 
@@ -106,10 +122,11 @@ Red (`research/autoresearch/ems-no-cf-red/autoresearch.jsonl` on `ar/red/ems-no-
 | 2 | concentrated spatial surge (max concentration, moderate demand) | 870.87 | keep | 197 |
 | 3 | higher demand (1.25) under the same concentrated surge | 717.07 | revert | 133 |
 | 4 | maximum urgent share (1.153) under the concentrated surge | 916.32 | keep | 171 |
+| 5 | maximum offload (1.151) under the urgent concentrated surge | 557.68 | revert | 159 |
 
 Spend so far (this arm, from `runs/spend.jsonl`): it01 $0.336, it02 $0.997,
-it03 $1.336, it04 $1.324, it05 $0.530, it13 $0.254 (other iters free) = $4.78.
-Program total $9.65 / $200 (stop above $150).
+it03 $1.336, it04 $1.324, it05 $0.530, it13 $0.254, it20 $0.255 (other iters
+free) = $5.03. Program total $10.43 / $200 (stop above $150).
 
 ## Deviations
 (none)
