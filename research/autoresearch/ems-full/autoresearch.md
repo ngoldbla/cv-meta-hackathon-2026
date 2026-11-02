@@ -31,3 +31,6 @@ Gen data/full/it07 (seed 7): 50 days, 202545 decisions, 1791 labels (455 s wall)
 
 ## Iter 8 (KEEP, 0.9943 - first keep, beats b1 by 0.57%)
 Gen data/full/it08 (seed 8): 50 days, 196996 decisions, 1699 labels (412 s wall). Two-shard gain survey (72 labels): median gain 21, p75 91, max 445 - so the gate threshold went at 100 (scale 25): full imitation below 100, decaying above. Union train on it06+it07+it08 (594758 decisions, 3239 masked labels, 28 s wall / 23.8 GPU s). Deployment: held 0.268 vs 0.289, divert 0.120 vs 0.119, t1p90 19.7 vs 21.0 - small targeted deviations, net win. pytest 141 passed + name guard clean before the kept commit. Red iter 2 is due now (after blue iter 8).
+
+## Iter 9 (rebaseline, 1.0021)
+Red #2 kept (offload 1.151 + concentration, regret 1257.56), so the pool changed (pool_key 4a3f9e94da137ed4 -> 3ec06df3526a27f0). Best candidate unchanged (iter-8 gain-gated imitation): candidate primary 27733.3 vs b1 27674.6 on the harder pool (b1 was 25111.0 on the old pool). The 0.9943 keep does not survive the harder pool; new best is 1.0021. Held 0.295 vs b1 0.315, divert 0.134 vs 0.132, t1p90 20.2 vs 21.3 min. Amendment 2 applies from the next train (iter 10).
