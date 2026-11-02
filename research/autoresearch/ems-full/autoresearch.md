@@ -118,3 +118,6 @@ Next: iter 28 starts with gen data/full/it28 (rule (b): iter-27 keep; it14 drops
 ## Iter 28 (revert, 1.0521)
 Gen data/full/it28 first (seed 28, 50 days, 205414 decisions, 1833 labels, 594 s wall, $0.1730): required by rule (b) after the iter-27 keep. One change: gate_gain 25 -> 50. Train on the latest 8-dir window, it14 dropping out ($0.0939, masked 5654, loss 5.89 -> 5.63, 57.4 GPU s).
 Result 1.0521 vs best 1.0448: a wider gate hurts - more imitation on moderate gains pulls toward the mixed history, which trails b1 on this pool. Consistent with the imitate sweep: labels over history. Gate stays 25. Red iter 7 is due now (after blue iter 28).
+
+## Iter 29 (rebaseline, 1.0976)
+Red #7 kept (re-mined top-200 vs iter-27, regret 4617.18), so the pool changed (pool_key 365e3488b85fda64 -> 4c088d562472f880). Best candidate unchanged (iter-27 imitate-3 weights): candidate primary 29576.6 vs b1 26947.0. The largest rebaseline gap yet (~10%): each re-mining finds a worse concentration for the current best. New best is 1.0976. Held 0.318 vs b1 0.313, divert 0.136 vs 0.131, t1p90 21.69 vs 21.30. Next: iter 30 starts with gen data/full/it30 (rule (c): red kept since last gen; it15 drops out), then retrain the imitate-3 recipe.
