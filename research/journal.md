@@ -160,3 +160,8 @@
 - **What was tried:** blue hyps 16-20 (log iters 17-21): queue-scaled activation, coverage-preserving assignment, demand-uniform blend 0.7/0.3, relocation idle-gate (MIN_IDLE_RELOC=3), gate tightened to 5.
 - **What happened:** hyp 19 KEPT at 0.9990 (guards clean): skipping relocation with fewer than 3 idle beats b1. The rest reverted (1.2887, 1.0188, 1.0175, 0.9995). Scheduling note: red #4/#5 are owed after hyps 16 and 20 (I ran hyps 13-20 straight); both run next, against the kept candidate, before blue hyp 21.
 - **Next:** red #4 + #5 catch-up, then blue hyps 21-24.
+
+## 2026-11-01: ems-readable blue hyps 21-25 + red #4-6 (task 018, arm READABLE)
+- **What was tried:** blue hyps 21-25 (log iters 23-28): gate 3->2, proactive-on-gated-base, proactive 1.5->2.0, 1.5->1.25, proactive 1.5->2.0 retune on the new pool; red #4 (conc max) kept at 733.52, #5 (unavailable on conc) reverted at 697.27, #6 (urgent on conc) kept at 785.82.
+- **What happened:** hyp 22 KEPT at 0.9944 (proactive stacks with the gate); the rest reverted (0.9973, 1.0106, 1.0117, 1.0125). Proactive ratio brackets sharply at 1.5. Red #4 and #6 keeps moved the blue pool twice (rebaselines #22 at 0.9965, #27 at 1.0037): the urgent+conc pool punishes the gated+proactive candidate, which now trails b1.
+- **Next:** blue hyps 26-30 adapt to the urgent+conc pool (ablations, gate retune), then red #7.
