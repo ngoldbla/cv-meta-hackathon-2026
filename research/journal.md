@@ -175,3 +175,8 @@
 - **What was tried:** blue hyps 31-35 (log iters 34-39): lone-unit relocation preference, urgent-only queue positioning, fixed busy-p 0.3, half-hour activation guard, activate_n 3->4 retry; red #8 (unavailable on the full corner) kept at 861.45.
 - **What happened:** all blue reverted (1.0097, 1.0001, 1.0007, 1.0149, 1.0353); best stays gate-2 at 0.9950 after rebaseline #36. Red #8's keep moved the pool to the full corner (demand floor + conc + urgent + unavailable); the gate-2 candidate improved slightly on it (0.9974->0.9950).
 - **Next:** blue hyps 36-40 (gate retune, divert-mix, dispatch margin), then red #9-10.
+
+## 2026-11-01: ems-readable DONE (task 018, arm READABLE)
+- **What was tried:** blue hyps 36-40 (log iters 40-44): divert-only-when-urgent, tier-3-2nd-nearest, gate 2->4, 30-min gated relocation, 15-min cadence; red #9 (tighter spike) reverted at 688.52, #10 (demand 1.05 on the corner) kept at 1207.57; final blue rebaseline #45.
+- **What happened:** hyp 39 KEPT at 0.9933 (30-min gated relocation stacks with gate-2); the rest reverted (1.0190, 1.2115, 0.9989, 0.9938). Final blue best-on-final-pool is 1.0097 (rebaseline #45): red #10's full corner (demand 1.05 + conc + urgent + unavailable) punishes the candidate past b1 with no blue iterations left to adapt. Final candidate: gate-2 + 30-min cadence, 2/20 constants. Final red: 1207.57.
+- **Next:** audit both loops with ar_check.py, finish the task report; reviewer hashes the final candidate into a protocol_note.
