@@ -30,8 +30,12 @@ idle<5, tier-2 idle<4) looks like a stable optimum. Blue #21-24 reverted in
 new dimensions: same-borough bonus 0.8537, queue-gated tier-3 hold 0.8396,
 busy-hours hold gate 0.8394, tier-1-only same-borough bonus 0.8406. Red #6
 reverted (10% unavailable: 305.07, 78/200 days — saturation kills the edge);
-pool unchanged. Best stays 0.8375. Next: moving-unit preference, ES with more
-pairs under the envelope.
+pool unchanged. Best stays 0.8375. Blue #25 reverted (16-pair fine ES, 2,772
+scenario-days: 0.8430); #26 reverted (tier-3 moving-unit bonus: 0.8473); #27
+reverted (16-gen fine ES, 2,880 scenario-days: 0.8872, drifted). Blue #28 KEPT:
+tier-2 waited escape at 10 min -> 0.8371 (deterministic bench, keep checks
+pass). Red #7 reverted (single-zip surge: 854.63, 154/200 days); pool
+unchanged. Best is now 0.8371. Next: tier-2 escape threshold variants.
 
 ## Work done
 - Claimed task 017 on main (`9a4b206 Start task 017`, pushed).
@@ -100,6 +104,17 @@ pairs under the envelope.
   (50 s).
 - Red #6 (`93b21a6`, pushed): revert, 10% unavailable -> 305.07 (120 s, 78/200
   days). Pool unchanged, no blue rebaseline.
+- Blue #25 (`e706ec5`, pushed): revert, 16-pair fine ES (days 12, gens 7, seed
+  25; 2,772 scenario-days, 230 s train) -> 0.8430 (42 s). Journal `95de895`
+  covers iters 21-25.
+- Blue #26 (`b3b8ea7`, pushed): revert, tier-3 moving-unit bonus -> 0.8473
+  (40 s).
+- Blue #27 (`21890dd`, pushed): revert, 16-gen fine ES (pairs 4, days 20, seed
+  27; 2,880 scenario-days, 247 s train) -> 0.8872 (40 s).
+- Blue #28 (`aff7dc0`, pushed): KEEP, tier-2 waited escape 10 min -> 0.8371
+  (53 s). Keep checks pass.
+- Red #7 (`049643c`, pushed): revert, single-zip surge -> 854.63 (135 s,
+  154/200 days). Pool unchanged, no blue rebaseline.
 
 ## Results
 Blue (`research/autoresearch/ems-no-cf/autoresearch.jsonl` on `ar/blue/ems-no-cf`):
@@ -130,6 +145,10 @@ Blue (`research/autoresearch/ems-no-cf/autoresearch.jsonl` on `ar/blue/ems-no-cf
 | 22 | tier-3 hold only when queue>=3 | 0.8396 | revert | 62 | — | — | — |
 | 23 | hold rule only during busy hours (06-24h) | 0.8394 | revert | 71 | — | — | — |
 | 24 | tier-1-only same-borough bonus (0.1) | 0.8406 | revert | 50 | — | — | — |
+| 25 | fine ES with more pairs (16, days 12, seed 25) | 0.8430 | revert | 42 | 16 | 12 | 7 |
+| 26 | tier-3-only moving-unit bonus (0.1) | 0.8473 | revert | 40 | — | — | — |
+| 27 | long-horizon fine ES (pairs 4, days 20, gens 16, seed 27) | 0.8872 | revert | 40 | 4 | 20 | 16 |
+| 28 | tier-2 hold escapes after 10 min waited | 0.8371 | keep | 53 | — | — | — |
 
 Red (`research/autoresearch/ems-no-cf-red/autoresearch.jsonl` on `ar/red/ems-no-cf`):
 
@@ -141,10 +160,12 @@ Red (`research/autoresearch/ems-no-cf-red/autoresearch.jsonl` on `ar/red/ems-no-
 | 4 | maximum urgent share (1.153) under the concentrated surge | 916.32 | keep | 171 |
 | 5 | maximum offload (1.151) under the urgent concentrated surge | 557.68 | revert | 159 |
 | 6 | 10% unavailable fleet under the urgent concentrated surge | 305.07 | revert | 120 |
+| 7 | surge tightened to a single zip | 854.63 | revert | 135 |
 
 Spend so far (this arm, from `runs/spend.jsonl`): it01 $0.336, it02 $0.997,
-it03 $1.336, it04 $1.324, it05 $0.530, it13 $0.254, it20 $0.255 (other iters
-free) = $5.03. Program total $10.43 / $200 (stop above $150).
+it03 $1.336, it04 $1.324, it05 $0.530, it13 $0.254, it20 $0.255, it25 $0.248,
+it27 $0.251 (other iters free) = $5.53. Program total $11.59 / $200 (stop
+above $150).
 
 ## Deviations
 (none)
