@@ -97,3 +97,7 @@ Next: imitate 3 -> 1; iter 23 starts with gen data/full/it23 (rule (b): iter-22 
 ## Iter 23 (revert, 1.0416)
 Gen data/full/it23 first (seed 23, 50 days, 199117 decisions, 1761 labels, 573 s wall, $0.1548): required by rule (b) after the iter-22 keep. One change: imitate 3 -> 1. Train on the latest 8-dir window, it08 dropping out ($0.0685, masked 5495, loss 3.93 -> 3.83, 37.8 GPU s).
 Result 1.0416 vs best 1.0286: near-pure label-following drifts (held 0.325 vs b1 0.318, divert 0.138 vs 0.134). Imitate sweep is U-shaped with minimum near 3: 100 -> 1.0378, 30 -> 1.0344, 10 -> 1.0337, 3 -> 1.0286 (kept), 1 -> 1.0416. Reverted. Next: gate_k 25 -> 10 (sharper imitation decay above the gate) on the reused window.
+
+## Iter 24 (revert, 1.0370)
+No gen (8 A1 dirs, best unchanged since last gen, no red keep since): reused the latest-8 window. One change: gate_k 25 -> 10. Train ($0.0742, loss 5.97 -> 5.70, 42.2 GPU s).
+Result 1.0370 vs best 1.0286: sharper decay above the gate hurts - imitation that vanishes too fast on big (noisy) gains destabilizes the policy. gate_k stays 25. Recipe tuning looks exhausted around (imitate 3, gate 25/25, tau 1.0); next frontier is candidate/file changes (hold context features, divert rules) or fresh-data retrains as the window churns. Red iter 6 is due now (after blue iter 24).
