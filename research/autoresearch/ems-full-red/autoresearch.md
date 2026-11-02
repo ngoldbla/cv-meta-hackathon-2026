@@ -28,3 +28,6 @@ Re-mined regret over all 1027 days vs the iter-22 keep (imitate 3): mean 1468.09
 
 ## Iter 7 (KEEP, 4617.18)
 Re-mined regret over all 1027 days vs the iter-27 keep: mean 1523.37 (up from 1468.09 vs iter-22), 656 days > 0, top day 10138.43; committed as research/autoresearch/ems-full-red/library/regret_days_7.json. Attacking its top 200: regret 4530.61 -> 4617.18 (+1.9%), 200/200 days with regret; candidate primary 44907.2 vs ref 40290.0. Note the target moved (iter-27 keep); the keep compares against the best kept red value regardless. pytest 141 passed + name guard clean before the kept commit. Blue must rebaseline (pool changed).
+
+## Iter 8 (revert, 4575.37)
+Re-mined regret over all 1027 days vs the iter-30 keep: mean 1542.87 (up from 1523.37 vs iter-27), 662 days > 0, top day 9164.05; committed as research/autoresearch/ems-full-red/library/regret_days_8.json. Attacking its top 200: 4575.37 vs best 4617.18 - close but no keep. Mining is plateauing (4306.68 -> 4530.61 -> 4617.18 -> 4575.37). Reverted; pool unchanged, no blue rebaseline needed. Remaining red axes are thin (thetas maxed, day-mining stalled); red 9-10 may need weekday-varying thetas or a new attack idea.
