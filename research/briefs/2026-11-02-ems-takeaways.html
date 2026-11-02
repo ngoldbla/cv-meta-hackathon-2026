@@ -74,7 +74,7 @@ footer { font-size: .85rem; color: var(--muted); border-top: 1px solid var(--rul
     <h2 id="verdict">The short answer</h2>
     <div class="verdict">
       <p>The loops found one strong idea: <strong>during a surge, hold a new low-priority call for a short time when few ambulances are free.</strong> In the simulator, this rule cut lateness by about a quarter on busy days. It did not use more ambulances.</p>
-      <p>A person can read and use the rule. A learned model that copied this hold behaviour did better on busy days, but it was worse on calm days. The full learning method (FULL) did not beat the standard rules.</p>
+      <p><strong>This idea is not new.</strong> Operations research described it for an ambulance fleet in 1980 (Taylor and Templeton), and ambulance services in the UK "stack" low-priority calls during a surge. The loops found the idea without that knowledge, and they found settings that work in this simulator. A person can read and use the rule. A learned model that copied this hold behaviour did better on busy days, but it was worse on calm days. The full learning method (FULL) did not beat the standard rules.</p>
       <p>No sealed test has run. All results come from development days in a simulator.</p>
     </div>
     <div class="strip">
@@ -103,6 +103,7 @@ footer { font-size: .85rem; color: var(--muted); border-top: 1px solid var(--rul
         </table>
       </div>
       <p class="note">Tier lateness is the mean number of minutes late per day, past each target (15, 40 and 120 minutes). All three tiers get better. The policy does not move lateness from urgent calls to other calls.</p>
+      <p>The mean response time also became shorter in each tier. With NO_CF, it went from 8.6 to 6.7 minutes for tier 1, from 11.1 to 8.6 minutes for tier 2, and from 14.7 to 12.0 minutes for tier 3, which is the tier that is held. A known study of a similar policy found the opposite trade-off: 18% fewer late arrivals, but a 37% longer mean response time (Jagtenberg and others, 2017). We did not find this trade-off in our simulator.</p>
     </div>
 
     <div class="finding f-mid">
@@ -135,8 +136,20 @@ footer { font-size: .85rem; color: var(--muted); border-top: 1px solid var(--rul
       <p>FULL's red loop kept 6 changes that made the test days harder. After each change, FULL lost ground on the new days, up to 9.8% worse than b1. This shows the purpose of the red loop: it stops a weak policy from looking strong.</p>
     </div>
 
+    <div class="finding f-mid">
+      <span class="tag">Finding 5 · prior work</span>
+      <h3>The loops rediscovered a known policy class</h3>
+      <p>A literature check found that the idea is known in research and in practice:</p>
+      <ul>
+        <li><strong>Research:</strong> "cutoff priority" queues keep the last free units for urgent calls (Taylor and Templeton, 1980; Schaack and Larson, 1986). Research has also shown since 1972 that the nearest unit is not always the best choice.</li>
+        <li><strong>Practice:</strong> UK ambulance services hold ("stack") low-priority calls during a surge. FDNY in New York also holds calls when demand is high.</li>
+        <li><strong>Not found:</strong> a published rule with our settings (one hold of 5 minutes when fewer than 5 or fewer than 4 units are free), or an automated search that found such a rule.</li>
+      </ul>
+      <p>Thus, the correct claim is that an automated loop rediscovered a known policy class without help, and found settings that work. The claim is not a new dispatch formula.</p>
+    </div>
+
     <div class="finding f-weak">
-      <span class="tag">Finding 5 · defects we found and fixed</span>
+      <span class="tag">Finding 6 · defects we found and fixed</span>
       <h3>The training data had three defects</h3>
       <ul>
         <li>A GPU training job waited 31 minutes for 26 seconds of work. Container limits fixed this.</li>
@@ -175,6 +188,7 @@ footer { font-size: .85rem; color: var(--muted); border-top: 1px solid var(--rul
       <li>All results come from a simulator of NYC, 2017 to 2019. It matched 7 of 10 real-world checks.</li>
       <li>The score counts minutes late. It does not count deaths or hospital results.</li>
       <li>The hold rule came from the loops' search. A new, pre-registered test must confirm it.</li>
+      <li>The sources for the literature check are in research/literature/2026-11-02-hold-rule-prior-art.md and research/claims.yaml. Most papers were read at abstract level only.</li>
     </ul>
     <p class="note">If the work continues, register one claim for a surge-only hold rule: 5% less lateness on the surge pools and no more than 2% more on normal days. Then run the sealed test one time.</p>
   </section>

@@ -74,7 +74,7 @@ footer { font-size: .85rem; color: var(--muted); border-top: 1px solid var(--rul
   <header style="display:grid;gap:10px">
     <span class="eyebrow">Draft for clinical review · simulated NYC EMS · 2026-11-02</span>
     <h1>EMS Surge Reserve Protocol</h1>
-    <p class="lede">This protocol gives three surge levels and the dispatch rules for each level. It is for clinical and dispatch staff to review. It is not approved for use.</p>
+    <p class="lede">This protocol gives three surge levels and the dispatch rules for each level. Level 2 uses a known idea, "cutoff priority" dispatch, with settings that we tested in a simulator. It is for clinical and dispatch staff to review. It is not approved for use.</p>
   </header>
 
   <div class="warn">
@@ -138,7 +138,7 @@ footer { font-size: .85rem; color: var(--muted); border-top: 1px solid var(--rul
           <div class="name"><span class="tag">Level 2</span><h3>Citywide reserve</h3></div>
           <span class="lab">Trigger</span>
           <span class="trigger">Fewer than 5 free units in the whole city.</span>
-          <span class="src">New rule found by the study</span>
+          <span class="src">Known policy class; settings found by the study</span>
         </div>
         <div>
           <span class="lab">Actions</span>
@@ -160,6 +160,18 @@ footer { font-size: .85rem; color: var(--muted); border-top: 1px solid var(--rul
     <p>In the simulator, calls that arrive with no free unit fell from 13% to 0.03%. All three tiers were less late, which includes the held tiers.</p>
   </section>
 
+  <section aria-labelledby="prior">
+    <h2 id="prior">Prior work</h2>
+    <p>This rule is a known idea. It is not a new invention.</p>
+    <ul>
+      <li>Research describes "cutoff priority" dispatch: when most units are busy, low-priority calls wait, so that the last free units stay available for urgent calls. Taylor and Templeton applied it to an ambulance fleet in 1980.</li>
+      <li>UK ambulance services hold ("stack") low-acuity calls during a surge. FDNY in New York also holds calls when demand is high.</li>
+      <li>We did not find a published rule with these settings: one hold of 5 minutes, when fewer than 5 or fewer than 4 units are free.</li>
+      <li>A similar policy in a Dutch study gave 18% fewer late arrivals, but a 37% longer mean response time. In our simulator, the mean response time became shorter in each tier.</li>
+    </ul>
+    <p class="note">Sources: research/literature/2026-11-02-hold-rule-prior-art.md and research/claims.yaml.</p>
+  </section>
+
   <section aria-labelledby="effect">
     <h2 id="effect">Effect in the simulator</h2>
     <p>Comparison with the standard rules (b1) on 200 development days that the search did not use:</p>
@@ -169,6 +181,9 @@ footer { font-size: .85rem; color: var(--muted); border-top: 1px solid var(--rul
         <tbody>
           <tr><td>Weighted lateness (8:3:1), all days</td><td class="n">1.00</td><td class="n better">0.80 (20% less)</td></tr>
           <tr><td>Tier-1 response, 90th percentile</td><td class="n">16.7 min</td><td class="n better">12.2 min</td></tr>
+          <tr><td>Mean response, tier 1</td><td class="n">8.6 min</td><td class="n better">6.7 min</td></tr>
+          <tr><td>Mean response, tier 2</td><td class="n">11.1 min</td><td class="n better">8.6 min</td></tr>
+          <tr><td>Mean response, tier 3 (the held tier)</td><td class="n">14.7 min</td><td class="n better">12.0 min</td></tr>
           <tr><td>Tier-1 minutes late per day</td><td class="n">72</td><td class="n better">30</td></tr>
           <tr><td>Tier-2 minutes late per day</td><td class="n">260</td><td class="n better">62</td></tr>
           <tr><td>Tier-3 minutes late per day</td><td class="n">10,538</td><td class="n better">9,040</td></tr>
