@@ -10,9 +10,9 @@ deployment still over-holds. Red iter 1 kept (max load + max urgency, regret
 Blue iter 5 rebaselined at 1.0000 on the new pool. Amendment-1 iters 6-8:
 whole-day labels + imitate 30 close the gap to 0.16%, and gain-gated
 imitation (iter 8) is the first keep at 0.9943. Red iter 2 kept (offload +
-concentration, regret 1257.56), so the pool changed again and blue must
-rebaseline next. Amendment 2 applies from the next blue train (iter 10).
-Arm spend $1.63.
+concentration, regret 1257.56), so the pool changed again; blue iter 9
+rebaselined the iter-8 keep at 1.0021 on the new pool. Amendment 2 applies
+from the iter-10 train. Arm spend $1.63.
 
 ## Work done
 - Claimed task 019 on main (`19a1f00 Start task 019`, pushed).
@@ -40,6 +40,9 @@ Arm spend $1.63.
   KEEP 0.9943 (gain-gated imitation; pytest 141 passed + name guard clean).
 - Red iter 2 (`da9e237`, pushed): keep, regret 1257.56, vs the kept blue
   iter-8 candidate. Pool changed again; blue rebaseline is due next.
+- Blue iter 9 (`1712b9b`, pushed): rebaseline 1.0021 on pool
+  `3ec06df3526a27f0` (candidate 27733.3 vs b1 27674.6; b1 was 25111.0 on
+  the old pool). `ar_check` on the blue log: 10 entries, 0 problems.
 
 ## Results
 Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`):
@@ -54,10 +57,10 @@ Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`)
 | 6 | imitate 10 + sharp masked labels (gain_min 0.5, tau 1.0) on whole-day data closes the drift gap | 1.0134 | revert | 204.0 | data/full/it06 | data/full/it06 |
 | 7 | imitate 30 anchors deployment to b1; label term adds gains on top (window it06+it07) | 1.0016 | revert | 175.0 | data/full/it07 | data/full/it06,data/full/it07 |
 | 8 | gain-gated imitation (gate_gain 100, gate_k 25, imitate 30): clone b1 except where a label shows a big win (window it06+it07+it08) | 0.9943 | keep | 218.0 | data/full/it08 | data/full/it06,data/full/it07,data/full/it08 |
+| 9 | rebaseline after red #2 keep (offload+concentration library); best unchanged (gain-gated imitation, iter 8) | 1.0021 | rebaseline | 231.0 | - | - |
 
-Best kept: iter 8 (gain-gated imitation), 0.9943 on the pre-red-2 pool
-(commit `0793a18b842069f09324d297acabedf3d7f971e3`). Red #2 kept since, so
-the value is stale until the iter-9 rebaseline.
+Best kept: iter 8's weights (gain-gated imitation), rebaselined at 1.0021
+on pool `3ec06df3526a27f0` (rebaseline commit `1712b9b`).
 
 Red (`research/autoresearch/ems-full-red/autoresearch.jsonl` on `ar/red/ems-full`):
 
