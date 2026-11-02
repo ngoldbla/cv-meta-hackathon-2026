@@ -1,0 +1,29 @@
+iter10: Amendment-1 gen (condition a: 1 Amendment-1 dir <4) on best-kept (iter7, 0.9971)
+gen: modal-python -m emslearn.cli gen --candidate experiments/ar/ems_candidate.py --out data/blue-only/it10 --n 50 --seed 10 --label-rate 0.0093 --label-cap 40 --window 10800
+{"out": "data/blue-only/it10", "days": 50, "decisions": 218196, "labelled": 1878, "seconds": 524.9}
+train: modal-python -m emslearn.cli train --script experiments/ar/ems_train.py --data data/blue-only/it09,data/blue-only/it10 --save experiments/ar/ems_candidate.npz --args {"imitate": 100}
+{"decisions": 431008, "labelled": 3721, "options": 17, "features": 12, "load_s": 12.5}
+{"epoch": 0, "loss": 100.5677, "elapsed_s": 20.1}
+{"epoch": 1, "loss": 45.2222, "elapsed_s": 20.3}
+{"epoch": 2, "loss": 44.5482, "elapsed_s": 20.4}
+{"epoch": 3, "loss": 44.2828, "elapsed_s": 20.6}
+{"epoch": 4, "loss": 44.1944, "elapsed_s": 20.8}
+{"epoch": 5, "loss": 44.1641, "elapsed_s": 21.0}
+{"epoch": 6, "loss": 44.0315, "elapsed_s": 21.1}
+{"epoch": 7, "loss": 43.952, "elapsed_s": 21.3}
+{"epoch": 8, "loss": 43.8582, "elapsed_s": 21.5}
+{"epoch": 9, "loss": 43.8355, "elapsed_s": 21.7}
+{"epoch": 10, "loss": 43.7827, "elapsed_s": 21.8}
+{"epoch": 11, "loss": 43.7387, "elapsed_s": 22.0}
+{"epoch": 12, "loss": 43.7296, "elapsed_s": 22.2}
+{"epoch": 13, "loss": 43.6932, "elapsed_s": 22.4}
+{"epoch": 14, "loss": 43.6326, "elapsed_s": 22.5}
+{"epoch": 15, "loss": 43.6053, "elapsed_s": 22.7}
+{"epoch": 16, "loss": 43.6002, "elapsed_s": 22.9}
+{"epoch": 17, "loss": 43.6055, "elapsed_s": 23.1}
+{"epoch": 18, "loss": 43.5919, "elapsed_s": 23.2}
+{"epoch": 19, "loss": 43.5445, "elapsed_s": 23.4}
+{"done": true, "seconds": 23.4}
+
+{"saved": "experiments/ar/ems_candidate.npz", "gpu_seconds": 28.3, "seconds": 33.2}
+bench: RC=0 wall 276s METRIC ratio_b1=1.0084 (union train it09+it10 OK: 431008 decisions, 3721 labelled; wait ~5s)
