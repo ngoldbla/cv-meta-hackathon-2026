@@ -43,7 +43,8 @@ KEEPS 0.8012: refit imitation on the 1.78M latest-8 window (loss diverged late 0
 iter 8; kept on the mechanical rule, stability fix next). Iter 28 KEEPS 0.7898: stable
 4-epoch refit on the latest-8 window (loss monotonic, gates pass). Iter 29 reverts 0.8072
 (12-epoch lr-1e-3 fits better at 0.0242 but benches worse: loss does not predict the day objective).
-Best: 0.7898 (`9ad1171`).
+Best: 0.7898 (`9ad1171`). Iter 30 reverts 0.7997 (wider MLP fits better, benches worse).
+Journal entry for iters 26-30 added (branch).
 
 ## Work done
 - Claimed task 016 on main (`ec9da1a Start task 016`, pushed).
@@ -163,6 +164,10 @@ Best: 0.7898 (`9ad1171`).
   553.6 s, iter-28 policy). No script-file change; train with `--args {"label_w": 0, "lr": 0.001,
   "epochs": 12}` on it19-21,it23-25,it28-29 (1,787,553 decisions, sums exact; loss 0.0875->0.0242
   monotonic; wall 70.1 s, gpu 66.0 s). Bench REVERTS at 0.8072 (109 s).
+- Iter 30 (`4734f07`, pushed): no gen. No script-file change; train with `--args {"label_w": 0,
+  "epochs": 4, "hidden": [128, 128]}` on the same latest-8 window (loss 0.0512->0.0240; wall
+  45.9 s, gpu 40.9 s). Bench REVERTS at 0.7997 (117 s). Journal entry for iters 26-30 added on
+  the branch.
 
 ## Results
 | iter | hypothesis | value | decision | seconds | gen | train window |
@@ -196,6 +201,7 @@ Best: 0.7898 (`9ad1171`).
 | 27 | refit imitation on latest-8 window | 0.8012 | keep | 205.0 | - | it12,it18,it19,it20,it21,it23,it24,it25 |
 | 28 | stable 4-epoch refit on latest-8 | 0.7898 | keep | 112.0 | it28 | it18,it19,it20,it21,it23,it24,it25,it28 |
 | 29 | long stable schedule (lr 1e-3, 12 ep) | 0.8072 | revert | 109.0 | it29 | it19,it20,it21,it23,it24,it25,it28,it29 |
+| 30 | wider MLP [128,128], 4 epochs | 0.7997 | revert | 117.0 | - | it19,it20,it21,it23,it24,it25,it28,it29 |
 
 Values from `research/autoresearch/ems-blue-only/autoresearch.jsonl` on `ar/blue/ems-blue-only`.
 Best kept: 0.7898 (iter 28, `9ad1171`).
@@ -232,7 +238,8 @@ Best kept: 0.7898 (iter 28, `9ad1171`).
   `train --data ...latest-8... --args {"label_w": 0}`; probes x2 (deployed strip still absent;
   8-dir labelled 14530 reproducible). Iter 28: `gen (...it28 --seed 28 ...)`; `train --data
   ...latest-8... --args {"label_w": 0, "epochs": 4}`. Iter 29: `gen (...it29 --seed 29 ...)`;
-  `train --data ...latest-8... --args {"label_w": 0, "lr": 0.001, "epochs": 12}`.
+  `train --data ...latest-8... --args {"label_w": 0, "lr": 0.001, "epochs": 12}`. Iter 30: no
+  gen; `train --data ...same window... --args {"label_w": 0, "epochs": 4, "hidden": [128, 128]}`.
 
 - Amendment-2 mechanism: the deployed `ems-m5` train was probe-verified (this session) to still
   serve hold labels, so the loop applies the strip in `ems_train.py` from iter 12 (same semantics as
