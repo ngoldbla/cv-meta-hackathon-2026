@@ -1,0 +1,5 @@
+iter34: no gen (13 Amendment-1 dirs exist; best unchanged since it32) - rule change, no training
+change: ems_candidate.py score: hold only fresh calls (waited<600s); stale tier-2/3 get assigned even when idle is low. Unit-verified (fresh t2/t3 held at 1 idle; stale identical to unforced scorer; first test draft had a bad assumption about the scorer, fixed).
+bench: RC=0 METRIC ratio_b1=0.7744 (primary 8709.6 vs b1 11247.14; better on all weightings; run 20261102-022132). NOTE: wall-clock wrapper broke (unit-check failure short-circuited S=), so seconds=133.2 comes from the bench's own output, not the wrapper.
+gates: 141 passed, 1 skipped, name guard clean
+decision: KEEP (strictly better by 0.0001) - best 0.7745 -> 0.7744
