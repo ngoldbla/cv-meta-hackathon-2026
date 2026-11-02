@@ -1,0 +1,25 @@
+venue: local RTX 5060 Ti (Modal H100 queue was 31 min for iter 2); same script/args/data as Modal path
+cmd: python experiments/ar/ems_train.py --data runs/shards-local/it02 --out experiments/ar/ems_candidate.npz --ckpt runs/shards-local/ckpt-it03 --args {}
+{"decisions": 859852, "labelled": 8000, "options": 17, "features": 12, "load_s": 3.6}
+{"epoch": 0, "loss": 11.3784, "elapsed_s": 8.5}
+{"epoch": 1, "loss": 8.0003, "elapsed_s": 9.0}
+{"epoch": 2, "loss": 7.7742, "elapsed_s": 9.6}
+{"epoch": 3, "loss": 7.6824, "elapsed_s": 10.1}
+{"epoch": 4, "loss": 7.6193, "elapsed_s": 10.7}
+{"epoch": 5, "loss": 7.5927, "elapsed_s": 11.2}
+{"epoch": 6, "loss": 7.562, "elapsed_s": 12.1}
+{"epoch": 7, "loss": 7.5326, "elapsed_s": 12.9}
+{"epoch": 8, "loss": 7.5217, "elapsed_s": 13.4}
+{"epoch": 9, "loss": 7.5081, "elapsed_s": 14.2}
+{"epoch": 10, "loss": 7.4949, "elapsed_s": 14.8}
+{"epoch": 11, "loss": 7.4876, "elapsed_s": 15.6}
+{"epoch": 12, "loss": 7.4867, "elapsed_s": 16.1}
+{"epoch": 13, "loss": 7.4716, "elapsed_s": 16.6}
+{"epoch": 14, "loss": 7.4685, "elapsed_s": 17.1}
+{"epoch": 15, "loss": 7.4584, "elapsed_s": 17.6}
+{"epoch": 16, "loss": 7.4612, "elapsed_s": 18.1}
+{"epoch": 17, "loss": 7.4534, "elapsed_s": 18.7}
+{"epoch": 18, "loss": 7.4397, "elapsed_s": 19.3}
+{"epoch": 19, "loss": 7.4477, "elapsed_s": 19.8}
+{"done": true, "seconds": 19.8}
+train_exit=0 wall_seconds=26
