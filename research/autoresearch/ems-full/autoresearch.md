@@ -70,3 +70,8 @@ Result 1.0100 vs best 0.9989: sharper targets clearly hurt - overcommitting to t
 
 ## Iter 17 (rebaseline, 1.0727)
 Red #4 kept (regret-mined top-200, regret 4306.68), so the pool changed (pool_key 834c832309563aa9 -> 28037b2fec557333). Best candidate unchanged (iter-14 weights): candidate primary 30099.8 vs b1 28059.7. The mined pool concentrates exactly this candidate's weaknesses, so the 0.9989 keep starts 7% behind here; new best is 1.0727. Note b1 finds this pool easier than the busiest-days pool (28059.7 vs 33860.7): the mining targets candidate-vs-ref regret, not raw difficulty. Held 0.321 vs b1 0.318, divert 0.137 vs 0.134, t1p90 21.68 vs 21.55. Next: iter 18 starts with gen data/full/it18 (rule (c): red kept since last gen), then retrain the gate-25 recipe on the full 8-dir window.
+
+## Iter 18 (KEEP, 1.0344)
+Gen data/full/it18 first (seed 18, 50 days, 201972 decisions, 1753 labels, 537 s wall, $0.1839): required by rule (c) since red #4 changed the pool. No .py change: gate-25 recipe retrained on the full 8-dir window it06+it07+it08+it10+it12+it14+it15+it18 ($0.0683, masked 5575/14162 = 39.4%, gains p50/p75/p90/p99 = 33/94/196/462, loss 22.52 -> 18.96, 37.7 GPU s).
+Result 1.0344 vs best 1.0727: fresh on-pool data closes over half the mined-pool gap (candidate 29024.9 vs b1 28059.7; held 0.314 vs 0.318, divert 0.136 vs 0.134, t1p90 21.31 vs 21.55). Still above b1: the mined weaknesses are only partly learnable by retraining. pytest 141 passed + name guard clean before the kept commit.
+Next: window is full (8 dirs); the next gen drops it06. Iter 19 starts with gen data/full/it19 (rule (b): iter-18 keep), then consider deeper changes (features, candidate rules) since recipe tweaks have stalled near the gate-25 optimum.
