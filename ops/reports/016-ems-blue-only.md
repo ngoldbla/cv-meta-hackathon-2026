@@ -11,8 +11,10 @@ itself, two SIGTERM-stopped, single-writer verified) and the log repaired to the
 keeps 0.9997. Iters 6-8 (previous session, pre-Amendment): no-hold reverts (1.0010, holds net-helpful),
 400-day imitation KEEPS 0.9971 (best), 800-day imitation reverts (1.0024, late-epoch training divergence).
 Iter 9 (first under Amendment 1): whole-day labels verified (hours 0.56-23.45, 87.5% non-zero deltas) and
-train wait ~5 s, but labels + imitate 0.1 still catastrophically off b1 (4.5756, divert-happy). Coverage
-was not the problem: the 3 h-window labels are adversarial to the day objective. Best: 0.9971 (`69b357f`).
+train wait ~5 s, but labels + imitate 0.1 still catastrophically off b1 (4.5756, divert-happy). Iter 10:
+imitate 100 on the it09+it10 union (sums exact) reverts 1.0084 - nearer b1 than the old-label 1.0722 but
+still no win. Coverage was not the problem: the 3 h-window labels are adversarial to the day objective.
+Best: 0.9971 (`69b357f`).
 
 ## Work done
 - Claimed task 016 on main (`ec9da1a Start task 016`, pushed).
@@ -52,6 +54,10 @@ was not the problem: the 3 h-window labels are adversarial to the day objective.
   00000: 40 labels at hours 0.56-23.45, per-6h [6,3,20,11,0], 87.5% non-zero deltas. Train on `it09`
   (defaults): wall 28.6 s, gpu 23.7 s (wait ~5 s, gate 60 s). Bench REVERTS at 4.5756 (591 s wall,
   near the 600 s gate): whole-day labels still teach divert-happy (divert 0.287 vs b1 0.050).
+- Iter 10 (`c0b3d03`, pushed): gen `it10` (condition a; 50 days, 218,196 decisions, 1,878 labels,
+  524.9 s). Union train on `it09,it10` (431,008 decisions / 3,721 labelled, sums exact; wall 33.2 s,
+  gpu 28.3 s) with `--args {"imitate": 100}`. Bench REVERTS at 1.0084 (276 s). Journal entry for
+  iters 6-10 added.
 
 ## Results
 | iter | hypothesis | value | decision | seconds | gen | train window |
@@ -65,6 +71,7 @@ was not the problem: the 3 h-window labels are adversarial to the day objective.
 | 7 | 400d imitation (loc01+loc02) | 0.9971 | keep | 140.0 | loc02 | loc01,loc02 |
 | 8 | 800d imitation (loc01-04) | 1.0024 | revert | 75.0 | loc03,loc04 | loc01-loc04 |
 | 9 | whole-day labels + imitate 0.1 | 4.5756 | revert | 591.0 | it09 | it09 |
+| 10 | imitate 100 + whole-day labels | 1.0084 | revert | 276.0 | it10 | it09,it10 |
 
 Values from `research/autoresearch/ems-blue-only/autoresearch.jsonl` on `ar/blue/ems-blue-only`.
 Best kept: 0.9971 (iter 7, `69b357f`).
@@ -84,6 +91,8 @@ Best kept: 0.9971 (iter 7, `69b357f`).
   (seed 4) + `loc04` (seed 5) for iter 8. Iters 6-8 added no Modal spend. Iter 9: `gen --out
   data/blue-only/it09 --n 50 --seed 9 --label-rate 0.0093 --label-cap 40 --window 10800`; `train --script
   experiments/ar/ems_train.py --data data/blue-only/it09 --save experiments/ar/ems_candidate.npz --args {}`.
+  Iter 10: `gen (...it10 --seed 10 ...)` same shape; `train --data data/blue-only/it09,data/blue-only/it10
+  --args {"imitate": 100}` (union sums exact).
 
 ## Blocked / questions
 (none currently)
