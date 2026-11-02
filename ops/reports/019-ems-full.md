@@ -23,8 +23,8 @@ the new pool. Iter 15 (wider scorer [128,128]) reverted at 1.0007;
 iter 16 (tau 0.5) reverted at 1.0100. Red iter 4 (regret-mined top-200
 days) kept at regret 4306.68; blue iter 17 rebaselined the iter-14 keep
 at 1.0727 on the mined pool. Iter 18 (gate-25 retrain with fresh it18)
-kept at 1.0344; iter 19 (decisive-only labels) reverted at 1.0376.
-Arm spend $3.32.
+kept at 1.0344; iter 19 (decisive-only labels) reverted at 1.0376
+and iter 20 (imitate 100) reverted at 1.0378. Arm spend $3.42.
 
 ## Work done
 - Claimed task 019 on main (`19a1f00 Start task 019`, pushed).
@@ -104,6 +104,9 @@ Arm spend $3.32.
   first (seed 19, 50 days, 203056 decisions, 1791 labels; required by
   rule (b)), then `gain_min` 0.5 -> 2.0, trained on the latest 8-dir
   window with it06 dropped (masked 5121).
+- Blue iter 20 (`ba2f750`, pushed): revert 1.0378. No gen (window reused);
+  one change (`imitate` 30 -> 100), trained on the latest-8 window
+  ($0.1015): stronger imitation memorizes mixed-history mistakes.
 
 ## Results
 Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`):
@@ -129,6 +132,7 @@ Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`)
 | 17 | rebaseline after red #4 keep (regret-mined library); best unchanged (gate-25 recipe, iter 14) | 1.0727 | rebaseline | 150.0 | - | - |
 | 18 | retrain the kept gate-25 recipe on the 8-dir window incl. fresh on-pool it18 | 1.0344 | keep | 129.0 | data/full/it18 | data/full/it06,data/full/it07,data/full/it08,data/full/it10,data/full/it12,data/full/it14,data/full/it15,data/full/it18 |
 | 19 | train only on decisive labels (gain_min 0.5 -> 2.0), latest 8-dir window | 1.0376 | revert | 134.0 | data/full/it19 | data/full/it07,data/full/it08,data/full/it10,data/full/it12,data/full/it14,data/full/it15,data/full/it18,data/full/it19 |
+| 20 | stronger anchor (imitate 30 -> 100), reused window | 1.0378 | revert | 146.0 | reused | data/full/it07,data/full/it08,data/full/it10,data/full/it12,data/full/it14,data/full/it15,data/full/it18,data/full/it19 |
 
 Best kept: iter 18's weights (gate-25 recipe, 8-dir window), 1.0344 on
 pool `28037b2fec557333` (commit `078c078`).
@@ -142,7 +146,7 @@ Red (`research/autoresearch/ems-full-red/autoresearch.jsonl` on `ar/red/ems-full
 | 3 | attack the 200 busiest dev days (library/busy_days.json) with maxed thetas | 1520.87 | keep | 81.0 |
 | 4 | attack the top-200 regret days mined from a 1027-day bench (library/regret_days.json) | 4306.68 | keep | 78.0 |
 
-Spend added by this arm: $3.320 (`runs/spend.jsonl` on main). emslearn
+Spend added by this arm: $3.421 (`runs/spend.jsonl` on main). emslearn
 commands in order (pre-Amendment regime, from the blue worktree notes):
 1. `gen` 200 days, `--out data/full/it01`, label_rate 0.05 ($0.6958);
 2. `train --data data/full/it01` x4, one per iter 1-4 ($0.0971, $0.0591,
@@ -185,7 +189,8 @@ worktree notes:
 21. `train` on the full 8-dir window incl. it18 ($0.0683; iter 18 keep);
 22. `gen --n 25 --n-gen 25 --seed 19 --out data/full/it19` with the
     Amendment-1 label flags ($0.1835; rolls out the iter-18 keep);
-23. `train` on the latest 8-dir window, it06 dropped ($0.1342; iter 19).
+23. `train` on the latest 8-dir window, it06 dropped ($0.1342; iter 19);
+24. `train` on the same window ($0.1015; iter 20, imitate 100).
 
 ## Deviations
 - Iters 1-4 ran before Amendment 1 (21:14-21:39 CDT vs amendment 21:44 CDT),
