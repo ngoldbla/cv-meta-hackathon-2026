@@ -1,8 +1,10 @@
 """Blue-loop candidate policy (the autoresearch loop edits this file only). Starts as b1.
 
 Arm READABLE: readable code, no trained parameters. Hand-set numeric constants
-added (1/20): MIN_IDLE_RELOC = 3 (skip the hourly relocation pass when fewer
-than 3 units are idle; thin fleets should stay put instead of churning).
+added (2/20): MIN_IDLE_RELOC = 3 (skip the hourly relocation pass when fewer
+than 3 units are idle; thin fleets should stay put instead of churning);
+PROACTIVE_RATIO = 1.5 (activate a borough whose observed last-hour calls
+exceed 1.5x its expected count).
 """
 
 from __future__ import annotations
@@ -14,6 +16,7 @@ from ems.policy.classical import Classical
 from ems.sim.calib import BOROUGHS
 
 MIN_IDLE_RELOC = 3
+PROACTIVE_RATIO = 1.5
 
 
 class Candidate(Classical):
@@ -47,4 +50,12 @@ class Candidate(Classical):
                 u = free.pop(k)
                 if u.z != t and not u.moving:
                     acts.append(Relocate(u.id, t))
+        if obs.budget_unit_hours > 0:
+            cal = self.sim.cal
+            for bi, b in enumerate(BOROUGHS):
+                exp = cal.expected_calls(b, (obs.hour - 1) % 24)
+                seen = obs.calls_last_hour[bi] if bi < len(obs.calls_last_hour) else 0
+                if exp > 0 and seen > PROACTIVE_RATIO * exp and (bi, obs.hour) not in self.activated:
+                    self.activated.add((bi, obs.hour))
+                    acts.append(Activate(bi, int(self.params["activate_n"])))
         return acts
