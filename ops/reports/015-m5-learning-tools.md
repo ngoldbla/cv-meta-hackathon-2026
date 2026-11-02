@@ -5,6 +5,10 @@ Branch head at start: ac45acc9d3e537a2a303a3db5cd4ee893782f500  ·  at finish: <
 ## Summary
 Steps 1-2 done: reviewer patch applied cleanly (`git apply --check` then `git apply`, no hand edits); full suite 141 passed, 1 skipped; name_guard and ruff clean. Environment note: reinstalled the editable package (`pip install -e . --no-deps --no-build-isolation`) so the new top-level `emslearn` package resolves; no repo files touched by this.
 
+## Results
+- Step 2: pytest 141 passed, 1 skipped; name_guard rc=0; ruff "All checks passed!".
+- Step 3: `modal deploy cloud/ems_modal.py` created Function scenario, Function rollout, Function train; "App deployed in 2.200s".
+
 ## Work done
 - Claimed task 015 (this report created).
 - Step 1: extracted diff block (lines 38-1167 of the task file) via `mktemp`+`sed`; `git apply --check` OK, `git apply` OK. New files: `judges/ems/emslearn/` (5 files), `ems_blue_bench_m5.py`, `ems_candidate_learned.py`, `ems_es.py`, `ems_red_bench_m5.py`, `ems_train.py`, `tests/test_emslearn.py`; modified: `cloud/ems_modal.py`, `scripts/ar_check.py`, `tests/test_ar_check.py`.
@@ -14,7 +18,7 @@ Steps 1-2 done: reviewer patch applied cleanly (`git apply --check` then `git ap
 (none yet)
 
 ## Deviations
-(none)
+- Environment: reinstalled the editable package (`pip install -e . --no-deps --no-build-isolation`) after applying the patch so the new `emslearn` top-level package resolves in `.venv`. No repo files touched; needed for the step-2 counts.
 
 ## Blocked / questions
 (none)
