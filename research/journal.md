@@ -165,3 +165,8 @@
 - **What was tried:** tier-3 moving-unit bonus reverted (0.8473); 16-gen fine ES reverted badly (0.8872, drifted). Tier-2 waited escape kept twice: 10 min (0.8371) then 5 min (0.8324). Dropping the tier-2 hold entirely reverted (0.8585), so the single 5-min hold cycle is load-bearing. Red #7 (single-zip surge) reverted at 854.63; pool unchanged.
 - **What happened:** best is 0.8324 (tier-3 idle<5 no escape, tier-2 idle<4 with 5-min escape). The escape gradient points shorter; the next probe is whether tier-3 wants an escape too, now that tier-2 has one.
 - **Next:** tier-3 escape variants on top of the kept tier-2 escape; red #8 after blue 32.
+
+## 2026-11-02: ems-no-cf blue iters 31-35, red iter 8 (task 017)
+- **What was tried:** tier-3 escape at 5 min kept (0.8249) — the escape that failed alone (#19) wins on top of the tier-2 escape. Re-bracketed both thresholds with escapes: tier-3 idle<6 (0.8489) and idle<4 (0.8482) reverted; tier-2 idle<5 (0.8410) and idle<3 (0.8498) reverted. Red #8 (nominal demand) reverted at 717.12; pool unchanged.
+- **What happened:** best is 0.8249 (tier-3 idle<5 + 5-min escape, tier-2 idle<4 + 5-min escape). Thresholds are bracketed optima in both directions with escapes in place. 5 iterations of blue cap left.
+- **Next:** final probes (tier-1 never-hold sanity is structural; ES on the escaped rule with a fresh seed), red #9 after blue 36, then audit and finish.
