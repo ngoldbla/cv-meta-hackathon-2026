@@ -145,3 +145,8 @@
 - **What was tried:** red baseline (regret 500.25 vs b1), then: demand floor 0.9 (it1), urgent ceiling (it2), unavailable ceiling (it3), conc max 104/3 (it4), unavailable on conc max (it5). Log: `research/autoresearch/ems-readable-red/autoresearch.jsonl` on branch `ar/red/ems-readable`.
 - **What happened:** it1 kept (500.25->650.56) and it4 kept (650.56->733.52); it2/it3/it5 reverted (516.20, 579.82, 697.27). Single-dim ceilings for urgent/unavailable shrink the gap, but conc max stacks with the demand floor. Regret shows no date pattern (top-30 weekdays/months spread) and no volume correlation (0.06), so pick_days mining is parked; theta corners carry the loop.
 - **Next:** red it6+ (urgent-on-conc interaction, offload, triple corner), interleaved after every 4 blue hyps.
+
+## 2026-11-01: ems-readable red DONE (task 018, arm READABLE)
+- **What was tried:** red iters 6-10: urgent on conc (kept, 785.82), offload on corner (reverted, 623.58), unavailable on the full corner (kept, 861.45), tighter spike over 1 zip (reverted, 688.52), demand 1.05 on the corner (kept, 1207.57).
+- **What happened:** the red loop finishes at regret 1207.57 with theta = demand 1.05, conc 104/3, urgent 1.153, unavailable 0.25 (nominal offload). The demand floor (it1) reversed once all ceilings stacked: higher load on thin fleets with spikes widens the candidate-oracle gap far more. pick_days stayed nominal throughout (no date/volume pattern found).
+- **Next:** audit with ar_check.py; reviewer hashes the final candidate into a protocol_note.
