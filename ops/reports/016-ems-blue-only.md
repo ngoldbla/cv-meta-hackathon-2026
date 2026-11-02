@@ -18,7 +18,9 @@ Best: 0.9971 (`69b357f`). Iter 11 (previous session): labels-off imitation on th
 reverts 0.9990 - beats b1, short of iter 7. Amendment 2 landed (task file + `6cf5f54`), but a probe train
 shows the deployed `ems-m5` app still serves hold labels (labelled 3721 = full gen sum), so the strip is
 applied in-script from iter 12. NOTE: `02c4e87` replaced the 016/019 task files with only the Amendment-2
-text; this session works from the recovered plan (`3da968b` version) + Amendment 2.
+text; this session works from the recovered plan (`3da968b` version) + Amendment 2. Iter 12
+(first under Amendment 2, in-script strip): unit-choice labels + imitate 100 on it09-12 revert 1.0056 -
+nearer b1 than iter 10's 1.0084 but still short of 0.9971; removing hold labels did not fix the label term.
 
 ## Work done
 - Claimed task 016 on main (`ec9da1a Start task 016`, pushed).
@@ -71,6 +73,12 @@ text; this session works from the recovered plan (`3da968b` version) + Amendment
   sum, so the deployed `ems-m5` app does NOT strip hold labels yet (`6cf5f54` committed, not
   deployed). No deploy attempted (shared app, other arms live). The strip is implemented in the
   in-scope `ems_train.py` from iter 12 (same semantics, idempotent with a later deploy).
+- Iter 12 (`45d4bc3`, pushed): FIRST under Amendment 2. Gen `it12` (condition a; 50 days, 215,274
+  decisions, 1,787 labels, 648.5 s). Script change: `drop_hold_labels` in `ems_train.py` (mirrors
+  `emslearn.shards`, unit-verified locally), reverted after. Train on `it09-it12` (874,712 decisions
+  / 7,393 pre-strip labelled, sums exact; wall 53.6 s, gpu 48.4 s) with `--args {"imitate": 100}`.
+  Bench REVERTS at 1.0056 (87 s). cf reports for the run show all 5 nonzero deltas on hold
+  alternatives; every unit-choice/divert/activate alternative is exactly zero.
 
 ## Results
 | iter | hypothesis | value | decision | seconds | gen | train window |
@@ -86,6 +94,7 @@ text; this session works from the recovered plan (`3da968b` version) + Amendment
 | 9 | whole-day labels + imitate 0.1 | 4.5756 | revert | 591.0 | it09 | it09 |
 | 10 | imitate 100 + whole-day labels | 1.0084 | revert | 276.0 | it10 | it09,it10 |
 | 11 | labels off (label_w 0) on Modal window | 0.9990 | revert | 76.0 | it11 | it09,it10,it11 |
+| 12 | unit labels (hold stripped) + imitate 100 | 1.0056 | revert | 87.0 | it12 | it09,it10,it11,it12 |
 
 Values from `research/autoresearch/ems-blue-only/autoresearch.jsonl` on `ar/blue/ems-blue-only`.
 Best kept: 0.9971 (iter 7, `69b357f`).
@@ -106,7 +115,10 @@ Best kept: 0.9971 (iter 7, `69b357f`).
   data/blue-only/it09 --n 50 --seed 9 --label-rate 0.0093 --label-cap 40 --window 10800`; `train --script
   experiments/ar/ems_train.py --data data/blue-only/it09 --save experiments/ar/ems_candidate.npz --args {}`.
   Iter 10: `gen (...it10 --seed 10 ...)` same shape; `train --data data/blue-only/it09,data/blue-only/it10
-  --args {"imitate": 100}` (union sums exact).
+  --args {"imitate": 100}` (union sums exact). Iter 11: `gen (...it11 --seed 11 ...)`; `train --data
+  ...it09,it10,it11 --args {"label_w": 0}` (659,438 / 5,606, sums exact). Iter 12: `gen (...it12
+  --seed 12 ...)`; `train --data ...it09,it10,it11,it12 --args {"imitate": 100}` (874,712 / 7,393
+  pre-strip, sums exact).
 
 - Amendment-2 mechanism: the deployed `ems-m5` train was probe-verified (this session) to still
   serve hold labels, so the loop applies the strip in `ems_train.py` from iter 12 (same semantics as
