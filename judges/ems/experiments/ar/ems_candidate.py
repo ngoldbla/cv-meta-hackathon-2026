@@ -9,9 +9,18 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import numpy as np
+
 from emslearn.policy import LearnedPolicy
 
 
 class Candidate(LearnedPolicy):
     name = "candidate"
     weights_path = Path(__file__).with_suffix(".npz")
+
+    def score(self, x: np.ndarray) -> np.ndarray:
+        s = super().score(x)
+        if x.shape[0] and x[0, 5] > 0 and x[0, 8] * 100 < 2:  # tier-3 call, <2 idle: hold
+            s = np.full_like(s, -1e9, dtype=np.float64)
+            s[x[:, 11] > 0] = 0.0
+        return s
