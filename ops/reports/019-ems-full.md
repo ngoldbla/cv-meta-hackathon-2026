@@ -40,7 +40,8 @@ reverted at 1.0478 and iter 32 (imitate 5) reverted at 1.0497.
 Red iter 8 (re-mined top-200 vs the iter-30 keep) reverted at 4575.37:
 pool unchanged. Iter 33 (fine-tune from best) reverted at 1.0502;
 iter 34 (lr 1e-3 from scratch) reverted at 1.0531; iter 35 (gain_min
-1.0) reverted at 1.0614. Arm spend $5.59.
+1.0) reverted at 1.0614; iter 36 (lr 1e-3 x 60 epochs) reverted at
+1.0636. Arm spend $5.68.
 
 ## Work done
 - Claimed task 019 on main (`19a1f00 Start task 019`, pushed).
@@ -202,6 +203,11 @@ iter 34 (lr 1e-3 from scratch) reverted at 1.0531; iter 35 (gain_min
   one change (`gain_min` 0.5 -> 1.0, dropping 149 labels), trained on
   the latest-8 window ($0.0638): marginal labels matter. Journal
   (`15603c5`, pushed).
+- Blue iter 36 (`00ee2b2`, pushed): revert 1.0636. No gen (window reused);
+  one change (lr 1e-3 x 60 epochs, proper low-lr test), trained on the
+  latest-8 window ($0.0938): low lr genuinely worse. `train-it36.log`
+  lost its head to a `tee | head` race (weights unaffected, verified
+  by completion markers + sane bench).
 
 ## Results
 Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`):
@@ -243,6 +249,7 @@ Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`)
 | 33 | fine-tune from best weights (--init loader + lr 1e-3), reused window | 1.0502 | revert | 105.0 | reused | data/full/it19,data/full/it22,data/full/it23,data/full/it26,data/full/it27,data/full/it28,data/full/it30,data/full/it31 |
 | 34 | lr 1e-3 from scratch (ablating iter 33), reused window | 1.0531 | revert | 99.0 | reused | data/full/it19,data/full/it22,data/full/it23,data/full/it26,data/full/it27,data/full/it28,data/full/it30,data/full/it31 |
 | 35 | drop marginal labels (gain_min 0.5 -> 1.0), reused window | 1.0614 | revert | 104.0 | reused | data/full/it19,data/full/it22,data/full/it23,data/full/it26,data/full/it27,data/full/it28,data/full/it30,data/full/it31 |
+| 36 | proper low-lr test (lr 1e-3 x 60 epochs), reused window | 1.0636 | revert | 112.0 | reused | data/full/it19,data/full/it22,data/full/it23,data/full/it26,data/full/it27,data/full/it28,data/full/it30,data/full/it31 |
 
 Best kept: iter 30's weights (imitate-3 recipe), 1.0451 on pool
 `4c088d562472f880` (commit `81de581`).
@@ -260,7 +267,7 @@ Red (`research/autoresearch/ems-full-red/autoresearch.jsonl` on `ar/red/ems-full
 | 7 | re-mine the top-200 regret days vs the iter-27 keep (library/regret_days_7.json) | 4617.18 | keep | 76.0 |
 | 8 | re-mine the top-200 regret days vs the iter-30 keep (library/regret_days_8.json) | 4575.37 | revert | 74.0 |
 
-Spend added by this arm: $5.586 (`runs/spend.jsonl` on main). emslearn
+Spend added by this arm: $5.680 (`runs/spend.jsonl` on main). emslearn
 commands in order (pre-Amendment regime, from the blue worktree notes):
 1. `gen` 200 days, `--out data/full/it01`, label_rate 0.05 ($0.6958);
 2. `train --data data/full/it01` x4, one per iter 1-4 ($0.0971, $0.0591,
@@ -331,7 +338,8 @@ worktree notes:
 41. `train` on the same window ($0.0860; iter 32, imitate 5);
 42. `train` on the same window ($0.0697; iter 33, fine-tune);
 43. `train` on the same window ($0.0636; iter 34, lr 1e-3);
-44. `train` on the same window ($0.0638; iter 35, gain_min 1.0).
+44. `train` on the same window ($0.0638; iter 35, gain_min 1.0);
+45. `train` on the same window ($0.0938; iter 36, lr 1e-3 x 60).
 
 ## Deviations
 - Iters 1-4 ran before Amendment 1 (21:14-21:39 CDT vs amendment 21:44 CDT),
