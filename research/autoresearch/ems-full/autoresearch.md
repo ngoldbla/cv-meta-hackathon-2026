@@ -146,3 +146,7 @@ Result 1.0531 vs best 1.0451: low lr underfits in 20 epochs. Ablation complete: 
 ## Iter 35 (revert, 1.0614)
 No gen (8 A1 dirs, best unchanged since last gen, red 8 reverted): reused the latest-8 window. One change: gain_min 0.5 -> 1.0 (drops only 149 labels: 5778 -> 5629). Train ($0.0638, loss 5.85 -> 5.59, 34.2 GPU s).
 Result 1.0614 vs best 1.0451: dropping even marginal 0.5-1.0-gain labels hurts clearly - small-gain labels guide fine unit-choice distinctions. gain_min 0.5 confirmed. Next: the proper low-lr test (lr 1e-3 x 60 epochs) on the reused window.
+
+## Iter 36 (revert, 1.0636)
+No gen (8 A1 dirs, best unchanged since last gen, red 8 reverted): reused the latest-8 window. One change: lr 1e-3 x 60 epochs (matching budget for the low-lr test). Train ($0.0938, final loss 5.5853 at epoch 59, 57.3 GPU s).
+Result 1.0636 vs best 1.0451: lower lr is genuinely worse here, not just under-budgeted - lr 3e-3 confirmed. Note: train-it36.log lost its head (decisions/masked/epochs 0-29) to a `tee | head` logging race; masked count equals iter 35's 5778 (identical window + mask). The weights were valid (done:true, saved, sane deployment: held 0.315 vs 0.313). From now on, train logs redirect to file without `| head`. Red iter 9 is due now (after blue iter 36).
