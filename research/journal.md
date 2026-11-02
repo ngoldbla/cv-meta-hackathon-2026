@@ -170,3 +170,8 @@
 - **What was tried:** re-mined regret vs the iter-27 keep for red 7; blue rebaseline; fresh-data retrains (it30, it31); fine-grained imitate probe (5) between the tested 3 and 10.
 - **What happened:** red 7 KEPT (regret 4530.61 -> 4617.18). Blue 29 rebaselined at 1.0976 (largest gap yet, ~10%). Iter 30 (fresh it30 retrain) KEPT at 1.0451 - the post-mining retrain pattern holds a third time. Iter 31 (fresh it31 retrain) reverted at 1.0478: the streak breaks, recipe converged near 1.045. Iter 32 (imitate 5) reverted at 1.0497, landing between 3 and 10 as expected; imitate axis exhausted, recipe fully converged at (imitate 3, gate 25/25, tau 1.0, gain_min 0.5). Best: iter-30 weights, 1.0451. Arm spend $5.39.
 - **Next:** red 8 after blue 32 (re-mine vs the iter-30 keep); blue needs a new frontier (candidate-file changes) since recipe + fresh-data gains are exhausted on this pool.
+
+## 2026-11-02: ems-full blue iters 33-35, red iter 8 reverts (task 019)
+- **What was tried:** fine-tune procedure (new --init loader + lr 1e-3 from the iter-30 best); ablation (lr 1e-3 from scratch); gain_min 1.0 (last neighbor between kept 0.5 and reverted 2.0). Red 8 re-mined vs the iter-30 keep.
+- **What happened:** iter 33 (fine-tune) reverted at 1.0502: warm start underperforms from-scratch noise. Iter 34 (lr 1e-3 from scratch) reverted at 1.0531: low lr underfits in 20 epochs; its train loss 5.59 beats the keep's 5.63 yet deploys worse, so train loss does not predict deployment. Iter 35 (gain_min 1.0) reverted at 1.0614: even 149 marginal labels matter. Red 8 reverted at 4575.37 (pool unchanged): mining plateaus. Best: iter-30 weights, 1.0451. Arm spend $5.59.
+- **Next:** proper low-lr test (lr 1e-3 x 60 epochs) for iter 36, then red 9 after blue 36.
