@@ -63,3 +63,7 @@ Next: recipe tweaks on the 6-dir window (gen rule (b) is now true too, so iter 1
 ## Iter 15 (revert, 1.0007)
 Gen data/full/it15 first (seed 15, 50 days, 211623 decisions, 1825 labels, 711 s wall, $0.1970): required by rule (b) after the iter-14 keep. One change: hidden [64,64] -> [128,128]. Train on the 7-dir window it06+it07+it08+it10+it12+it14+it15 ($0.0883, masked 4898/12409 = 39.5%, loss 21.39 -> 18.92, 53.1 GPU s).
 Result 1.0007 vs best 0.9989: the wider scorer fits the train loss better (18.92 vs 19.17) but deploys worse - capacity was not the bottleneck; the extra parameters likely overfit the 4898 labels. Reverted. Next: try tau 1.0 -> 0.5 (sharper label targets) on the reused 7-dir window (no gen: 7 A1 dirs, best unchanged since last gen, no red keep since).
+
+## Iter 16 (revert, 1.0100)
+No gen (7 A1 dirs exist, best unchanged since last gen, no red keep since): reused the 7-dir window. One change: tau 1.0 -> 0.5. Train ($0.0681, loss 23.00 -> 19.02, 37.5 GPU s).
+Result 1.0100 vs best 0.9989: sharper targets clearly hurt - overcommitting to the argmax unit amplifies label noise instead of averaging over near-tied good options. Reverted; tau stays 1.0. Red iter 4 is due now (after blue iter 16).
