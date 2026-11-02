@@ -1,7 +1,7 @@
 ---
 id: "016"
 title: "Autoresearch blue loop: ems-blue-only (M5 arm BLUE_ONLY)"
-status: open
+status: in_progress
 created: 2026-11-01
 report: ops/reports/016-ems-blue-only.md
 ---
