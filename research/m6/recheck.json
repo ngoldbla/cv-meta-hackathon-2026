@@ -1,0 +1,306 @@
+{
+ "fresh": {
+  "n": 200,
+  "b1_tier_L": [
+   72.3,
+   259.9,
+   10537.5
+  ],
+  "blue-only": {
+   "ratio": {
+    "primary": 0.741,
+    "equal": 0.7808,
+    "steep": 0.7002
+   },
+   "ci_primary": [
+    0.7191,
+    0.7673
+   ],
+   "tier_L": [
+    31.5,
+    53.6,
+    8401.9
+   ],
+   "held_share": 0.0002
+  },
+  "no-cf": {
+   "ratio": {
+    "primary": 0.7958,
+    "equal": 0.8401,
+    "steep": 0.7491
+   },
+   "ci_primary": [
+    0.775,
+    0.817
+   ],
+   "tier_L": [
+    29.9,
+    62.1,
+    9040.1
+   ],
+   "held_share": 0.0003
+  },
+  "readable": {
+   "ratio": {
+    "primary": 0.9976,
+    "equal": 0.9974,
+    "steep": 0.9977
+   },
+   "ci_primary": [
+    0.979,
+    1.0156
+   ],
+   "tier_L": [
+    72.1,
+    260.3,
+    10508.9
+   ],
+   "held_share": 0.1327
+  },
+  "full": {
+   "ratio": {
+    "primary": 1.018,
+    "equal": 1.0166,
+    "steep": 1.0185
+   },
+   "ci_primary": [
+    0.9963,
+    1.0392
+   ],
+   "tier_L": [
+    72.1,
+    276.8,
+    10701.7
+   ],
+   "held_share": 0.136
+  }
+ },
+ "red-full": {
+  "n": 100,
+  "b1_tier_L": [
+   209.3,
+   1269.3,
+   36955.3
+  ],
+  "blue-only": {
+   "ratio": {
+    "primary": 0.6953,
+    "equal": 0.7463,
+    "steep": 0.647
+   },
+   "ci_primary": [
+    0.6809,
+    0.7094
+   ],
+   "tier_L": [
+    78.4,
+    137.5,
+    28467.9
+   ],
+   "held_share": 0.0007
+  },
+  "no-cf": {
+   "ratio": {
+    "primary": 0.7367,
+    "equal": 0.7874,
+    "steep": 0.6877
+   },
+   "ci_primary": [
+    0.7229,
+    0.7497
+   ],
+   "tier_L": [
+    78.4,
+    226.0,
+    29958.0
+   ],
+   "held_share": 0.0041
+  },
+  "readable": {
+   "ratio": {
+    "primary": 1.0038,
+    "equal": 1.0042,
+    "steep": 1.0028
+   },
+   "ci_primary": [
+    0.9924,
+    1.0149
+   ],
+   "tier_L": [
+    204.2,
+    1286.6,
+    37104.3
+   ],
+   "held_share": 0.4772
+  },
+  "full": {
+   "ratio": {
+    "primary": 1.0168,
+    "equal": 1.0161,
+    "steep": 1.0169
+   },
+   "ci_primary": [
+    1.0035,
+    1.0298
+   ],
+   "tier_L": [
+    209.4,
+    1314.6,
+    37530.2
+   ],
+   "held_share": 0.4834
+  }
+ },
+ "red-no-cf": {
+  "n": 100,
+  "b1_tier_L": [
+   28.5,
+   69.7,
+   2817.8
+  ],
+  "blue-only": {
+   "ratio": {
+    "primary": 1.0441,
+    "equal": 1.0923,
+    "steep": 0.9962
+   },
+   "ci_primary": [
+    0.9976,
+    1.0974
+   ],
+   "tier_L": [
+    22.1,
+    29.5,
+    3133.7
+   ],
+   "held_share": 0.0
+  },
+  "no-cf": {
+   "ratio": {
+    "primary": 0.9803,
+    "equal": 1.0229,
+    "steep": 0.9371
+   },
+   "ci_primary": [
+    0.9395,
+    1.027
+   ],
+   "tier_L": [
+    20.4,
+    32.6,
+    2929.6
+   ],
+   "held_share": 0.0001
+  },
+  "readable": {
+   "ratio": {
+    "primary": 0.9569,
+    "equal": 0.9605,
+    "steep": 0.9527
+   },
+   "ci_primary": [
+    0.927,
+    0.9875
+   ],
+   "tier_L": [
+    26.3,
+    65.0,
+    2709.6
+   ],
+   "held_share": 0.0248
+  },
+  "full": {
+   "ratio": {
+    "primary": 0.9855,
+    "equal": 0.983,
+    "steep": 0.9888
+   },
+   "ci_primary": [
+    0.9501,
+    1.0198
+   ],
+   "tier_L": [
+    29.1,
+    68.8,
+    2768.5
+   ],
+   "held_share": 0.0262
+  }
+ },
+ "red-readable": {
+  "n": 100,
+  "b1_tier_L": [
+   184.7,
+   999.5,
+   31385.4
+  ],
+  "blue-only": {
+   "ratio": {
+    "primary": 0.69,
+    "equal": 0.7384,
+    "steep": 0.6431
+   },
+   "ci_primary": [
+    0.6736,
+    0.7056
+   ],
+   "tier_L": [
+    67.3,
+    111.3,
+    23871.1
+   ],
+   "held_share": 0.0007
+  },
+  "no-cf": {
+   "ratio": {
+    "primary": 0.7448,
+    "equal": 0.7944,
+    "steep": 0.6961
+   },
+   "ci_primary": [
+    0.73,
+    0.7596
+   ],
+   "tier_L": [
+    70.8,
+    169.8,
+    25633.1
+   ],
+   "held_share": 0.0031
+  },
+  "readable": {
+   "ratio": {
+    "primary": 1.0038,
+    "equal": 1.0031,
+    "steep": 1.004
+   },
+   "ci_primary": [
+    0.9889,
+    1.0184
+   ],
+   "tier_L": [
+    182.9,
+    1022.3,
+    31466.1
+   ],
+   "held_share": 0.4221
+  },
+  "full": {
+   "ratio": {
+    "primary": 1.0045,
+    "equal": 1.0057,
+    "steep": 1.0037
+   },
+   "ci_primary": [
+    0.9885,
+    1.0204
+   ],
+   "tier_L": [
+    186.9,
+    979.7,
+    31588.0
+   ],
+   "held_share": 0.4239
+  }
+ }
+}

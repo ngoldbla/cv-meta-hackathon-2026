@@ -2,6 +2,8 @@
 
 Fresh pool: dev_pool(200, seed 1001). No loop benchmarked on seed 1001; the days themselves can overlap with
 training days, since the dev set has 1,027 days. Red pools: 100 days from each final red generator, seed 1001.
+Red generators run from their red worktrees (byte-identical to research/m6/final/red-*.py), because FULL's reads
+its mined-days file (research/autoresearch/ems-full-red/library/regret_days_7.json) relative to its own path.
 Per-tier lateness comes from solving the three weightings (8:3:1, 1:1:1, 20:5:1) for L1, L2, L3.
 """
 
@@ -14,7 +16,7 @@ import numpy as np
 import ems.evaluate as ev
 from emslearn.cli import pool
 
-S = Path(__file__).resolve().parent
+S = Path(__file__).resolve().parent / "final"  # snapshots hashed in ledger seq 20
 ARMS = ("blue-only", "no-cf", "readable", "full")
 POL = {a: f"file:{S / a / 'ems_candidate.py'}:Candidate" for a in ARMS}
 W = np.array([[8.0, 3.0, 1.0], [1.0, 1.0, 1.0], [20.0, 5.0, 1.0]])
@@ -28,7 +30,9 @@ def tiers(rows):
 def main():
     pools = {"fresh": pool(200, 1001, None, 0)}
     for g in ("full", "no-cf", "readable"):
-        pools[f"red-{g}"] = pool(0, 1001, str(S / f"red-{g}.py"), 100)
+        gen = Path.home() / f"cv-meta-hackathon-2026-ar-red-ems-{g}/judges/ems/experiments/ar/ems_red_sampler.py"
+        assert gen.read_bytes() == (S / f"red-{g}.py").read_bytes(), gen
+        pools[f"red-{g}"] = pool(0, 1001, str(gen), 100)
     out = {}
     for name, scen in pools.items():
         rows = ev.run_pool(scen, ["b1", *POL.values()], 24)
@@ -41,7 +45,7 @@ def main():
                       "held_share": round(float(np.mean([r["held_share"] for r in rows[p]])), 4)}
         out[name] = res
         print(json.dumps({name: res}), flush=True)
-    (S / "recheck.json").write_text(json.dumps(out, indent=1))
+    (S.parent / "recheck.json").write_text(json.dumps(out, indent=1))
 
 
 if __name__ == "__main__":
