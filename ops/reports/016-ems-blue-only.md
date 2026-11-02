@@ -36,7 +36,8 @@ threshold 3->4 (primary 9098, gates pass). Iter 20 KEEPS 0.8084: threshold 4->5 
 flattening, gates pass). Journal entry for iters 16-20 added (branch). Iter 21 reverts
 0.8168 (threshold 5->6 over-reserves; peak at 5). Iter 22 KEEPS 0.8066: reservation extended
 to tier-2 (hold when <2 idle; gates pass). Iter 23 KEEPS 0.8027: tier-2 threshold 2->3
-(gates pass). Best: 0.8027 (`eda2824`).
+(gates pass). Iter 24 KEEPS 0.8016: tier-2 threshold 3->4 (gates pass). Best: 0.8016
+(`a1b9939`).
 
 ## Work done
 - Claimed task 016 on main (`ec9da1a Start task 016`, pushed).
@@ -133,6 +134,9 @@ to tier-2 (hold when <2 idle; gates pass). Iter 23 KEEPS 0.8027: tier-2 threshol
 - Iter 23 (`eda2824`, pushed): gen `it23` (condition b; 50 days, 223,210 decisions, 1,871 labels,
   552.0 s, t3<5+t2<2 policy). Rule change (KEPT): tier-2 threshold 2->3, no training. Bench KEEPS
   at 0.8027 (96 s; primary 9029; gates pass).
+- Iter 24 (`a1b9939`, pushed): gen `it24` (condition b; 50 days, 224,232 decisions, 1,906 labels,
+  528.6 s, t3<5+t2<3 policy). Rule change (KEPT): tier-2 threshold 3->4, no training. Bench KEEPS
+  at 0.8016 (98 s; primary 9016; gates pass).
 
 ## Results
 | iter | hypothesis | value | decision | seconds | gen | train window |
@@ -160,9 +164,10 @@ to tier-2 (hold when <2 idle; gates pass). Iter 23 KEEPS 0.8027: tier-2 threshol
 | 21 | reservation threshold 5->6 | 0.8168 | revert | 91.0 | it21 | - |
 | 22 | + hold tier-2 when idle<2 | 0.8066 | keep | 184.0 | - | - |
 | 23 | tier-2 threshold 2->3 | 0.8027 | keep | 96.0 | it23 | - |
+| 24 | tier-2 threshold 3->4 | 0.8016 | keep | 98.0 | it24 | - |
 
 Values from `research/autoresearch/ems-blue-only/autoresearch.jsonl` on `ar/blue/ems-blue-only`.
-Best kept: 0.8027 (iter 23, `eda2824`).
+Best kept: 0.8016 (iter 24, `a1b9939`).
 
 ## Deviations
 - Collision repair commit `e86289e` (not an iteration): jsonl deduped to one baseline line, bench.log
@@ -190,7 +195,8 @@ Best kept: 0.8027 (iter 23, `eda2824`).
   (no train: rule change). Iter 19: `gen (...it19 --seed 19 ...)` (no train: rule change).
   Iter 20: `gen (...it20 --seed 20 ...)` (no train: rule change). Iter 21: `gen (...it21
   --seed 21 ...)` (no train: rule change). Iter 22: no Modal calls (rule change, no training).
-  Iter 23: `gen (...it23 --seed 23 ...)` (no train: rule change).
+  Iter 23: `gen (...it23 --seed 23 ...)` (no train: rule change). Iter 24: `gen (...it24
+  --seed 24 ...)` (no train: rule change).
 
 - Amendment-2 mechanism: the deployed `ems-m5` train was probe-verified (this session) to still
   serve hold labels, so the loop applies the strip in `ems_train.py` from iter 12 (same semantics as
