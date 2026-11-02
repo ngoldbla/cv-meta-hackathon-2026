@@ -1,0 +1,1 @@
+{"iter": 0, "time": "2026-11-02T01:28:41Z", "commit": "c4407c19676c2b90017fa9eaa89445ff04b5651d", "hypothesis": "unchanged baseline", "files": [], "metric": "regret_candidate", "value": 500.25, "best_before": null, "decision": "baseline", "evidence": "research/autoresearch/ems-readable-red/bench.log", "seconds": 195.5}
