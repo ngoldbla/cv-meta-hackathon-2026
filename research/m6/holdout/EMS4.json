@@ -1,0 +1,359 @@
+{
+ "split": "holdout",
+ "pools": [
+  "covid-a",
+  "normal-2016",
+  "omicron-b",
+  "stress"
+ ],
+ "prereg": "EMS4",
+ "eval_version": "ems-1.1",
+ "evaluator_sha256": "33bf0058e5cc7e929f93350d6e991e3ddf4a12130b2f67c347379c5b7f6cc0c7",
+ "ratio_max": 0.95,
+ "alpha": 0.05,
+ "claim_stands": false,
+ "summary": {
+  "omicron-b": {
+   "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/full/ems_candidate.py:Candidate": {
+    "primary": 3207.3739500105366,
+    "equal": 2641.1790476463666,
+    "steep": 3905.261911007827,
+    "tier1_p90_min": 8.667127116020344,
+    "held_share": 0.011558243269986633,
+    "unit_hours_extra": 132.0,
+    "divert_share": 0.004958547485537638,
+    "callbacks": 3.6979166666666665
+   },
+   "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/readable/ems_candidate.py:Candidate": {
+    "primary": 3169.503775546082,
+    "equal": 2618.115440109254,
+    "steep": 3843.8631639101586,
+    "tier1_p90_min": 8.448798317612969,
+    "held_share": 0.011020136599372196,
+    "unit_hours_extra": 122.625,
+    "divert_share": 0.004793256581523138,
+    "callbacks": 3.6354166666666665
+   }
+  },
+  "covid-a": {
+   "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/full/ems_candidate.py:Candidate": {
+    "primary": 4256.92929067432,
+    "equal": 3313.2650096221582,
+    "steep": 5538.513755400237,
+    "tier1_p90_min": 9.913886181980466,
+    "held_share": 0.02413113920445902,
+    "unit_hours_extra": 301.5483870967742,
+    "divert_share": 0.008678388086900817,
+    "callbacks": 7.397849462365591
+   },
+   "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/readable/ems_candidate.py:Candidate": {
+    "primary": 4094.0860515955806,
+    "equal": 3197.375162386929,
+    "steep": 5300.062059757835,
+    "tier1_p90_min": 9.464362563609953,
+    "held_share": 0.022988025385297272,
+    "unit_hours_extra": 301.93548387096774,
+    "divert_share": 0.008217519050436866,
+    "callbacks": 6.989247311827957
+   }
+  },
+  "normal-2016": {
+   "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/full/ems_candidate.py:Candidate": {
+    "primary": 1896.3783782967441,
+    "equal": 1699.776149796107,
+    "steep": 2189.5784575515618,
+    "tier1_p90_min": 8.916837854732028,
+    "held_share": 0.007998549077046538,
+    "unit_hours_extra": 115.54098360655738,
+    "divert_share": 0.0029560472803781186,
+    "callbacks": 1.7513661202185793
+   },
+   "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/readable/ems_candidate.py:Candidate": {
+    "primary": 1858.9607105992854,
+    "equal": 1670.1520751333924,
+    "steep": 2141.410641967662,
+    "tier1_p90_min": 8.579698676062513,
+    "held_share": 0.007489412607865378,
+    "unit_hours_extra": 109.01639344262296,
+    "divert_share": 0.00275454027165396,
+    "callbacks": 1.6520947176684881
+   }
+  },
+  "stress": {
+   "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/full/ems_candidate.py:Candidate": {
+    "primary": 28632.53252209955,
+    "equal": 25690.880824188236,
+    "steep": 32461.649487562085,
+    "tier1_p90_min": 24.24693586782352,
+    "held_share": 0.3746862149554059,
+    "unit_hours_extra": 540.0,
+    "divert_share": 0.14987841641132763,
+    "callbacks": 92.38524590163935
+   },
+   "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/readable/ems_candidate.py:Candidate": {
+    "primary": 28282.25038248131,
+    "equal": 25379.40358403747,
+    "steep": 32064.657973861216,
+    "tier1_p90_min": 24.14058028581141,
+    "held_share": 0.3702171324813412,
+    "unit_hours_extra": 540.0,
+    "divert_share": 0.14810786805863055,
+    "callbacks": 91.27322404371584
+   }
+  }
+ },
+ "tests": [
+  {
+   "a": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/full/ems_candidate.py:Candidate",
+   "b": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/readable/ems_candidate.py:Candidate",
+   "weighting": "primary",
+   "n": 96,
+   "mean_a": 3207.3739500105366,
+   "mean_b": 3169.503775546082,
+   "rel_change": 0.01628908348729879,
+   "ci95": [
+    -0.0037132642688052007,
+    0.03469900265844426
+   ],
+   "wilcoxon_p": 0.06134409205747387,
+   "ratio": 1.011948297634676,
+   "ratio_ci95": [
+    0.9927050564295398,
+    1.0303923401363868
+   ],
+   "holm_p": 0.12268818411494774,
+   "pool": "omicron-b"
+  },
+  {
+   "a": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/full/ems_candidate.py:Candidate",
+   "b": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/readable/ems_candidate.py:Candidate",
+   "weighting": "equal",
+   "n": 96,
+   "mean_a": 2641.1790476463666,
+   "mean_b": 2618.115440109254,
+   "rel_change": 0.014064511288798822,
+   "ci95": [
+    -0.009460861927901545,
+    0.035818690740284514
+   ],
+   "wilcoxon_p": 0.1583732208786255,
+   "ratio": 1.0088092401059863,
+   "ratio_ci95": [
+    0.986377779443896,
+    1.0311706895178514
+   ],
+   "holm_p": 0.1583732208786255,
+   "pool": "omicron-b"
+  },
+  {
+   "a": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/full/ems_candidate.py:Candidate",
+   "b": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/readable/ems_candidate.py:Candidate",
+   "weighting": "steep",
+   "n": 96,
+   "mean_a": 3905.261911007827,
+   "mean_b": 3843.8631639101586,
+   "rel_change": 0.02016322005603561,
+   "ci95": [
+    0.001654659555820745,
+    0.03700192929588937
+   ],
+   "wilcoxon_p": 0.011327259626457238,
+   "ratio": 1.0159731875146176,
+   "ratio_ci95": [
+    0.9982850642635112,
+    1.032530943448559
+   ],
+   "holm_p": 0.04530903850582895,
+   "pool": "omicron-b"
+  },
+  {
+   "a": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/full/ems_candidate.py:Candidate",
+   "b": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/readable/ems_candidate.py:Candidate",
+   "weighting": "primary",
+   "n": 93,
+   "mean_a": 4256.92929067432,
+   "mean_b": 4094.0860515955806,
+   "rel_change": 0.05063733254212115,
+   "ci95": [
+    0.016267279785146697,
+    0.0845369420812196
+   ],
+   "wilcoxon_p": 0.00824463732042201,
+   "ratio": 1.039775236042065,
+   "ratio_ci95": [
+    1.0051218202491339,
+    1.074770975172274
+   ],
+   "holm_p": 0.041223186602110044,
+   "pool": "covid-a"
+  },
+  {
+   "a": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/full/ems_candidate.py:Candidate",
+   "b": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/readable/ems_candidate.py:Candidate",
+   "weighting": "equal",
+   "n": 93,
+   "mean_a": 3313.2650096221582,
+   "mean_b": 3197.375162386929,
+   "rel_change": 0.045090398121396674,
+   "ci95": [
+    0.005767358589756638,
+    0.08376988052426744
+   ],
+   "wilcoxon_p": 0.0271806514033892,
+   "ratio": 1.0362453079008453,
+   "ratio_ci95": [
+    0.9955569097357084,
+    1.0773310926180881
+   ],
+   "holm_p": 0.0815419542101676,
+   "pool": "covid-a"
+  },
+  {
+   "a": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/full/ems_candidate.py:Candidate",
+   "b": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/readable/ems_candidate.py:Candidate",
+   "weighting": "steep",
+   "n": 93,
+   "mean_a": 5538.513755400237,
+   "mean_b": 5300.062059757835,
+   "rel_change": 0.05682707254566603,
+   "ci95": [
+    0.023140987009508993,
+    0.09053768465457154
+   ],
+   "wilcoxon_p": 0.0017342624297908577,
+   "ratio": 1.0449903591606806,
+   "ratio_ci95": [
+    1.0124527472198328,
+    1.0760725820332127
+   ],
+   "holm_p": 0.010405574578745146,
+   "pool": "covid-a"
+  },
+  {
+   "a": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/full/ems_candidate.py:Candidate",
+   "b": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/readable/ems_candidate.py:Candidate",
+   "weighting": "primary",
+   "n": 1098,
+   "mean_a": 1896.3783782967441,
+   "mean_b": 1858.9607105992854,
+   "rel_change": 0.02931461715167678,
+   "ci95": [
+    0.02108339548639352,
+    0.03770806056178524
+   ],
+   "wilcoxon_p": 7.30250340720842e-12,
+   "ratio": 1.020128272471878,
+   "ratio_ci95": [
+    1.0117311560673505,
+    1.0282654321974332
+   ],
+   "holm_p": 7.30250340720842e-11,
+   "pool": "normal-2016"
+  },
+  {
+   "a": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/full/ems_candidate.py:Candidate",
+   "b": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/readable/ems_candidate.py:Candidate",
+   "weighting": "equal",
+   "n": 1098,
+   "mean_a": 1699.776149796107,
+   "mean_b": 1670.1520751333924,
+   "rel_change": 0.027928359776840713,
+   "ci95": [
+    0.01925322324888646,
+    0.037024534569981504
+   ],
+   "wilcoxon_p": 5.998930438442971e-12,
+   "ratio": 1.0177373516482615,
+   "ratio_ci95": [
+    1.008743950888465,
+    1.026499811071269
+   ],
+   "holm_p": 7.198716526131565e-11,
+   "pool": "normal-2016"
+  },
+  {
+   "a": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/full/ems_candidate.py:Candidate",
+   "b": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/readable/ems_candidate.py:Candidate",
+   "weighting": "steep",
+   "n": 1098,
+   "mean_a": 2189.5784575515618,
+   "mean_b": 2141.410641967662,
+   "rel_change": 0.03369680902144234,
+   "ci95": [
+    0.024872172298528103,
+    0.04252790572340088
+   ],
+   "wilcoxon_p": 6.063371643405029e-12,
+   "ratio": 1.0224934978092948,
+   "ratio_ci95": [
+    1.0143135750643748,
+    1.0305498543094231
+   ],
+   "holm_p": 7.198716526131565e-11,
+   "pool": "normal-2016"
+  },
+  {
+   "a": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/full/ems_candidate.py:Candidate",
+   "b": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/readable/ems_candidate.py:Candidate",
+   "weighting": "primary",
+   "n": 1098,
+   "mean_a": 28632.53252209955,
+   "mean_b": 28282.25038248131,
+   "rel_change": 0.018937092687677005,
+   "ci95": [
+    0.013334017275597496,
+    0.024630809584856642
+   ],
+   "wilcoxon_p": 1.776879770054275e-05,
+   "ratio": 1.0123852287169912,
+   "ratio_ci95": [
+    1.0070783064848965,
+    1.017599388413173
+   ],
+   "holm_p": 0.00015991917930488475,
+   "pool": "stress"
+  },
+  {
+   "a": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/full/ems_candidate.py:Candidate",
+   "b": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/readable/ems_candidate.py:Candidate",
+   "weighting": "equal",
+   "n": 1098,
+   "mean_a": 25690.880824188236,
+   "mean_b": 25379.40358403747,
+   "rel_change": 0.01954932545917092,
+   "ci95": [
+    0.013836535669714985,
+    0.025348390496433275
+   ],
+   "wilcoxon_p": 2.7640167913504234e-05,
+   "ratio": 1.0122728352980948,
+   "ratio_ci95": [
+    1.0066672331499587,
+    1.0177525924511428
+   ],
+   "holm_p": 0.00022112134330803387,
+   "pool": "stress"
+  },
+  {
+   "a": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/full/ems_candidate.py:Candidate",
+   "b": "file:/home/ndgold/cv-meta-hackathon-2026/research/m6/final/readable/ems_candidate.py:Candidate",
+   "weighting": "steep",
+   "n": 1098,
+   "mean_a": 32461.649487562085,
+   "mean_b": 32064.657973861216,
+   "rel_change": 0.018565606302026538,
+   "ci95": [
+    0.01279384242268266,
+    0.024346238257582684
+   ],
+   "wilcoxon_p": 3.784609510092508e-05,
+   "ratio": 1.0123809682930187,
+   "ratio_ci95": [
+    1.0070678832431192,
+    1.0176196656841534
+   ],
+   "holm_p": 0.0002649226657064756,
+   "pool": "stress"
+  }
+ ]
+}
