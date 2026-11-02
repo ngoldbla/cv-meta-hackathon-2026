@@ -33,7 +33,8 @@ when fewer than 2 units are idle (capacity reservation; tier1_p90 16.13->14.15 m
 0.8896], p=2.5e-17, determinism re-run identical, gates pass). Iter 18 KEEPS 0.8359:
 reservation threshold 2->3 (tier1_p90 13.31 min, gates pass). Iter 19 KEEPS 0.8089:
 threshold 3->4 (primary 9098, gates pass). Iter 20 KEEPS 0.8084: threshold 4->5 (gains
-flattening, gates pass). Journal entry for iters 16-20 added (branch). Best: 0.8084 (`a0e127d`).
+flattening, gates pass). Journal entry for iters 16-20 added (branch). Iter 21 reverts
+0.8168 (threshold 5->6 over-reserves; peak at 5). Best: 0.8084 (`a0e127d`).
 
 ## Work done
 - Claimed task 016 on main (`ec9da1a Start task 016`, pushed).
@@ -121,6 +122,9 @@ flattening, gates pass). Journal entry for iters 16-20 added (branch). Best: 0.8
 - Iter 20 (`a0e127d`, pushed): gen `it20` (condition b; 50 days, 221,458 decisions, 1,858 labels,
   654.0 s, threshold-4 policy). Rule change (KEPT): threshold 4->5, no training. Bench KEEPS at
   0.8084 (85 s; primary 9092; gates pass). Journal entry for iters 16-20 added on the branch.
+- Iter 21 (`1d548e5`, pushed): gen `it21` (condition b; 50 days, 222,660 decisions, 1,834 labels,
+  567.3 s, threshold-5 policy). Rule change: threshold 5->6, reverted after. Bench REVERTS at
+  0.8168 (91 s).
 
 ## Results
 | iter | hypothesis | value | decision | seconds | gen | train window |
@@ -145,6 +149,7 @@ flattening, gates pass). Journal entry for iters 16-20 added (branch). Best: 0.8
 | 18 | reservation threshold 2->3 | 0.8359 | keep | 92.0 | it18 | - |
 | 19 | reservation threshold 3->4 | 0.8089 | keep | 87.0 | it19 | - |
 | 20 | reservation threshold 4->5 | 0.8084 | keep | 85.0 | it20 | - |
+| 21 | reservation threshold 5->6 | 0.8168 | revert | 91.0 | it21 | - |
 
 Values from `research/autoresearch/ems-blue-only/autoresearch.jsonl` on `ar/blue/ems-blue-only`.
 Best kept: 0.8084 (iter 20, `a0e127d`).
@@ -173,7 +178,8 @@ Best kept: 0.8084 (iter 20, `a0e127d`).
   calls (rule change, kept weights). Iter 16: no Modal calls (rule change, kept weights).
   Iter 17: no Modal calls (rule change, no training). Iter 18: `gen (...it18 --seed 18 ...)`
   (no train: rule change). Iter 19: `gen (...it19 --seed 19 ...)` (no train: rule change).
-  Iter 20: `gen (...it20 --seed 20 ...)` (no train: rule change).
+  Iter 20: `gen (...it20 --seed 20 ...)` (no train: rule change). Iter 21: `gen (...it21
+  --seed 21 ...)` (no train: rule change).
 
 - Amendment-2 mechanism: the deployed `ems-m5` train was probe-verified (this session) to still
   serve hold labels, so the loop applies the strip in `ems_train.py` from iter 12 (same semantics as
