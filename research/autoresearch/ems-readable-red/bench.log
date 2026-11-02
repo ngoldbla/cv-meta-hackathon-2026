@@ -1,2 +1,2 @@
-{"run": "runs/ar-red-ems-m5/20261101-214449", "seconds": 116.6, "candidate_primary": 6090.136633075355, "ref_primary": 5480.938036265597, "days_with_regret": 145}
-METRIC regret_candidate=785.82
+{"run": "runs/ar-red-ems-m5/20261101-215815", "seconds": 72.7, "candidate_primary": 7503.280735416269, "ref_primary": 6880.7044401718795, "days_with_regret": 108}
+METRIC regret_candidate=623.58
