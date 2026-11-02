@@ -7,6 +7,8 @@ TBD.
 
 ## Work done
 - Claimed task 021.
+- Built `judges/ems/scripts/confirm.py` (fetch_sealed w/ ledger gate, verify_sealed, sealed_day_tables via clean+day_table, pools_for, policies_for w/ seq-20 + EMS5-pin hash checks, check/run/dry-run CLI) and `judges/ems/tests/test_confirm.py` (11 unit tests, temp ledgers + fake opener only).
+- `confirm.py check`: all green (22-entry chain, 5 preregs match, seq-20 hashes match, EMS5 pins verify, counts 96/93/1098/1098, no holdout_eval).
 
 ## Results
 TBD.
