@@ -1,0 +1,7 @@
+iter30: no gen (12 Amendment-1 dirs exist; best unchanged since it29) - capacity test, no script-file change
+change: train --args {"label_w": 0, "epochs": 4, "hidden": [128, 128]} on latest-8 window it19,it20,it21,it23,it24,it25,it28,it29 (4-epoch schedule carried over as the working regimen; hidden is the tested change)
+{"decisions": 1787553, "labelled": 14594, "options": 17, "features": 12, "load_s": 2.8} (sums exact)
+train: 4 epochs, loss 0.0512 -> 0.0240 monotonic (fits better than [64,64] 0.0265)
+{"saved": "experiments/ar/ems_candidate.npz", "gpu_seconds": 40.9, "seconds": 45.9}
+bench: RC=0 wall 117s METRIC ratio_b1=0.7997 (better fit, worse bench - same lesson as iter29)
+decision: REVERT - best stays 0.7898
