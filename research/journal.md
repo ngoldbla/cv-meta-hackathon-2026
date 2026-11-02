@@ -170,3 +170,8 @@
 - **What was tried:** blue hyps 26-30 (log iters 29-33): queue-aware retry, proactive ablation (gate-only), gate 3->2, narrower coverage 360s, volume-gated early activation; red #7 (offload on corner) reverted at 623.58.
 - **What happened:** hyps 27 and 28 KEPT (0.9985, 0.9974): on the urgent+conc pool, proactive activation hurts (over-fires on spikes) and the looser gate-2 wins. Queue-aware (1.0169), coverage-360 (0.9995) and early-activation (1.0047) reverted. Best is now gate-only at 2 idle, 1/20 constants. Red #7 reverted; pool unchanged.
 - **Next:** blue hyps 31-32, then red #8 (triple corner, pick_days).
+
+## 2026-11-01: ems-readable blue hyps 31-35 + red #8 (task 018, arm READABLE)
+- **What was tried:** blue hyps 31-35 (log iters 34-39): lone-unit relocation preference, urgent-only queue positioning, fixed busy-p 0.3, half-hour activation guard, activate_n 3->4 retry; red #8 (unavailable on the full corner) kept at 861.45.
+- **What happened:** all blue reverted (1.0097, 1.0001, 1.0007, 1.0149, 1.0353); best stays gate-2 at 0.9950 after rebaseline #36. Red #8's keep moved the pool to the full corner (demand floor + conc + urgent + unavailable); the gate-2 candidate improved slightly on it (0.9974->0.9950).
+- **Next:** blue hyps 36-40 (gate retune, divert-mix, dispatch margin), then red #9-10.
