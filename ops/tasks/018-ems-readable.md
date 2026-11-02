@@ -1,7 +1,7 @@
 ---
 id: "018"
 title: "Autoresearch blue + red loops: ems-readable (M5 arm READABLE)"
-status: in_progress
+status: done
 created: 2026-11-01
 report: ops/reports/018-ems-readable.md
 ---
