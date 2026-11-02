@@ -35,7 +35,12 @@ scenario-days: 0.8430); #26 reverted (tier-3 moving-unit bonus: 0.8473); #27
 reverted (16-gen fine ES, 2,880 scenario-days: 0.8872, drifted). Blue #28 KEPT:
 tier-2 waited escape at 10 min -> 0.8371 (deterministic bench, keep checks
 pass). Red #7 reverted (single-zip surge: 854.63, 154/200 days); pool
-unchanged. Best is now 0.8371. Next: tier-2 escape threshold variants.
+unchanged. Best is now 0.8371. Blue #29 KEPT tier-2 escape at 5 min (0.8324);
+#30 reverted dropping the tier-2 hold (0.8585 — the single 5-min hold cycle is
+load-bearing). Blue #31 KEPT tier-3 escape at 5 min (0.8249); #32 reverted
+tier-3 idle<6 with escape (0.8489). Red #8 reverted (nominal demand: 717.12,
+176/200 days); pool unchanged. Best is now 0.8249. Next: re-bracket tier-2
+threshold with escapes in place.
 
 ## Work done
 - Claimed task 017 on main (`9a4b206 Start task 017`, pushed).
@@ -115,6 +120,16 @@ unchanged. Best is now 0.8371. Next: tier-2 escape threshold variants.
   (53 s). Keep checks pass.
 - Red #7 (`049643c`, pushed): revert, single-zip surge -> 854.63 (135 s,
   154/200 days). Pool unchanged, no blue rebaseline.
+- Blue #29 (`26a5357`, pushed): KEEP, tier-2 escape 5 min -> 0.8324 (41 s).
+  Keep checks pass.
+- Blue #30 (`47b87f1`, pushed): revert, drop tier-2 hold -> 0.8585 (42 s).
+  Journal `a5a442b` covers iters 26-30.
+- Blue #31 (`9d27f70`, pushed): KEEP, tier-3 escape 5 min -> 0.8249 (39 s).
+  Keep checks pass.
+- Blue #32 (`538dbf9`, pushed): revert, tier-3 idle<6 with escape -> 0.8489
+  (75 s).
+- Red #8 (`2705c43`, pushed): revert, nominal demand 1.0 -> 717.12 (110 s,
+  176/200 days). Pool unchanged, no blue rebaseline.
 
 ## Results
 Blue (`research/autoresearch/ems-no-cf/autoresearch.jsonl` on `ar/blue/ems-no-cf`):
@@ -149,6 +164,10 @@ Blue (`research/autoresearch/ems-no-cf/autoresearch.jsonl` on `ar/blue/ems-no-cf
 | 26 | tier-3-only moving-unit bonus (0.1) | 0.8473 | revert | 40 | — | — | — |
 | 27 | long-horizon fine ES (pairs 4, days 20, gens 16, seed 27) | 0.8872 | revert | 40 | 4 | 20 | 16 |
 | 28 | tier-2 hold escapes after 10 min waited | 0.8371 | keep | 53 | — | — | — |
+| 29 | tier-2 hold escapes after 5 min waited | 0.8324 | keep | 41 | — | — | — |
+| 30 | drop the tier-2 hold entirely | 0.8585 | revert | 42 | — | — | — |
+| 31 | tier-3 hold escapes after 5 min waited | 0.8249 | keep | 39 | — | — | — |
+| 32 | wider tier-3 hold (idle<6) with the escape | 0.8489 | revert | 75 | — | — | — |
 
 Red (`research/autoresearch/ems-no-cf-red/autoresearch.jsonl` on `ar/red/ems-no-cf`):
 
@@ -161,10 +180,11 @@ Red (`research/autoresearch/ems-no-cf-red/autoresearch.jsonl` on `ar/red/ems-no-
 | 5 | maximum offload (1.151) under the urgent concentrated surge | 557.68 | revert | 159 |
 | 6 | 10% unavailable fleet under the urgent concentrated surge | 305.07 | revert | 120 |
 | 7 | surge tightened to a single zip | 854.63 | revert | 135 |
+| 8 | nominal demand (1.0) with max urgent share | 717.12 | revert | 110 |
 
 Spend so far (this arm, from `runs/spend.jsonl`): it01 $0.336, it02 $0.997,
 it03 $1.336, it04 $1.324, it05 $0.530, it13 $0.254, it20 $0.255, it25 $0.248,
-it27 $0.251 (other iters free) = $5.53. Program total $11.59 / $200 (stop
+it27 $0.251 (other iters free) = $5.53. Program total $11.63 / $200 (stop
 above $150).
 
 ## Deviations
