@@ -14,7 +14,11 @@ Iter 9 (first under Amendment 1): whole-day labels verified (hours 0.56-23.45, 8
 train wait ~5 s, but labels + imitate 0.1 still catastrophically off b1 (4.5756, divert-happy). Iter 10:
 imitate 100 on the it09+it10 union (sums exact) reverts 1.0084 - nearer b1 than the old-label 1.0722 but
 still no win. Coverage was not the problem: the 3 h-window labels are adversarial to the day objective.
-Best: 0.9971 (`69b357f`).
+Best: 0.9971 (`69b357f`). Iter 11 (previous session): labels-off imitation on the Modal it09-11 window
+reverts 0.9990 - beats b1, short of iter 7. Amendment 2 landed (task file + `6cf5f54`), but a probe train
+shows the deployed `ems-m5` app still serves hold labels (labelled 3721 = full gen sum), so the strip is
+applied in-script from iter 12. NOTE: `02c4e87` replaced the 016/019 task files with only the Amendment-2
+text; this session works from the recovered plan (`3da968b` version) + Amendment 2.
 
 ## Work done
 - Claimed task 016 on main (`ec9da1a Start task 016`, pushed).
@@ -58,6 +62,15 @@ Best: 0.9971 (`69b357f`).
   524.9 s). Union train on `it09,it10` (431,008 decisions / 3,721 labelled, sums exact; wall 33.2 s,
   gpu 28.3 s) with `--args {"imitate": 100}`. Bench REVERTS at 1.0084 (276 s). Journal entry for
   iters 6-10 added.
+- Iter 11 (`f5da4a1`, pushed; previous session): gen `it11` (condition a; 50 days, 228,430 decisions,
+  1,878 labels, 662.4 s). Train on `it09,it10,it11` (659,438 decisions / 5,606 labelled, sums exact;
+  wall 45.2 s, gpu 39.8 s) with `label_w` 0 (script change, reverted after). Bench REVERTS at 0.9990
+  (76 s): pure imitation on Modal rollouts beats b1 but falls short of the 400 d local 0.9971.
+- Resume + Amendment-2 probe (this session): single-writer re-verified (no 016 processes in the
+  worktree, tip stable at `f5da4a1`). Probe train on `it09,it10` reports labelled 3721 = exact gen
+  sum, so the deployed `ems-m5` app does NOT strip hold labels yet (`6cf5f54` committed, not
+  deployed). No deploy attempted (shared app, other arms live). The strip is implemented in the
+  in-scope `ems_train.py` from iter 12 (same semantics, idempotent with a later deploy).
 
 ## Results
 | iter | hypothesis | value | decision | seconds | gen | train window |
@@ -72,6 +85,7 @@ Best: 0.9971 (`69b357f`).
 | 8 | 800d imitation (loc01-04) | 1.0024 | revert | 75.0 | loc03,loc04 | loc01-loc04 |
 | 9 | whole-day labels + imitate 0.1 | 4.5756 | revert | 591.0 | it09 | it09 |
 | 10 | imitate 100 + whole-day labels | 1.0084 | revert | 276.0 | it10 | it09,it10 |
+| 11 | labels off (label_w 0) on Modal window | 0.9990 | revert | 76.0 | it11 | it09,it10,it11 |
 
 Values from `research/autoresearch/ems-blue-only/autoresearch.jsonl` on `ar/blue/ems-blue-only`.
 Best kept: 0.9971 (iter 7, `69b357f`).
@@ -94,5 +108,16 @@ Best kept: 0.9971 (iter 7, `69b357f`).
   Iter 10: `gen (...it10 --seed 10 ...)` same shape; `train --data data/blue-only/it09,data/blue-only/it10
   --args {"imitate": 100}` (union sums exact).
 
+- Amendment-2 mechanism: the deployed `ems-m5` train was probe-verified (this session) to still
+  serve hold labels, so the loop applies the strip in `ems_train.py` from iter 12 (same semantics as
+  `emslearn.shards.drop_hold_labels`, idempotent with a later deploy). Extra `emslearn` command, in
+  order: `train --script /tmp/probe_labels.py --data data/blue-only/it09,data/blue-only/it10 --save
+  /tmp/probe016.npz` (labelled 3721 = full gen sum, no strip server-side).
+- Task files `ops/tasks/016-ems-blue-only.md` and `ops/tasks/019-ems-full.md` currently contain only
+  the Amendment-2 text: `02c4e87` replaced both files instead of appending. The runner cannot repair
+  task files; this session works from the plan recovered from `3da968b` plus Amendment 2.
+
 ## Blocked / questions
-(none currently)
+- Reviewer: restore `ops/tasks/016-*.md` and `019-*.md` (frontmatter + plan + Amendments 1-2).
+- Dylan: deploy `6cf5f54` to `ems-m5` (or confirm intended timing); until then 016 strips hold labels
+  in-script, and 019 (same Amendment) may be training with hold labels unknowingly.
