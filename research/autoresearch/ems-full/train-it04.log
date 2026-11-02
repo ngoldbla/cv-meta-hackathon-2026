@@ -1,0 +1,24 @@
+{"decisions": 859823, "labelled": 3929, "options": 17, "features": 12, "load_s": 13.3}
+{"epoch": 0, "loss": 2.2555, "elapsed_s": 21.3}
+{"epoch": 1, "loss": 2.1355, "elapsed_s": 21.7}
+{"epoch": 2, "loss": 2.1234, "elapsed_s": 22.0}
+{"epoch": 3, "loss": 2.1025, "elapsed_s": 22.3}
+{"epoch": 4, "loss": 2.095, "elapsed_s": 22.6}
+{"epoch": 5, "loss": 2.0961, "elapsed_s": 22.9}
+{"epoch": 6, "loss": 2.0945, "elapsed_s": 23.2}
+{"epoch": 7, "loss": 2.0959, "elapsed_s": 23.6}
+{"epoch": 8, "loss": 2.0887, "elapsed_s": 23.9}
+{"epoch": 9, "loss": 2.0879, "elapsed_s": 24.2}
+{"epoch": 10, "loss": 2.0861, "elapsed_s": 24.5}
+{"epoch": 11, "loss": 2.0835, "elapsed_s": 24.8}
+{"epoch": 12, "loss": 2.0826, "elapsed_s": 25.2}
+{"epoch": 13, "loss": 2.0789, "elapsed_s": 25.5}
+{"epoch": 14, "loss": 2.0908, "elapsed_s": 25.7}
+{"epoch": 15, "loss": 2.079, "elapsed_s": 26.1}
+{"epoch": 16, "loss": 2.0753, "elapsed_s": 26.4}
+{"epoch": 17, "loss": 2.0883, "elapsed_s": 26.7}
+{"epoch": 18, "loss": 2.0781, "elapsed_s": 27.0}
+{"epoch": 19, "loss": 2.0818, "elapsed_s": 27.3}
+{"done": true, "seconds": 27.3}
+
+{"saved": "experiments/ar/ems_candidate.npz", "gpu_seconds": 32.5, "seconds": 49.0}
