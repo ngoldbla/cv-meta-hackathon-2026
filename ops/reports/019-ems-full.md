@@ -42,7 +42,8 @@ pool unchanged. Iter 33 (fine-tune from best) reverted at 1.0502;
 iter 34 (lr 1e-3 from scratch) reverted at 1.0531; iter 35 (gain_min
 1.0) reverted at 1.0614; iter 36 (lr 1e-3 x 60 epochs) reverted at
 1.0636. Red iter 9 (joint day x theta-variant mining) reverted at
-4533.96: pool unchanged. Arm spend $5.68.
+4533.96: pool unchanged. Iter 37 (never-hold ablation) KEPT at 1.0370.
+Arm spend $5.68.
 
 ## Work done
 - Claimed task 019 on main (`19a1f00 Start task 019`, pushed).
@@ -216,6 +217,12 @@ iter 34 (lr 1e-3 from scratch) reverted at 1.0531; iter 35 (gain_min
   mean 5665.1) and attacked it with per-date thetas: focused stress
   does not transfer across pool seeds, blanket-max stands, pool
   unchanged. `ar_check` on the red log: 10 entries, 0 problems.
+- Blue iter 37 (`9a1a523`, pushed): KEEP 1.0370. Deployment-only change
+  (no gen/train, iter-30 weights unchanged): mask the hold row in
+  `Candidate.score`, so the policy never holds. The learned holds were
+  actively harmful (Amendment 2 strips hold labels from training, so
+  hold scores are imitation-driven noise). pytest 141 passed + name
+  guard clean before the kept commit.
 
 ## Results
 Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`):
@@ -258,6 +265,7 @@ Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`)
 | 34 | lr 1e-3 from scratch (ablating iter 33), reused window | 1.0531 | revert | 99.0 | reused | data/full/it19,data/full/it22,data/full/it23,data/full/it26,data/full/it27,data/full/it28,data/full/it30,data/full/it31 |
 | 35 | drop marginal labels (gain_min 0.5 -> 1.0), reused window | 1.0614 | revert | 104.0 | reused | data/full/it19,data/full/it22,data/full/it23,data/full/it26,data/full/it27,data/full/it28,data/full/it30,data/full/it31 |
 | 36 | proper low-lr test (lr 1e-3 x 60 epochs), reused window | 1.0636 | revert | 112.0 | reused | data/full/it19,data/full/it22,data/full/it23,data/full/it26,data/full/it27,data/full/it28,data/full/it30,data/full/it31 |
+| 37 | never-hold ablation: mask the hold row in Candidate.score (deployment-only, iter-30 weights) | 1.0370 | keep | 67.8 | - | - |
 
 Best kept: iter 30's weights (imitate-3 recipe), 1.0451 on pool
 `4c088d562472f880` (commit `81de581`).
