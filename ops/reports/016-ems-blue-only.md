@@ -1,6 +1,6 @@
 # Report 016: Autoresearch blue loop: ems-blue-only (M5 arm BLUE_ONLY)
-Status: in_progress
-Branch head at start: ad3e853862541e7daf35406ad97bc440e50a0415  ·  at finish: <pending>
+Status: done
+Branch head at start: ad3e853862541e7daf35406ad97bc440e50a0415  ·  at finish: d5baa63
 
 ## Summary
 Task 015 is done (prerequisite met). Claimed 016 first (`ec9da1a`), set up the `ar/blue/ems-blue-only`
@@ -52,7 +52,12 @@ gates pass). Iter 35 KEEPS 0.7667: hold only when global queue>=5 (gates pass, a
 36 entries 0 problems). Journal entry for iters 31-35 added (branch). Iter 36 KEEPS 0.7618: hold only when queue>=8 (gates pass). Best: 0.7618
 (`6914421`). Iter 37 KEEPS 0.7608: hold only when queue>=12 (gates pass). Best: 0.7608
 (`a7e3b17`). Iter 38 KEEPS 0.7591: hold only when queue>=16 (gates pass). Best: 0.7591
-(`57a6b62`). Iter 39 reverts 0.7593 (queue 16->20; peak at 16).
+(`57a6b62`). Iter 39 reverts 0.7593 (queue 16->20; peak at 16). Iter 40 KEEPS 0.7533:
+final 4-epoch refit on the newest latest-8 window. LOOP AT CAP (40/40). Final best: 0.7533
+(`b8dd113`, primary 8472 vs b1 11247, -24.7%): reservation rules (tier-3<5, tier-2<4, fresh,
+queue>=16) + activate_n 2 + stable refit weights. Counterfactual labels never helped in any
+form; every kept point past iter 7 came from rules or stable imitation refits. `ar_check`:
+41 entries, 0 problems. Arm spend: $6.94 (program $20.98, gate $150).
 
 ## Work done
 - Claimed task 016 on main (`ec9da1a Start task 016`, pushed).
@@ -203,6 +208,12 @@ gates pass). Iter 35 KEEPS 0.7667: hold only when global queue>=5 (gates pass, a
 - Iter 39 (`d87598a`, pushed): gen `it39` (condition b; 50 days, 220,098 decisions, 1,907 labels,
   748.6 s, iter-38 policy). Rule change: congestion threshold 16->20, reverted after. Bench
   REVERTS at 0.7593 (105 s).
+- Iter 40 (`b8dd113`, pushed): no gen (19 Amendment-1 dirs, best unchanged). No script-file
+  change; train with `--args {"label_w": 0, "epochs": 4}` on it28,29,32,35-39 (1,780,276
+  decisions, sums exact; loss 0.0561->0.0212 monotonic; wall 116.6 s, gpu 115.1 s). Bench KEEPS
+  at 0.7533 (112 s; primary 8472; gates pass). Journal entry for iters 36-40 added on the
+  branch. LOOP AT CAP. Final `ar_check`: 41 entries, 0 problems. Branch `ar/blue/ems-blue-only`
+  pushed, not merged. No ledger entries (dev only, per task).
 
 ## Results
 | iter | hypothesis | value | decision | seconds | gen | train window |
@@ -246,9 +257,25 @@ gates pass). Iter 35 KEEPS 0.7667: hold only when global queue>=5 (gates pass, a
 | 37 | hold only when queue>=12 | 0.7608 | keep | 106.0 | it37 | - |
 | 38 | hold only when queue>=16 | 0.7591 | keep | 103.0 | it38 | - |
 | 39 | hold only when queue>=20 | 0.7593 | revert | 105.0 | it39 | - |
+| 40 | final 4-epoch refit, newest window | 0.7533 | keep | 112.0 | - | it28,it29,it32,it35,it36,it37,it38,it39 |
 
 Values from `research/autoresearch/ems-blue-only/autoresearch.jsonl` on `ar/blue/ems-blue-only`.
-Best kept: 0.7591 (iter 38, `57a6b62`).
+Best kept: 0.7533 (iter 40, `b8dd113`).
+
+Audit output (in the worktree, at `b8dd113`):
+```
+41 entries, 0 problems
+```
+Full command in the task's Stop-and-report section; branch `ar/blue/ems-blue-only` pushed, not
+merged. No ledger entries were written (dev-only loop, per task).
+
+Spend: this arm added $6.94 in 36 budget records (all `emslearn` calls above, in order);
+program total is $20.98 of $200 ($150 task gate never near).
+
+Final bench significance (run `20261102-034813`, paired dev, n=200): primary ratio 0.7533,
+CI [0.7306, 0.7777], p=1.6e-17 (equal 0.7934, steep 0.7121, all p<1e-11). Dev only: nothing
+from this loop is a finding; no ledger entries; the reviewer hashes the final candidate
+(`b8dd113`) into a `protocol_note`.
 
 ## Deviations
 - Collision repair commit `e86289e` (not an iteration): jsonl deduped to one baseline line, bench.log
@@ -290,6 +317,7 @@ Best kept: 0.7591 (iter 38, `57a6b62`).
   rule change). Iter 36: `gen (...it36 --seed 36 ...)` (no train: rule change). Iter 37:
   `gen (...it37 --seed 37 ...)` (no train: rule change). Iter 38: `gen (...it38 --seed 38 ...)`
   (no train: rule change). Iter 39: `gen (...it39 --seed 39 ...)` (no train: rule change).
+  Iter 40: no gen; `train --data ...newest-8... --args {"label_w": 0, "epochs": 4}`.
 
 - Amendment-2 mechanism: the deployed `ems-m5` train was probe-verified (this session) to still
   serve hold labels, so the loop applies the strip in `ems_train.py` from iter 12 (same semantics as
@@ -300,7 +328,17 @@ Best kept: 0.7591 (iter 38, `57a6b62`).
   the Amendment-2 text: `02c4e87` replaced both files instead of appending. The runner cannot repair
   task files; this session works from the plan recovered from `3da968b` plus Amendment 2.
 
+- Friction with the skill/task text (minor): (1) `emslearn.cli train` prints only the last
+  1500 chars of train stdout, so the decisions/labelled line can scroll away on long runs -
+  capture full output to a file (done from iter 13; iter 12's post-strip count was lost).
+  (2) Amendment 1's gen-before-edits rule serializes each iteration (gen ~9-15 min blocks the
+  change); unavoidable and correct, just slow. (3) Amendment 2's code (`6cf5f54`) was never
+  deployed in this session's span (probe-verified twice); the in-script strip covered 016.
+  (4) The 016/019 task files were truncated by `02c4e87` (see Blocked).
+
 ## Blocked / questions
-- Reviewer: restore `ops/tasks/016-*.md` and `019-*.md` (frontmatter + plan + Amendments 1-2).
-- Dylan: deploy `6cf5f54` to `ems-m5` (or confirm intended timing); until then 016 strips hold labels
-  in-script, and 019 (same Amendment) may be training with hold labels unknowingly.
+- Reviewer: restore `ops/tasks/016-*.md` and `019-*.md` (frontmatter + plan + Amendments 1-2),
+  with 016 marked `done` (loop at cap 40/40, report done). The runner could not set the status:
+  the file has no status line left to change.
+- Dylan: deploy `6cf5f54` to `ems-m5` (or confirm intended timing); 019 (same Amendment) may have
+  trained with hold labels unknowingly. No longer blocks 016 (done).
