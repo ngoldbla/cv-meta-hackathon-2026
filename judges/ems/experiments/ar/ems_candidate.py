@@ -9,9 +9,16 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from emslearn.policy import LearnedPolicy
+import numpy as np
+
+from emslearn.policy import FEATURES, LearnedPolicy
 
 
 class Candidate(LearnedPolicy):
     name = "candidate"
     weights_path = Path(__file__).with_suffix(".npz")
+
+    def score(self, x: np.ndarray) -> np.ndarray:
+        s = np.asarray(super().score(x), dtype=float).copy()
+        s[x[:, FEATURES.index("is_hold")] > 0] = -1e9
+        return s
