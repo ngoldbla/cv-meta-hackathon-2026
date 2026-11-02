@@ -79,3 +79,7 @@ Next: window is full (8 dirs); the next gen drops it06. Iter 19 starts with gen 
 ## Iter 19 (revert, 1.0376)
 Gen data/full/it19 first (seed 19, 50 days, 203056 decisions, 1791 labels, 609 s wall, $0.1835): required by rule (b) after the iter-18 keep. One change: gain_min 0.5 -> 2.0 (train only on decisive labels). Train on the latest 8-dir window, it06 dropping out ($0.1342, masked 5121, gains p50/p75/p90/p99 = 39/101/205/479, loss 22.41 -> 18.86, 88.5 GPU s).
 Result 1.0376 vs best 1.0344: decisive-only labels do not help - the near-tied labels carry useful signal (or the it06->it19 window swap confounds it). Reverted. Next: with best back above b1 (1.0344), strengthen the anchor instead - imitate 30 -> 100 on the reused window (a better b1 clone should land near 1.00x and bank the gap).
+
+## Iter 20 (revert, 1.0378)
+No gen (8 A1 dirs, best unchanged since last gen, no red keep since): reused the latest-8 window. One change: imitate 30 -> 100. Train ($0.1015, loss 54.55 -> 40.71, 63.2 GPU s).
+Result 1.0378 vs best 1.0344: stronger imitation HURTS. The window mixes rollout policies (b1-exact for old dirs, learned for new); at 100x the net memorizes logged choices including past mistakes, and the label term cannot correct. Lesson: on a mined pool, history-imitation is harmful; labels matter more. The opposite direction (imitate 10) is now worth testing. Red iter 5 is due now (after blue iter 20).
