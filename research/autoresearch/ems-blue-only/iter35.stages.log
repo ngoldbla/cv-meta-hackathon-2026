@@ -1,0 +1,7 @@
+iter35: Amendment-1 gen (condition b: best changed at iter34) on best-kept (fresh-rule + activate_n 2 + iter28 weights, 0.7744)
+gen: modal-python -m emslearn.cli gen --candidate experiments/ar/ems_candidate.py --out data/blue-only/it35 --n 50 --seed 35 --label-rate 0.0093 --label-cap 40 --window 10800
+{"out": "data/blue-only/it35", "days": 50, "decisions": 226437, "labelled": 1904, "seconds": 566.5}
+change: ems_candidate.py score: hold only when global queue >= 5 (busy qualifier); unit-verified (held at q8, unforced at q2)
+bench: RC=0 wall 107s METRIC ratio_b1=0.7667 (primary 8623 vs b1 11247)
+gates: 141 passed, 1 skipped, name guard clean
+decision: KEEP - best 0.7744 -> 0.7667
