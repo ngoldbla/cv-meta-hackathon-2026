@@ -1,0 +1,11 @@
+{"generation": 0, "L_center": 11974.9, "L_best": 11760.0, "elapsed_s": 41.7}
+{"generation": 1, "L_center": 11200.4, "L_best": 10837.9, "elapsed_s": 84.0}
+{"generation": 2, "L_center": 10226.6, "L_best": 10159.6, "elapsed_s": 126.7}
+{"generation": 3, "L_center": 10728.8, "L_best": 10329.6, "elapsed_s": 169.6}
+{"generation": 4, "L_center": 11791.7, "L_best": 11635.6, "elapsed_s": 213.8}
+{"generation": 5, "L_center": 11212.0, "L_best": 11056.5, "elapsed_s": 255.6}
+{"generation": 6, "L_center": 10522.1, "L_best": 10208.6, "elapsed_s": 298.2}
+{"generation": 7, "L_center": 9317.3, "L_best": 9144.3, "elapsed_s": 341.2}
+{"generation": 8, "L_center": 11567.4, "L_best": 11068.8, "elapsed_s": 384.2}
+{"generation": 9, "L_center": 9813.2, "L_best": 9582.1, "elapsed_s": 428.2}
+{"saved": "experiments/ar/ems_candidate.npz", "seconds": 428.2}
