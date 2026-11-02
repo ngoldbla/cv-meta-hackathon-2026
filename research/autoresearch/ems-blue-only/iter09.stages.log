@@ -1,0 +1,31 @@
+iter9: Amendment-1 gen (condition a: 0 Amendment-1 dirs) on best-kept (iter7, 0.9971)
+gen: modal-python -m emslearn.cli gen --candidate experiments/ar/ems_candidate.py --out data/blue-only/it09 --n 50 --seed 9 --label-rate 0.0093 --label-cap 40 --window 10800
+{"out": "data/blue-only/it09", "days": 50, "decisions": 212812, "labelled": 1843, "seconds": 471.8}
+train: modal-python -m emslearn.cli train --script experiments/ar/ems_train.py --data data/blue-only/it09 --save experiments/ar/ems_candidate.npz --args {}
+{"decisions": 212812, "labelled": 1843, "options": 17, "features": 12, "load_s": 10.5}
+{"epoch": 0, "loss": 2.5488, "elapsed_s": 17.4}
+{"epoch": 1, "loss": 2.5347, "elapsed_s": 17.4}
+{"epoch": 2, "loss": 2.5288, "elapsed_s": 17.5}
+{"epoch": 3, "loss": 2.5312, "elapsed_s": 17.6}
+{"epoch": 4, "loss": 2.5223, "elapsed_s": 17.7}
+{"epoch": 5, "loss": 2.525, "elapsed_s": 17.8}
+{"epoch": 6, "loss": 2.5194, "elapsed_s": 17.8}
+{"epoch": 7, "loss": 2.5198, "elapsed_s": 17.9}
+{"epoch": 8, "loss": 2.5115, "elapsed_s": 18.0}
+{"epoch": 9, "loss": 2.5088, "elapsed_s": 18.1}
+{"epoch": 10, "loss": 2.5124, "elapsed_s": 18.1}
+{"epoch": 11, "loss": 2.5054, "elapsed_s": 18.2}
+{"epoch": 12, "loss": 2.5036, "elapsed_s": 18.3}
+{"epoch": 13, "loss": 2.507, "elapsed_s": 18.4}
+{"epoch": 14, "loss": 2.4998, "elapsed_s": 18.5}
+{"epoch": 15, "loss": 2.5006, "elapsed_s": 18.5}
+{"epoch": 16, "loss": 2.5074, "elapsed_s": 18.6}
+{"epoch": 17, "loss": 2.4936, "elapsed_s": 18.7}
+{"epoch": 18, "loss": 2.4952, "elapsed_s": 18.8}
+{"epoch": 19, "loss": 2.5044, "elapsed_s": 18.8}
+{"done": true, "seconds": 18.8}
+
+{"saved": "experiments/ar/ems_candidate.npz", "gpu_seconds": 23.7, "seconds": 28.6}
+label-span check: shard 00000 (40 labels): hours 0.56-23.45, per-6h [6,3,20,11,0], 87.5% non-zero deltas -> whole-day coverage OK
+train wait: wall 28.6s - gpu 23.7s = ~5s (gate 60s) OK
+bench: run runs/ar-blue-ems-m5/20261101-220656 RC=0 wall 591s METRIC ratio_b1=4.5756 (divert_share 0.287 vs b1 0.05)
