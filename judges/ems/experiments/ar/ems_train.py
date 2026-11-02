@@ -21,7 +21,8 @@ import numpy as np
 import torch
 from torch import nn
 
-DEFAULTS = {"hidden": [64, 64], "epochs": 20, "batch": 4096, "lr": 3e-3, "tau": 5.0, "imitate": 0.1, "seed": 0}
+DEFAULTS = {"hidden": [64, 64], "epochs": 20, "batch": 4096, "lr": 3e-3, "tau": 1.0, "imitate": 30.0,
+            "gain_min": 0.5, "gate_gain": 100.0, "gate_k": 25.0, "seed": 0}
 
 
 def load(data: str):
@@ -66,6 +67,13 @@ def main() -> None:
     X, mask, delta, choice = load(a.data)[:4]
     X, mask, delta, choice = X.to(dev), mask.to(dev), delta.to(dev), choice.to(dev)
     labelled = ~torch.isnan(delta).all(1)
+    gain = delta.gather(1, choice[:, None]) - delta  # > 0 where an option beats the logged choice
+    best_gain = torch.where(mask & ~torch.isnan(delta), gain,
+                            torch.tensor(float("-inf"), device=dev)).max(1).values
+    labelled = labelled & (best_gain > cfg["gain_min"])  # flat labels only add noise toward uniform
+    gate = torch.where(best_gain > cfg["gate_gain"],  # clone b1 except where a label shows a big win
+                       torch.exp(-(best_gain - cfg["gate_gain"]) / cfg["gate_k"]),
+                       torch.ones((), device=dev))
     target = torch.softmax(torch.where(mask & ~torch.isnan(delta), -delta / cfg["tau"], torch.tensor(-1e9, device=dev)), 1)
     target = torch.where(labelled[:, None], target, torch.zeros_like(target))
     n, o, f = X.shape
@@ -92,7 +100,7 @@ def main() -> None:
         lab = labelled[idx]
         loss_l = -(target[idx] * logp).sum(1)
         loss_i = -logp.gather(1, choice[idx][:, None])[:, 0]
-        loss = (loss_l * lab).sum() / lab.sum().clamp(min=1) + cfg["imitate"] * loss_i.mean()
+        loss = (loss_l * lab).sum() / lab.sum().clamp(min=1) + cfg["imitate"] * (gate[idx] * loss_i).mean()
         opt.zero_grad(set_to_none=True)
         loss.backward()
         opt.step()
