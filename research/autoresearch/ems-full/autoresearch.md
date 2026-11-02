@@ -142,3 +142,7 @@ Result 1.0502 vs best 1.0451: warm start converges to a nearby but slightly wors
 ## Iter 34 (revert, 1.0531)
 No gen (8 A1 dirs, best unchanged since last gen, red 8 reverted): reused the latest-8 window. One change: lr 3e-3 -> 1e-3 from scratch. Train ($0.0636, loss 6.13 -> 5.59, 34.0 GPU s).
 Result 1.0531 vs best 1.0451: low lr underfits in 20 epochs. Ablation complete: neither fine-tune part helps (init 1.0502, low-lr 1.0531). Note train loss 5.59 BEATS the iter-30 keep's 5.63 yet deploys worse - train loss does not predict deployment here. Caveat: lr 1e-3 x 20 epochs confounds rate with budget; a proper low-lr test needs more epochs. Next: gain_min 1.0 (last untried neighbor between kept 0.5 and reverted 2.0), then lr 1e-3 x 60 epochs.
+
+## Iter 35 (revert, 1.0614)
+No gen (8 A1 dirs, best unchanged since last gen, red 8 reverted): reused the latest-8 window. One change: gain_min 0.5 -> 1.0 (drops only 149 labels: 5778 -> 5629). Train ($0.0638, loss 5.85 -> 5.59, 34.2 GPU s).
+Result 1.0614 vs best 1.0451: dropping even marginal 0.5-1.0-gain labels hurts clearly - small-gain labels guide fine unit-choice distinctions. gain_min 0.5 confirmed. Next: the proper low-lr test (lr 1e-3 x 60 epochs) on the reused window.
