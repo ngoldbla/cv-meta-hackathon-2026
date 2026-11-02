@@ -1,7 +1,7 @@
 ---
 id: "020"
 title: "Literature check: prior art for the EMS surge hold rule"
-status: open
+status: in_progress
 created: 2026-11-02
 report: ops/reports/020-hold-rule-literature-check.md
 ---
