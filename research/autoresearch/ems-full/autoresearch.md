@@ -67,3 +67,6 @@ Result 1.0007 vs best 0.9989: the wider scorer fits the train loss better (18.92
 ## Iter 16 (revert, 1.0100)
 No gen (7 A1 dirs exist, best unchanged since last gen, no red keep since): reused the 7-dir window. One change: tau 1.0 -> 0.5. Train ($0.0681, loss 23.00 -> 19.02, 37.5 GPU s).
 Result 1.0100 vs best 0.9989: sharper targets clearly hurt - overcommitting to the argmax unit amplifies label noise instead of averaging over near-tied good options. Reverted; tau stays 1.0. Red iter 4 is due now (after blue iter 16).
+
+## Iter 17 (rebaseline, 1.0727)
+Red #4 kept (regret-mined top-200, regret 4306.68), so the pool changed (pool_key 834c832309563aa9 -> 28037b2fec557333). Best candidate unchanged (iter-14 weights): candidate primary 30099.8 vs b1 28059.7. The mined pool concentrates exactly this candidate's weaknesses, so the 0.9989 keep starts 7% behind here; new best is 1.0727. Note b1 finds this pool easier than the busiest-days pool (28059.7 vs 33860.7): the mining targets candidate-vs-ref regret, not raw difficulty. Held 0.321 vs b1 0.318, divert 0.137 vs 0.134, t1p90 21.68 vs 21.55. Next: iter 18 starts with gen data/full/it18 (rule (c): red kept since last gen), then retrain the gate-25 recipe on the full 8-dir window.
