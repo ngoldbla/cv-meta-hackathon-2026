@@ -17,7 +17,9 @@ active on the deployed app (masked 40.9% of raw vs 61.8% pre-A2). Iter 11
 (gate_gain 100 -> 25 on the reused window) kept at 1.0015, the first
 Amendment-2 keep. Iter 12 (gate 10) reverted at 1.0088. Red iter 3
 (busiest-days attack) kept at regret 1520.87; blue iter 13 rebaselined
-the iter-11 keep at 1.0020 on the new pool. Arm spend $2.15.
+the iter-11 keep at 1.0020 on the new pool. Iter 14 (gate-25 retrain on
+the 6-dir window with fresh on-pool it14) kept at 0.9989, beating b1 on
+the new pool. Arm spend $2.40.
 
 ## Work done
 - Claimed task 019 on main (`19a1f00 Start task 019`, pushed).
@@ -68,6 +70,11 @@ the iter-11 keep at 1.0020 on the new pool. Arm spend $2.15.
 - Blue iter 13 (`59fa390`, pushed): rebaseline 1.0020 on pool
   `834c832309563aa9` (candidate 33928.7 vs b1 33860.7; b1 was 27674.6
   on the old pool). `ar_check` on the blue log: 14 entries, 0 problems.
+- Blue iter 14 (`355afa4`, pushed): KEEP 0.9989. Gen `data/full/it14`
+  first (seed 14, 50 days, 210153 decisions, 1858 labels; required by
+  rule (c)), then retrained the unchanged gate-25 recipe on
+  it06+it07+it08+it10+it12+it14 (masked 4256/10584). pytest 141 passed
+  + name guard clean before the kept commit.
 
 ## Results
 Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`):
@@ -87,9 +94,10 @@ Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`)
 | 11 | recalibrate gate for A2 unit-only gains (gate_gain 100 -> 25), reused window | 1.0015 | keep | 152.0 | reused | data/full/it06,data/full/it07,data/full/it08,data/full/it10 |
 | 12 | push the gate further open (gate_gain 25 -> 10) on the 5-dir window incl. it12 | 1.0088 | revert | 139.0 | data/full/it12 | data/full/it06,data/full/it07,data/full/it08,data/full/it10,data/full/it12 |
 | 13 | rebaseline after red #3 keep (busiest-days library); best unchanged (gate-25 imitation, iter 11) | 1.0020 | rebaseline | 152.0 | - | - |
+| 14 | retrain the kept gate-25 recipe on the 6-dir window incl. fresh on-pool it14 | 0.9989 | keep | 121.0 | data/full/it14 | data/full/it06,data/full/it07,data/full/it08,data/full/it10,data/full/it12,data/full/it14 |
 
-Best kept: iter 11's weights (gate_gain 25), rebaselined at 1.0020 on
-pool `834c832309563aa9` (rebaseline commit `59fa390`).
+Best kept: iter 14's weights (gate-25 recipe, 6-dir window), 0.9989 on
+pool `834c832309563aa9` (commit `355afa4`).
 
 Red (`research/autoresearch/ems-full-red/autoresearch.jsonl` on `ar/red/ems-full`):
 
@@ -99,7 +107,7 @@ Red (`research/autoresearch/ems-full-red/autoresearch.jsonl` on `ar/red/ems-full
 | 2 | max offload inflation (1.151) + max geographic concentration (104 calls over 3 zips) on top of iter 1 | 1257.56 | keep | 120.0 |
 | 3 | attack the 200 busiest dev days (library/busy_days.json) with maxed thetas | 1520.87 | keep | 81.0 |
 
-Spend added by this arm: $2.146 (`runs/spend.jsonl` on main). emslearn
+Spend added by this arm: $2.396 (`runs/spend.jsonl` on main). emslearn
 commands in order (pre-Amendment regime, from the blue worktree notes):
 1. `gen` 200 days, `--out data/full/it01`, label_rate 0.05 ($0.6958);
 2. `train --data data/full/it01` x4, one per iter 1-4 ($0.0971, $0.0591,
@@ -129,7 +137,10 @@ worktree notes:
 13. `gen --n 25 --n-gen 25 --seed 12 --out data/full/it12` with the
     Amendment-1 label flags ($0.1562; rolls out the iter-11 keep);
 14. `train --data data/full/it06,data/full/it07,data/full/it08,data/full/it10,data/full/it12`
-    ($0.0613; iter 12, gate 10).
+    ($0.0613; iter 12, gate 10);
+15. `gen --n 25 --n-gen 25 --seed 14 --out data/full/it14` with the
+    Amendment-1 label flags ($0.1876; rolls out the iter-11 keep);
+16. `train` on the 6-dir window incl. it14 ($0.0632; iter 14 keep).
 
 ## Deviations
 - Iters 1-4 ran before Amendment 1 (21:14-21:39 CDT vs amendment 21:44 CDT),
