@@ -1,5 +1,5 @@
 # Report 017: Autoresearch blue + red loops: ems-no-cf (M5 arm NO_CF)
-Status: in_progress
+Status: done
 Branch head at start: 046361bd188129844560d03e6c7daa28e27b88db  ·  at finish: <pending>
 
 ## Summary
@@ -41,8 +41,13 @@ load-bearing). Blue #31 KEPT tier-3 escape at 5 min (0.8249); #32 reverted
 tier-3 idle<6 with escape (0.8489). Red #8 reverted (nominal demand: 717.12,
 176/200 days); pool unchanged. Best is now 0.8249. Blue #33-35 re-bracketed
 thresholds with escapes, all reverted: tier-2 idle<5 (0.8410), tier-3 idle<4
-(0.8482), tier-2 idle<3 (0.8498). Thresholds (t3:5, t2:4) are bracketed optima
-in both directions. Best stays 0.8249. Next: final ES on the escaped rule.
+(0.8482), tier-2 idle<3 (0.8498). Blue #36 reverted (ES on the escaped rule:
+0.8785). Red #9 reverted (two-zip surge: 797.19). Blue #37-40 reverted
+(asymmetric escape 0.8314, tier-1 stationed bonus 0.8282, queue/busy-hours
+gates with escapes 0.8396/0.8471). Red #10 reverted (nominal offload: 869.70).
+Both loops at cap. Final best: blue 0.8249 (#31), red 916.32 (#4). ar_check:
+blue 41 entries 0 problems, red 11 entries 0 problems. Branches pushed, not
+merged; no ledger entries. Dev only — nothing here is a finding.
 
 ## Work done
 - Claimed task 017 on main (`9a4b206 Start task 017`, pushed).
@@ -138,6 +143,23 @@ in both directions. Best stays 0.8249. Next: final ES on the escaped rule.
   (39 s).
 - Blue #35 (`5f151dd`, pushed): revert, tier-2 idle<3 with escape -> 0.8498
   (40 s). Journal `c181915` covers iters 31-35.
+- Blue #36 (`1767170`, pushed): revert, ES (pairs 8, days 24, gens 7, seed 36;
+  2,856 scenario-days, 400 s train under contention) on the escaped rule ->
+  0.8785 (42 s).
+- Red #9 (`53d2655`, pushed): revert, two-zip surge -> 797.19 (178 s, 166/200
+  days). Pool unchanged, no blue rebaseline.
+- Blue #37 (`624b7a3`, pushed): revert, tier-3 escape 10 min (tier-2 5 min) ->
+  0.8314 (45 s).
+- Blue #38 (`c7b9997`, pushed): revert, tier-1 stationed-unit bonus -> 0.8282
+  (43 s).
+- Blue #39 (`c3fd5e5`, pushed): revert, queue gate with escape -> 0.8396
+  (39 s).
+- Blue #40 (`5321552`, pushed): revert, busy-hours gate with escape -> 0.8471
+  (67 s). Blue at the 40-iteration cap. Journal `46df86d` covers iters 36-40.
+- Red #10 (`fc486c9`, pushed): revert, nominal offload 1.0 -> 869.70 (140 s,
+  173/200 days). Red at the 10-iteration cap. Pool unchanged.
+- Audits (past verbatim below): blue `41 entries, 0 problems`, red
+  `11 entries, 0 problems`. Both branches pushed, not merged.
 
 ## Results
 Blue (`research/autoresearch/ems-no-cf/autoresearch.jsonl` on `ar/blue/ems-no-cf`):
@@ -179,6 +201,22 @@ Blue (`research/autoresearch/ems-no-cf/autoresearch.jsonl` on `ar/blue/ems-no-cf
 | 33 | wider tier-2 hold (idle<5) with the escape | 0.8410 | revert | 40 | — | — | — |
 | 34 | narrower tier-3 hold (idle<4) with the escape | 0.8482 | revert | 39 | — | — | — |
 | 35 | narrower tier-2 hold (idle<3) with the escape | 0.8498 | revert | 40 | — | — | — |
+| 36 | ES on the escaped rule (seed 36; 2,856 scenario-days) | 0.8785 | revert | 42 | 8 | 24 | 7 |
+| 37 | tier-3 escape 10 min, tier-2 escape 5 min | 0.8314 | revert | 45 | — | — | — |
+| 38 | tier-1 stationed-unit bonus (0.1) | 0.8282 | revert | 43 | — | — | — |
+| 39 | tier-3 queue gate (queue>=3) with the escape | 0.8396 | revert | 39 | — | — | — |
+| 40 | busy-hours hold gate with the escape | 0.8471 | revert | 67 | — | — | — |
+
+Best kept blue value: **0.8249** at `9d27f707fc2b5dd35160ebd95b42f09c8d181ea2`
+(`Autoresearch ems-no-cf #31: keep - tier-3 escape 5min`), branch
+`ar/blue/ems-no-cf` (head `46df86d`, pushed, not merged). The kept candidate is
+hand-coded (hold tier-3 when idle<5, tier-2 when idle<4, both escaping after 5
+min waited; nearest-unit choice); no `.npz` weights are kept — every ES run
+reverted. 8 keeps, 30 reverts, 2 rebaselines in 40 iterations.
+Best kept red value: **916.32** at `1faeb9418ece9565521c294b5ae2bc71610828fd`
+(`Autoresearch ems-no-cf-red #4: keep - max urgent share`), branch
+`ar/red/ems-no-cf` (head `fc486c9`, pushed, not merged). 2 keeps, 8 reverts in
+10 iterations.
 
 Red (`research/autoresearch/ems-no-cf-red/autoresearch.jsonl` on `ar/red/ems-no-cf`):
 
@@ -192,14 +230,56 @@ Red (`research/autoresearch/ems-no-cf-red/autoresearch.jsonl` on `ar/red/ems-no-
 | 6 | 10% unavailable fleet under the urgent concentrated surge | 305.07 | revert | 120 |
 | 7 | surge tightened to a single zip | 854.63 | revert | 135 |
 | 8 | nominal demand (1.0) with max urgent share | 717.12 | revert | 110 |
+| 9 | surge over two zips | 797.19 | revert | 178 |
+| 10 | nominal offload (1.0) with max urgent share | 869.70 | revert | 140 |
 
-Spend so far (this arm, from `runs/spend.jsonl`): it01 $0.336, it02 $0.997,
-it03 $1.336, it04 $1.324, it05 $0.530, it13 $0.254, it20 $0.255, it25 $0.248,
-it27 $0.251 (other iters free) = $5.53. Program total $11.63 / $200 (stop
-above $150).
+Spend by this arm (from `runs/spend.jsonl`): it01 $0.336, it02 $0.997, it03
+$1.336, it04 $1.324, it05 $0.530, it13 $0.254, it20 $0.255, it25 $0.248, it27
+$0.251, it36 $0.257 (all other iters free) = $5.79. Program total $12.56 /
+$200 (stop above $150).
+
+ES commands used, in order (all from the blue worktree's `judges/ems` with the
+task's `PYTHONPATH`, `--candidate experiments/ar/ems_candidate.py
+--pool-generator $RED/judges/ems/experiments/ar/ems_red_sampler.py`):
+iters 1-5 per the logged hypotheses (defaults 8/48/5; 15 gens; 10x96; fixed
+pool_seed 7, 10x96; sigma 0.02 lr 0.01, 8 gens — see `it01..it05.es.log` on
+`ar/blue/ems-no-cf`); it13 `--args '{"generations": 7, "days": 24, "pairs": 8,
+"seed": 13}'` (2,856 scenario-days); it20 same shape with `"seed": 20,
+"sigma": 0.02, "lr": 0.01`; it25 `{"generations": 7, "days": 12, "pairs": 16,
+"seed": 25, "sigma": 0.02, "lr": 0.01}` (2,772); it27 `{"generations": 16,
+"days": 20, "pairs": 4, "seed": 27, "sigma": 0.02, "lr": 0.01}` (2,880); it36
+`{"generations": 7, "days": 24, "pairs": 8, "seed": 36}` (2,856). Every
+post-Amendment ES run is within the 3,000 scenario-day envelope. No `gen`,
+`train`, counterfactual-report or `dev_eval.json` access in this arm, per the
+arm rules.
+
+`ar_check` output (blue, in the blue worktree):
+
+```text
+41 entries, 0 problems
+```
+
+`ar_check` output (red, in the red worktree):
+
+```text
+11 entries, 0 problems
+```
 
 ## Deviations
-(none)
+- Blue #14's log line first recorded a mistranscribed commit SHA (typed from
+  memory instead of captured from `git rev-parse`); fixed by follow-up commit
+  `5e7001b` on `ar/blue/ems-no-cf`, which touches only the jsonl line. All
+  later iterations capture `HEAD` in-shell. `ar_check` passes.
+- Both worktree branches lost their upstream tracking at the Amendment 1
+  cutover, so the first push of this session on each needed `git push -u
+  origin <branch>`; later pushes were plain `git push`.
+- Blue #36's ES train took 400 s (vs ~230 s for the same shape) under shared
+  Modal contention with the other arms; no flags changed.
+
+Friction with the skill text: none in the loop mechanics. The inbox
+`git pull --no-rebase` before each main push occasionally fast-forwards past
+the other arms' report commits; no conflicts occurred.
 
 ## Blocked / questions
-(none)
+(none — no model choices, pre-registrations, or approvals needed. Per the task,
+the reviewer hashes the final candidate into a `protocol_note`.)

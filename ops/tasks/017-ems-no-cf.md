@@ -1,7 +1,7 @@
 ---
 id: "017"
 title: "Autoresearch blue + red loops: ems-no-cf (M5 arm NO_CF)"
-status: in_progress
+status: done
 created: 2026-11-01
 report: ops/reports/017-ems-no-cf.md
 ---
