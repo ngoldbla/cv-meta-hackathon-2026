@@ -104,3 +104,8 @@ Result 1.0370 vs best 1.0286: sharper decay above the gate hurts - imitation tha
 
 ## Iter 25 (rebaseline, 1.0820)
 Red #6 kept (re-mined top-200 vs iter-22, regret 4530.61), so the pool changed (pool_key 28037b2fec557333 -> 365e3488b85fda64). Best candidate unchanged (iter-22 imitate-3 weights): candidate primary 30000.4 vs b1 27726.2. The re-mined pool again concentrates this candidate's weaknesses; new best is 1.0820. Held 0.323 vs b1 0.317, divert 0.136 vs 0.133, t1p90 21.80 vs 21.63. Next: iter 26 starts with gen data/full/it26 (rule (c): red kept since last gen; it10 drops out), then retrain the imitate-3 recipe.
+
+## Iter 26 (KEEP, 1.0523)
+Gen data/full/it26 first (seed 26, 50 days, 203775 decisions, 1782 labels, 451 s wall, $0.1656): required by rule (c) since red #6 changed the pool. No .py change: imitate-3 recipe retrained on the latest 8-dir window, it10 dropping out ($0.0741, masked 5567, loss 5.92 -> 5.66, 42.1 GPU s).
+Result 1.0523 vs best 1.0820: fresh on-pool data closes a third of the re-mined gap (candidate 29177.6 vs b1 27726.2; held 0.319 vs 0.317, divert 0.136 vs 0.133, t1p90 21.61 vs 21.63). pytest 141 passed + name guard clean before the kept commit.
+Next: iter 27 starts with gen data/full/it27 (rule (b): iter-26 keep; it12 drops out). Recipe is stable; the loop now advances by fresh-data retrains against each red mining.
