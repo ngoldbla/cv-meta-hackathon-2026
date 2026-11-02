@@ -37,7 +37,8 @@ kept at 1.0448; iter 28 (gate 50) reverted at 1.0521. Red iter 7
 iter 29 rebaselined at 1.0976 on the new pool. Iter 30 (imitate-3
 retrain with fresh it30) kept at 1.0451; iter 31 (same with it31)
 reverted at 1.0478 and iter 32 (imitate 5) reverted at 1.0497.
-Arm spend $5.39.
+Red iter 8 (re-mined top-200 vs the iter-30 keep) reverted at 4575.37:
+pool unchanged. Arm spend $5.39.
 
 ## Work done
 - Claimed task 019 on main (`19a1f00 Start task 019`, pushed).
@@ -183,6 +184,10 @@ Arm spend $5.39.
   one change (`imitate` 3 -> 5), trained on the latest-8 window
   ($0.0860): lands between 3 and 10 as expected. Journal (`69a823a`,
   pushed).
+- Red iter 8 (`f44538d`, pushed): revert 4575.37. Re-mined all 1027 days
+  vs the iter-30 keep (mean 1542.87, top day 9164.05; committed as
+  `library/regret_days_8.json`) and attacked its top 200: mining
+  plateaus (4617.18 best stands). Pool unchanged.
 
 ## Results
 Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`):
@@ -236,6 +241,7 @@ Red (`research/autoresearch/ems-full-red/autoresearch.jsonl` on `ar/red/ems-full
 | 5 | re-mine the top-200 regret days vs the iter-18 keep (library/regret_days_5.json) | 4132.41 | revert | 83.0 |
 | 6 | re-mine the top-200 regret days vs the iter-22 keep (library/regret_days_6.json) | 4530.61 | keep | 78.0 |
 | 7 | re-mine the top-200 regret days vs the iter-27 keep (library/regret_days_7.json) | 4617.18 | keep | 76.0 |
+| 8 | re-mine the top-200 regret days vs the iter-30 keep (library/regret_days_8.json) | 4575.37 | revert | 74.0 |
 
 Spend added by this arm: $5.389 (`runs/spend.jsonl` on main). emslearn
 commands in order (pre-Amendment regime, from the blue worktree notes):
