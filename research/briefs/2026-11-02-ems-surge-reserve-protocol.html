@@ -192,10 +192,22 @@ footer { font-size: .85rem; color: var(--muted); border-top: 1px solid var(--rul
   </section>
 
   <section aria-labelledby="alt">
-    <h2 id="alt">The stronger version that we do not recommend yet</h2>
+    <h2 id="alt">The stronger version, and why we do not recommend it yet</h2>
     <div class="card">
-      <p>A second loop found a version with a larger gain: 26% less lateness on all days and up to 33% less on busy days. It adds three changes. It holds only when 16 or more calls wait in the city. It holds for up to 10 minutes. It requests 2 extra units at a time, not 3. It also uses a learned model to select the unit.</p>
-      <p>This version was 6–12% worse than the standard rules on the calmest days. The learned model cannot be written as a rule. Thus, we recommend the simpler level 2 rule above.</p>
+      <p>A second loop (BLUE_ONLY) found a version with a larger gain: 26% less lateness on all days and up to 33% less on the busiest days. We tested each of its parts separately on the same 200 days.</p>
+      <div class="wrap">
+        <table>
+          <thead><tr><th>Part</th><th>What the test showed</th></tr></thead>
+          <tbody>
+            <tr><td>Written hold rule: hold only when 16 or more calls wait</td><td>It never starts. In the test, 16 waiting calls and fewer than 5 free units did not occur at the same time.</td></tr>
+            <tr><td>Learned model that selects the unit</td><td>All of the gain comes from this part. The model holds 2.6% of calls by itself and never holds a tier-1 call. Without the model, the version scores about the same as the standard rules.</td></tr>
+            <tr><td>Request 2 extra units at a time, not 3</td><td>This part causes the harm on calm days. When we added it to the level 2 rule, lateness fell by 9% more on the busiest days, but it rose by 9% on the calmest days.</td></tr>
+            <tr><td>Hold for up to 10 minutes, not 5</td><td>Less than 1% change. A second hold gives almost no gain.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Thus, the extra gain needs a learned model, which nobody can read as a rule. The 2-unit requests help only during a surge. We recommend the level 2 rule above.</p>
+      <p><strong>Option for review:</strong> request 2 extra units at a time only on busy days, and 3 on other days. We did not test this option.</p>
     </div>
   </section>
 

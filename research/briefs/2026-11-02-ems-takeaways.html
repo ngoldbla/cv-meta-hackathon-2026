@@ -74,7 +74,7 @@ footer { font-size: .85rem; color: var(--muted); border-top: 1px solid var(--rul
     <h2 id="verdict">The short answer</h2>
     <div class="verdict">
       <p>The loops found one strong idea: <strong>during a surge, hold a new low-priority call for a short time when few ambulances are free.</strong> In the simulator, this rule cut lateness by about a quarter on busy days. It did not use more ambulances.</p>
-      <p>The learned model did not beat the standard rules. The useful result is a rule that a person can read.</p>
+      <p>A person can read and use the rule. A learned model that copied this hold behaviour did better on busy days, but it was worse on calm days. The full learning method (FULL) did not beat the standard rules.</p>
       <p>No sealed test has run. All results come from development days in a simulator.</p>
     </div>
     <div class="strip">
@@ -91,7 +91,7 @@ footer { font-size: .85rem; color: var(--muted); border-top: 1px solid var(--rul
     <div class="finding f-good">
       <span class="tag">Finding 1 · the main result</span>
       <h3>A short hold during a surge keeps ambulances free for urgent calls</h3>
-      <p>Two loops found the rule separately. Each holds a tier-2 or tier-3 call for a few minutes when few ambulances are free and the call is new. We tested both final policies on 200 new development days. No loop used these days during its search.</p>
+      <p>NO_CF found the rule as code that a person can read. It holds a tier-2 or tier-3 call for 5 minutes when few ambulances are free and the call is new. BLUE_ONLY has the same hold behaviour, but in a learned model: its written hold rule never starts. We tested both final policies on 200 new development days. No loop used these days during its search.</p>
       <div class="wrap">
         <table>
           <thead><tr><th>Policy</th><th>Lateness vs b1</th><th>Tier-1 lateness</th><th>Tier-2 lateness</th><th>Tier-3 lateness</th></tr></thead>
@@ -119,13 +119,14 @@ footer { font-size: .85rem; color: var(--muted); border-top: 1px solid var(--rul
           </tbody>
         </table>
       </div>
-      <p>Thus, a service must use the rule only during a surge. On calm days, use the standard rules. NO_CF uses only rules, and it is the safer of the two.</p>
+      <p>Thus, a service must use the rule only during a surge. On calm days, use the standard rules. NO_CF uses only rules, and it is the safer of the two. A test of each part showed the cause of the harm on calm days: BLUE_ONLY requests 2 extra units at a time, not 3. When we added this change to NO_CF, its lateness on the calmest days went from 2% less than b1 to 7% more.</p>
     </div>
 
     <div class="finding f-bad">
-      <span class="tag">Finding 3 · a negative result</span>
-      <h3>The learned model did not beat the standard rules</h3>
-      <p>FULL used the full learning method. On fresh days it was 1.8% worse than b1. The learned part of BLUE_ONLY added only about 1% to its hold rule. NO_CF did not keep any learned weights, because each training attempt gave a worse score than its rules.</p>
+      <span class="tag">Finding 3 · a mixed result for learning</span>
+      <h3>The full learning method failed, but a learned copy of the hold rule worked</h3>
+      <p>FULL used the full learning method. On fresh days it was 1.8% worse than b1. NO_CF did not keep any learned weights, because each training attempt gave a worse score than its rules.</p>
+      <p>BLUE_ONLY is different. Its learned model holds 2.6% of calls and never holds a tier-1 call. It probably learned this from its own earlier hold rules. Without the model, BLUE_ONLY scores about the same as b1 (1.002). With the model, it gives 7% less lateness than NO_CF on all days and 12% less on the busiest days. But it is 8% worse than NO_CF on the calmest days, because of its 2-unit surge requests.</p>
     </div>
 
     <div class="finding f-good">
