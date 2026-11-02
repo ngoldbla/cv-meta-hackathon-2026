@@ -1,6 +1,6 @@
 # Report 020: Literature check: prior art for the EMS surge hold rule
 Status: done
-Branch head at start: a4fa643910b366f435b9f106b7b1b0973c3e7461  ·  at finish: <sha>
+Branch head at start: a4fa643910b366f435b9f106b7b1b0973c3e7461  ·  at finish: 9bd9f77283072d99364a7853edb14be6db322669
 
 ## Summary
 Searched ~2h for prior art on the NO_CF surge hold rule (hold tier-3 when <5
