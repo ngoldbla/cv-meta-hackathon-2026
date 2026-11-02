@@ -30,7 +30,7 @@ def sample_theta(rng: np.random.Generator, d: date) -> dict:
 
 
 def pick_days(rng: np.random.Generator, days: list[date], n: int) -> list[date]:
-    lib = Path(__file__).resolve().parents[4] / "research/autoresearch/ems-full-red/library/regret_days.json"
+    lib = Path(__file__).resolve().parents[4] / "research/autoresearch/ems-full-red/library/regret_days_6.json"
     avail = set(days)
     ranked = [d for d in (date.fromisoformat(x) for x in json.loads(lib.read_text())["dates"]) if d in avail]
     if len(ranked) >= n:

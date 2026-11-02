@@ -22,3 +22,6 @@ Thetas maxed and busiest-days exhausted, so: a full 1027-day mining bench vs the
 
 ## Iter 5 (revert, 4132.41)
 Re-mined regret over all 1027 days vs the adapted iter-18 keep (mean 1332.13, 620 days > 0, top day 9399.80; committed as research/autoresearch/ems-full-red/library/regret_days_5.json) and attacked its top 200. Result 4132.41 vs best 4306.68: the adapted candidate's worst-200 are less bad than the iter-14 keep's were (overall mean also fell 1361.68 -> 1332.13), so blue is catching up to the mining strategy. Reverted; pool unchanged, no blue rebaseline needed. Next red axis candidates: weekday-varied thetas, or re-mining again once blue moves substantially.
+
+## Iter 6 (KEEP, 4530.61)
+Re-mined regret over all 1027 days vs the iter-22 keep (imitate 3): mean 1468.09 (UP from 1332.13 vs iter-18 - the imitate-3 policy is less robust overall even though it wins on the mined pool), 633 days > 0, top day 9375.76; committed as research/autoresearch/ems-full-red/library/regret_days_6.json. Attacking its top 200: regret 4306.68 -> 4530.61 (+5%), 200/200 days with regret; candidate primary 45959.7 vs ref 41429.1. Note the target moved (iter-22 keep); the keep compares against the best kept red value regardless. pytest 141 passed + name guard clean before the kept commit. Blue must rebaseline (pool changed).
