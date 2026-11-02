@@ -1,8 +1,8 @@
 """Blue-loop candidate policy (the autoresearch loop edits this file only). Starts as b1.
 
 Arm READABLE: readable code, no trained parameters. Hand-set numeric constants
-added (1/20): MIN_IDLE_RELOC = 3 (skip the hourly relocation pass when fewer
-than 3 units are idle; thin fleets should stay put instead of churning).
+added (1/20): MIN_IDLE_RELOC = 2 (skip the hourly relocation pass when fewer
+than 2 units are idle; thin fleets should stay put instead of churning).
 (Hyp 27 ablation: proactive activation removed to test whether it hurts on
 the urgent+conc pool.)
 """
@@ -15,7 +15,7 @@ from ems.policy.api import Activate, Assign, Divert, Relocate
 from ems.policy.classical import Classical
 from ems.sim.calib import BOROUGHS
 
-MIN_IDLE_RELOC = 3
+MIN_IDLE_RELOC = 2
 
 
 class Candidate(Classical):
