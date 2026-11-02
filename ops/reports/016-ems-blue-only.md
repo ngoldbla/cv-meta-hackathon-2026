@@ -7,7 +7,10 @@ Task 015 is done (prerequisite met). Claimed 016 first (`ec9da1a`), set up the `
 worktree, and ran the baseline: `METRIC ratio_b1=1.0000` (115.7 s bench / 117 s wall). The launcher's other
 arm runners piled onto 016 instead of spreading over 016-019; the collision was resolved (one stood down
 itself, two SIGTERM-stopped, single-writer verified) and the log repaired to the single verified baseline
-(`e86289e`, `ar_check` clean). The loop is starting iteration 1.
+(`e86289e`, `ar_check` clean). Iters 1-5: listwise labels drag off b1 at imitate 0.1-100, pure imitation
+keeps 0.9997. Iters 6-8 (previous session, pre-Amendment): no-hold reverts (1.0010, holds net-helpful),
+400-day imitation KEEPS 0.9971 (best), 800-day imitation reverts (1.0024, late-epoch training divergence).
+Best: 0.9971 (`69b357f`). Amendment 1 applies from iter 9.
 
 ## Work done
 - Claimed task 016 on main (`ec9da1a Start task 016`, pushed).
@@ -33,7 +36,15 @@ itself, two SIGTERM-stopped, single-writer verified) and the log repaired to the
   vs 26 s local) after a smoke test; `it02` shards downloaded and byte-verified (counts exact).
 - Iter 5 (`a443599`, pushed): pure imitation on unlabelled local `loc01` (200 days, 863,625 decisions,
   66 s gen) KEPT at 0.9997 (primary 11244.25 vs 11247.14). Keep gates passed (141/1, name guard clean).
-  Best: 0.9997.
+- Iters 6-8 (`b1ecea8`, `69b357f`, `bbaae5a`, pushed; previous session, no new Modal spend, all local):
+  iter 6 no-hold options with kept weights reverts 1.0010 (203 s bench; holds are net-helpful, cf hold
+  regret was actionable but removing the channel hurts); iter 7 doubles imitation data to 400 days
+  (`loc12` = loc01+loc02, 1,716,977 decisions) and KEEPS 0.9971 (140 s); iter 8 doubles again to 800 days
+  (`loc1234`, 3,432,555 decisions) but the loss diverges from epoch 8 (0.0357 to 5.04 at epoch 19, last
+  epoch saved) and reverts 1.0024 (75 s). Best: 0.9971.
+- Cutover to Amendment 1: previous session SIGTERM-stopped at the iter-8 boundary per the pace plan;
+  single-writer re-verified (no 016 processes, branch tip stable at `bbaae5a`). Modal caps confirmed
+  deployed (40/56/3). This session resumes at iter 9 under Amendment 1.
 
 ## Results
 | iter | hypothesis | value | decision | seconds |
@@ -43,8 +54,12 @@ itself, two SIGTERM-stopped, single-writer verified) and the log repaired to the
 | 3 | imitate 10.0 | 1.4347 | revert | 144.0 |
 | 4 | imitate 100.0 | 1.0722 | revert | 175.0 |
 | 5 | pure imitation loc01 | 0.9997 | keep | 72.0 |
+| 6 | no-hold options with kept weights | 1.0010 | revert | 203.0 |
+| 7 | 400d imitation (loc01+loc02) | 0.9971 | keep | 140.0 |
+| 8 | 800d imitation (loc01-04) | 1.0024 | revert | 75.0 |
 
 Values from `research/autoresearch/ems-blue-only/autoresearch.jsonl` on `ar/blue/ems-blue-only`.
+Best kept: 0.9971 (iter 7, `69b357f`).
 
 ## Deviations
 - Collision repair commit `e86289e` (not an iteration): jsonl deduped to one baseline line, bench.log
@@ -56,7 +71,8 @@ Values from `research/autoresearch/ems-blue-only/autoresearch.jsonl` on `ar/blue
 - `emslearn` commands used, in order: `gen --out data/blue-only/it02 --n 200 --seed 1 --label-rate 0.05`
   (iter 1); `train --script ems_train.py --data data/blue-only/it02 --save ems_candidate.npz` x2
   (iters 1-2, Modal). Local from iter 3: same train script/args on downloaded `it02` shards; local gen
-  `loc01` (`--n 200 --seed 2 --label-rate 0`) for iter 5.
+  `loc01` (`--n 200 --seed 2 --label-rate 0`) for iter 5; local `loc02` (seed 3) for iter 7, `loc03`
+  (seed 4) + `loc04` (seed 5) for iter 8. Iters 6-8 added no Modal spend.
 
 ## Blocked / questions
 (none currently)
