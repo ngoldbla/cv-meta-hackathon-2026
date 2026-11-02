@@ -1,0 +1,1603 @@
+{
+ "criterion": "per-date argmax-variant by regret (dedup of top-200 day x variant grid); days from regret_days_7/8 union",
+ "variants": {
+  "V0_allmax": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "V1_urgency": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "V2_offload": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "V3_conc": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  }
+ },
+ "dates": [
+  "2018-02-08",
+  "2017-06-14",
+  "2019-08-13",
+  "2019-01-22",
+  "2018-12-19",
+  "2017-08-31",
+  "2018-11-09",
+  "2018-10-23",
+  "2019-11-05",
+  "2018-07-01",
+  "2018-01-23",
+  "2018-05-30",
+  "2019-09-06",
+  "2019-06-12",
+  "2018-05-14",
+  "2017-09-12",
+  "2017-09-08",
+  "2017-11-30",
+  "2017-11-27",
+  "2019-08-06",
+  "2019-05-21",
+  "2019-05-16",
+  "2017-03-17",
+  "2019-06-03",
+  "2018-04-16",
+  "2018-10-22",
+  "2018-05-31",
+  "2018-11-03",
+  "2018-01-16",
+  "2017-12-07",
+  "2019-07-18",
+  "2017-08-22",
+  "2018-11-30",
+  "2018-11-20",
+  "2019-11-18",
+  "2018-07-05",
+  "2019-05-15",
+  "2019-12-05",
+  "2018-03-14",
+  "2018-08-23",
+  "2019-08-16",
+  "2017-05-26",
+  "2017-04-24",
+  "2019-04-01",
+  "2019-02-11",
+  "2019-11-04",
+  "2017-03-02",
+  "2018-04-10",
+  "2018-10-15",
+  "2019-06-11",
+  "2019-11-27",
+  "2018-05-02",
+  "2017-10-02",
+  "2019-12-09",
+  "2019-09-25",
+  "2018-07-25",
+  "2019-06-25",
+  "2018-12-06",
+  "2017-02-13",
+  "2019-04-18",
+  "2017-06-16",
+  "2018-05-09",
+  "2019-05-19",
+  "2017-02-22",
+  "2019-08-25",
+  "2018-04-12",
+  "2018-12-26",
+  "2019-07-27",
+  "2018-01-20",
+  "2018-03-29",
+  "2017-05-04",
+  "2017-01-13",
+  "2017-01-25",
+  "2018-12-21",
+  "2017-05-05",
+  "2017-05-20",
+  "2019-03-03",
+  "2018-03-01",
+  "2018-08-06",
+  "2018-12-12",
+  "2019-02-13",
+  "2017-12-18",
+  "2018-07-18",
+  "2017-12-12",
+  "2019-06-15",
+  "2018-03-28",
+  "2017-08-06",
+  "2018-01-18",
+  "2018-04-17",
+  "2018-03-17",
+  "2018-09-03",
+  "2019-06-24",
+  "2018-11-17",
+  "2017-06-05",
+  "2017-11-29",
+  "2017-07-08",
+  "2018-09-14",
+  "2017-03-24",
+  "2019-01-15",
+  "2017-11-09",
+  "2019-03-15",
+  "2017-10-10",
+  "2017-09-25",
+  "2017-09-19",
+  "2017-09-26",
+  "2018-09-12",
+  "2018-05-11",
+  "2017-07-28",
+  "2017-12-01",
+  "2018-07-11",
+  "2019-05-20",
+  "2017-08-10",
+  "2018-05-07",
+  "2019-01-10",
+  "2018-08-29",
+  "2017-07-11",
+  "2018-03-24",
+  "2018-02-20",
+  "2018-02-24",
+  "2017-01-03",
+  "2017-03-28",
+  "2018-12-11",
+  "2019-04-25",
+  "2019-03-13",
+  "2018-02-06",
+  "2019-03-28",
+  "2019-12-14",
+  "2018-09-26",
+  "2018-06-22",
+  "2019-07-07",
+  "2018-03-13",
+  "2018-12-22",
+  "2019-10-24",
+  "2019-03-07",
+  "2019-01-09",
+  "2019-06-06",
+  "2019-01-02",
+  "2017-12-14",
+  "2017-08-16",
+  "2018-07-28",
+  "2019-07-01",
+  "2018-11-16",
+  "2019-10-09",
+  "2017-08-20",
+  "2018-01-15",
+  "2019-07-19",
+  "2017-10-24",
+  "2017-07-12",
+  "2018-06-30",
+  "2018-05-29",
+  "2019-10-23",
+  "2017-10-04",
+  "2018-12-28",
+  "2018-09-18",
+  "2017-04-22",
+  "2019-02-25"
+ ],
+ "thetas": {
+  "2018-02-08": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-06-14": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-08-13": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2019-01-22": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-12-19": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-08-31": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-11-09": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-10-23": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-11-05": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-07-01": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-01-23": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-05-30": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2019-09-06": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-06-12": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-05-14": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-09-12": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-09-08": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-11-30": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2017-11-27": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2019-08-06": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2019-05-21": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-05-16": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-03-17": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-06-03": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-04-16": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-10-22": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-05-31": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-11-03": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-01-16": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-12-07": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2019-07-18": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2017-08-22": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-11-30": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-11-20": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-11-18": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-07-05": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-05-15": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2019-12-05": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-03-14": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-08-23": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-08-16": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-05-26": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-04-24": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-04-01": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2019-02-11": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2019-11-04": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-03-02": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-04-10": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-10-15": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2019-06-11": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-11-27": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-05-02": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-10-02": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2019-12-09": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2019-09-25": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-07-25": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-06-25": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-12-06": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2017-02-13": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2019-04-18": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-06-16": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-05-09": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-05-19": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-02-22": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-08-25": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-04-12": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-12-26": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-07-27": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-01-20": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-03-29": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2017-05-04": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2017-01-13": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-01-25": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-12-21": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-05-05": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2017-05-20": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-03-03": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-03-01": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-08-06": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-12-12": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2019-02-13": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-12-18": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-07-18": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-12-12": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-06-15": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-03-28": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-08-06": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-01-18": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-04-17": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-03-17": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-09-03": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-06-24": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-11-17": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2017-06-05": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-11-29": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-07-08": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-09-14": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-03-24": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2019-01-15": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-11-09": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-03-15": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2017-10-10": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-09-25": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2017-09-19": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-09-26": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-09-12": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-05-11": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-07-28": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-12-01": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-07-11": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-05-20": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-08-10": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-05-07": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2019-01-10": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-08-29": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-07-11": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-03-24": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-02-20": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-02-24": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-01-03": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-03-28": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-12-11": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-04-25": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2019-03-13": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-02-06": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-03-28": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2019-12-14": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-09-26": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-06-22": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-07-07": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-03-13": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-12-22": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-10-24": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2019-03-07": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-01-09": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-06-06": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2019-01-02": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-12-14": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2017-08-16": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-07-28": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-07-01": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-11-16": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.0,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-10-09": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2017-08-20": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-01-15": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-07-19": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-10-24": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2017-07-12": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-06-30": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-05-29": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-10-23": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2017-10-04": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2018-12-28": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2018-09-18": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.0,
+   "offload": 1.151,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  },
+  "2017-04-22": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.151,
+   "concentration_calls": 104.0,
+   "concentration_zips": 3.0
+  },
+  "2019-02-25": {
+   "demand": 1.059749,
+   "unavailable": 0.25,
+   "urgent_share": 1.153,
+   "offload": 1.0,
+   "concentration_calls": 0.0,
+   "concentration_zips": 0.0
+  }
+ },
+ "regrets": [
+  9164.05,
+  8906.08,
+  8734.86,
+  8507.39,
+  8352.03,
+  7809.75,
+  7784.19,
+  7732.84,
+  7680.14,
+  7679.63,
+  7620.55,
+  7607.69,
+  7557.16,
+  7530.76,
+  7478.23,
+  7259.09,
+  7227.01,
+  7202.34,
+  7198.99,
+  7179.5,
+  7126.81,
+  7122.16,
+  7106.95,
+  7098.4,
+  6980.85,
+  6948.96,
+  6874.69,
+  6766.21,
+  6743.9,
+  6580.99,
+  6556.96,
+  6497.6,
+  6474.88,
+  6468.74,
+  6464.52,
+  6371.92,
+  6369.21,
+  6345.01,
+  6292.56,
+  6274.61,
+  6247.33,
+  6239.27,
+  6218.95,
+  6213.4,
+  6127.49,
+  6103.03,
+  6094.9,
+  6090.45,
+  6083.11,
+  6061.91,
+  6037.59,
+  5999.87,
+  5985.84,
+  5978.33,
+  5972.05,
+  5971.02,
+  5947.8,
+  5906.48,
+  5833.81,
+  5797.4,
+  5754.85,
+  5690.5,
+  5616.15,
+  5604.56,
+  5538.69,
+  5537.97,
+  5496.02,
+  5488.15,
+  5438.9,
+  5424.49,
+  5419.1,
+  5396.41,
+  5394.48,
+  5365.75,
+  5343.81,
+  5332.2,
+  5279.32,
+  5275.86,
+  5268.08,
+  5250.75,
+  5245.42,
+  5234.91,
+  5234.61,
+  5221.02,
+  5183.75,
+  5169.83,
+  5146.82,
+  5131.98,
+  5124.13,
+  5119.16,
+  5119.0,
+  5106.49,
+  5089.34,
+  5088.11,
+  5079.62,
+  5073.86,
+  5069.44,
+  5061.77,
+  5056.54,
+  5011.44,
+  5009.49,
+  5002.6,
+  4983.26,
+  4980.63,
+  4960.65,
+  4946.8,
+  4929.1,
+  4920.54,
+  4914.0,
+  4894.78,
+  4873.01,
+  4868.06,
+  4859.92,
+  4855.57,
+  4853.5,
+  4848.45,
+  4832.3,
+  4831.48,
+  4829.82,
+  4828.66,
+  4808.93,
+  4807.61,
+  4796.98,
+  4789.28,
+  4756.05,
+  4752.25,
+  4637.4,
+  4637.08,
+  4626.02,
+  4623.54,
+  4610.05,
+  4591.73,
+  4584.04,
+  4568.54,
+  4563.28,
+  4562.68,
+  4560.55,
+  4554.92,
+  4543.19,
+  4539.41,
+  4514.84,
+  4512.94,
+  4495.95,
+  4482.93,
+  4467.46,
+  4461.55,
+  4458.16,
+  4449.69,
+  4431.75,
+  4428.7,
+  4390.22,
+  4383.72,
+  4377.99,
+  4316.85,
+  4298.24,
+  4270.66
+ ]
+}
