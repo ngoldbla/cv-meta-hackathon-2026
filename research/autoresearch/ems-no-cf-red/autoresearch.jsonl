@@ -1,0 +1,1 @@
+{"iter": 0, "time": "2026-11-02T01:25:11Z", "commit": "607871f349ba8cb2e7d40445d6b117439fe7546b", "hypothesis": "baseline - nominal sampler against b1 candidate", "files": [], "metric": "regret_candidate", "value": 500.25, "best_before": null, "decision": "baseline", "evidence": "research/autoresearch/ems-no-cf-red/bench.log", "seconds": 86}
