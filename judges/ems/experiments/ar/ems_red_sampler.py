@@ -17,6 +17,9 @@ alone reverted at 516.20, but the combination with concentration is untested).
 (Red it7 reverted: offload on the corner, 623.58 < 785.82.)
 Red it8: unavailable at ceiling (0.25) on the full corner (it5's pair with
 conc reverted, but the triple with urgent added is untested).
+(Red it9 reverted: tighter spike over 1 zip, 688.52 < 861.45.)
+Red it10: demand 0.9->1.05 on the corner (load 1.40, within the cap); retests
+whether the demand floor still holds with all ceilings stacked.
 """
 
 from __future__ import annotations
@@ -30,7 +33,7 @@ from ems.scenarios.sampler import sample_theta as nominal_theta
 
 def sample_theta(rng: np.random.Generator, d: date) -> dict:
     t = nominal_theta(rng)
-    t["demand"] = 0.9
+    t["demand"] = 1.05
     t["concentration_calls"] = 104.0
     t["concentration_zips"] = 3.0
     t["urgent_share"] = 1.153
