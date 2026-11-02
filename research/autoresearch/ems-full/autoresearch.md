@@ -93,3 +93,7 @@ Next: push further down the imitate axis (10 -> 3); iter 22 starts with gen data
 Gen data/full/it22 first (seed 22, 50 days, 201642 decisions, 1816 labels, 643 s wall, $0.1860): required by rule (b) after the iter-21 keep. One change: imitate 10 -> 3. Train on the latest 8-dir window, it07 dropping out ($0.0779, masked 5451, loss 5.99 -> 5.74, 45.1 GPU s).
 Result 1.0286 vs best 1.0337: less imitation keeps winning (100 -> 1.0378, 30 -> 1.0344, 10 -> 1.0337, 3 -> 1.0286), no drift yet (held 0.319 vs b1 0.318, divert 0.136 vs 0.134, t1p90 21.60 vs 21.55). The gate (not the imitate level) now carries the b1 anchoring. pytest 141 passed + name guard clean before the kept commit.
 Next: imitate 3 -> 1; iter 23 starts with gen data/full/it23 (rule (b): iter-22 keep; it08 drops out).
+
+## Iter 23 (revert, 1.0416)
+Gen data/full/it23 first (seed 23, 50 days, 199117 decisions, 1761 labels, 573 s wall, $0.1548): required by rule (b) after the iter-22 keep. One change: imitate 3 -> 1. Train on the latest 8-dir window, it08 dropping out ($0.0685, masked 5495, loss 3.93 -> 3.83, 37.8 GPU s).
+Result 1.0416 vs best 1.0286: near-pure label-following drifts (held 0.325 vs b1 0.318, divert 0.138 vs 0.134). Imitate sweep is U-shaped with minimum near 3: 100 -> 1.0378, 30 -> 1.0344, 10 -> 1.0337, 3 -> 1.0286 (kept), 1 -> 1.0416. Reverted. Next: gate_k 25 -> 10 (sharper imitation decay above the gate) on the reused window.
