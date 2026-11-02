@@ -1,0 +1,8 @@
+iter12: Amendment-1 gen (condition a: 3 Amendment-1 dirs <4) on best-kept (iter7, 0.9971). FIRST iteration under Amendment 2 (in-script strip; deployed app probe-verified unstripped).
+gen: modal-python -m emslearn.cli gen --candidate experiments/ar/ems_candidate.py --out data/blue-only/it12 --n 50 --seed 12 --label-rate 0.0093 --label-cap 40 --window 10800
+{"out": "data/blue-only/it12", "days": 50, "decisions": 215274, "labelled": 1787, "seconds": 648.5}
+change: ems_train.py drop_hold_labels (mirrors emslearn.shards.drop_hold_labels; unit-verified locally 3/5 labelled); train --args {"imitate": 100} on it09,it10,it11,it12
+window sums (gen-reported, pre-strip): 874712 decisions / 7393 labelled; post-strip labelled line lost to tail truncation (capture full stdout from iter 13)
+train: loss ~41.0 at imitate-100 scale, epochs 11-19 flat 40.92-41.00
+{"saved": "experiments/ar/ems_candidate.npz", "gpu_seconds": 48.4, "seconds": 53.6}
+bench: RC=0 wall 87s METRIC ratio_b1=1.0056 (unit labels + imitate 100: nearer b1 than iter10 1.0084 but still short of iter7 0.9971; hold labels were not the whole poison)
