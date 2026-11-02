@@ -9,9 +9,19 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import numpy as np
+
 from emslearn.policy import LearnedPolicy
 
 
 class Candidate(LearnedPolicy):
     name = "candidate"
     weights_path = Path(__file__).with_suffix(".npz")
+
+    def score(self, x: np.ndarray) -> np.ndarray:
+        s = super().score(x)
+        tier3 = x[:, 5] > 0
+        idle_n = x[:, 8] * 100.0
+        hold = x[:, 11] > 0
+        give_hold = tier3 & (idle_n < 3)
+        return np.where(hold & give_hold, 1e9, s)
