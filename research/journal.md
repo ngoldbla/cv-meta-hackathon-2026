@@ -150,3 +150,8 @@
 - **What was tried:** tuned the hold rule on the nominal pool (iters 7-8: idle<5 kept at 0.8208, idle<8 reverted), then on the concentrated-surge pool after red #2 kept (iters 10-11: idle<6/idle<4 both reverted, idle<5 stands; iter 12: tier-2 hold when idle<2 kept at 0.8533; iter 14: tier-2 idle<3 kept at 0.8459). Iter 13 ran ES on top of the hold rule inside the Amendment 1 envelope (pairs 8, days 24, gens 7 = 2,856 scenario-days, seed 13). Red #3 (demand 1.25 under concentrated surge) reverted at 717.07 vs 870.87.
 - **What happened:** hand-coded hold refinements keep winning (best 0.8459); envelope ES reverted (0.8668) — 24-day pools are noisy and the linear scorer sees few live dims. One transcription error (iter 14's logged commit SHA) fixed by follow-up commit. Red pool unchanged since #2, so no blue rebaseline was needed.
 - **Next:** keep climbing the hold-rule gradient (tier-2 idle<4, waited escape), retry small-step ES on top of the rule, red #4 after blue 16.
+
+## 2026-11-02: ems-no-cf blue iters 15-20, red iter 4 (task 017)
+- **What was tried:** tier-2 hold idle<4 kept (0.8342), idle<5 reverted (0.8417, over-holding). Red #4 kept max urgent share (regret 916.32); blue #17 rebaselined (0.8375). Tier-3 idle<6 reverted again on the new pool (0.8500); a 10-min waited escape on the tier-3 hold reverted at near-tie (0.8382 vs 0.8375). Fine envelope ES on the rule (sigma 0.02, lr 0.01, seed 20) reverted (0.8732).
+- **What happened:** the hold rule (tier-3 idle<5, tier-2 idle<4) is a stable optimum; both coarser and finer ES fail to improve the linear weights underneath it. Best is 0.8375 on the urgent-heavy pool.
+- **Next:** red #5, then probe new rule dimensions (queue-gated hold, same-borough preference) or accept the plateau.
