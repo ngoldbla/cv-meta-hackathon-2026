@@ -54,3 +54,8 @@ Result 1.0088 vs best 1.0015: gate 10 opens too far and drifts (held 0.313 vs 0.
 
 ## Iter 13 (rebaseline, 1.0020)
 Red #3 kept (busiest-days attack, regret 1520.87), so the pool changed (pool_key 3ec06df3526a27f0 -> 834c832309563aa9). Best candidate unchanged (iter-11 gate-25 weights): candidate primary 33928.7 vs b1 33860.7 on the much harder pool (b1 was 27674.6 on the old pool). New best is 1.0020. Held 0.344 vs b1 0.347, divert 0.150 vs 0.150, t1p90 21.47 vs 22.01 min. Next: blue iters 14+ continue from the iter-11 weights; gen rule (c) is now true (red kept since last gen), so iter 14 starts with gen data/full/it14 (seed 14).
+
+## Iter 14 (KEEP, 0.9989 - beats b1 on the new pool)
+Gen data/full/it14 first (seed 14, 50 days, 210153 decisions, 1858 labels, 626 s wall, $0.1876): required by rule (c) since red #3 changed the pool; rolls out the iter-11 keep on the busiest-days pool (more decisions/day than it10/12, as expected). No .py change: gate-25 recipe retrained on the 6-dir window it06+it07+it08+it10+it12+it14 ($0.0632, masked 4256/10584 = 40.2%, gains p50/p75/p90/p99 = 33/94/198/467, loss 23.81 -> 19.17, 33.7 GPU s).
+Result 0.9989 vs best 1.0020: fresh on-pool data + the kept recipe beats b1 by 0.11% (candidate 33824.8 vs b1 33860.7; held 0.343 vs 0.347, divert 0.150 vs 0.150, t1p90 21.53 vs 22.01). pytest 141 passed + name guard clean before the kept commit.
+Next: recipe tweaks on the 6-dir window (gen rule (b) is now true too, so iter 15 also starts with a gen - it15; consider gate_k, imitate, tau, or capacity).
