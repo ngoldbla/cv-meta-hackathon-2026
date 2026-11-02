@@ -19,8 +19,8 @@ Amendment-2 keep. Iter 12 (gate 10) reverted at 1.0088. Red iter 3
 (busiest-days attack) kept at regret 1520.87; blue iter 13 rebaselined
 the iter-11 keep at 1.0020 on the new pool. Iter 14 (gate-25 retrain on
 the 6-dir window with fresh on-pool it14) kept at 0.9989, beating b1 on
-the new pool. Iter 15 (wider scorer [128,128]) reverted at 1.0007.
-Arm spend $2.68.
+the new pool. Iter 15 (wider scorer [128,128]) reverted at 1.0007;
+iter 16 (tau 0.5) reverted at 1.0100. Arm spend $2.75.
 
 ## Work done
 - Claimed task 019 on main (`19a1f00 Start task 019`, pushed).
@@ -81,6 +81,8 @@ Arm spend $2.68.
   rule (b)), then hidden [64,64] -> [128,128], trained on the 7-dir
   window (masked 4898/12409; train loss 18.92 beats 19.17 but deploys
   worse). Journal (`e397a8c`, pushed).
+- Blue iter 16 (`facb63c`, pushed): revert 1.0100. No gen (window reused);
+  one change (tau 1.0 -> 0.5), trained on the 7-dir window ($0.0681).
 
 ## Results
 Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`):
@@ -102,6 +104,7 @@ Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`)
 | 13 | rebaseline after red #3 keep (busiest-days library); best unchanged (gate-25 imitation, iter 11) | 1.0020 | rebaseline | 152.0 | - | - |
 | 14 | retrain the kept gate-25 recipe on the 6-dir window incl. fresh on-pool it14 | 0.9989 | keep | 121.0 | data/full/it14 | data/full/it06,data/full/it07,data/full/it08,data/full/it10,data/full/it12,data/full/it14 |
 | 15 | wider scorer ([128,128]) fits the imitation+label mixture better | 1.0007 | revert | 129.0 | data/full/it15 | data/full/it06,data/full/it07,data/full/it08,data/full/it10,data/full/it12,data/full/it14,data/full/it15 |
+| 16 | sharper label targets (tau 1.0 -> 0.5), reused 7-dir window | 1.0100 | revert | 144.0 | reused | data/full/it06,data/full/it07,data/full/it08,data/full/it10,data/full/it12,data/full/it14,data/full/it15 |
 
 Best kept: iter 14's weights (gate-25 recipe, 6-dir window), 0.9989 on
 pool `834c832309563aa9` (commit `355afa4`).
@@ -114,7 +117,7 @@ Red (`research/autoresearch/ems-full-red/autoresearch.jsonl` on `ar/red/ems-full
 | 2 | max offload inflation (1.151) + max geographic concentration (104 calls over 3 zips) on top of iter 1 | 1257.56 | keep | 120.0 |
 | 3 | attack the 200 busiest dev days (library/busy_days.json) with maxed thetas | 1520.87 | keep | 81.0 |
 
-Spend added by this arm: $2.682 (`runs/spend.jsonl` on main). emslearn
+Spend added by this arm: $2.750 (`runs/spend.jsonl` on main). emslearn
 commands in order (pre-Amendment regime, from the blue worktree notes):
 1. `gen` 200 days, `--out data/full/it01`, label_rate 0.05 ($0.6958);
 2. `train --data data/full/it01` x4, one per iter 1-4 ($0.0971, $0.0591,
@@ -150,7 +153,8 @@ worktree notes:
 16. `train` on the 6-dir window incl. it14 ($0.0632; iter 14 keep);
 17. `gen --n 25 --n-gen 25 --seed 15 --out data/full/it15` with the
     Amendment-1 label flags ($0.1970; rolls out the iter-14 keep);
-18. `train` on the 7-dir window incl. it15 ($0.0883; iter 15, [128,128]).
+18. `train` on the 7-dir window incl. it15 ($0.0883; iter 15, [128,128]);
+19. `train` on the same 7-dir window ($0.0681; iter 16, tau 0.5).
 
 ## Deviations
 - Iters 1-4 ran before Amendment 1 (21:14-21:39 CDT vs amendment 21:44 CDT),
