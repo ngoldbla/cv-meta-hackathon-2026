@@ -1,0 +1,182 @@
+<title>EMS Surge Takeaways</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a one-column closing brief, same family as the status brief. Verdict first, then findings, method lessons, limits. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --ink: #17212c; --muted: #56616e; --rule: #d9dde3; --chip: #eef0f3;
+  --accent: #a8281f; --good: #2c6e49; --mid: #b06a00; --weak: #7a3e9d; --null: #5b6673;
+  --display: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --body: "Barlow", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161c; --surface: #1a2129; --ink: #e6e9ed; --muted: #9aa4af; --rule: #2c3540; --chip: #232c36;
+    --accent: #e0645a; --good: #5fb784; --mid: #e3a23c; --weak: #c08ae0; --null: #9aa4af; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161c; --surface: #1a2129; --ink: #e6e9ed; --muted: #9aa4af; --rule: #2c3540; --chip: #232c36;
+  --accent: #e0645a; --good: #5fb784; --mid: #e3a23c; --weak: #c08ae0; --null: #9aa4af; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 17px/1.55 var(--body); margin: 0; padding-inline: 16px; padding-block: 32px 64px; }
+main { max-width: 800px; margin: 0 auto; display: grid; gap: 40px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; line-height: 1.1; text-wrap: balance; }
+h1 { font-size: 2.4rem; font-weight: 700; }
+h2 { font-size: 1.6rem; font-weight: 600; padding-bottom: 6px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 1.2rem; font-weight: 600; }
+p { margin: 0; max-width: 68ch; }
+ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+section { display: grid; gap: 16px; }
+.eyebrow { font: 500 .78rem/1 var(--mono); text-transform: uppercase; letter-spacing: .12em; color: var(--accent); }
+.lede { color: var(--muted); font-size: 1.05rem; }
+.note { color: var(--muted); font-size: .92rem; }
+
+.verdict { background: var(--surface); border: 1px solid var(--rule); border-left: 6px solid var(--good); padding: 18px 20px; display: grid; gap: 10px; }
+.verdict p { font-size: 1.1rem; }
+
+.strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+.cell { background: var(--surface); padding: 12px 14px; display: grid; gap: 4px; min-width: 0; }
+.cell .k { font: 500 .72rem/1.2 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.cell .v { font: 600 1.35rem/1.15 var(--display); font-variant-numeric: tabular-nums; }
+.cell .s { font-size: .85rem; color: var(--muted); }
+
+.finding { background: var(--surface); border: 1px solid var(--rule); border-left: 5px solid var(--c); padding: 14px 18px; display: grid; gap: 8px; }
+.finding .tag { font: 500 .72rem/1.2 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--c); }
+.f-good { --c: var(--good); } .f-mid { --c: var(--mid); } .f-bad { --c: var(--accent); } .f-weak { --c: var(--weak); }
+
+.wrap { overflow-x: auto; border: 1px solid var(--rule); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: .95rem; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font: 500 .72rem/1.2 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+tr:last-child td { border-bottom: 0; }
+td.n { font: 600 1.05rem/1.2 var(--display); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.better { color: var(--good); } .worse { color: var(--accent); }
+
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.two > div { background: var(--surface); border: 1px solid var(--rule); padding: 14px 16px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.who { font: 500 .72rem/1.2 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+footer { font-size: .85rem; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 12px; }
+</style>
+
+<main>
+  <header style="display:grid;gap:10px">
+    <span class="eyebrow">NYC EMS surge dispatch · closing brief · 2026-11-02</span>
+    <h1>EMS Surge Takeaways</h1>
+    <p class="lede">This brief gives the main results of the project, the lessons about the method, and the limits of the results.</p>
+  </header>
+
+  <section aria-labelledby="verdict">
+    <h2 id="verdict">The short answer</h2>
+    <div class="verdict">
+      <p>The loops found one strong idea: <strong>during a surge, hold a new low-priority call for a short time when few ambulances are free.</strong> In the simulator, this rule cut lateness by about a quarter on busy days. It did not use more ambulances.</p>
+      <p>The learned model did not beat the standard rules. The useful result is a rule that a person can read.</p>
+      <p>No sealed test has run. All results come from development days in a simulator.</p>
+    </div>
+    <div class="strip">
+      <div class="cell"><span class="k">Best policy, fresh days</span><span class="v">26% less</span><span class="s">lateness than b1</span></div>
+      <div class="cell"><span class="k">Tier-1, 90th percentile</span><span class="v">16.7 → 12.5 min</span><span class="s">response time</span></div>
+      <div class="cell"><span class="k">Extra ambulance-hours</span><span class="v">493 → 495</span><span class="s">almost no change</span></div>
+      <div class="cell"><span class="k">Cloud cost</span><span class="v">$21.34</span><span class="s">of $200</span></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="results">
+    <h2 id="results">What we found</h2>
+
+    <div class="finding f-good">
+      <span class="tag">Finding 1 · the main result</span>
+      <h3>A short hold during a surge keeps ambulances free for urgent calls</h3>
+      <p>Two loops found the rule separately. Each holds a tier-2 or tier-3 call for a few minutes when few ambulances are free and the call is new. We tested both final policies on 200 new development days. No loop used these days during its search.</p>
+      <div class="wrap">
+        <table>
+          <thead><tr><th>Policy</th><th>Lateness vs b1</th><th>Tier-1 lateness</th><th>Tier-2 lateness</th><th>Tier-3 lateness</th></tr></thead>
+          <tbody>
+            <tr><td>b1 (standard surge rules)</td><td class="n">1.00</td><td class="n">72</td><td class="n">260</td><td class="n">10,538</td></tr>
+            <tr><td>BLUE_ONLY final</td><td class="n better">0.74</td><td class="n better">32</td><td class="n better">54</td><td class="n better">8,402</td></tr>
+            <tr><td>NO_CF final</td><td class="n better">0.80</td><td class="n better">30</td><td class="n better">62</td><td class="n better">9,040</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Tier lateness is the mean number of minutes late per day, past each target (15, 40 and 120 minutes). All three tiers get better. The policy does not move lateness from urgent calls to other calls.</p>
+    </div>
+
+    <div class="finding f-mid">
+      <span class="tag">Finding 2 · the limit</span>
+      <h3>The rule helps on busy days, and it can cause harm on calm days</h3>
+      <div class="wrap">
+        <table>
+          <thead><tr><th>Days, by load</th><th>BLUE_ONLY</th><th>NO_CF</th></tr></thead>
+          <tbody>
+            <tr><td>Calmest 25%</td><td class="n worse">6–12% worse</td><td class="n">about the same</td></tr>
+            <tr><td>25–50%</td><td class="n">about the same</td><td class="n better">up to 6% better</td></tr>
+            <tr><td>50–75%</td><td class="n better">27–30% better</td><td class="n better">20–25% better</td></tr>
+            <tr><td>Busiest 25%</td><td class="n better">29–33% better</td><td class="n better">20–24% better</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Thus, a service must use the rule only during a surge. On calm days, use the standard rules. NO_CF uses only rules, and it is the safer of the two.</p>
+    </div>
+
+    <div class="finding f-bad">
+      <span class="tag">Finding 3 · a negative result</span>
+      <h3>The learned model did not beat the standard rules</h3>
+      <p>FULL used the full learning method. On fresh days it was 1.8% worse than b1. The learned part of BLUE_ONLY added only about 1% to its hold rule. NO_CF did not keep any learned weights, because each training attempt gave a worse score than its rules.</p>
+    </div>
+
+    <div class="finding f-good">
+      <span class="tag">Finding 4 · the red loop worked</span>
+      <h3>The attack loop found the weak points of the learned policy</h3>
+      <p>FULL's red loop kept 6 changes that made the test days harder. After each change, FULL lost ground on the new days, up to 9.8% worse than b1. This shows the purpose of the red loop: it stops a weak policy from looking strong.</p>
+    </div>
+
+    <div class="finding f-weak">
+      <span class="tag">Finding 5 · defects we found and fixed</span>
+      <h3>The training data had three defects</h3>
+      <ul>
+        <li>A GPU training job waited 31 minutes for 26 seconds of work. Container limits fixed this.</li>
+        <li>All training labels came from midnight to 8 a.m. The busy hours had no labels. We fixed the label rate.</li>
+        <li>The labels for "hold this call" agreed with a full-day check in only 18 of 40 cases. That is the same as chance. We removed them.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section aria-labelledby="method">
+    <h2 id="method">Lessons about the method</h2>
+    <ul>
+      <li><strong>A frozen judge works.</strong> No loop could change the simulator or the score. All eight audits found 0 problems.</li>
+      <li><strong>Test the best score on new days.</strong> A loop keeps its best of 40 tries, so luck can inflate its score. Here the scores held on new days.</li>
+      <li><strong>Examine the labels before you train on them.</strong> Two of the three defects were in the labels. The loops could not see these defects.</li>
+      <li><strong>Give every arm the same actions.</strong> The READABLE arm had no "hold" action. Thus, the comparison of readable rules with learned rules was not fair.</li>
+      <li><strong>Make the pass rule fit the policy.</strong> The registered rule needs 5% less lateness on all pools, which includes normal days. A surge rule gives no gain on normal days, so it cannot pass. A better rule is a gain on surge days and no harm on normal days.</li>
+      <li><strong>Keep the agent's instructions in task files.</strong> The task files gave a clear record of each change. One script error deleted part of two task files. We restored them from the history.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="who">
+    <h2 id="who">What this means</h2>
+    <div class="two">
+      <div><span class="who">People who call for help</span>
+        <p>In the simulator, ambulances reach critical patients about 4 minutes sooner at the 90th percentile during a surge. No real patient has received this benefit. A live test is necessary first.</p></div>
+      <div><span class="who">People who run the service</span>
+        <p>The idea is cheap and readable. It needs no model and no GPU. Before use, clinical staff must review it, because a hold makes a low-priority patient wait. A good first test is advice only: the rule suggests a hold, and the dispatcher decides.</p></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="limits">
+    <h2 id="limits">Limits</h2>
+    <ul>
+      <li>The sealed tests (Omicron, COVID wave 1, normal 2016 days and the stress pool) did not run. No claim is supported or rejected. The sealed data stays sealed and is available for a later test.</li>
+      <li>All results come from a simulator of NYC, 2017 to 2019. It matched 7 of 10 real-world checks.</li>
+      <li>The score counts minutes late. It does not count deaths or hospital results.</li>
+      <li>The hold rule came from the loops' search. A new, pre-registered test must confirm it.</li>
+    </ul>
+    <p class="note">If the work continues, register one claim for a surge-only hold rule: 5% less lateness on the surge pools and no more than 2% more on normal days. Then run the sealed test one time.</p>
+  </section>
+
+  <footer>Written in ASD-STE100 Simplified Technical English. Sources: the loop logs and reports for tasks 016–019, the pre-M6 re-check (research/m6/recheck.json), ledger entry 20, and the Modal spend log.</footer>
+</main>
