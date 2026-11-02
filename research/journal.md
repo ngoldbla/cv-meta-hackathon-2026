@@ -165,3 +165,8 @@
 - **What was tried:** blue hyps 21-25 (log iters 23-28): gate 3->2, proactive-on-gated-base, proactive 1.5->2.0, 1.5->1.25, proactive 1.5->2.0 retune on the new pool; red #4 (conc max) kept at 733.52, #5 (unavailable on conc) reverted at 697.27, #6 (urgent on conc) kept at 785.82.
 - **What happened:** hyp 22 KEPT at 0.9944 (proactive stacks with the gate); the rest reverted (0.9973, 1.0106, 1.0117, 1.0125). Proactive ratio brackets sharply at 1.5. Red #4 and #6 keeps moved the blue pool twice (rebaselines #22 at 0.9965, #27 at 1.0037): the urgent+conc pool punishes the gated+proactive candidate, which now trails b1.
 - **Next:** blue hyps 26-30 adapt to the urgent+conc pool (ablations, gate retune), then red #7.
+
+## 2026-11-01: ems-readable blue hyps 26-30 + red #7 (task 018, arm READABLE)
+- **What was tried:** blue hyps 26-30 (log iters 29-33): queue-aware retry, proactive ablation (gate-only), gate 3->2, narrower coverage 360s, volume-gated early activation; red #7 (offload on corner) reverted at 623.58.
+- **What happened:** hyps 27 and 28 KEPT (0.9985, 0.9974): on the urgent+conc pool, proactive activation hurts (over-fires on spikes) and the looser gate-2 wins. Queue-aware (1.0169), coverage-360 (0.9995) and early-activation (1.0047) reverted. Best is now gate-only at 2 idle, 1/20 constants. Red #7 reverted; pool unchanged.
+- **Next:** blue hyps 31-32, then red #8 (triple corner, pick_days).
