@@ -10,7 +10,9 @@ itself, two SIGTERM-stopped, single-writer verified) and the log repaired to the
 (`e86289e`, `ar_check` clean). Iters 1-5: listwise labels drag off b1 at imitate 0.1-100, pure imitation
 keeps 0.9997. Iters 6-8 (previous session, pre-Amendment): no-hold reverts (1.0010, holds net-helpful),
 400-day imitation KEEPS 0.9971 (best), 800-day imitation reverts (1.0024, late-epoch training divergence).
-Best: 0.9971 (`69b357f`). Amendment 1 applies from iter 9.
+Iter 9 (first under Amendment 1): whole-day labels verified (hours 0.56-23.45, 87.5% non-zero deltas) and
+train wait ~5 s, but labels + imitate 0.1 still catastrophically off b1 (4.5756, divert-happy). Coverage
+was not the problem: the 3 h-window labels are adversarial to the day objective. Best: 0.9971 (`69b357f`).
 
 ## Work done
 - Claimed task 016 on main (`ec9da1a Start task 016`, pushed).
@@ -45,18 +47,24 @@ Best: 0.9971 (`69b357f`). Amendment 1 applies from iter 9.
 - Cutover to Amendment 1: previous session SIGTERM-stopped at the iter-8 boundary per the pace plan;
   single-writer re-verified (no 016 processes, branch tip stable at `bbaae5a`). Modal caps confirmed
   deployed (40/56/3). This session resumes at iter 9 under Amendment 1.
+- Iter 9 (`d6e3547`, pushed): Amendment-1 gen `it09` (condition a; 50 days, 212,812 decisions, 1,843
+  labels, 471.8 s - the known slow case, FULL genning simultaneously). Label span verified on shard
+  00000: 40 labels at hours 0.56-23.45, per-6h [6,3,20,11,0], 87.5% non-zero deltas. Train on `it09`
+  (defaults): wall 28.6 s, gpu 23.7 s (wait ~5 s, gate 60 s). Bench REVERTS at 4.5756 (591 s wall,
+  near the 600 s gate): whole-day labels still teach divert-happy (divert 0.287 vs b1 0.050).
 
 ## Results
-| iter | hypothesis | value | decision | seconds |
-| 0 | baseline - learned candidate with no weights is exactly b1 | 1.0000 | baseline | 117.0 |
-| 1 | listwise labels + imitate 0.1 | 2.6947 | revert | 248.0 |
-| 2 | imitate 1.0 | 2.1217 | revert | 267.0 |
-| 3 | imitate 10.0 | 1.4347 | revert | 144.0 |
-| 4 | imitate 100.0 | 1.0722 | revert | 175.0 |
-| 5 | pure imitation loc01 | 0.9997 | keep | 72.0 |
-| 6 | no-hold options with kept weights | 1.0010 | revert | 203.0 |
-| 7 | 400d imitation (loc01+loc02) | 0.9971 | keep | 140.0 |
-| 8 | 800d imitation (loc01-04) | 1.0024 | revert | 75.0 |
+| iter | hypothesis | value | decision | seconds | gen | train window |
+| 0 | baseline - learned candidate with no weights is exactly b1 | 1.0000 | baseline | 117.0 | - | - |
+| 1 | listwise labels + imitate 0.1 | 2.6947 | revert | 248.0 | it02 | it02 |
+| 2 | imitate 1.0 | 2.1217 | revert | 267.0 | reused | it02 |
+| 3 | imitate 10.0 | 1.4347 | revert | 144.0 | reused | it02 |
+| 4 | imitate 100.0 | 1.0722 | revert | 175.0 | reused | it02 |
+| 5 | pure imitation loc01 | 0.9997 | keep | 72.0 | loc01 | loc01 |
+| 6 | no-hold options with kept weights | 1.0010 | revert | 203.0 | - | - |
+| 7 | 400d imitation (loc01+loc02) | 0.9971 | keep | 140.0 | loc02 | loc01,loc02 |
+| 8 | 800d imitation (loc01-04) | 1.0024 | revert | 75.0 | loc03,loc04 | loc01-loc04 |
+| 9 | whole-day labels + imitate 0.1 | 4.5756 | revert | 591.0 | it09 | it09 |
 
 Values from `research/autoresearch/ems-blue-only/autoresearch.jsonl` on `ar/blue/ems-blue-only`.
 Best kept: 0.9971 (iter 7, `69b357f`).
@@ -68,11 +76,14 @@ Best kept: 0.9971 (iter 7, `69b357f`).
 - Training venue: local RTX 5060 Ti from iter 3 on (same `ems_train.py`/args/data as the Modal H100 path;
   Modal queue was 31 min for iter 2's train vs 26 s local). Gens stay on Modal (labelled) or local CPU
   (unlabelled). The benchmark is unchanged (local CPU sim), so the metric is unaffected by venue.
+- From iter 9 (Amendment 1): venue back on Modal for labelled gen + train (caps deployed, train wait ~5 s).
 - `emslearn` commands used, in order: `gen --out data/blue-only/it02 --n 200 --seed 1 --label-rate 0.05`
   (iter 1); `train --script ems_train.py --data data/blue-only/it02 --save ems_candidate.npz` x2
   (iters 1-2, Modal). Local from iter 3: same train script/args on downloaded `it02` shards; local gen
   `loc01` (`--n 200 --seed 2 --label-rate 0`) for iter 5; local `loc02` (seed 3) for iter 7, `loc03`
-  (seed 4) + `loc04` (seed 5) for iter 8. Iters 6-8 added no Modal spend.
+  (seed 4) + `loc04` (seed 5) for iter 8. Iters 6-8 added no Modal spend. Iter 9: `gen --out
+  data/blue-only/it09 --n 50 --seed 9 --label-rate 0.0093 --label-cap 40 --window 10800`; `train --script
+  experiments/ar/ems_train.py --data data/blue-only/it09 --save experiments/ar/ems_candidate.npz --args {}`.
 
 ## Blocked / questions
 (none currently)
