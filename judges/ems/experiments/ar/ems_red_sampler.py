@@ -14,6 +14,9 @@ reward the oracle's foresight positioning over b1's static map.
 (Red it5 reverted: unavailable on conc max, 697.27 < 733.52.)
 Red it6: urgent_share at ceiling (1.153) on top of conc max (it2's ceiling
 alone reverted at 516.20, but the combination with concentration is untested).
+(Red it7 reverted: offload on the corner, 623.58 < 785.82.)
+Red it8: unavailable at ceiling (0.25) on the full corner (it5's pair with
+conc reverted, but the triple with urgent added is untested).
 """
 
 from __future__ import annotations
@@ -31,6 +34,7 @@ def sample_theta(rng: np.random.Generator, d: date) -> dict:
     t["concentration_calls"] = 104.0
     t["concentration_zips"] = 3.0
     t["urgent_share"] = 1.153
+    t["unavailable"] = 0.25
     return t
 
 
