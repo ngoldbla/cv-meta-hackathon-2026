@@ -155,3 +155,8 @@
 - **What was tried:** blue hyps 11-15 (log iters 12-16): prefer settled units in assignment, fixed MEXCLP busy-p 0.5, queue-aware positioning (QUEUE_W=1.0), activate_n 3->2, next-hour demand positioning; red #3 added unavailable=0.25 to the demand floor.
 - **What happened:** all blue reverted (1.2797, 1.0054, 1.0021, 1.0396, 1.0166); best stays b1 at 1.0000. Preferring settled units hurt badly (1.28): assigning relocating units is load-bearing. activate_n is now bracketed at 3 (2 -> +4.0%, 4 -> +2.4%). Red #3 reverted (579.82 < 650.56); pool unchanged.
 - **Next:** blue hyps 16-20 (divert-mix condition, demand-uniform blend, activation scaling, relocation idle-gate), then red #4.
+
+## 2026-11-01: ems-readable blue hyps 16-20, first keep (task 018, arm READABLE)
+- **What was tried:** blue hyps 16-20 (log iters 17-21): queue-scaled activation, coverage-preserving assignment, demand-uniform blend 0.7/0.3, relocation idle-gate (MIN_IDLE_RELOC=3), gate tightened to 5.
+- **What happened:** hyp 19 KEPT at 0.9990 (guards clean): skipping relocation with fewer than 3 idle beats b1. The rest reverted (1.2887, 1.0188, 1.0175, 0.9995). Scheduling note: red #4/#5 are owed after hyps 16 and 20 (I ran hyps 13-20 straight); both run next, against the kept candidate, before blue hyp 21.
+- **Next:** red #4 + #5 catch-up, then blue hyps 21-24.
