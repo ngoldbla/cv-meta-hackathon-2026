@@ -53,3 +53,6 @@ The task body: goal, parts, stop condition, and what to report.
 - **Commits:** per `AGENTS.md`, authored by the repository author with an `Assisted-by: agent` trailer.
   - Before pushing, run `git pull --no-rebase`.
   - Never force-push.
+
+## Archived programs
+- **EMS surge dispatch** (tasks 007-021): archived 2026-11-02 at branch `archive/ems-surge-2026-11` and tag `ems-archive-2026-11-02` (`63cde9a`). M6 sealed run: EMS1-EMS5 all null (ledger seq 22-26). Its files stay on `main` read-only. New tasks must not change `judges/ems/`, `research/m6/` or the EMS pre-registrations.
