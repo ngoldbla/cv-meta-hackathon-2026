@@ -38,7 +38,8 @@ iter 29 rebaselined at 1.0976 on the new pool. Iter 30 (imitate-3
 retrain with fresh it30) kept at 1.0451; iter 31 (same with it31)
 reverted at 1.0478 and iter 32 (imitate 5) reverted at 1.0497.
 Red iter 8 (re-mined top-200 vs the iter-30 keep) reverted at 4575.37:
-pool unchanged. Arm spend $5.39.
+pool unchanged. Iter 33 (fine-tune from best) reverted at 1.0502.
+Arm spend $5.46.
 
 ## Work done
 - Claimed task 019 on main (`19a1f00 Start task 019`, pushed).
@@ -188,6 +189,10 @@ pool unchanged. Arm spend $5.39.
   vs the iter-30 keep (mean 1542.87, top day 9164.05; committed as
   `library/regret_days_8.json`) and attacked its top 200: mining
   plateaus (4617.18 best stands). Pool unchanged.
+- Blue iter 33 (`c03c6e2`, pushed): revert 1.0502. No gen (window reused);
+  one change (fine-tune procedure: `--init` loader + lr 1e-3, training
+  from the iter-30 best), trained on the latest-8 window ($0.0697):
+  warm start underperforms from-scratch noise.
 
 ## Results
 Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`):
@@ -226,6 +231,7 @@ Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`)
 | 30 | retrain the kept imitate-3 recipe on the latest-8 window incl. fresh on-pool it30 | 1.0451 | keep | 110.0 | data/full/it30 | data/full/it18,data/full/it19,data/full/it22,data/full/it23,data/full/it26,data/full/it27,data/full/it28,data/full/it30 |
 | 31 | retrain the kept imitate-3 recipe on the latest-8 window incl. fresh on-pool it31 | 1.0478 | revert | 108.0 | data/full/it31 | data/full/it19,data/full/it22,data/full/it23,data/full/it26,data/full/it27,data/full/it28,data/full/it30,data/full/it31 |
 | 32 | fine-grained imitate probe (3 -> 5), reused window | 1.0497 | revert | 111.0 | reused | data/full/it19,data/full/it22,data/full/it23,data/full/it26,data/full/it27,data/full/it28,data/full/it30,data/full/it31 |
+| 33 | fine-tune from best weights (--init loader + lr 1e-3), reused window | 1.0502 | revert | 105.0 | reused | data/full/it19,data/full/it22,data/full/it23,data/full/it26,data/full/it27,data/full/it28,data/full/it30,data/full/it31 |
 
 Best kept: iter 30's weights (imitate-3 recipe), 1.0451 on pool
 `4c088d562472f880` (commit `81de581`).
@@ -243,7 +249,7 @@ Red (`research/autoresearch/ems-full-red/autoresearch.jsonl` on `ar/red/ems-full
 | 7 | re-mine the top-200 regret days vs the iter-27 keep (library/regret_days_7.json) | 4617.18 | keep | 76.0 |
 | 8 | re-mine the top-200 regret days vs the iter-30 keep (library/regret_days_8.json) | 4575.37 | revert | 74.0 |
 
-Spend added by this arm: $5.389 (`runs/spend.jsonl` on main). emslearn
+Spend added by this arm: $5.459 (`runs/spend.jsonl` on main). emslearn
 commands in order (pre-Amendment regime, from the blue worktree notes):
 1. `gen` 200 days, `--out data/full/it01`, label_rate 0.05 ($0.6958);
 2. `train --data data/full/it01` x4, one per iter 1-4 ($0.0971, $0.0591,
@@ -311,7 +317,8 @@ worktree notes:
 39. `gen --n 25 --n-gen 25 --seed 31 --out data/full/it31` with the
     Amendment-1 label flags ($0.1577; rolls out the iter-30 keep);
 40. `train` on the latest 8-dir window, it18 dropped ($0.0745; iter 31);
-41. `train` on the same window ($0.0860; iter 32, imitate 5).
+41. `train` on the same window ($0.0860; iter 32, imitate 5);
+42. `train` on the same window ($0.0697; iter 33, fine-tune).
 
 ## Deviations
 - Iters 1-4 ran before Amendment 1 (21:14-21:39 CDT vs amendment 21:44 CDT),
