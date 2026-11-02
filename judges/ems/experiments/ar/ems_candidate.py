@@ -5,6 +5,8 @@ added (1/20): MIN_IDLE_RELOC = 2 (skip the hourly relocation pass when fewer
 than 2 units are idle; thin fleets should stay put instead of churning).
 (Hyp 27 ablation: proactive activation removed to test whether it hurts on
 the urgent+conc pool.)
+Hyp 39: RELOC_S = 1800.0 (relocate every half hour instead of hourly, still
+gated on >= MIN_IDLE_RELOC idle). (2/20 constants if kept.)
 """
 
 from __future__ import annotations
@@ -16,6 +18,7 @@ from ems.policy.classical import Classical
 from ems.sim.calib import BOROUGHS
 
 MIN_IDLE_RELOC = 2
+RELOC_S = 1800.0
 
 
 class Candidate(Classical):
@@ -38,8 +41,9 @@ class Candidate(Classical):
             if q >= self.params["activate_queue"] and obs.budget_unit_hours > 0 and (b, obs.hour) not in self.activated:
                 self.activated.add((b, obs.hour))
                 acts.append(Activate(b, int(self.params["activate_n"])))
-        if obs.hour != self.last_hour and len(idle) >= MIN_IDLE_RELOC:
-            self.last_hour = obs.hour
+        bucket = int(obs.now // RELOC_S)
+        if bucket != getattr(self, "last_reloc_bucket", -1) and len(idle) >= MIN_IDLE_RELOC:
+            self.last_reloc_bucket = bucket
             on = sum(u.on_duty for u in self.sim.units)
             p = min(0.95, max(0.0, 1 - len(obs.idle) / max(on, 1)))
             targets = self.positions(len(idle), self.demand_now(obs), p)
