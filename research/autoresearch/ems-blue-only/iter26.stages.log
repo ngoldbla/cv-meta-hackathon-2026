@@ -1,0 +1,4 @@
+iter26: no gen (11 Amendment-1 dirs exist; best unchanged since it25) - rule change, no training
+change: ems_candidate.py tier-3 threshold 5->6 with tier-2<4 rule in place (interaction check)
+bench: RC=0 wall 93s METRIC ratio_b1=0.8112 (no interaction win; tier-3 peak stays 5)
+decision: REVERT - best stays 0.8016
