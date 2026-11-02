@@ -1,0 +1,6 @@
+iter13: no gen (4 Amendment-1 dirs exist; best unchanged since it12) - reuse window it09,it10,it11,it12
+change: ems_train.py label_w (DEFAULTS 1.0, multiplies the label term); train --args {"label_w": 0} on it09-12 (pure imitation of the iter-7 policy)
+{"decisions": 874712, "labelled": 7393, "options": 17, "features": 12, "load_s": 1.5} (sums exact; labels ignored via label_w 0)
+train: 20 epochs, loss 0.0602 -> 0.0170, healthy, no divergence
+{"saved": "experiments/ar/ems_candidate.npz", "gpu_seconds": 23.3, "seconds": 28.0}
+bench: RC=0 wall 126s METRIC ratio_b1=1.0150 (pure imitation on 875k Modal decisions WORSE than iter11 0.9990 on 659k; more iter-7-policy data did not help - training noise or compounding imitation error)
