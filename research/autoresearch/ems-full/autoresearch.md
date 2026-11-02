@@ -126,3 +126,7 @@ Red #7 kept (re-mined top-200 vs iter-27, regret 4617.18), so the pool changed (
 Gen data/full/it30 first (seed 30, 50 days, 203437 decisions, 1771 labels, 523 s wall, $0.1721): required by rule (c) since red #7 changed the pool. No .py change: imitate-3 recipe retrained on the latest 8-dir window, it15 dropping out ($0.1003, masked 5715, loss 5.90 -> 5.63, 62.3 GPU s).
 Result 1.0451 vs best 1.0976: fresh on-pool data closes half the gap again (candidate 28161.3 vs b1 26947.0; held 0.314 vs 0.313, divert 0.134 vs 0.131, t1p90 21.55 vs 21.30). The post-mining retrain pattern holds for the third time (1.0727->1.0344, 1.0820->1.0523, 1.0976->1.0451). pytest 141 passed + name guard clean before the kept commit.
 Next: iter 31 starts with gen data/full/it31 (rule (b): iter-30 keep; it18 drops out), then retrain unchanged again.
+
+## Iter 31 (revert, 1.0478)
+Gen data/full/it31 first (seed 31, 50 days, 203036 decisions, 1760 labels, 472 s wall, $0.1577): required by rule (b) after the iter-30 keep. No .py change: imitate-3 recipe retrained on the latest 8-dir window, it18 dropping out ($0.0745, masked 5778, loss 5.86 -> 5.60, 42.4 GPU s).
+Result 1.0478 vs best 1.0451: the fresh-data retrain streak breaks - window churn no longer helps; the recipe has converged near 1.045 on this pool. Reverted. Next: fine-grained imitate probe between 3 and 10 (imitate 5) on the reused window.
