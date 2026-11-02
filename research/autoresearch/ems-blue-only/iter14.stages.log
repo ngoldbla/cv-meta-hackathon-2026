@@ -1,0 +1,6 @@
+iter14: no gen (4 Amendment-1 dirs exist; best unchanged since it12) - reuse window it09,it10,it11,it12
+change: ems_train.py label_w (same as iter13); train --args {"label_w": 0, "seed": 1} on it09-12 (pure imitation, seed-1 retry of iter13)
+{"decisions": 874712, "labelled": 7393, "options": 17, "features": 12, "load_s": 2.0} (sums exact; labels ignored)
+train: 20 epochs, loss 0.0599 -> 0.0210, healthy
+{"saved": "experiments/ar/ems_candidate.npz", "gpu_seconds": 24.9, "seconds": 31.4}
+bench: RC=0 wall 110s METRIC ratio_b1=1.0058 (seed-1 retry of iter13 1.0150: better but still above b1; ~1% seed swing dwarfs the 0.3% best-vs-b1 gap)
