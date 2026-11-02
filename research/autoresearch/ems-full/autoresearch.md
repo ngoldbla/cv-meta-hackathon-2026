@@ -134,3 +134,7 @@ Result 1.0478 vs best 1.0451: the fresh-data retrain streak breaks - window chur
 ## Iter 32 (revert, 1.0497)
 No gen (8 A1 dirs, best unchanged since last gen, no red keep since): reused the latest-8 window. One change: imitate 3 -> 5. Train ($0.0860, loss 7.47 -> 7.01, 51.3 GPU s).
 Result 1.0497 vs best 1.0451: imitate 5 lands between 3 and 10 as expected - minimum confirmed near 3, imitate axis exhausted. Recipe fully converged at (imitate 3, gate 25/25, tau 1.0, gain_min 0.5). Red iter 8 is due now (after blue iter 32).
+
+## Iter 33 (revert, 1.0502)
+No gen (8 A1 dirs, best unchanged since last gen, red 8 reverted): reused the latest-8 window. One coherent change: fine-tune procedure - ems_train.py learns to load --init weights (plumbing existed in CLI/Modal but the script ignored the flag) plus lr 3e-3 -> 1e-3, training from the iter-30 best ($0.0697, loss starts 5.60 vs 5.9 from scratch, ends 5.57, 38.7 GPU s).
+Result 1.0502 vs best 1.0451: warm start converges to a nearby but slightly worse optimum - from-scratch noise helps. Reverted (loader code removed with the revert; re-add if warm-start is revisited). Next: ablate the bundle - lr 1e-3 from scratch (no --init) on the reused window.
