@@ -44,6 +44,7 @@ iter 34 (lr 1e-3 from scratch) reverted at 1.0531; iter 35 (gain_min
 1.0636. Red iter 9 (joint day x theta-variant mining) reverted at
 4533.96: pool unchanged. Iter 37 (never-hold ablation) KEPT at 1.0370.
 Iter 38 (K=8 options) reverted at 1.0397.
+Iter 39 (K=24 options) reverted at 1.0408.
 Arm spend $5.68.
 
 ## Work done
@@ -228,6 +229,10 @@ Arm spend $5.68.
   (no gen/train): restrict options to the 8 nearest units with hold
   still masked. Narrower choice hurts: the learned unit choice among
   16 adds value; only the holds were harmful.
+- Blue iter 39 (`7df289e`, pushed): revert 1.0408. Deployment-only change
+  (no gen/train): widen options to the 24 nearest units with hold
+  still masked. K is U-shaped (8: 1.0397, 16: 1.0370, 24: 1.0408):
+  16 stands.
 
 ## Results
 Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`):
@@ -272,6 +277,7 @@ Blue (`research/autoresearch/ems-full/autoresearch.jsonl` on `ar/blue/ems-full`)
 | 36 | proper low-lr test (lr 1e-3 x 60 epochs), reused window | 1.0636 | revert | 112.0 | reused | data/full/it19,data/full/it22,data/full/it23,data/full/it26,data/full/it27,data/full/it28,data/full/it30,data/full/it31 |
 | 37 | never-hold ablation: mask the hold row in Candidate.score (deployment-only, iter-30 weights) | 1.0370 | keep | 67.8 | - | - |
 | 38 | restrict options to the 8 nearest units (deployment-only, hold still masked) | 1.0397 | revert | 64.7 | - | - |
+| 39 | widen options to the 24 nearest units (deployment-only, hold still masked) | 1.0408 | revert | 71.2 | - | - |
 
 Best kept: iter 30's weights (imitate-3 recipe), 1.0451 on pool
 `4c088d562472f880` (commit `81de581`).
