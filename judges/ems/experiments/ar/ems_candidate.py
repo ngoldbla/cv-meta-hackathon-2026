@@ -24,5 +24,5 @@ class Candidate(LearnedPolicy):
         tier3 = x[:, 5] > 0
         idle_n = x[:, 8] * 100.0
         hold = x[:, 11] > 0
-        give_hold = (tier3 & (idle_n < 5)) | (tier2 & (idle_n < 3))
+        give_hold = (tier3 & (idle_n < 5)) | (tier2 & (idle_n < 4))
         return np.where(hold & give_hold, 1e9, s)
