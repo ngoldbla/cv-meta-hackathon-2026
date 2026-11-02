@@ -8,7 +8,9 @@ Interface (fixed by the frozen red bench and stress-pool builder):
 
 from __future__ import annotations
 
+import json
 from datetime import date
+from pathlib import Path
 
 import numpy as np
 
@@ -28,4 +30,9 @@ def sample_theta(rng: np.random.Generator, d: date) -> dict:
 
 
 def pick_days(rng: np.random.Generator, days: list[date], n: int) -> list[date]:
-    return [days[i] for i in rng.choice(len(days), size=n, replace=n > len(days))]
+    lib = Path(__file__).resolve().parents[4] / "research/autoresearch/ems-full-red/library/busy_days.json"
+    avail = set(days)
+    ranked = [d for d in (date.fromisoformat(x) for x in json.loads(lib.read_text())["dates"]) if d in avail]
+    if len(ranked) >= n:
+        return ranked[:n]
+    return ranked + [days[i] for i in rng.choice(len(days), size=n - len(ranked), replace=True)]
