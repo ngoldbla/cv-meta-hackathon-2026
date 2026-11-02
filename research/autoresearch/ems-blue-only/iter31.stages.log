@@ -1,0 +1,5 @@
+iter31: no gen (12 Amendment-1 dirs exist; best unchanged since it29) - rule change, no training
+change: ems_candidate.py Candidate.__init__ passes {"activate_n": 2} (b1 calibration: 3); hypothesis: reservation-held calls over-trigger surge, fewer units per trigger saves unit-hours
+bench: RC=0 wall 141s METRIC ratio_b1=0.7745 (primary 8710 vs b1 11247; unit_hours_extra 495.24 vs b1 494.28 - win is NOT from unit-hours, which barely moved, but from the capacity mix)
+gates: 141 passed, 1 skipped, name guard clean
+decision: KEEP - best 0.7898 -> 0.7745

@@ -18,6 +18,9 @@ class Candidate(LearnedPolicy):
     name = "candidate"
     weights_path = Path(__file__).with_suffix(".npz")
 
+    def __init__(self, params: dict | None = None):
+        super().__init__({"activate_n": 2, **(params or {})})
+
     def score(self, x: np.ndarray) -> np.ndarray:
         s = super().score(x)
         t3 = x[0, 5] > 0 and x[0, 8] * 100 < 5  # tier-3 call, <5 idle: hold
