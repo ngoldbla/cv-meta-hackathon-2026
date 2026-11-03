@@ -86,6 +86,44 @@ export function leftoverYearNote(
   return `${year} model year: at resale it counts as a year older.`;
 }
 
+export interface DealerFace<T> {
+  /** Cheapest unit by price with fees, or null when there are none. */
+  face: T | null;
+  /** The face unit's leftover-year note, or null when it has none. */
+  faceNote: string | null;
+  /** Every other unit, cheapest first, each with its own note. */
+  more: Array<{ unit: T; note: string | null }>;
+  /** "N more nearby" for the collapsed control, or null when hidden. */
+  moreLabel: string | null;
+}
+
+/**
+ * One unit on the card face (task 033): the cheapest unit by price
+ * (the listings price, which already includes fees) stays on the
+ * "Distance to the dealer" row; every other unit goes behind the
+ * "N more nearby" control. A hidden unit's leftover-year note travels
+ * with it and never shows on the face; the face unit's own note does.
+ */
+export function dealerUnitsFace<
+  T extends { price: number; year?: number | null },
+>(
+  units: readonly T[] | null | undefined,
+  currentModelYear: number | null | undefined,
+): DealerFace<T> {
+  const sorted = [...(units ?? [])].sort((a, b) => a.price - b.price);
+  const face = sorted[0] ?? null;
+  const more = sorted.slice(1).map((unit) => ({
+    unit,
+    note: leftoverYearNote(unit.year, currentModelYear),
+  }));
+  return {
+    face,
+    faceNote: face ? leftoverYearNote(face.year, currentModelYear) : null,
+    more,
+    moreLabel: more.length > 0 ? `${more.length} more nearby` : null,
+  };
+}
+
 /** Lifespan row text (task 031): unrated models say so, no number. */
 export function lifespanRowText(lifespanYears: number | null | undefined): string {
   if (lifespanYears === null || lifespanYears === undefined) return "Not yet rated";

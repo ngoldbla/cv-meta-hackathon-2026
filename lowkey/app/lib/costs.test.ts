@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   costPerYearOfLife,
+  dealerUnitsFace,
   effectiveMonthlyCost,
   lastsAboutLabel,
   leftoverYearNote,
@@ -117,6 +118,70 @@ describe("lifespan row (task 031, part 3)", () => {
 
   it("keeps the rated label otherwise", () => {
     expect(lifespanRowText(13.9)).toBe("Lasts about 14 years");
+  });
+});
+
+describe("dealer face units (task 033)", () => {
+  const unit = (over: Partial<{ price: number; year: number | null }> = {}) => ({
+    price: 31950,
+    dealer: "Fixture Motors",
+    distanceMiles: 13.7,
+    year: 2026 as number | null,
+    trim: "LX",
+    url: "https://example.com/fixture/unit",
+    ...over,
+  });
+
+  it("shows nothing on the face and no control for 0 units", () => {
+    const plan = dealerUnitsFace([], 2026);
+    expect(plan.face).toBeNull();
+    expect(plan.faceNote).toBeNull();
+    expect(plan.more).toEqual([]);
+    expect(plan.moreLabel).toBeNull();
+  });
+
+  it("shows the single unit on the face with no control for 1 unit", () => {
+    const only = unit();
+    const plan = dealerUnitsFace([only], 2026);
+    expect(plan.face).toBe(only);
+    expect(plan.more).toEqual([]);
+    expect(plan.moreLabel).toBeNull();
+  });
+
+  it("puts the cheapest by price with fees on the face for 3 units", () => {
+    const pricey = unit({ price: 33950, url: "https://example.com/fixture/a" });
+    const cheapest = unit({ price: 31950, url: "https://example.com/fixture/b" });
+    const middle = unit({ price: 32950, url: "https://example.com/fixture/c" });
+    const plan = dealerUnitsFace([pricey, cheapest, middle], 2026);
+    expect(plan.face).toBe(cheapest);
+    expect(plan.more.map((m) => m.unit)).toEqual([middle, pricey]);
+    expect(plan.moreLabel).toBe("2 more nearby");
+  });
+
+  it("keeps a hidden leftover year's note off the face", () => {
+    const face = unit({ price: 31950, year: 2026 });
+    const hidden = unit({
+      price: 32950,
+      year: 2025,
+      url: "https://example.com/fixture/old",
+    });
+    const plan = dealerUnitsFace([face, hidden], 2026);
+    expect(plan.faceNote).toBeNull();
+    expect(plan.more).toHaveLength(1);
+    expect(plan.more[0]?.note).toBe(
+      "2025 model year: at resale it counts as a year older.",
+    );
+  });
+
+  it("shows the face unit's own leftover note on the face", () => {
+    const face = unit({ price: 31950, year: 2025 });
+    const hidden = unit({ price: 32950, year: 2026 });
+    const plan = dealerUnitsFace([hidden, face], 2026);
+    expect(plan.face).toBe(face);
+    expect(plan.faceNote).toBe(
+      "2025 model year: at resale it counts as a year older.",
+    );
+    expect(plan.more[0]?.note).toBeNull();
   });
 });
 

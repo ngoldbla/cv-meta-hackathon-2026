@@ -1,4 +1,13 @@
+"use client";
+
+import { useState } from "react";
+
 import { Badge } from "@/components/ui/badge";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/b-collapsible";
 import {
   Card,
   CardContent,
@@ -8,8 +17,8 @@ import {
 } from "@/components/ui/card";
 import { StatusDot } from "@/components/ui/status-dot";
 import {
+  dealerUnitsFace,
   effectiveMonthlyCost,
-  leftoverYearNote,
   lifespanRowText,
   monthlyBills,
   trimLineText,
@@ -133,13 +142,8 @@ export default function PickCard({
 }) {
   const units = local?.units ?? [];
   const modelForUnits = local?.model ?? pick.model;
-  const leftoverNotes = [
-    ...new Set(
-      units
-        .map((u) => leftoverYearNote(u.year, pick.currentYear))
-        .filter((n): n is string => n !== null),
-    ),
-  ];
+  const facePlan = dealerUnitsFace(units, pick.currentYear);
+  const [moreOpen, setMoreOpen] = useState(false);
   const cheapest = pick.flag === "badge" || pick.flag === "extra";
   const label =
     pick.flag === "badge"
@@ -246,30 +250,28 @@ export default function PickCard({
             <dd className="text-[15px]">
               {local?.error ? (
                 <span>{local.error}</span>
-              ) : units.length > 0 ? (
+              ) : facePlan.face ? (
                 <ul className="flex flex-col gap-1.5">
-                  {units.map((u, i) => (
-                    <li key={`${u.url}-${i}`} className="text-[13px] leading-relaxed">
-                      <span className="font-medium">
-                        {unitTitle(u.year, modelForUnits, u.trim)}
-                      </span>
-                      {" · "}
-                      <span className="mono">{fmt(u.price)}</span>
-                      {" · "}
-                      <span className="mono">{u.distanceMiles} mi</span>
-                      {" · "}
-                      {u.dealer}
-                      {" · "}
-                      <a
-                        href={u.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-block py-[13px] -my-[13px]"
-                      >
-                        See the car
-                      </a>
-                    </li>
-                  ))}
+                  <li className="text-[13px] leading-relaxed">
+                    <span className="font-medium">
+                      {unitTitle(facePlan.face.year, modelForUnits, facePlan.face.trim)}
+                    </span>
+                    {" · "}
+                    <span className="mono">{fmt(facePlan.face.price)}</span>
+                    {" · "}
+                    <span className="mono">{facePlan.face.distanceMiles} mi</span>
+                    {" · "}
+                    {facePlan.face.dealer}
+                    {" · "}
+                    <a
+                      href={facePlan.face.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-block py-[13px] -my-[13px]"
+                    >
+                      See the car
+                    </a>
+                  </li>
                 </ul>
               ) : local ? (
                 <span>No local stock found. Payment uses the typical price.</span>
@@ -277,11 +279,56 @@ export default function PickCard({
                 "—"
               )}
             </dd>
-            {leftoverNotes.map((note) => (
-              <dd key={note} className="mt-1 text-[13px] leading-relaxed text-foreground/80">
-                {note}
+            {facePlan.faceNote ? (
+              <dd className="mt-1 text-[13px] leading-relaxed text-foreground/80">
+                {facePlan.faceNote}
               </dd>
-            ))}
+            ) : null}
+            {facePlan.moreLabel ? (
+              <Collapsible
+                open={moreOpen}
+                onOpenChange={setMoreOpen}
+                className="border-b-0 overflow-visible"
+              >
+                <CollapsibleTrigger className="min-h-11 justify-start gap-1 py-2 font-semibold text-brass underline underline-offset-[3px] [&>span]:flex-none [&>span]:text-[13px] [&>span]:leading-5">
+                  {moreOpen ? "Show less" : facePlan.moreLabel}
+                </CollapsibleTrigger>
+                <CollapsibleContent contentClassName="space-y-0 pr-0 pb-1 [&_ul]:list-none [&_ul]:pl-0 [&_a]:no-underline">
+                  <ul className="flex flex-col gap-1.5 pt-1">
+                    {facePlan.more.map(({ unit: u, note }) => (
+                      <li
+                        key={u.url}
+                        className="text-[13px] leading-relaxed"
+                      >
+                        <span className="font-medium">
+                          {unitTitle(u.year, modelForUnits, u.trim)}
+                        </span>
+                        {" · "}
+                        <span className="mono">{fmt(u.price)}</span>
+                        {" · "}
+                        <span className="mono">{u.distanceMiles} mi</span>
+                        {" · "}
+                        {u.dealer}
+                        {" · "}
+                        <a
+                          href={u.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-block py-[13px] -my-[13px]"
+                        >
+                          See the car
+                        </a>
+                        {note ? (
+                          <span className="mt-1 block text-foreground/80">
+                            {note}
+                          </span>
+                        ) : null}
+                      </li>
+                    ))}
+                  </ul>
+                </CollapsibleContent>
+              </Collapsible>
+            ) : null}
           </div>
           <div>
             <dt className="text-xs text-muted-foreground">Lifespan</dt>
