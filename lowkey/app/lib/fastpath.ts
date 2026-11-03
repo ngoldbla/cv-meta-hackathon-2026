@@ -1,9 +1,11 @@
 /**
- * Fast-path detection (task 026, part 5).
+ * Fast-path detection (task 026, part 5; task 030, part 3).
  *
- * When the first message contains a ZIP and a category, the server
- * calls rank_category, ownership_math and local_units directly
- * instead of waiting for the model. Follow-ups still use the model.
+ * When a user message, together with the conversation so far,
+ * gives a ZIP and a category, the server calls rank_category,
+ * ownership_math and local_units directly instead of waiting for
+ * the model. Task 026 covered the first message; task 030 extends
+ * it to any user turn whose own text gives a ZIP or a category.
  */
 
 import type { Category } from "./table";
@@ -60,6 +62,43 @@ export function parseFastRequest(text: string): FastRequest | null {
     downFixed: down.fixed,
     downPercent: down.percent,
   };
+}
+
+/**
+ * Fast request from the whole conversation (task 030, part 3).
+ * `texts` are the user messages oldest-first. The latest ZIP and
+ * the latest category win; APR and down-payment overrides are kept
+ * the same way. The fast path runs only when the newest message
+ * itself gives a ZIP or a category — a down-payment-only follow-up
+ * ("What if I put $5k down?") still goes to the model — and only
+ * once both a ZIP and a category are known from somewhere.
+ */
+export function parseConversationFastRequest(
+  texts: string[],
+): FastRequest | null {
+  if (texts.length === 0) return null;
+  const newest = texts[texts.length - 1] ?? "";
+  if (!parseZip(newest) && !parseCategory(newest)) return null;
+  let zip: string | null = null;
+  let category: Category | null = null;
+  let userApr: number | null = null;
+  let downFixed: number | null = null;
+  let downPercent: number | null = null;
+  for (const text of texts) {
+    const z = parseZip(text);
+    if (z) zip = z;
+    const c = parseCategory(text);
+    if (c) category = c;
+    const apr = parseUserApr(text);
+    if (apr !== null) userApr = apr;
+    const down = parseDown(text);
+    if (down.fixed !== null || down.percent !== null) {
+      downFixed = down.fixed;
+      downPercent = down.percent;
+    }
+  }
+  if (!zip || !category) return null;
+  return { zip, category, userApr, downFixed, downPercent };
 }
 
 /** Down-payment dollars for a pick price under a fast request. */

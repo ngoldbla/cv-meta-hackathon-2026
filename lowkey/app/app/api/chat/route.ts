@@ -8,7 +8,11 @@ import {
   type UIMessage,
 } from "ai";
 
-import { downForPrice, parseFastRequest } from "@/lib/fastpath";
+import {
+  downForPrice,
+  parseConversationFastRequest,
+  type FastRequest,
+} from "@/lib/fastpath";
 import { aprLabel, getDefaultApr } from "@/lib/fred";
 import {
   executeLocalUnits,
@@ -22,7 +26,7 @@ export const maxDuration = 60;
 const SYSTEM = `You are Low Key. Your job is helping someone get a car without regret, so leaving cheaply (walk-away cost, months underwater) is the main reason to choose a car. You tell someone who needs a car now which new gas car to buy nearby, what it costs per month, and what it would cost to walk away from it. No ads, no forms, no shopping.
 
 Rules:
-- If the user has not yet given a ZIP and a type, ask one question only: "What's your ZIP, and do you need a sedan, an SUV or a pickup?" Do not show picks before you have both.
+- Never ask for a ZIP or a body type that the user has already given in this conversation; if one is still missing, ask only for that one, in one short sentence. If neither has been given, ask for both in one short sentence. Do not show picks before you have both.
 - Any mention of sedans, SUVs or pickups as a type to consider is a request for the ranking: call rank_category for that category (map plurals to Sedan, SUV or Pickup). A ZIP never replaces the ranking when a category is named.
 - Show at most 4 ranked picks plus the commodity pick. Never show more, and never turn the chat into a browsing tool.
 - After rank_category, call local_units for each pick with the user's ZIP, then ownership_math for each pick with model and zip (the server prices the cheapest local unit, or the labelled typical price when there is none; use 10% down over 60 months unless the user said otherwise; omit apr so the server uses the Federal Reserve average, and pass apr only when the user states their own rate, for example "my rate is 5.9%"). In both calls, set model to the exact model string from rank_category (for example "CR-V", not "Honda CR-V").
@@ -52,15 +56,14 @@ function userText(message: UIMessage | undefined): string {
 }
 
 /**
- * Fast path (task 026, part 5): a first message with a ZIP and a
- * category is answered by calling the tools directly, in parallel,
- * and streaming them as tool-result parts. No model call, so the
- * cards arrive in well under the 15-second target. The code-written
- * summary is rendered by the client from the same tool results.
+ * Fast path (task 026, part 5; task 030, part 3): a request whose
+ * conversation gives a ZIP and a category is answered by calling
+ * the tools directly and streaming them as tool-result parts. No
+ * model call, so the cards arrive in well under the 15-second
+ * target. The code-written summary is rendered by the client from
+ * the same tool results.
  */
-async function fastPathResponse(text: string) {
-  const req = parseFastRequest(text);
-  if (!req) return null;
+async function fastPathResponse(req: FastRequest) {
   const stream = createUIMessageStream({
     execute: async ({ writer }) => {
       const stamp = Date.now().toString(36);
@@ -164,11 +167,13 @@ async function fastPathResponse(text: string) {
 
 export async function POST(req: Request) {
   const { messages }: { messages: UIMessage[] } = await req.json();
-  // Fast path only for the very first user turn.
-  if (messages.length === 1 && messages[0]?.role === "user") {
-    const fast = await fastPathResponse(userText(messages[0]));
-    if (fast) return fast;
-  }
+  // Fast path on any user turn that, with the conversation so far,
+  // gives a ZIP and a category (task 030, part 3).
+  const userTexts = messages
+    .filter((m) => m.role === "user")
+    .map((m) => userText(m));
+  const fastReq = parseConversationFastRequest(userTexts);
+  if (fastReq) return fastPathResponse(fastReq);
   if (!process.env.META_API_KEY) {
     return Response.json(
       { error: "META_API_KEY is not set on the server." },
