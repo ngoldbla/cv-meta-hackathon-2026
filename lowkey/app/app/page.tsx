@@ -462,10 +462,12 @@ export default function Home() {
                   <ToggleGroupItem
                     key={kind}
                     value={label}
-                    className="h-auto min-h-11 flex-1 flex-col gap-1 px-1 py-2"
+                    className="h-auto min-h-11 flex-1 px-1 py-2"
                   >
-                    <CarFigure kind={kind} className="w-[104px]" />
-                    <span>{label}</span>
+                    <span className="flex flex-col items-center gap-1">
+                      <CarFigure kind={kind} className="w-[104px]" />
+                      <span>{label}</span>
+                    </span>
                   </ToggleGroupItem>
                 ))}
               </ToggleGroup>
