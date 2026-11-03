@@ -1,7 +1,7 @@
 ---
 id: "034"
 title: "Low Key: draw the numbers with json-render (cost bars, comparison, lifespan track)"
-status: in_progress
+status: done
 created: 2026-11-03
 report: ops/reports/034-lowkey-json-render.md
 ---
