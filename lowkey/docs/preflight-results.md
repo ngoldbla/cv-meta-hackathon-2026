@@ -75,3 +75,28 @@ Provider usage for the whole account on 2026-11-03: 24 requests, 101000 charged 
 - Corolla, the expected commodity sedan, is not cheap to hold on the new basis ($151/mo, retention 0.68): its 2026 new price has risen against its used values. The Civic is both #2 and the commodity pick.
 - Heavy-duty trucks occupy 3 of the Pickup top 5 by percentage retention while costing $264–$323/mo. Percentage retention alone promotes expensive trucks; the commodity pick (Tacoma on both measures) is the safeguard, and the PRD may want a price or class guard for #1/#2 as well.
 - Rural coverage is real but thin: 0 Accord Sedans within 50 miles of 59001 (5 at 150), 4–6 units for the other two models. The "3 local units per car" promise is not guaranteed in rural ZIPs.
+
+## 2026-11-03 (task 023, runner): lineups under the lineup rules
+
+Recomputed from the task-022 fits (new-price basis) with the PRD lineup rules as pulled for this run: four ranked picks per category, no make holding more than 2 of the 4, heavy-duty pickups excluded, resale after the 15% trade-in discount (fitted retail retention × 0.85; dollars per month = new price × (1 − adjusted retention) / 60). A model ranks only with a fitted retention, a current new price and at least 30 sold units at each of at least 3 fitted ages. Makes were resolved per model from current new inventory (`lowkey/preflight/make_map.py`; bare "1500"/"2500"/"3500" are Ram). Logic: `lowkey/preflight/lineup.py`; full machine output cached outside git (`lineups.json`). Retention below is after the discount, with the retail fit in parentheses.
+
+- **Sedan** (3 makes: Honda, Hyundai, Mazda):
+  - #1 Honda Accord Sedan: retention 0.656 (fit 0.772), $180/mo, new $31,472; sold n by age 1–5: 1050, 1384, 780, 1374, 1262.
+  - #2 Honda Civic Sedan: retention 0.653 (fit 0.768), $163/mo, new $28,180; sold n: 692, 1768, 1183, 1131, 697. Also the commodity pick (`badge`, cheapest to hold).
+  - #3 Mazda Mazda3 Sedan: retention 0.623 (fit 0.733), $172/mo, new $27,387; sold n: 201, 185, 160, 125, 212.
+  - #4 Hyundai Elantra: retention 0.599 (fit 0.705), $166/mo, new $24,860; sold n: 1479, 1306, 1740, 574, 810.
+  - Skipped by the make cap: Honda Civic Si Sedan (fit 0.762) would have been the third Honda.
+- **SUV** (3 makes: Honda, Mazda, Toyota):
+  - #1 Honda CR-V: retention 0.629 (fit 0.741), $216/mo, new $34,899; sold n: 983, 2462, 826, 1136, 1330.
+  - #2 Toyota Corolla Cross: retention 0.623 (fit 0.733), $206/mo, new $32,783; sold n ages 1–4: 292, 609, 675, 506 (no age-5 sales yet; the 5-year value is extrapolated).
+  - #3 Mazda CX-50: retention 0.596 (fit 0.701), $241/mo, new $35,718; sold n ages 1–3: 714, 994, 536 (extrapolated to 5 years).
+  - #4 Toyota 4Runner: retention 0.585 (fit 0.689), $404/mo, new $58,416; sold n: 916, 1066, 1538, 1053, 1078.
+  - Commodity pick (`extra`): Hyundai Venue, retention 0.575 (fit 0.676), $176/mo, new $24,856; sold n ages 1–4: 389, 310, 424, 246.
+- **Pickup** (3 makes: Chevrolet, Ram, Toyota):
+  - #1 Toyota Tacoma: retention 0.633 (fit 0.745), $281/mo, new $46,039; sold n: 1897, 2155, 3246, 1849, 2013.
+  - #2 Ram 1500 (provider model "1500"): retention 0.609 (fit 0.716), $364/mo, new $55,801; sold n: 2424, 181, 190, 2449, 2105. Ages 2–3 are much thinner than ages 1, 4 and 5; the fit uses all five ages, each still above 30.
+  - #3 Chevrolet Colorado: retention 0.564 (fit 0.664), $310/mo, new $42,691; sold n: 803, 1795, 1387, 833, 623.
+  - #4 Chevrolet Silverado 1500: retention 0.560 (fit 0.659), $378/mo, new $51,541; sold n: 2573, 5628, 5350, 2633, 4039.
+  - Commodity pick (`extra`): Ford Maverick, retention 0.554 (fit 0.652), $264/mo, new $35,509; sold n ages 1–4: 670, 722, 365, 485.
+  - Excluded as heavy-duty before ranking: Ram 2500 ("2500"), Chevrolet Silverado 2500HD, Ford F-250, GMC Sierra 2500HD, Chevrolet Silverado 3500HD, Ford F-350. (The task-022 percentage top 5 had three of these; none can appear now, and none has an EPA MPG rating.)
+- Under task 023's superseded two-pick text (distinct makes), Sedan #2 would instead be the Mazda3 Sedan with the Civic demoted to commodity-`extra`; the SUV and Pickup #1–#2 are unchanged. The four-pick lineups above follow the PRD as pulled (`lowkey/docs/prd.md`, amended by task 024).
