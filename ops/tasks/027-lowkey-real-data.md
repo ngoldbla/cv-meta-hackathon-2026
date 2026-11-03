@@ -1,7 +1,7 @@
 ---
 id: "027"
 title: "Low Key: wire the live app to real data (listings provider, depreciation table, fuel)"
-status: open
+status: in_progress
 created: 2026-11-03
 report: ops/reports/027-lowkey-real-data.md
 ---
