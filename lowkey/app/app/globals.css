@@ -69,15 +69,15 @@
   --chart-yours: #bfd6c4;
   --chart-under-text: #8a3b1e;
   --chart-yours-text: #2e5e3a;
-  /* Cost-bar tokens (task 034 mockup hexes; task 035 darkened the
-     light gas and back stripes so each segment clears 3:1 on the
-     card — see report 035 for the ratios). */
+  /* Cost-bar tokens (task 034 mockup hexes; task 036 restored the
+     pale light gas and back stripes — segment boundaries are
+     carried by the 2 px card gaps, see report 036). */
   --cost-loan: #1b1c1e;
-  --cost-gas: #9c7c3a;
+  --cost-gas: #d9c08a;
   --cost-lost: #7a5a10;
   --cost-interest: #8e8a80;
-  --cost-back-a: #4f7d5c;
-  --cost-back-b: #6a9a76;
+  --cost-back-a: #bfd6c4;
+  --cost-back-b: #d7e6da;
   --cost-back-bg: #eef5ef;
   --cost-back-ink: #2e5e3a;
   --cost-track: #e7e5df;
