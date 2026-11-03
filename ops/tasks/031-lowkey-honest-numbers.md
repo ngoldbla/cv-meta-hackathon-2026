@@ -34,6 +34,8 @@ These answer the questions at the end of reports 027 and 029. Dylan approved all
    - Fixture tests: the Venue list steps to SEL; a list where the only higher variant is cosmetic falls back to the next real trim; a drivetrain variant is not merged.
    - Rebuild and re-upload the table (task 027's commands; no `--refresh-*` unless specs need it).
 
+5. **The car drawing is too big on the card** (reviewer, from `~/.cache/low-key/screens/030/03-cards-after-one-tap.png`). At 390 px the Hairline figure sits in roughly 400 px of empty space, pushing the numbers below the fold, and the "In stock" dot crowds the sentence. Put the figure in a small fixed box (about 96 px tall) beside or above the model name, with the rank badge and "In stock" on one row, so the monthly bills are visible without scrolling on a 390×844 screen. Keep the figure's own size rules from task 028 and the reduced-motion rule.
+
 ## Checks before you finish
 - `npm ci && npm run build`, the app tests, `pytest -q`, `pytest lowkey/`, `ruff check lowkey/`, `scripts/name_guard.py` and `scripts/secret_guard.py --all` pass.
 - On the deployed URL at 390 px: Sedan near 60614 and SUV near 60614. Confirm the CR-V card shows only after-discount percentages, the Corolla Cross and CX-50 cards show "Not yet rated", the Venue recommends the SEL, and every unit shows its model year. Note any leftover-year line that appears.
