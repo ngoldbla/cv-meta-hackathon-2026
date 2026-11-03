@@ -1,7 +1,7 @@
 ---
 id: "036"
 title: "Low Key: restore the light-mode pale gas and back colours; 2 px gaps between bar segments"
-status: open
+status: in_progress
 created: 2026-11-03
 report: ops/reports/036-lowkey-light-segments.md
 ---
