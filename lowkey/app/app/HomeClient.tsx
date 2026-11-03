@@ -37,7 +37,17 @@ import { RevealText } from "@/components/ui/reveal-text";
 import { StreamingText } from "@/components/ui/streaming-text";
 import { ThinkingIndicator } from "@/components/ui/thinking-indicator";
 import { Typography } from "@/components/ui/typography";
-import { areaPlaceLabel, type SearchArea } from "@/lib/geo";
+import {
+  areaAfterSearch,
+  areaPlaceLabel,
+  confirmArea,
+  lookupWithRetry,
+  parseStoredArea,
+  resolveInitialArea,
+  serializeStoredArea,
+  type GeoLookupResult,
+  type SearchArea,
+} from "@/lib/geo";
 import { closingLine } from "@/lib/summary";
 import type { CurveLike } from "@/components/WorthChart";
 
@@ -226,16 +236,7 @@ const GEO_ERROR = "Couldn't get your location. Type a ZIP instead.";
 
 function loadStoredArea(): SearchArea | null {
   try {
-    const raw = window.localStorage.getItem(AREA_STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as Partial<SearchArea>;
-    if (!parsed.zip || !/^\d{5}$/.test(parsed.zip)) return null;
-    return {
-      zip: parsed.zip,
-      city: parsed.city ?? null,
-      state: parsed.state ?? null,
-      approximate: false,
-    };
+    return parseStoredArea(window.localStorage.getItem(AREA_STORAGE_KEY));
   } catch {
     return null;
   }
@@ -243,10 +244,7 @@ function loadStoredArea(): SearchArea | null {
 
 function persistArea(next: SearchArea) {
   try {
-    window.localStorage.setItem(
-      AREA_STORAGE_KEY,
-      JSON.stringify({ zip: next.zip, city: next.city, state: next.state }),
-    );
+    window.localStorage.setItem(AREA_STORAGE_KEY, serializeStoredArea(next));
   } catch {
     // Storage is best-effort only (task 030, part 1).
   }
@@ -279,14 +277,15 @@ export default function HomeClient({
     return () => mq.removeEventListener("change", update);
   }, []);
 
-  // A returning visitor's confirmed area wins over the header guess.
+  // Stored-area precedence (task 032, part 1): confirmed wins over
+  // the header guess; unconfirmed yields to a fresh guess.
   useEffect(() => {
-    const stored = loadStoredArea();
-    if (stored) {
-      setArea(stored);
+    const resolved = resolveInitialArea(loadStoredArea(), initialArea);
+    if (resolved) {
+      setArea(resolved);
       setZipOpen(false);
     }
-  }, []);
+  }, [initialArea]);
 
   useEffect(() => {
     if (zipOpen) zipInputRef.current?.focus();
@@ -333,7 +332,7 @@ export default function HomeClient({
   }
 
   function applyArea(next: SearchArea) {
-    const confirmed: SearchArea = { ...next, approximate: false };
+    const confirmed = confirmArea(next);
     setArea(confirmed);
     persistArea(confirmed);
     setZipOpen(false);
@@ -361,23 +360,34 @@ export default function HomeClient({
       (pos) => {
         const lat = Math.round(pos.coords.latitude * 100) / 100;
         const lon = Math.round(pos.coords.longitude * 100) / 100;
-        void fetch(`/api/geo?lat=${lat}&lon=${lon}`)
-          .then((r) => (r.ok ? r.json() : null))
-          .then(
-            (data: { zip?: string; city?: string | null; state?: string | null } | null) => {
-              if (data?.zip && /^\d{5}$/.test(data.zip)) {
-                applyArea({
-                  zip: data.zip,
-                  city: data.city ?? null,
-                  state: data.state ?? null,
-                });
-              } else {
-                setGeoError(GEO_ERROR);
-              }
-            },
-          )
-          .catch(() => setGeoError(GEO_ERROR))
-          .finally(() => setGeoBusy(false));
+        void (async () => {
+          try {
+            // A bare or failed lookup retries once (task 032, part 2).
+            const data = await lookupWithRetry(
+              async (): Promise<GeoLookupResult | null> => {
+                const res = await fetch(`/api/geo?lat=${lat}&lon=${lon}`);
+                if (!res.ok) return null;
+                return (await res
+                  .json()
+                  .catch(() => null)) as GeoLookupResult | null;
+              },
+            );
+            if (data?.zip && /^\d{5}$/.test(data.zip)) {
+              applyArea({
+                zip: data.zip,
+                city: data.city ?? null,
+                state: data.state ?? null,
+              });
+            } else {
+              // Failure leaves the current area as it was.
+              setGeoError(GEO_ERROR);
+            }
+          } catch {
+            setGeoError(GEO_ERROR);
+          } finally {
+            setGeoBusy(false);
+          }
+        })();
       },
       () => {
         setGeoError(GEO_ERROR);
@@ -394,13 +404,17 @@ export default function HomeClient({
     setGeoBusy(true);
     setGeoError(null);
     try {
-      const res = await fetch(`/api/geo?zip=${zip}`);
-      const data = res.ok
-        ? ((await res.json().catch(() => null)) as {
-            city?: string | null;
-            state?: string | null;
-          } | null)
-        : null;
+      // A bare or failed lookup retries once (task 032, part 2);
+      // a second bare result still confirms the typed ZIP alone.
+      const data = await lookupWithRetry(
+        async (): Promise<GeoLookupResult | null> => {
+          const res = await fetch(`/api/geo?zip=${zip}`);
+          if (!res.ok) return null;
+          return (await res
+            .json()
+            .catch(() => null)) as GeoLookupResult | null;
+        },
+      );
       applyArea({ zip, city: data?.city ?? null, state: data?.state ?? null });
     } catch {
       applyArea({ zip, city: null, state: null });
@@ -414,13 +428,8 @@ export default function HomeClient({
     setBodyPick([label]);
     if (area) {
       setPendingBody(null);
-      if (area.approximate) {
-        const confirmed: SearchArea = { ...area, approximate: false };
-        setArea(confirmed);
-        persistArea(confirmed);
-      } else {
-        persistArea(area);
-      }
+      // Searching does not confirm a guessed area (task 032, part 1).
+      persistArea(areaAfterSearch(area));
       send(`${area.zip}, ${label}`);
     } else {
       setPendingBody(label);

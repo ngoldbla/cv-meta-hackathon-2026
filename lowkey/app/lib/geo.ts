@@ -16,6 +16,12 @@ export interface SearchArea {
   state: string | null;
   /** True for the header guess, which is labelled approximate. */
   approximate?: boolean;
+  /**
+   * True only after the user confirms the area (task 032): entering
+   * a ZIP with Change, or "Use my location" succeeding. Searching
+   * with a guessed area never sets this.
+   */
+  confirmed?: boolean;
 }
 
 export function isValidZip(value: string | null | undefined): boolean {
@@ -50,7 +56,123 @@ export function parseVercelArea(headers: HeaderGetter): SearchArea | null {
     regionRaw && /^[A-Za-z]{2}$/.test(regionRaw)
       ? regionRaw.toUpperCase()
       : null;
-  return { zip: postal, city: city || null, state, approximate: true };
+  return {
+    zip: postal,
+    city: city || null,
+    state,
+    approximate: true,
+    confirmed: false,
+  };
+}
+
+/** Whether the user has confirmed this area (task 032, part 1). */
+export function isAreaConfirmed(area: SearchArea): boolean {
+  if (typeof area.confirmed === "boolean") return area.confirmed;
+  return area.approximate === false;
+}
+
+/** Mark an area confirmed: the "(approximate)" label goes away. */
+export function confirmArea(area: SearchArea): SearchArea {
+  return { ...area, approximate: false, confirmed: true };
+}
+
+/**
+ * Searching with an area does not confirm it (task 032, part 1).
+ * The area is returned unchanged so the label survives a search.
+ */
+export function areaAfterSearch(area: SearchArea): SearchArea {
+  return area;
+}
+
+/** Parse the `localStorage` value, or null when absent or invalid. */
+export function parseStoredArea(raw: string | null): SearchArea | null {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as Partial<SearchArea>;
+    if (!parsed.zip || !/^\d{5}$/.test(parsed.zip)) return null;
+    // Areas stored before task 032 carry no flag; the old code only
+    // stored after confirming, so treat them as confirmed.
+    const confirmed =
+      typeof parsed.confirmed === "boolean"
+        ? parsed.confirmed
+        : typeof parsed.approximate === "boolean"
+          ? !parsed.approximate
+          : true;
+    return {
+      zip: parsed.zip,
+      city: typeof parsed.city === "string" ? parsed.city : null,
+      state: typeof parsed.state === "string" ? parsed.state : null,
+      approximate: !confirmed,
+      confirmed,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/** Serialize an area for `localStorage`, confirmed flag included. */
+export function serializeStoredArea(area: SearchArea): string {
+  return JSON.stringify({
+    zip: area.zip,
+    city: area.city,
+    state: area.state,
+    confirmed: isAreaConfirmed(area),
+  });
+}
+
+/**
+ * Which area to show on load (task 032, part 1): a stored confirmed
+ * area beats the header guess; an unconfirmed stored area is
+ * replaced by a fresh header guess and otherwise stays approximate.
+ */
+export function resolveInitialArea(
+  stored: SearchArea | null,
+  headerGuess: SearchArea | null,
+): SearchArea | null {
+  if (stored && isAreaConfirmed(stored)) return stored;
+  if (headerGuess) return headerGuess;
+  return stored ?? headerGuess;
+}
+
+export interface GeoLookupResult {
+  zip: string | null;
+  city: string | null;
+  state: string | null;
+}
+
+/** True when a lookup gave no city to show (or failed outright). */
+export function isBareGeoResult(
+  result: GeoLookupResult | null | undefined,
+): boolean {
+  return !result || !result.city;
+}
+
+const defaultSleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Run a city lookup, retrying once after `delayMs` when the first
+ * attempt is bare or fails (task 032, part 2). Never calls `attempt`
+ * a third time; a second bare result is returned as-is.
+ */
+export async function lookupWithRetry(
+  attempt: () => Promise<GeoLookupResult | null>,
+  sleep: (ms: number) => Promise<void> = defaultSleep,
+  delayMs = 1000,
+): Promise<GeoLookupResult | null> {
+  let first: GeoLookupResult | null;
+  try {
+    first = await attempt();
+  } catch {
+    first = null;
+  }
+  if (!isBareGeoResult(first)) return first;
+  await sleep(delayMs);
+  try {
+    return await attempt();
+  } catch {
+    return null;
+  }
 }
 
 /** Round a coordinate to 2 decimals (about 1 km) before sending. */

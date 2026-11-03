@@ -1,5 +1,6 @@
 import {
   censusCoordsUrl,
+  lookupWithRetry,
   parseCensusGeographies,
   parseTigerZipCentroid,
   roundCoord,
@@ -25,26 +26,40 @@ async function fetchJson(url: string): Promise<unknown | null> {
   }
 }
 
-async function fromCoords(lat: number, lon: number): Promise<GeoOut> {
-  // User coordinates are rounded again server-side so the raw
-  // values never leave here.
-  const payload = await fetchJson(
-    censusCoordsUrl(roundCoord(lat), roundCoord(lon)),
-  );
+async function censusPlaceOnce(lat: number, lon: number): Promise<GeoOut> {
+  const payload = await fetchJson(censusCoordsUrl(lat, lon));
   if (!payload) return EMPTY;
   const parsed = parseCensusGeographies(payload);
   if (!parsed) return EMPTY;
   return parsed;
 }
 
+/**
+ * Census geographies with one quiet retry (task 032, part 2).
+ * Report 030's cold 30097 bare ZIP came through this call: warm
+ * probes of both upstreams return Duluth, GA, and the route can
+ * only answer with a bare ZIP from here when the Census fetch or
+ * its place layer comes back empty, so the retry belongs here.
+ * The client retry re-runs the whole lookup, TIGERweb included.
+ */
+async function censusPlaceWithRetry(
+  lat: number,
+  lon: number,
+): Promise<GeoOut> {
+  const result = await lookupWithRetry(() => censusPlaceOnce(lat, lon));
+  return result ?? EMPTY;
+}
+
+async function fromCoords(lat: number, lon: number): Promise<GeoOut> {
+  // User coordinates are rounded again server-side so the raw
+  // values never leave here.
+  return censusPlaceWithRetry(roundCoord(lat), roundCoord(lon));
+}
+
 async function fromCentroid(lat: number, lon: number): Promise<GeoOut> {
   // A ZCTA centroid is public data, not a user's location, so it
   // is sent unrounded: rounding it can cross a place boundary.
-  const payload = await fetchJson(censusCoordsUrl(lat, lon));
-  if (!payload) return EMPTY;
-  const parsed = parseCensusGeographies(payload);
-  if (!parsed) return EMPTY;
-  return parsed;
+  return censusPlaceWithRetry(lat, lon);
 }
 
 /**
