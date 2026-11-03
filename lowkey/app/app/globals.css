@@ -69,6 +69,16 @@
   --chart-yours: #bfd6c4;
   --chart-under-text: #8a3b1e;
   --chart-yours-text: #2e5e3a;
+  /* Cost-bar tokens (task 034, mockup hexes; dark values below). */
+  --cost-loan: #1b1c1e;
+  --cost-gas: #d9c08a;
+  --cost-lost: #7a5a10;
+  --cost-interest: #8e8a80;
+  --cost-back-a: #bfd6c4;
+  --cost-back-b: #d7e6da;
+  --cost-back-bg: #eef5ef;
+  --cost-back-ink: #2e5e3a;
+  --cost-track: #e7e5df;
   --radius: 0.75rem;
   color-scheme: light;
   /* Legacy aliases (removed as components are rebuilt). */
@@ -108,6 +118,15 @@
   --chart-yours: #3e5e4a;
   --chart-under-text: #e9b8a4;
   --chart-yours-text: #a9d3b3;
+  --cost-loan: #f3f2ee;
+  --cost-gas: #d9c08a;
+  --cost-lost: #d9b96a;
+  --cost-interest: #a9a7a1;
+  --cost-back-a: #3e5e4a;
+  --cost-back-b: #2f4a3a;
+  --cost-back-bg: #243528;
+  --cost-back-ink: #a9d3b3;
+  --cost-track: #3a3b3e;
   color-scheme: dark;
 }
 
