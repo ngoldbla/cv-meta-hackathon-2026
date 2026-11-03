@@ -46,6 +46,10 @@
 | P13 | **Trade-in discount** | For 3 models, compare sold retail medians against published trade-in values at the same age | A single discount factor (expected 10–20%) for walk-away costs, recorded with its source. | free |
 | P14 | **Template choice** | Read the candidate Vercel AI chatbot templates: tool calls, MCP client, custom OpenAI-compatible base URL, licence | One template chosen, with the reason recorded. Prefer the smallest: no database or auth needed in v1. | free |
 
+| P15 | **Gas price data** | Register a free EIA API key. Pull weekly retail regular gasoline for the US, PADDs, states and cities. Build a ZIP → most-local-series map. | Every test ZIP maps to a series with at least 10 years of weekly history. Record which states and cities EIA covers directly. | free |
+| P16 | **Gas forecast** | Run Timestral (28M first) on each series weekly. Backtest: forecast from 5 past start dates, 52 weeks ahead, and compare with what happened. | The 10th–90th range covers the actual price at least 70% of the time, and the median beats "price stays the same" on mean absolute error. If it doesn't, show today's price and a flat range instead. Check the Timestral licence (Modified MIT, revenue cap) per AGENTS.md. | free (CPU or Modal) |
+| P17 | **MPG** | fueleconomy.gov web service for each ranked model and trim | Combined MPG found for every ranked model. | free |
+
 **Expected preflight spend: under $1 of provider credit, plus well under $1 of Muse Spark.**
 
 ## The ownership math (deterministic; tested before any UI)

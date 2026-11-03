@@ -29,6 +29,14 @@ Low Key is a chat that tells someone who needs a car now which new gas car to bu
 
 The pitch in one sentence: *"If you change your mind after a year, leaving costs you about $X, which is $Y a month for having a car."*
 
+3. **Fuel forecast** (optional third number, if preflight P15–P16 pass).
+   - Expected fuel cost per month over the 5-year hold, as a range (low, typical, high).
+   - Fuel cost per month = (12,000 ÷ 12) miles ÷ the model's EPA combined MPG × forecast regular-gas price for the user's area.
+   - Gas prices: EIA weekly retail regular gasoline (free, official, decades of weekly history). The ZIP maps to the most local EIA series: city, then state, then PADD region.
+   - Forecast: Timestral (open weights, run by us), producing quantiles weekly per series. The app shows the middle and the 10th–90th range.
+   - MPG: the EPA's fueleconomy.gov web service (free).
+   - "Cost to run per month" = payment + fuel. Insurance and repairs remain excluded and the app says so.
+
 ## Depreciation is rent
 - Rent = value lost over the hold ÷ months.
 - **The hold is 5 years**, at 12,000 miles a year. The hold is fixed.
