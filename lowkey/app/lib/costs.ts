@@ -3,7 +3,7 @@
  * results only; every number here traces to rank_category,
  * local_units or ownership_math.
  */
-import { monthlyPayment } from "./ownership";
+import { monthlyPayment, TRADE_IN_FACTOR } from "./ownership";
 
 export interface MonthlyBills {
   total: number;
@@ -96,6 +96,8 @@ export function trimLineText(args: {
   trimGuardHit?: boolean;
   trimRetention5y?: number | null;
   modelRetentionRetail?: number | null;
+  /** Trade-in discount factor from the table (retention basis). */
+  tradeInFactor?: number;
   trimStepCost?: number | null;
   trimFeatures?: string[];
   aprPercent?: number | null;
@@ -113,8 +115,14 @@ export function trimLineText(args: {
       args.trimRetention5y !== null && args.trimRetention5y !== undefined &&
       args.modelRetentionRetail !== null && args.modelRetentionRetail !== undefined
     ) {
-      const trimPct = Math.round(args.trimRetention5y * 100);
-      const modelPct = Math.round(args.modelRetentionRetail * 100);
+      // Display only (task 031): every percentage shown is the
+      // after-discount figure (retail fit x the table's trade-in
+      // factor), matching the dollar figures on the card. The guard
+      // decision itself stays on the retail fits in trim.py; only
+      // these displayed numbers change.
+      const factor = args.tradeInFactor ?? TRADE_IN_FACTOR;
+      const trimPct = Math.round(args.trimRetention5y * factor * 100);
+      const modelPct = Math.round(args.modelRetentionRetail * factor * 100);
       return `${base} (base): the ${step} keeps ${trimPct}% of its price after 5 years, more than 3 points below the model's ${modelPct}%, so the base trim is recommended.`;
     }
     return `${base} (base): the step-up trim keeps its value clearly worse, so the base trim is recommended.`;

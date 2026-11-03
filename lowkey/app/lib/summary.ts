@@ -83,12 +83,14 @@ function categoryNoun(category: string): string {
 
 /**
  * One plain sentence per card, from tool results. Example shape:
- * "Keeps 63% of its price after 5 years, the most of any gas SUV
- * here. Underwater for 7 months; sell after a year and having it
- * cost about $732 a month." With task-029 trim/lifespan data the
- * sentence names the step-up trim and the lifespan, for example:
- * "The SE is one step up from base and keeps 74% of its price
- * after 5 years. Built to last about 17 years."
+ * "Keeps about 63% of its price: what you'd likely get selling it
+ * after 5 years, the most of any gas SUV here. Underwater for 7
+ * months; sell after a year and having it cost about $732 a month."
+ * With task-029 trim/lifespan data the sentence names the step-up
+ * trim and the lifespan, for example: "The SE is one step up from
+ * base and keeps about 58% of its price: what you'd likely get
+ * selling it after 5 years. Built to last about 11 years."
+ * retention5y is already the after-discount figure (task 031).
  */
 export function cardSentence(
   pick: SummaryPick,
@@ -102,8 +104,8 @@ export function cardSentence(
     peers.length > 1 && pick.retention5y === maxRetention &&
     peers.filter((p) => p.retention5y === maxRetention).length === 1;
   const keeps = isTopRetention
-    ? `keeps ${pct}% of its price after 5 years, the most of any gas ${categoryNoun(category)} here.`
-    : `keeps ${pct}% of its price after 5 years.`;
+    ? `keeps about ${pct}% of its price: what you'd likely get selling it after 5 years, the most of any gas ${categoryNoun(category)} here.`
+    : `keeps about ${pct}% of its price: what you'd likely get selling it after 5 years.`;
   let first: string;
   if (pick.recommendedTrim && pick.trimIsStepUp) {
     first = `The ${pick.recommendedTrim} is one step up from base and ${keeps}`;
@@ -146,7 +148,7 @@ export function closingLine(
   void category;
   void back36;
   if (cost12 === undefined) {
-    return `Start with the ${top.pick.make} ${top.pick.model} at ${pay} a month; it keeps ${pct}% of its price after 5 years.`;
+    return `Start with the ${top.pick.make} ${top.pick.model} at ${pay} a month; it keeps about ${pct}% of its price: what you'd likely get selling it after 5 years.`;
   }
-  return `Start with the ${top.pick.make} ${top.pick.model} at ${pay} a month; it keeps ${pct}% of its price after 5 years, and leaving after a year costs about ${dollars(cost12)} a month.`;
+  return `Start with the ${top.pick.make} ${top.pick.model} at ${pay} a month; it keeps about ${pct}% of its price: what you'd likely get selling it after 5 years, and leaving after a year costs about ${dollars(cost12)} a month.`;
 }

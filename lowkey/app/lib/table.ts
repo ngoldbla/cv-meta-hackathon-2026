@@ -177,14 +177,22 @@ export type RankPick = ReturnType<typeof toRankPick>;
 /** One category's lineup plus footer metadata. Nothing else leaks. */
 export function lineupFromTable(table: LowkeyTable, category: Category) {
   const lineup = table.lineups[category];
-  const picks = lineup.picks.map((p) => toRankPick(p));
+  const picks = lineup.picks.map((p) => ({
+    ...toRankPick(p),
+    // Task 031: the table's discount factor, so the card can show
+    // after-discount percentages from the same factor the dollars use.
+    tradeInFactor: table.tradeInFactor,
+  }));
   const commodity = lineup.commodity
-    ? toRankPick(
-        lineup.commodity,
-        lineup.commodityFlag === "badge" || lineup.commodityFlag === "extra"
-          ? lineup.commodityFlag
-          : undefined,
-      )
+    ? {
+        ...toRankPick(
+          lineup.commodity,
+          lineup.commodityFlag === "badge" || lineup.commodityFlag === "extra"
+            ? lineup.commodityFlag
+            : undefined,
+        ),
+        tradeInFactor: table.tradeInFactor,
+      }
     : null;
   return {
     category: lineup.category,

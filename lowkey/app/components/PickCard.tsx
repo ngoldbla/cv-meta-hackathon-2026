@@ -43,6 +43,7 @@ interface PickLike {
   trimGuardHit?: boolean;
   trimRetention5y?: number | null;
   trimFeatures?: string[];
+  tradeInFactor?: number;
   lifespanYears?: number | null;
   lifespanSource?: string | null;
   lifespanAsOf?: string | null;
@@ -178,6 +179,7 @@ export default function PickCard({
     trimRetention5y: pick.trimRetention5y,
     modelRetentionRetail:
       pick.retentionRetail ?? pick.retention5y / 0.85,
+    tradeInFactor: pick.tradeInFactor,
     trimStepCost: pick.trimStepCost,
     trimFeatures: pick.trimFeatures,
     aprPercent: ownership?.aprPercent,

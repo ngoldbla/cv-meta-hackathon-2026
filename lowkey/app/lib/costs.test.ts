@@ -101,8 +101,24 @@ describe("trimLineText (task 029, part 1)", () => {
       trimGuardHit: true, trimRetention5y: 0.6, modelRetentionRetail: 0.68,
     })!;
     expect(line).toContain("LE (base)");
-    expect(line).toContain("keeps 60%");
-    expect(line).toContain("model's 68%");
+    // Displayed percentages are after the 15% discount (retail x 0.85):
+    // trim 0.60 -> 51%, model 0.68 -> 58%. The guard itself compares
+    // the retail fits; only the shown numbers change (task 031).
+    expect(line).toContain("keeps 51%");
+    expect(line).toContain("model's 58%");
+  });
+
+  it("shows only after-discount percentages when retail and discounted differ", () => {
+    // CR-V shape (task 031): retail fits trim 0.688 / model 0.741,
+    // after-discount 0.585 / 0.629 -> "58%" and "63%" on the card.
+    const line = trimLineText({
+      baseTrim: "LX", stepUpTrim: "EX", recommendedTrim: "LX",
+      trimGuardHit: true, trimRetention5y: 0.688, modelRetentionRetail: 0.741,
+    })!;
+    expect(line).toContain("the EX keeps 58%");
+    expect(line).toContain("model's 63%");
+    expect(line).not.toContain("69%");
+    expect(line).not.toContain("74%");
   });
 
   it("says so when the step-up trim has no local stock", () => {

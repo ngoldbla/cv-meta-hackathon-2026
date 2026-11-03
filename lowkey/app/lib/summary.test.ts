@@ -29,7 +29,7 @@ describe("cardSentence (code-written, task 026 part 4)", () => {
   it("builds the top pick sentence from tool numbers only", () => {
     const s = cardSentence(crv, crvOwn, peers, "SUV");
     expect(s).toBe(
-      "Keeps 63% of its price after 5 years, the most of any gas SUV here.",
+      "Keeps about 63% of its price: what you'd likely get selling it after 5 years, the most of any gas SUV here.",
     );
     // Number check: each sentence number traces to a tool result.
     const allowed = new Set<number>([
@@ -43,13 +43,21 @@ describe("cardSentence (code-written, task 026 part 4)", () => {
     const venue = fixture.commodity;
     const s = cardSentence(venue, ownershipFor(venue.price, venue.retention5y), peers, "SUV");
     expect(s).not.toContain("the most of any");
-    expect(s).toContain(`Keeps ${Math.round(venue.retention5y * 100)}%`);
+    expect(s).toContain(`Keeps about ${Math.round(venue.retention5y * 100)}%`);
+  });
+
+  it("never shows the retail percentage when retail and after-discount differ", () => {
+    // CR-V shape (task 031): retail 74%, after-discount 63%.
+    const pick = { rank: 1, make: "Honda", model: "CR-V", price: 34899, retention5y: 0.629, depPerMonth: 216 };
+    const s = cardSentence(pick, undefined, [pick], "SUV");
+    expect(s).toContain("63%");
+    expect(s).not.toContain("74%");
   });
 
   it("handles missing ownership without inventing numbers", () => {
     const s = cardSentence(crv, undefined, peers, "SUV");
     expect(s).toBe(
-      "Keeps 63% of its price after 5 years, the most of any gas SUV here.",
+      "Keeps about 63% of its price: what you'd likely get selling it after 5 years, the most of any gas SUV here.",
     );
   });
 
@@ -61,7 +69,7 @@ describe("cardSentence (code-written, task 026 part 4)", () => {
     const s = cardSentence(pick, own, [pick], "SUV");
     // Single-peer lineup: no superlative claim, and no walk-away
     // numbers on the card face (they live in the walk-away view).
-    expect(s).toBe("Keeps 63% of its price after 5 years.");
+    expect(s).toBe("Keeps about 63% of its price: what you'd likely get selling it after 5 years.");
     expect(underwaterLabel(own.evenMonth)).toBe("Underwater for 7 months");
   });
 });
@@ -75,7 +83,7 @@ describe("cardSentence with trim and lifespan (task 029, part 4)", () => {
       trimIsStepUp: true, lifespanYears: 11.3,
     };
     const s = cardSentence(pick, ownershipFor(28295, 0.577), [pick], "Sedan");
-    expect(s).toContain("The SE is one step up from base and keeps 58%");
+    expect(s).toContain("The SE is one step up from base and keeps about 58%");
     expect(s).toContain("Built to last about 11 years.");
   });
 

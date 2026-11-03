@@ -61,6 +61,7 @@ interface PickOut {
   trimGuardHit?: boolean;
   trimRetention5y?: number | null;
   trimFeatures?: string[];
+  tradeInFactor?: number;
   lifespanYears?: number | null;
   lifespanSource?: string | null;
   lifespanAsOf?: string | null;
