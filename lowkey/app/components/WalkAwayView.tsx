@@ -41,6 +41,7 @@ export interface WalkAwayPick {
   rank: number | null;
   make: string;
   model: string;
+  lifespanYears?: number | null;
 }
 
 const usd0 = new Intl.NumberFormat("en-US", {
@@ -219,6 +220,12 @@ export default function WalkAwayView({
           Cost per month falls the longer you keep it. A minus sign means you would owe the difference to sell.
         </Typography>
       </section>
+      {pick.lifespanYears ? (
+        <Typography variant="paragraph-sm" className="text-muted-foreground">
+          Lasts about {Math.round(pick.lifespanYears)} years: {money(ownership.price)} with
+          fees is about {money(ownership.price / pick.lifespanYears)} a year of life.
+        </Typography>
+      ) : null}
       <Typography variant="paragraph-xs" className="text-muted-foreground">
         {money(ownership.price)}, {downPct}% down, {ownership.termMonths} months, {aprText}. Say “my rate is 5.9%” to change it. Worth if sold = recent sales of this model, less 15%. Excludes tax, insurance, fuel and repairs.
       </Typography>

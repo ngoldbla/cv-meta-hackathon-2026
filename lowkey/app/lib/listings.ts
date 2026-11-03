@@ -21,6 +21,8 @@ export interface LocalUnitsResult {
   zip: string;
   model: string;
   providerModel: string;
+  /** Trim filter the search used, or null for any trim. */
+  trim: string | null;
   units: LocalUnit[];
   unitsFound: number;
   totalFound: number;
@@ -56,6 +58,7 @@ export function listingsUrl(
   providerModel: string,
   zip: string,
   radius: number,
+  trim?: string | null,
 ): string {
   const params = new URLSearchParams({
     inventory_type: "new",
@@ -69,6 +72,7 @@ export function listingsUrl(
     fuel_type: "Gas only",
     exclude_powertrain_type: "MHEV,HEV",
   });
+  if (trim) params.set("trim", trim);
   return `${baseUrl.replace(/\/$/, "")}/listings?${params.toString()}`;
 }
 
@@ -113,11 +117,16 @@ export function mapListingsResponse(
   return { units: units.slice(0, 3), total };
 }
 
-function failure(zip: string, providerModel: string): LocalUnitsResult {
+function failure(
+  zip: string,
+  providerModel: string,
+  trim: string | null = null,
+): LocalUnitsResult {
   return {
     zip,
     model: providerModel,
     providerModel,
+    trim,
     units: [],
     unitsFound: 0,
     totalFound: 0,
@@ -130,6 +139,7 @@ function failure(zip: string, providerModel: string): LocalUnitsResult {
 export async function fetchLocalUnits(args: {
   zip: string;
   providerModel: string;
+  trim?: string | null;
   fetcher?: ListingsFetcher;
   baseUrl?: string;
   apiKey?: string;
@@ -137,17 +147,18 @@ export async function fetchLocalUnits(args: {
   retryDelaysMs?: number[];
 }): Promise<LocalUnitsResult> {
   const { zip, providerModel } = args;
+  const trim = args.trim ?? null;
   const baseUrl = args.baseUrl ?? process.env.LOWKEY_PROVIDER_BASE_URL;
   const apiKey = args.apiKey ?? process.env.LOWKEY_PROVIDER_KEY;
   if (!baseUrl || !apiKey || !providerModel || !/^\d{5}$/.test(zip)) {
-    return failure(zip, providerModel);
+    return failure(zip, providerModel, trim);
   }
   const fetcher: ListingsFetcher =
     args.fetcher ?? (fetch as unknown as ListingsFetcher);
 
   const retryDelays = args.retryDelaysMs ?? [700, 1400];
   async function search(radius: number) {
-    const url = listingsUrl(baseUrl!, providerModel, zip, radius);
+    const url = listingsUrl(baseUrl!, providerModel, zip, radius, trim);
     for (let attempt = 0; ; attempt += 1) {
       const res = await fetcher(url, {
         headers: {
@@ -180,6 +191,7 @@ export async function fetchLocalUnits(args: {
         zip,
         model: providerModel,
         providerModel,
+        trim,
         units: first.units,
         unitsFound: first.units.length,
         totalFound: first.total,
@@ -195,6 +207,7 @@ export async function fetchLocalUnits(args: {
         zip,
         model: providerModel,
         providerModel,
+        trim,
         units: wide.units,
         unitsFound: wide.units.length,
         totalFound: wide.total,
@@ -209,6 +222,7 @@ export async function fetchLocalUnits(args: {
         zip,
         model: providerModel,
         providerModel,
+        trim,
         units: first.units,
         unitsFound: first.units.length,
         totalFound: first.total,
@@ -219,6 +233,56 @@ export async function fetchLocalUnits(args: {
       };
     }
   } catch {
-    return failure(zip, providerModel);
+    return failure(zip, providerModel, trim);
   }
+}
+
+export interface TrimSearchOutcome {
+  result: LocalUnitsResult;
+  /** Trim whose units (if any) the result carries. */
+  trimUsed: string | null;
+  /** True when the step-up trim had no stock and base was searched. */
+  fellBackToBase: boolean;
+}
+
+/**
+ * Recommended-trim search with the no-stock fallback (task 029,
+ * part 1): search the recommended trim first (50 widening to 150
+ * miles inside fetchLocalUnits); only a clean zero within 150 miles
+ * falls back to the base trim. A load error never falls back, since
+ * stock is then unknown rather than absent.
+ */
+export async function fetchUnitsWithTrimFallback(args: {
+  zip: string;
+  providerModel: string;
+  recommendedTrim?: string | null;
+  baseTrim?: string | null;
+  fetcher?: ListingsFetcher;
+  baseUrl?: string;
+  apiKey?: string;
+  retryDelaysMs?: number[];
+}): Promise<TrimSearchOutcome> {
+  const recommended = args.recommendedTrim ?? null;
+  const base = args.baseTrim ?? null;
+  const shared = {
+    zip: args.zip,
+    providerModel: args.providerModel,
+    fetcher: args.fetcher,
+    baseUrl: args.baseUrl,
+    apiKey: args.apiKey,
+    retryDelaysMs: args.retryDelaysMs,
+  };
+  if (!recommended || !base || recommended === base) {
+    const result = await fetchLocalUnits({
+      ...shared,
+      trim: recommended ?? base,
+    });
+    return { result, trimUsed: result.trim, fellBackToBase: false };
+  }
+  const first = await fetchLocalUnits({ ...shared, trim: recommended });
+  if (first.error || first.totalFound > 0 || first.unitsFound > 0) {
+    return { result: first, trimUsed: recommended, fellBackToBase: false };
+  }
+  const fallback = await fetchLocalUnits({ ...shared, trim: base });
+  return { result: fallback, trimUsed: base, fellBackToBase: true };
 }

@@ -37,11 +37,13 @@ PREFLIGHT = Path(__file__).resolve().parent.parent / "preflight"
 sys.path.insert(0, str(PREFLIGHT))
 
 import analyze  # noqa: E402
+import lifespan as lifespan_mod  # noqa: E402
 import lineup as lineup_mod  # noqa: E402
 import make_map  # noqa: E402
 import p6_sold_depth  # noqa: E402
 import p15_gas  # noqa: E402
 import provider_client  # noqa: E402
+import trim as trim_mod  # noqa: E402
 
 CACHE_DIR = Path.home() / ".cache" / "low-key"
 PREFLIGHT_CACHE = CACHE_DIR / "preflight"
@@ -328,6 +330,230 @@ def forecast_all(records: dict[str, dict], skip: bool) -> dict[str, dict]:
     return out
 
 
+def _spec_model_name(provider_model: str) -> str:
+    """Model name the specs index uses (the provider value itself).
+
+    The specs index keeps body styles ("Honda Accord Sedan",
+    "Mazda Mazda3 Sedan"), so stripping the suffix would miss.
+    """
+    return provider_model
+
+
+def _metric(body: dict, facet: str, value: str, name: str) -> float | None:
+    rows = (body.get("data", {}).get("facets", {}).get(facet) or [])
+    for row in rows:
+        if row.get("value") == value:
+            raw = (row.get("metrics", {}).get(name) or {}).get("value")
+            return float(raw) if raw is not None else None
+    return None
+
+
+def _facet_trim_rows(category: str, provider_model: str) -> list[dict]:
+    body = provider_client.get(
+        "/facets",
+        {
+            "facets": "trim",
+            "inventory_type": "new",
+            "body_type": category,
+            "model": provider_model,
+            "year": str(trim_mod.CURRENT_YEAR),
+            "metrics": "price.median,msrp.median",
+            "facet_value_limit": "80",
+        },
+    )
+    return body.get("data", {}).get("facets", {}).get("trim") or []
+
+
+def _trims_from_specs(
+    make: str, provider_model: str
+) -> tuple[list[trim_mod.TrimPrice], dict[str, str]]:
+    """Current-year trims with starting MSRPs from the specs API.
+
+    Resolves "<make> <model>" to its model spec, then reads the year
+    spec's trim list. Returns (trims, trim -> spec_ref). Raises on
+    any missing step so the caller can fall back to facets.
+    """
+    spec_model = _spec_model_name(provider_model)
+    resolved = provider_client.get(
+        "/specs/resolve", {"q": f"{make} {spec_model}"}
+    )
+    wanted = f"{make} {spec_model}".lower()
+    model_ref = None
+    for entry in resolved.get("data") or []:
+        if entry.get("level") == "model" and str(entry.get("name", "")).lower() == wanted:
+            model_ref = entry.get("spec_ref")
+            break
+    if not model_ref:
+        raise ValueError(f"no model spec for {make} {spec_model}")
+    year = provider_client.get(
+        f"/specs/{model_ref}/{trim_mod.CURRENT_YEAR}", {}
+    )
+    trims: list[trim_mod.TrimPrice] = []
+    refs: dict[str, str] = {}
+    for row in (year.get("data") or {}).get("trims") or []:
+        name = row.get("name")
+        msrp = row.get("starting_msrp")
+        if name and msrp:
+            trims.append(
+                trim_mod.TrimPrice(str(name), float(msrp), row.get("spec_ref"))
+            )
+            if row.get("spec_ref"):
+                refs[str(name)] = str(row["spec_ref"])
+    if not trims:
+        raise ValueError(f"no priced trims in specs for {provider_model}")
+    return trims, refs
+
+
+def _standard_options(spec_ref: str) -> list[str]:
+    body = provider_client.get(f"/specs/{spec_ref}", {})
+    names: list[str] = []
+    for opt in (body.get("data") or {}).get("options") or []:
+        if opt.get("status") == "standard" and opt.get("name"):
+            names.append(str(opt["name"]))
+    return names
+
+
+def trim_for_pick(category: str, pick: dict) -> dict:
+    """Trim recommendation fields for one table pick (task 029, part 1).
+
+    Specs (starting MSRP) is the primary trim-order source; facets
+    (median MSRP of new units) is the fallback. Any failure leaves
+    null trims rather than failing the build or guessing.
+    """
+    empty = {
+        "baseTrim": None,
+        "stepUpTrim": None,
+        "recommendedTrim": None,
+        "trimBaseMsrp": None,
+        "trimRecommendedMsrp": None,
+        "trimStepCost": None,
+        "trimIsStepUp": False,
+        "trimGuardHit": False,
+        "trimRetention5y": None,
+        "trimSource": None,
+        "trimFeatures": [],
+    }
+    provider_model = pick["providerModel"]
+    make = pick["make"]
+    try:
+        try:
+            trims, refs = _trims_from_specs(make, provider_model)
+            source: str | None = "specs"
+        except Exception as exc:
+            print(f"trim specs fallback {provider_model}: {type(exc).__name__}", flush=True)
+            rows = _facet_trim_rows(category, provider_model)
+            trims = [
+                trim_mod.TrimPrice(
+                    str(r["value"]),
+                    float((r.get("metrics", {}).get("msrp.median") or {}).get("value")),
+                )
+                for r in rows
+                if (r.get("metrics", {}).get("msrp.median") or {}).get("value")
+            ]
+            refs = {}
+            source = "facets" if trims else None
+        ordered = trim_mod.order_trims(trims)
+        base, step = trim_mod.step_up(ordered)
+        if base is None:
+            return empty
+        trim_ret: float | None = None
+        if step is not None:
+            # Guard denominator: median new price of the step trim.
+            try:
+                rows = _facet_trim_rows(category, provider_model)
+                body_like = {"data": {"facets": {"trim": rows}}}
+                trim_new_price = _metric(body_like, "trim", step.trim, "price.median")
+            except Exception:
+                trim_new_price = step.msrp
+            sold_by_age: dict[int, tuple[int, float | None]] = {}
+            for sold_year in trim_mod.SOLD_YEARS:
+                try:
+                    body = provider_client.get(
+                        "/facets",
+                        {
+                            "facets": "trim",
+                            "inventory_status": "sold",
+                            "inventory_type": "used",
+                            "body_type": category,
+                            "model": provider_model,
+                            "year": str(sold_year),
+                            "sold_within_days": "90",
+                            "max_mileage": str(
+                                (trim_mod.CURRENT_YEAR - sold_year) * 15000 + 8000
+                            ),
+                            "metrics": "price.median,msrp.median",
+                            "facet_value_limit": "80",
+                        },
+                    )
+                    rows = body.get("data", {}).get("facets", {}).get("trim") or []
+                    row = next((r for r in rows if r.get("value") == step.trim), None)
+                    if row is not None:
+                        price = (row.get("metrics", {}).get("price.median") or {}).get(
+                            "value"
+                        )
+                        sold_by_age[trim_mod.CURRENT_YEAR - sold_year] = (
+                            int(row.get("count") or 0),
+                            float(price) if price is not None else None,
+                        )
+                except Exception as exc:
+                    print(
+                        f"trim guard sold {provider_model} {sold_year}: "
+                        f"{type(exc).__name__}",
+                        flush=True,
+                    )
+            trim_ret = trim_mod.trim_retention_from_sold(sold_by_age, trim_new_price)
+        # First pass without features tells us whether the step stands.
+        choice = trim_mod.choose_trim(
+            ordered,
+            source=source,
+            model_retention_5y=pick.get("retentionRetail"),
+            trim_retention_5y=trim_ret,
+        )
+        features: list[str] = []
+        if choice.is_step_up and source == "specs" and base and step:
+            try:
+                base_std = _standard_options(refs[base.trim])
+                step_std = _standard_options(refs[step.trim])
+                base_names = {n.lower() for n in base_std}
+                features = [n for n in step_std if n.lower() not in base_names][:3]
+                choice = trim_mod.choose_trim(
+                    ordered,
+                    source=source,
+                    model_retention_5y=pick.get("retentionRetail"),
+                    trim_retention_5y=trim_ret,
+                    features=features,
+                )
+            except Exception as exc:
+                print(f"trim features {provider_model}: {type(exc).__name__}", flush=True)
+        print(
+            f"trim {provider_model}: base {choice.base_trim} -> "
+            f"{choice.recommended_trim} via {choice.source}"
+            f"{' (guard)' if choice.guard_hit else ''} "
+            f"trimRet {trim_ret if trim_ret is None else round(trim_ret, 3)}",
+            flush=True,
+        )
+        return {
+            "baseTrim": choice.base_trim,
+            "stepUpTrim": choice.step_trim,
+            "recommendedTrim": choice.recommended_trim,
+            "trimBaseMsrp": choice.base_msrp,
+            "trimRecommendedMsrp": choice.recommended_msrp,
+            "trimStepCost": choice.step_cost,
+            "trimIsStepUp": choice.is_step_up,
+            "trimGuardHit": choice.guard_hit,
+            "trimRetention5y": (
+                round(choice.trim_retention_5y, 4)
+                if choice.trim_retention_5y is not None
+                else None
+            ),
+            "trimSource": choice.source,
+            "trimFeatures": choice.features,
+        }
+    except Exception as exc:
+        print(f"trim {provider_model} failed: {type(exc).__name__}: {exc}", flush=True)
+        return empty
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
@@ -363,6 +589,29 @@ def main() -> None:
                 flush=True,
             )
 
+    # Task 029, parts 1-2: one-step-up trims (specs, facets fallback,
+    # retention guard) and lifespans (outside-git cache) per pick.
+    lifespan_cache = lifespan_mod.load_lifespan_cache()
+    trim_cache: dict[tuple[str, str], dict] = {}
+    for category, entry in lineups.items():
+        picks = [*entry["picks"], *([entry["commodity"]] if entry["commodity"] else [])]
+        for pick in picks:
+            key = (category, pick["providerModel"])
+            if key not in trim_cache:
+                trim_cache[key] = trim_for_pick(category, pick)
+            pick.update(trim_cache[key])
+            life = lifespan_cache["models"].get(pick["providerModel"])
+            if life:
+                pick["lifespanYears"] = life["years"]
+                pick["lifespanMiles"] = lifespan_mod.miles_from_years(life["years"])
+                pick["lifespanSource"] = lifespan_cache["source"]
+                pick["lifespanAsOf"] = lifespan_cache["asOf"]
+            else:
+                pick["lifespanYears"] = None
+                pick["lifespanMiles"] = None
+                pick["lifespanSource"] = None
+                pick["lifespanAsOf"] = None
+
     records = ensure_eia_series(args.refresh_eia, only)
     gas_series = forecast_all(records, args.skip_forecast)
     eia_as_of = max((s["latestDate"] for s in gas_series.values()), default=None)
@@ -387,6 +636,14 @@ def main() -> None:
             "provider": {"asOf": provider_as_of},
             "epa": {"asOf": epa_as_of, "modelYear": epa_year},
             "eia": {"asOf": eia_as_of},
+            "trim": {
+                "asOf": provider_as_of,
+                "method": "specs starting MSRP, facets median MSRP fallback; retention guard >3 points",
+            },
+            "lifespan": {
+                "source": lifespan_cache["source"],
+                "asOf": lifespan_cache["asOf"],
+            },
             "forecast": {
                 "model": "mistralai/Timestral-28M",
                 "asOf": date.today().isoformat(),

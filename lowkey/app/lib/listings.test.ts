@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   fetchLocalUnits,
+  fetchUnitsWithTrimFallback,
+  listingsUrl,
   mapListingsResponse,
   type ListingsFetcher,
 } from "./listings";
@@ -231,5 +233,86 @@ describe("fetchLocalUnits radius widening and failures", () => {
     });
     expect(r.unitsFound).toBe(1);
     expect(r.bestDealer).toBe("Fixture Motors");
+  });
+});
+
+describe("trim filtering and the no-stock fallback (task 029, part 1)", () => {
+  it("adds the trim filter to the search URL only when set", () => {
+    expect(
+      listingsUrl("https://provider.example", "Corolla", "60614", 50, "SE"),
+    ).toContain("trim=SE");
+    expect(
+      listingsUrl("https://provider.example", "Corolla", "60614", 50),
+    ).not.toContain("trim=");
+  });
+
+  it("falls back to base when the step-up trim has no stock in 150 miles", async () => {
+    const urls: string[] = [];
+    const fetcher: ListingsFetcher = async (url) => {
+      urls.push(url);
+      if (url.includes("trim=SE")) {
+        return { ok: true, status: 200, json: async () => body([], 0) };
+      }
+      return {
+        ok: true,
+        status: 200,
+        json: async () => body([row({ trim: "LE" })], 1),
+      };
+    };
+    const out = await fetchUnitsWithTrimFallback({
+      zip: "60614",
+      providerModel: "Corolla",
+      recommendedTrim: "SE",
+      baseTrim: "LE",
+      fetcher,
+      baseUrl: "https://provider.example",
+      apiKey: "test-key",
+    });
+    expect(out.fellBackToBase).toBe(true);
+    expect(out.trimUsed).toBe("LE");
+    expect(out.result.units[0]?.trim).toBe("LE");
+    // SE searched at 50 then 150 (zero found), then LE takes over.
+    expect(urls.some((u) => u.includes("trim=SE") && u.includes("radius=150"))).toBe(true);
+    expect(urls.some((u) => u.includes("trim=LE"))).toBe(true);
+  });
+
+  it("keeps the step-up trim when it is in stock", async () => {
+    const fetcher: ListingsFetcher = async () => ({
+      ok: true,
+      status: 200,
+      json: async () => body([row({ trim: "SE" })], 2),
+    });
+    const out = await fetchUnitsWithTrimFallback({
+      zip: "60614",
+      providerModel: "Corolla",
+      recommendedTrim: "SE",
+      baseTrim: "LE",
+      fetcher,
+      baseUrl: "https://provider.example",
+      apiKey: "test-key",
+    });
+    expect(out.fellBackToBase).toBe(false);
+    expect(out.trimUsed).toBe("SE");
+  });
+
+  it("never falls back on a load error (stock unknown, not absent)", async () => {
+    let calls = 0;
+    const fetcher: ListingsFetcher = async () => {
+      calls += 1;
+      return { ok: false, status: 429, json: async () => ({}) };
+    };
+    const out = await fetchUnitsWithTrimFallback({
+      zip: "60614",
+      providerModel: "Corolla",
+      recommendedTrim: "SE",
+      baseTrim: "LE",
+      fetcher,
+      baseUrl: "https://provider.example",
+      apiKey: "test-key",
+      retryDelaysMs: [1, 1],
+    });
+    expect(out.fellBackToBase).toBe(false);
+    expect(out.result.error).toBe("Couldn't load local stock right now");
+    expect(calls).toBeGreaterThan(0);
   });
 });

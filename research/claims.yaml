@@ -137,3 +137,20 @@
   source: Hansen, Nielsen & Rehn, PLoS ONE (2025), doi:10.1371/journal.pone.0335665, abstract
   verdict: supported (abstract; full text not checked)
   evidence: '"found lack of evidence to infer an association between the EMS response time and patient survival, with very low certainty of evidence"; "Only sparse scientific evidence supports the notion that the shortest possible response time relates to improved patient outcomes ... other than out-of-hospital cardiac arrest and trauma"'
+# Task 029 P18 (2026-11-03): vehicle-lifespan sources checked before any
+# lifespan number was built on. Fetched 2026-11-03 from iseecars.com.
+- id: lowkey029-iseecars-250k-probability
+  claim: The iSeeCars Longest-Lasting Cars study gives each model a predicted chance of reaching 250,000 miles (industry average 4.8% in the 2025 study cited by task 029; 5.4% in the current study)
+  source: iSeeCars, The Longest Lasting Cars Most Likely To Reach 250,000 Miles, https://www.iseecars.com/longest-lasting-cars-study (current study dated September 15, 2026; fetched 2026-11-03)
+  verdict: supported as a probability; overstated if read as an expected lifespan in miles or years
+  evidence: '"analyzed data for over 395 million cars"; "The average vehicle has a 5.4% chance of reaching 250,000 miles"; methodology: "The average odometer reading for each vehicle was calculated at each yearly age, and a proprietary model based on these average mileages was developed to estimate the probability that each vehicle would survive to various mileage thresholds." A survival probability at one threshold does not determine an expected life without a further distributional assumption, so Low Key does not convert it to years. The 4.8% figure is the superseded 2025 average (174M vehicles), not the current 5.4%.
+- id: lowkey029-iseecars-expected-years
+  claim: The iSeeCars Most Reliable New Cars for the Money study (2026) gives an expected lifespan in years per model, derived from the Longest-Lasting odometer model, covering 10 of Low Keys 12 ranked models (all except Corolla Cross and CX-50)
+  source: iSeeCars, The Most Reliable New Cars for the Money for 2026, https://www.iseecars.com/best-new-cars-for-the-money-study (fetched 2026-11-03)
+  verdict: supported (study tables; lifespan model itself is proprietary and not independently recomputable)
+  evidence: 'Methodology: "analyzed the prices of over 8.7 million new cars sold in July - December 2025 and the odometer readings of almost 400 million used cars from its Longest Lasting Cars Study. The average list price of each model was compared to its expected lifespan (in years)"; overall average "an 11-year lifespan, or $4,251 for each year". Table values checked: Honda Civic 13.5 years, Toyota Corolla 11.3, Mazda Mazda3 Sedan 10.7 (hatchback 13.8, not used for the sedan), Honda Accord 12.4, Honda CR-V 13.9, Toyota 4Runner 14.1, Toyota Tacoma 15.7, Chevrolet Colorado 12.6, Chevrolet Silverado 1500 12.2, Ram 1500 10.8. No expected-years row for Corolla Cross, Mazda CX-50, Hyundai Venue or Ford Maverick appears in the published overall or segment tables, so those models show no lifespan.'
+- id: lowkey029-iseecars-potential-lifespan
+  claim: The iSeeCars car-lifespan study gives a potential lifespan in miles per model (for example Toyota Sequoia 296,509 miles)
+  source: iSeeCars, How Many Miles Can a Car Last?, https://www.iseecars.com/car-lifespan-study (fetched 2026-11-03)
+  verdict: overstated if used as an expected lifespan; covers only 20 models
+  evidence: '"analyzed over two million cars produced and sold for at least 10 of the past 20 model years, ranking each model by its highest mileage-achieving cars"; "the top 1 percent of these vehicles delivered between 230,000 and 297,000 miles"; "this study isn''t reporting the maximum lifespan of these vehicles. This is simply a measure of current odometer readings." The figure is a 99th-percentile odometer reading, not a mean life, and none of Low Keys sedan/SUV ranked models except 4Runner, CR-V, Tacoma and Silverado 1500 appears in the relevant top-20/segment lists.'

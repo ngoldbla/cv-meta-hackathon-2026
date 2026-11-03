@@ -7,16 +7,13 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { RollingDigits } from "@/components/ui/rolling-digits";
 import { StatusDot } from "@/components/ui/status-dot";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  effectiveMonthlyCost,
+  lastsAboutLabel,
+  monthlyBills,
+  trimLineText,
+} from "@/lib/costs";
 import { cardSentence, underwaterLabel } from "@/lib/summary";
 import { CarFigure } from "./hairline/CarFigure";
 import type { CarKind } from "@/lib/hairline/cars";
@@ -35,8 +32,20 @@ interface PickLike {
   price: number;
   typicalNewPrice?: number;
   retention5y: number;
+  retentionRetail?: number;
   depPerMonth: number;
   flag?: "badge" | "extra";
+  baseTrim?: string | null;
+  stepUpTrim?: string | null;
+  recommendedTrim?: string | null;
+  trimStepCost?: number | null;
+  trimIsStepUp?: boolean;
+  trimGuardHit?: boolean;
+  trimRetention5y?: number | null;
+  trimFeatures?: string[];
+  lifespanYears?: number | null;
+  lifespanSource?: string | null;
+  lifespanAsOf?: string | null;
 }
 
 interface OwnershipLike {
@@ -44,6 +53,9 @@ interface OwnershipLike {
   priceSource?: "local" | "typical" | "given";
   priceLabel?: string | null;
   monthlyPayment: number;
+  loanAmount?: number;
+  downPayment?: number;
+  aprPercent?: number;
   evenMonth?: number | null;
   underwaterMonth?: number | null;
   curve?: CurveLike[];
@@ -75,6 +87,10 @@ export interface LocalLike {
   widened?: boolean;
   error?: string | null;
   fuel?: FuelLike | null;
+  recommendedTrim?: string | null;
+  baseTrim?: string | null;
+  trimUsed?: string | null;
+  fellBackToBase?: boolean;
   units: {
     dealer: string;
     distanceMiles: number;
@@ -96,11 +112,6 @@ function fmt(n: number | undefined | null): string {
   return n === undefined || n === null ? "—" : usd.format(n);
 }
 
-function signed(n: number): string {
-  if (n < 0) return `-$${Math.abs(Math.round(n)).toLocaleString("en-US")}`;
-  return usd.format(n);
-}
-
 export default function PickCard({
   pick,
   ownership,
@@ -116,7 +127,6 @@ export default function PickCard({
   category?: string;
   onWalkAway?: () => void;
 }) {
-  const leave1y = ownership?.walkAway.find((p) => p.month === 12);
   const units = local?.units ?? [];
   const bestUnit =
     units.length > 0
@@ -140,8 +150,39 @@ export default function PickCard({
     peers && peers.length > 0 ? peers : [pick],
     category ?? "",
   );
-  const keepsPrice = ownership?.price ?? pick.price;
-  const typical = ownership?.priceSource === "typical";
+  const bills = ownership
+    ? monthlyBills(ownership.monthlyPayment, local?.fuel?.perMonth)
+    : null;
+  const priceForCost = ownership?.price ?? pick.price;
+  const loanForCost =
+    ownership?.loanAmount ??
+    (ownership?.downPayment !== undefined
+      ? priceForCost - ownership.downPayment
+      : priceForCost * 0.9);
+  const effective =
+    ownership !== undefined
+      ? effectiveMonthlyCost({
+          price: priceForCost,
+          retentionAfterDiscount: pick.retention5y,
+          monthlyPayment: ownership.monthlyPayment,
+          loanAmount: loanForCost,
+          fuelPerMonth: local?.fuel?.perMonth,
+        })
+      : null;
+  const trimLine = trimLineText({
+    baseTrim: pick.baseTrim,
+    stepUpTrim: pick.stepUpTrim,
+    recommendedTrim: pick.recommendedTrim,
+    trimIsStepUp: pick.trimIsStepUp,
+    trimGuardHit: pick.trimGuardHit,
+    trimRetention5y: pick.trimRetention5y,
+    modelRetentionRetail:
+      pick.retentionRetail ?? pick.retention5y / 0.85,
+    trimStepCost: pick.trimStepCost,
+    trimFeatures: pick.trimFeatures,
+    aprPercent: ownership?.aprPercent,
+    fellBackToBase: local?.fellBackToBase,
+  });
   return (
     <Card className="my-3">
       <CardHeader>
@@ -166,39 +207,62 @@ export default function PickCard({
             <CarFigure kind={KIND_BY_CATEGORY[category]} />
           </div>
         ) : null}
-        <dl className="grid grid-cols-1 gap-x-4 gap-y-3 min-[420px]:grid-cols-2">
+        {trimLine ? (
+          <p className="mb-3 text-[13px] leading-relaxed text-foreground/80">{trimLine}</p>
+        ) : null}
+        <dl className="grid grid-cols-1 gap-x-4 gap-y-3">
           <div>
-            <dt className="text-xs text-muted-foreground">Per month</dt>
+            <dt className="text-xs text-muted-foreground">Monthly bills</dt>
             <dd className="mono text-[15px]">
-              {ownership ? (
-                <>
-                  $
-                  <RollingDigits
-                    value={Math.round(ownership.monthlyPayment)}
-                    locale="en-US"
-                  />
-                  /mo
-                  {typical ? (
-                    <span className="font-sans text-xs text-muted-foreground"> typical price</span>
-                  ) : null}
-                </>
+              {bills
+                ? bills.gas !== null
+                  ? `${fmt(bills.total)} a month: ${fmt(bills.loan)} loan + ${fmt(bills.gas)} gas`
+                  : `${fmt(bills.total)} a month (loan; no gas estimate)`
+                : "—"}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs text-muted-foreground">Cost to drive</dt>
+            <dd className="mono text-[15px]">
+              {effective !== null ? `${fmt(effective)} a month` : "—"}
+            </dd>
+            <dd className="text-[13px] leading-relaxed text-foreground/80">
+              Lower than your bills, because you keep the car&apos;s resale value.
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs text-muted-foreground">Distance to the dealer</dt>
+            <dd className="text-[15px]">
+              {local?.error ? (
+                <span>{local.error}</span>
+              ) : bestUnit ? (
+                <span>
+                  <span className="mono">{bestUnit.distanceMiles} mi</span>
+                  {" · "}
+                  {bestUnit.dealer}
+                  {" · "}
+                  <a
+                    href={bestUnit.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-block py-[13px] -my-[13px]"
+                  >
+                    See the car
+                  </a>
+                </span>
+              ) : local ? (
+                <span>No local stock found. Payment uses the typical price.</span>
               ) : (
                 "—"
               )}
             </dd>
           </div>
-          <div>
-            <dt className="text-xs text-muted-foreground">Keeps after 5 years</dt>
-            <dd className="mono text-[15px]">{`${Math.round(pick.retention5y * 100)}% · ${fmt(keepsPrice * pick.retention5y)}`}</dd>
-          </div>
-          <div>
-            <dt className="text-xs text-muted-foreground">Leave at 1 year</dt>
-            <dd className="mono text-[15px]">{leave1y ? fmt(leave1y.walkAwayCost) : "—"}</dd>
-          </div>
-          <div>
-            <dt className="text-xs text-muted-foreground">Best local price</dt>
-            <dd className="mono text-[15px]">{fmt(local?.bestPrice ?? bestUnit?.price)}</dd>
-          </div>
+          {pick.lifespanYears !== null && pick.lifespanYears !== undefined ? (
+            <div>
+              <dt className="text-xs text-muted-foreground">Lifespan</dt>
+              <dd className="text-[15px]">{lastsAboutLabel(pick.lifespanYears)}</dd>
+            </div>
+          ) : null}
           <div>
             <dt className="text-xs text-muted-foreground">
               {ownership ? underwaterLabel(even) : "Worth vs owe"}
@@ -211,62 +275,13 @@ export default function PickCard({
               )}
             </dd>
           </div>
-          <div>
-            <dt className="text-xs text-muted-foreground">Local stock</dt>
-            <dd className="text-[15px]">
-              {local?.error ? (
-                <span>{local.error}</span>
-              ) : units.length > 0 ? (
-                <span>
-                  {units.length} nearby · closest{" "}
-                  <span className="mono">{bestUnit?.distanceMiles} mi</span>
-                </span>
-              ) : local ? (
-                <span>No local stock found. Payment uses the typical price.</span>
-              ) : (
-                "—"
-              )}
-            </dd>
-          </div>
         </dl>
-        {local?.fuel ? (
-          <p className="mt-3 text-[13px] leading-relaxed text-foreground/80">{local.fuel.text}</p>
-        ) : null}
-        {local?.widened ? (
-          <p className="mt-2 text-[13px] text-muted-foreground">
-            Searched out to 150 miles.
-            {local.totalFound !== undefined && local.totalFound < 3
-              ? ` Only ${local.totalFound} in stock within 150 miles.`
-              : ""}
+        {pick.lifespanYears !== null && pick.lifespanYears !== undefined &&
+        pick.lifespanSource ? (
+          <p className="mt-3 text-xs text-muted-foreground">
+            Lifespan: {pick.lifespanSource}
+            {pick.lifespanAsOf ? `, as of ${pick.lifespanAsOf}` : ""}.
           </p>
-        ) : null}
-        {units.length > 0 ? (
-          <ul className="mt-2.5 list-disc pl-[18px] text-[13px] leading-relaxed text-foreground/80">
-            {units.map((u) => (
-              <li key={u.url}>
-                <span className="mono">{fmt(u.price)}</span>
-                {" · "}
-                {u.dealer}
-                {" · "}
-                <span className="mono">{u.distanceMiles} mi</span>
-                {u.daysOnLot !== null && u.daysOnLot !== undefined
-                  ? ` · ${u.daysOnLot} days on the lot`
-                  : ""}
-                {u.year || u.trim
-                  ? ` · ${[u.year, u.trim].filter(Boolean).join(" ")}`
-                  : ""}
-                {" · "}
-                <a
-                  href={u.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-block py-[13px] -my-[13px]"
-                >
-                  See the car
-                </a>
-              </li>
-            ))}
-          </ul>
         ) : null}
         {ownership && onWalkAway ? (
           <button
@@ -276,35 +291,6 @@ export default function PickCard({
           >
             If I change my mind
           </button>
-        ) : null}
-        {ownership ? (
-          <details className="mt-2 border-t border-border pt-2.5 text-sm">
-            <summary className="min-h-11 cursor-pointer py-2 font-semibold">
-              Walk-away table
-            </summary>
-            <Table columns="minmax(0,0.7fr) minmax(0,1fr) minmax(0,1fr)" size="compact">
-              <TableHeader>
-                <TableRow variant="header">
-                  <TableHead>Sell at</TableHead>
-                  <TableHead align="right">You get back</TableHead>
-                  <TableHead align="right">Cost per month</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {ownership.walkAway.map((p) => (
-                  <TableRow key={p.month}>
-                    <TableCell className="mono">{p.month} mo</TableCell>
-                    <TableCell align="right" className="mono">
-                      {p.getBack !== undefined ? signed(p.getBack) : "—"}
-                    </TableCell>
-                    <TableCell align="right" className="mono">
-                      {fmt(p.costPerMonth ?? p.perMonth)}/mo
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </details>
         ) : null}
       </CardContent>
     </Card>

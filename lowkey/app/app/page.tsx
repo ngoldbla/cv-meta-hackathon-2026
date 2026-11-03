@@ -48,9 +48,21 @@ interface PickOut {
   price: number;
   typicalNewPrice?: number;
   retention5y: number;
+  retentionRetail?: number;
   depPerMonth: number;
   mpg?: number | null;
   flag?: "badge" | "extra";
+  baseTrim?: string | null;
+  stepUpTrim?: string | null;
+  recommendedTrim?: string | null;
+  trimStepCost?: number | null;
+  trimIsStepUp?: boolean;
+  trimGuardHit?: boolean;
+  trimRetention5y?: number | null;
+  trimFeatures?: string[];
+  lifespanYears?: number | null;
+  lifespanSource?: string | null;
+  lifespanAsOf?: string | null;
 }
 
 interface RankOutput {
@@ -68,6 +80,7 @@ interface OwnershipOutput {
   priceSource?: "local" | "typical" | "given";
   priceLabel?: string | null;
   typicalPrice?: number | null;
+  loanAmount?: number;
   downPayment: number;
   aprPercent: number;
   termMonths: number;

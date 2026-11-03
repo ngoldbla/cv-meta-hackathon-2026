@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { fuelForModel } from "./fuel";
 import { aprLabel, getDefaultApr } from "./fred";
-import { fetchLocalUnits } from "./listings";
+import { fetchUnitsWithTrimFallback } from "./listings";
 import { ownershipMath } from "./ownership";
 import {
   getTable,
@@ -40,7 +40,13 @@ export async function executeLocalUnits(args: {
   }
   const resolved = table && model ? resolveTablePick(table, model) : undefined;
   const providerModel = resolved?.pick.providerModel ?? (model ?? "");
-  const result = await fetchLocalUnits({ zip, providerModel });
+  const search = await fetchUnitsWithTrimFallback({
+    zip,
+    providerModel,
+    recommendedTrim: resolved?.pick.recommendedTrim ?? null,
+    baseTrim: resolved?.pick.baseTrim ?? null,
+  });
+  const result = search.result;
   const fuel =
     table && resolved
       ? fuelForModel({ mpg: resolved.pick.mpg, zip, table })
@@ -51,6 +57,10 @@ export async function executeLocalUnits(args: {
     providerModel: providerModel || null,
     make: resolved?.pick.make ?? null,
     category: category ?? null,
+    recommendedTrim: resolved?.pick.recommendedTrim ?? null,
+    baseTrim: resolved?.pick.baseTrim ?? null,
+    trimUsed: search.trimUsed,
+    fellBackToBase: search.fellBackToBase,
     units: result.units,
     unitsFound: result.unitsFound,
     totalFound: result.totalFound,
@@ -88,11 +98,18 @@ export async function executeOwnership(args: {
   let price = args.price;
   let priceSource: "local" | "typical" | "given" = args.priceSource ?? "given";
   let typicalPrice: number | null = resolved?.pick.typicalNewPrice ?? null;
+  let trimUsed: string | null = resolved?.pick.recommendedTrim ?? null;
+  let fellBackToBase = false;
   if (zip && resolved) {
-    const local = await fetchLocalUnits({
+    const search = await fetchUnitsWithTrimFallback({
       zip,
       providerModel: resolved.pick.providerModel,
+      recommendedTrim: resolved.pick.recommendedTrim ?? null,
+      baseTrim: resolved.pick.baseTrim ?? null,
     });
+    const local = search.result;
+    trimUsed = search.trimUsed;
+    fellBackToBase = search.fellBackToBase;
     if (local.bestPrice !== undefined) {
       price = local.bestPrice;
       priceSource = "local";
@@ -126,6 +143,11 @@ export async function executeOwnership(args: {
     priceSource,
     priceLabel: priceSource === "typical" ? "typical price" : null,
     typicalPrice,
+    trimUsed,
+    fellBackToBase,
+    recommendedTrim: resolved?.pick.recommendedTrim ?? null,
+    baseTrim: resolved?.pick.baseTrim ?? null,
+    lifespanYears: resolved?.pick.lifespanYears ?? null,
     aprDate: aprInfo?.dateIso ?? null,
     aprAssumed: aprInfo?.assumed ?? false,
     aprLabel: aprInfo ? aprLabel(aprInfo) : null,

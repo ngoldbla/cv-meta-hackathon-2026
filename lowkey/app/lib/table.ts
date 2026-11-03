@@ -30,6 +30,22 @@ export interface TablePick {
     fittedAges: number[];
   };
   mpg: number | null;
+  /** Task 029 trim/lifespan fields (null on tables built before 029). */
+  baseTrim?: string | null;
+  stepUpTrim?: string | null;
+  recommendedTrim?: string | null;
+  trimBaseMsrp?: number | null;
+  trimRecommendedMsrp?: number | null;
+  trimStepCost?: number | null;
+  trimIsStepUp?: boolean;
+  trimGuardHit?: boolean;
+  trimRetention5y?: number | null;
+  trimSource?: string | null;
+  trimFeatures?: string[];
+  lifespanYears?: number | null;
+  lifespanMiles?: number | null;
+  lifespanSource?: string | null;
+  lifespanAsOf?: string | null;
 }
 
 export interface TableLineup {
@@ -137,6 +153,21 @@ export function toRankPick(pick: TablePick, flag?: "badge" | "extra") {
     depPerMonth: pick.depPerMonth,
     sampleSizes: pick.sampleSizes,
     mpg: pick.mpg,
+    baseTrim: pick.baseTrim ?? null,
+    stepUpTrim: pick.stepUpTrim ?? null,
+    recommendedTrim: pick.recommendedTrim ?? null,
+    trimBaseMsrp: pick.trimBaseMsrp ?? null,
+    trimRecommendedMsrp: pick.trimRecommendedMsrp ?? null,
+    trimStepCost: pick.trimStepCost ?? null,
+    trimIsStepUp: pick.trimIsStepUp ?? false,
+    trimGuardHit: pick.trimGuardHit ?? false,
+    trimRetention5y: pick.trimRetention5y ?? null,
+    trimSource: pick.trimSource ?? null,
+    trimFeatures: pick.trimFeatures ?? [],
+    lifespanYears: pick.lifespanYears ?? null,
+    lifespanMiles: pick.lifespanMiles ?? null,
+    lifespanSource: pick.lifespanSource ?? null,
+    lifespanAsOf: pick.lifespanAsOf ?? null,
     ...(flag ? { flag } : {}),
   };
 }
