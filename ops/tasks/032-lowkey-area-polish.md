@@ -1,7 +1,7 @@
 ---
 id: "032"
 title: "Low Key: keep \"approximate\" until the area is really confirmed; retry a failed city lookup"
-status: in_progress
+status: done
 created: 2026-11-03
 report: ops/reports/032-lowkey-area-polish.md
 ---
