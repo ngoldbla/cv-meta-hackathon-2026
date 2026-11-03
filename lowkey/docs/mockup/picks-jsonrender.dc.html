@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Low Key: your picks</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#7A5A10}a:hover{color:#5C430A}
+.mono{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
+.lbl{font-size:12px;color:#5A5C60}
+.bar{display:flex;height:22px;border-radius:5px;overflow:hidden;background:#F3F2EE}
+.bar>span{display:block;height:100%}
+.loan{background:#1B1C1E}.gas{background:#D9C08A}.lost{background:#7A5A10}.int{background:#8E8A80}
+.back{background:repeating-linear-gradient(135deg,#BFD6C4 0 6px,#D7E6DA 6px 12px)}
+.key{display:inline-flex;align-items:center;gap:5px}
+.sw{width:10px;height:10px;border-radius:2px;display:inline-block}
+.row{display:grid;grid-template-columns:96px 1fr 44px;align-items:center;gap:8px;font-size:13px}
+.row .bar{height:16px}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 1600px; box-sizing: border-box; background: #F3F2EE; color: #1B1C1E; font-family: 'IBM Plex Sans', system-ui, sans-serif; display: flex; flex-direction: column">
+  <header style="display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid #DAD8D1">
+    <a href="Main.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #1B1C1E; min-height: 44px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7A5A10" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"></circle><path d="M11 12l9-9"></path><path d="M17 6l3 3"></path><path d="M15 8l2 2"></path></svg>
+      <span style="font-weight: 600; font-size: 18px">Low Key</span>
+    </a>
+    <span class="mono" style="font-size: 12px; color: #5A5C60">60614 · SUV</span>
+  </header>
+
+  <div style="display: flex; flex-direction: column; gap: 16px; padding: 18px 16px 28px">
+    <div style="align-self: flex-end; background: #1B1C1E; color: #F3F2EE; border-radius: 18px; padding: 8px 14px; font-size: 14px">SUV near 60614</div>
+    <span class="mono" style="align-self: center; font-size: 11px; color: #5A5C60; border: 1px solid #DAD8D1; padding: 3px 8px; border-radius: 4px">CR-V FROM THE LIVE APP · OTHERS ESTIMATED</span>
+
+    <!-- Block 1: comparison (json-render: CostCompare) -->
+    <section aria-label="What each SUV really costs a month" style="background: #FFFFFF; border: 1px solid #DAD8D1; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 16px; font-weight: 600">What each one really costs a month</span>
+        <span class="lbl">Over 5 years, after you sell it. Shortest bar is cheapest to own.</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div class="row"><span>Hyundai Venue</span><div class="bar"><span class="lost" style="width:21.7%"></span><span class="int" style="width:9.3%"></span><span class="gas" style="width:21.3%"></span></div><span class="mono" style="text-align:right">$383</span></div>
+        <div class="row"><span>Corolla Cross</span><div class="bar"><span class="lost" style="width:26.2%"></span><span class="int" style="width:12.7%"></span><span class="gas" style="width:22.0%"></span></div><span class="mono" style="text-align:right">$445</span></div>
+        <div class="row" style="font-weight:600"><span>Honda CR-V</span><div class="bar"><span class="lost" style="width:26.9%"></span><span class="int" style="width:13.2%"></span><span class="gas" style="width:22.6%"></span></div><span class="mono" style="text-align:right">$461</span></div>
+        <div class="row"><span>Mazda CX-50</span><div class="bar"><span class="lost" style="width:31.7%"></span><span class="int" style="width:14.3%"></span><span class="gas" style="width:25.4%"></span></div><span class="mono" style="text-align:right">$523</span></div>
+        <div class="row"><span>Toyota 4Runner</span><div class="bar"><span class="lost" style="width:47.6%"></span><span class="int" style="width:21.0%"></span><span class="gas" style="width:31.4%"></span></div><span class="mono" style="text-align:right">$733</span></div>
+      </div>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: #3E4044">
+        <span class="key"><span class="sw lost"></span>Value it loses</span>
+        <span class="key"><span class="sw int"></span>Loan interest</span>
+        <span class="key"><span class="sw gas"></span>Gas</span>
+      </div>
+    </section>
+
+    <!-- Block 2: one pick card (json-render: PickCard > CostBars, LifespanTrack, UnderwaterMini, DealerLine) -->
+    <article style="background: #FFFFFF; border: 1px solid #DAD8D1; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <span style="font-size: 12px; font-weight: 600; background: #EFE6CF; color: #5C430A; padding: 3px 10px; border-radius: 999px">Pick #1 · best resale</span>
+        <span style="font-size: 13px; color: #3E4044; display: inline-flex; align-items: center; gap: 6px"><span style="width:8px;height:8px;border-radius:50%;background:#2E8B6E"></span>In stock</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 20px; font-weight: 600">Honda CR-V LX</span>
+        <span style="font-size: 14px; color: #3E4044; line-height: 1.45">Keeps about 63% of its price: what you'd likely get selling it after 5 years, the most of any gas SUV here.</span>
+      </div>
+
+      <!-- CostBars -->
+      <section aria-label="Monthly bills 743 dollars: 577 loan and 166 gas. Real cost 461 dollars: 197 value lost, 97 interest, 166 gas. 282 dollars a month comes back when you sell." style="display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; flex-direction: column; gap: 5px">
+          <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 14px; font-weight: 500">You pay each month</span><span class="mono" style="font-size: 18px">$743</span></div>
+          <div class="bar"><span class="loan" style="width:77.7%"></span><span class="gas" style="width:22.3%"></span></div>
+          <div style="display: flex; gap: 12px; font-size: 12px; color: #3E4044"><span class="key"><span class="sw loan"></span>Loan $577</span><span class="key"><span class="sw gas"></span>Gas $166</span></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 5px">
+          <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 14px; font-weight: 500">What it really costs you</span><span class="mono" style="font-size: 18px">$461</span></div>
+          <div class="bar"><span class="lost" style="width:26.5%"></span><span class="int" style="width:13.1%"></span><span class="gas" style="width:22.3%"></span><span class="back" style="width:38.0%"></span></div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; font-size: 12px; color: #3E4044"><span class="key"><span class="sw lost"></span>Value lost $197</span><span class="key"><span class="sw int"></span>Interest $97</span><span class="key"><span class="sw gas"></span>Gas $166</span></div>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center; background: #EEF5EF; border-radius: 8px; padding: 8px 10px; font-size: 13px; color: #2E5E3A">
+          <span class="sw back" style="width:14px;height:14px"></span>
+          <span><b class="mono">$282</b> a month of what you pay comes back to you when you sell at 5 years.</span>
+        </div>
+      </section>
+
+      <!-- LifespanTrack -->
+      <section aria-label="Lasts about 14 years" style="display: flex; flex-direction: column; gap: 5px; border-top: 1px solid #ECEAE4; padding-top: 12px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 14px; font-weight: 500">Lasts about 14 years</span><span class="lbl">about 167,000 miles</span></div>
+        <div style="position: relative; height: 22px">
+          <div style="position: absolute; left: 0; right: 0; top: 9px; height: 4px; background: #E7E5DF; border-radius: 2px"></div>
+          <div style="position: absolute; left: 0; width: 25%; top: 9px; height: 4px; background: #1B1C1E; border-radius: 2px"></div>
+          <div style="position: absolute; left: 25%; width: 44.5%; top: 9px; height: 4px; background: #D9C08A"></div>
+          <div style="position: absolute; left: calc(69.5% - 7px); top: 4px; width: 14px; height: 14px; border-radius: 50%; background: #FFFFFF; border: 2px solid #7A5A10; box-sizing: border-box"></div>
+        </div>
+        <div class="mono" style="display: flex; justify-content: space-between; font-size: 11px; color: #5A5C60"><span>0</span><span>5 yrs: loan paid</span><span>20 yrs</span></div>
+        <span class="lbl">Dark: while you pay it off. Gold: years after that with no car payment.</span>
+      </section>
+
+      <!-- UnderwaterMini -->
+      <section aria-label="Underwater for 6 months" style="display: flex; align-items: center; gap: 12px; border-top: 1px solid #ECEAE4; padding-top: 12px">
+        <svg width="120" height="44" viewBox="0 0 120 44" aria-hidden="true">
+          <path d="M2,2 L12.9,5.8 L2,5 Z" fill="#E9B8A4"></path>
+          <path d="M12.9,5.8 L118,13 L118,42 Z" fill="#BFD6C4"></path>
+          <polyline points="2,2 118,42" fill="none" stroke="#1B1C1E" stroke-width="1.5" stroke-dasharray="3 3"></polyline>
+          <polyline points="2,5 118,13" fill="none" stroke="#7A5A10" stroke-width="2"></polyline>
+          <circle cx="12.9" cy="5.8" r="3" fill="#FFFFFF" stroke="#1B1C1E" stroke-width="1.5"></circle>
+        </svg>
+        <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 500">Underwater for 6 months</span><span class="lbl">then selling pays off the loan</span></div>
+      </section>
+
+      <!-- DealerLine -->
+      <section style="display: flex; flex-direction: column; gap: 4px; border-top: 1px solid #ECEAE4; padding-top: 12px; font-size: 13px">
+        <span><b class="mono">13.7 mi</b> · 2026 CR-V LX · <span class="mono">$31,950</span> · AutoNation Honda O'Hare · <a href="#">See the car</a></span>
+        <a href="#" style="font-size: 13px; min-height: 44px; display: inline-flex; align-items: center">2 more nearby ▾</a>
+      </section>
+
+      <a href="Walkaway.dc.html" style="display: inline-flex; align-items: center; justify-content: center; min-height: 44px; border-radius: 10px; border: 1px solid #1B1C1E; color: #1B1C1E; text-decoration: none; font-size: 14px; font-weight: 500">If I change my mind</a>
+    </article>
+
+    <p style="margin: 0; font-size: 12px; color: #5A5C60; line-height: 1.5">Two bars on one scale: the gap is money you get back when you sell. Every number is computed by Low Key's code from live listings and sold-car data, never written by the AI.</p>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1600}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

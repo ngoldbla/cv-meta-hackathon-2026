@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Low Key: the json-render spec</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+pre{margin:0;white-space:pre-wrap;word-break:break-word}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 1180px; box-sizing: border-box; background: #F3F2EE; color: #1B1C1E; font-family: 'IBM Plex Sans', system-ui, sans-serif; display: flex; flex-direction: column; gap: 14px; padding: 22px 16px">
+  <h1 style="margin: 0; font-size: 22px; font-weight: 600">What the server sends</h1>
+  <p style="margin: 0; font-size: 14px; line-height: 1.55; color: #3E4044">The card on board 2 is drawn from this json-render spec. Low Key's code builds it from the tool results; the page draws it with a fixed catalog of components. The AI never writes these numbers.</p>
+  <section style="background: #1B1C1E; color: #E9E6DD; border-radius: 12px; padding: 14px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; line-height: 1.5">
+<pre>{
+  "root": "crv",
+  "elements": {
+    "crv": {
+      "type": "PickCard",
+      "props": { "rank": 1, "badge": "best resale",
+        "model": "Honda CR-V LX", "inStock": true,
+        "sentence": "Keeps about 63% of its price…" },
+      "children": ["cost", "life", "water", "dealer"]
+    },
+    "cost": {
+      "type": "CostBars",
+      "props": {
+        "pay":  [{ "part": "loan", "usd": 577 },
+                 { "part": "gas",  "usd": 166 }],
+        "real": [{ "part": "valueLost", "usd": 197 },
+                 { "part": "interest",  "usd": 97 },
+                 { "part": "gas",       "usd": 166 }],
+        "backWhenSold": 282
+      }
+    },
+    "life":  { "type": "LifespanTrack",
+               "props": { "years": 13.9, "loanYears": 5,
+                          "source": "iSeeCars 2026" } },
+    "water": { "type": "UnderwaterMini",
+               "props": { "evenMonth": 6,
+                          "curveRef": "ownership:crv" } },
+    "dealer": { "type": "DealerLine",
+               "props": { "miles": 13.7, "year": 2026,
+                          "price": 31950, "more": 2 } }
+  }
+}</pre>
+  </section>
+  <section style="background: #FFFFFF; border: 1px solid #DAD8D1; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; line-height: 1.5">
+    <span style="font-weight: 600; font-size: 14px">The catalog</span>
+    <span><b>CostCompare</b>: one bar per pick, segmented, shared scale</span>
+    <span><b>CostBars</b>: "you pay" vs "really costs", gap = back when sold</span>
+    <span><b>LifespanTrack</b>: 0–20 years, loan years marked</span>
+    <span><b>UnderwaterMini</b>: the task-026 mini chart</span>
+    <span><b>DealerLine</b>: cheapest unit + "N more nearby"</span>
+    <span style="color: #5A5C60">Every number is checked against the tool results before it is sent.</span>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1180}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
