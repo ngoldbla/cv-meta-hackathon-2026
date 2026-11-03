@@ -9,6 +9,7 @@ In progress.
 - Stayed on branch `low-key` throughout (pulled `origin/low-key` first). The inbox skill's `git checkout main` step was not followed, per this task's own instruction ("Ignore the inbox skill's `git checkout main` step for this task") and Dylan's instruction to work only on `low-key`.
 - Part 1 (this commit): [lineup.py](/home/ndgold/cv-meta-hackathon-2026/lowkey/preflight/lineup.py) (pure ranking logic), [test_lineup.py](/home/ndgold/cv-meta-hackathon-2026/lowkey/preflight/test_lineup.py) (9 fixture tests), [make_map.py](/home/ndgold/cv-meta-hackathon-2026/lowkey/preflight/make_map.py) (model→make resolution). Lineups recorded in [preflight-results.md](/home/ndgold/cv-meta-hackathon-2026/lowkey/docs/preflight-results.md). A single `facets=make,model` call returns the two lists unpaired (verified live), so makes were resolved with per-make `facets=model` calls instead: 64 provider requests in this part.
 - Part 2 (this commit): [p10_spark_tools.py](/home/ndgold/cv-meta-hackathon-2026/lowkey/preflight/p10_spark_tools.py). Two full 10-prompt runs (baseline prompt, then one prompt change, kept): see Results.
+- Part 3 (this commit): [p15_gas.py](/home/ndgold/cv-meta-hackathon-2026/lowkey/preflight/p15_gas.py). All 29 EIA area series pulled (cache outside git); ZIP map in the script (USPS ZIP3 table + EIA PADD membership).
 
 ## Results
 - Provider usage: 60 requests / 260,000 charged micros at session start; 124 requests / 452,000 micros after part 1. Part 1 spent 64 requests, $0.192 of the $1.00 cap.
@@ -21,6 +22,7 @@ In progress.
   - Baseline system prompt: tools 9/10 (case "Show me sedans near 60614" called only `local_units`), numbers 10/10; 40,166 tokens (18,558 reasoning); latency 10.5–32.7 s per prompt.
   - One change (system prompt: any category mention is a ranking request; a ZIP never replaces it): tools 10/10, numbers 10/10 — kept. 46,686 tokens (23,117 reasoning); latency 17.9–33.9 s per prompt. Three payment prompts also called `rank_category` as an extra; every required tool was called.
   - The API reports tokens only, so Meta spend is reported as tokens (86,852 across the two full runs, plus about 13k probe tokens) against the $2.00 cap.
+- P15: PASS. 29 series pulled (US, 5 PADDs, 3 PADD 1 sub-districts, PADD 5 ex-CA, 9 states, 10 cities); shortest history 23.4 years. Test ZIPs: 60614 → Chicago (city, 26.4y), 30097 → PADD 1C (33.6y), 59001 → PADD 4 (34.5y). EIA direct states: CA, CO, FL, MA, MN, NY, OH, TX, WA. Direct cities: Boston, Chicago, Cleveland, Denver, Houston, Los Angeles, Miami, New York City, San Francisco, Seattle. EIA is free.
 
 ## Deviations
 - Part 1 follows the PRD as pulled (four picks, at most 2 per make), which task 024 amended while this task was starting, rather than task 023's superseded two-pick text. The two-pick result is noted in preflight-results.md for comparison (only the Sedan #2 changes). Task 024's parts 1–2 are therefore already satisfied by this work; only its part 3 (P8 spot-check of the new #3/#4 at ZIP 60614) remains, left for that task.
