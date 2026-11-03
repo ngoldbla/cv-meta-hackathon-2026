@@ -1,9 +1,9 @@
 # Report 023: Low Key: apply the lineup rules, then run P10, P15 and P16
-Status: in_progress
+Status: done
 Branch head at start: 5977ef177408b5686b45be8aab777e8249ef5f49 · at finish: (this commit)
 
 ## Summary
-In progress.
+The lineup rules are applied and the preflight is complete: P10, P15 and P16 all pass. Sedan and SUV keep Honda/Toyota at the top under the four-pick, at-most-2-per-make rule with the 15% discount; the Pickup #2 becomes the Ram 1500 once heavy-duty trucks are excluded. Muse Spark calls the right tools with no invented numbers (after one system-prompt fix) but takes 18–34 s per prompt. Timestral's range is calibrated (77% coverage) and its median beats a flat forecast overall, though not on the East Coast. Spend: $0.195 of the $1.00 listings cap; about 100k Meta tokens against the $2.00 cap; EIA free; no Modal.
 
 ## Work done
 - Stayed on branch `low-key` throughout (pulled `origin/low-key` first). The inbox skill's `git checkout main` step was not followed, per this task's own instruction ("Ignore the inbox skill's `git checkout main` step for this task") and Dylan's instruction to work only on `low-key`.
@@ -11,9 +11,10 @@ In progress.
 - Part 2 (this commit): [p10_spark_tools.py](/home/ndgold/cv-meta-hackathon-2026/lowkey/preflight/p10_spark_tools.py). Two full 10-prompt runs (baseline prompt, then one prompt change, kept): see Results.
 - Part 3 (this commit): [p15_gas.py](/home/ndgold/cv-meta-hackathon-2026/lowkey/preflight/p15_gas.py). All 29 EIA area series pulled (cache outside git); ZIP map in the script (USPS ZIP3 table + EIA PADD membership).
 - Part 4 (this commit): [p16_forecast.py](/home/ndgold/cv-meta-hackathon-2026/lowkey/preflight/p16_forecast.py), run with `~/.cache/low-key/venv-timestral/bin/python` (Timestral-28M + CPU torch installed there only). Backtest: 29 series × 5 origins × 52 weeks.
+- Finish (this commit): `pytest -q` 154 passed, 1 skipped (plus 9 lineup tests passed standalone; `lowkey/preflight/` is outside the default `testpaths`), `scripts/name_guard.py` pass, journal entry added. Commits: 3b9ce27 (claim), 4dfe4a6 (part 1), c8b778d (part 2), c394f50 (part 3), 5e979ba (part 4), this commit (finish). Two reviewer commits landed mid-run and were pulled before pushes (bec8fe1 among them); no conflicts.
 
 ## Results
-- Provider usage: 60 requests / 260,000 charged micros at session start; 124 requests / 452,000 micros after part 1. Part 1 spent 64 requests, $0.192 of the $1.00 cap.
+- Provider usage: 60 requests / 260,000 charged micros at session start; 125 requests / 455,000 micros at finish. This task spent 65 requests, $0.195 of the $1.00 cap (all in part 1). Meta: about 100k tokens in total (86,852 in the two full P10 runs) against the $2.00 cap; the API reports tokens, not dollars. EIA: free. Modal: not used.
 - Lineups (retention after the 15% discount; retail fit in parentheses; full sample sizes in preflight-results.md):
   - Sedan: #1 Honda Accord Sedan 0.656 (0.772) $180/mo; #2 Honda Civic Sedan 0.653 (0.768) $163/mo (also commodity, `badge`); #3 Mazda Mazda3 Sedan 0.623 $172/mo; #4 Hyundai Elantra 0.599 $166/mo. Civic Si Sedan skipped as the third Honda.
   - SUV: #1 Honda CR-V 0.629 (0.741) $216/mo; #2 Toyota Corolla Cross 0.623 $206/mo; #3 Mazda CX-50 0.596 $241/mo; #4 Toyota 4Runner 0.585 $404/mo; commodity `extra` Hyundai Venue $176/mo.
@@ -31,4 +32,4 @@ In progress.
 - Make resolution used per-make facet calls (64 requests) instead of the single `facets=make,model` call the task suggested, because that call does not pair makes with models.
 
 ## Blocked / questions
-Pending.
+- Nothing blocked. For Dylan: (1) Task 024 parts 1–2 are already satisfied by part 1 above; only its part 3 (P8 spot-check of the new #3/#4 picks at ZIP 60614) remains — run it as task 024 or close 024 as superseded? (2) The PRD still contradicts itself: "What the user sees" item 3 describes three cards (#1, #2, commodity) while the Lineup rules now say four picks plus a badge/extra commodity card — reconcile before the app is built (task 025 is already scaffolding it). (3) P10 latency (18–34 s per prompt, two reasoning rounds) breaks the PRD's "first cards in under 15 seconds" bar — is P9 to be measured with streaming or a lower reasoning setting? (4) On the East Coast the Timestral median adds nothing over today's price (PADD 1C included); show today's price as "typical" there with the Timestral range, or keep the median? (5) Two fits behind the lineups are extrapolations (Mazda CX-50 from ages 1–3, Toyota Corolla Cross from ages 1–4) and the Ram 1500's ages 2–3 counts (181, 190) are far thinner than its other ages — acceptable on the card, or require 5 observed ages for #1–#4?

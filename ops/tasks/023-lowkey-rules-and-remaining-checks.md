@@ -1,7 +1,7 @@
 ---
 id: "023"
 title: "Low Key: apply the lineup rules, then run P10, P15 and P16"
-status: in_progress
+status: done
 created: 2026-11-03
 report: ops/reports/023-lowkey-rules-and-remaining-checks.md
 ---
