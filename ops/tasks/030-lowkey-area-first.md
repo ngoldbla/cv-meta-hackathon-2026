@@ -1,7 +1,7 @@
 ---
 id: "030"
 title: "Low Key: a body-type tap starts the search; the search area is detected, confirmed and easy to change"
-status: open
+status: in_progress
 created: 2026-11-03
 report: ops/reports/030-lowkey-area-first.md
 ---
