@@ -256,7 +256,12 @@ export default function PickCard({
                   ? ` · ${[u.year, u.trim].filter(Boolean).join(" ")}`
                   : ""}
                 {" · "}
-                <a href={u.url} target="_blank" rel="noreferrer">
+                <a
+                  href={u.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-block py-[13px] -my-[13px]"
+                >
                   See the car
                 </a>
               </li>

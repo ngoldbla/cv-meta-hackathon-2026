@@ -1,6 +1,7 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
+import { MotionConfig } from "motion/react";
 import { useEffect, useState } from "react";
 
 import { CarFigure } from "@/components/hairline/CarFigure";
@@ -14,6 +15,7 @@ import {
 import {
   Drawer,
   DrawerBody,
+  DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerHeader,
@@ -266,6 +268,7 @@ export default function Home() {
   }
 
   return (
+    <MotionConfig reducedMotion="user">
     <main className="shell">
       <header className="topbar">
         <div className="brand">
@@ -480,11 +483,24 @@ export default function Home() {
           }}
         >
           <DrawerContent>
-            <DrawerHeader>
-              <DrawerTitle>If I change my mind</DrawerTitle>
-              <DrawerDescription>
-                {walk.pick.make} {walk.pick.model}
-              </DrawerDescription>
+            <DrawerHeader className="flex items-start justify-between gap-2">
+              <div>
+                <DrawerTitle>If I change my mind</DrawerTitle>
+                <DrawerDescription>
+                  {walk.pick.make} {walk.pick.model}
+                </DrawerDescription>
+              </div>
+              <DrawerClose asChild>
+                <button
+                  type="button"
+                  aria-label="Close"
+                  className="flex size-11 shrink-0 items-center justify-center"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                    <path d="M18 6 6 18M6 6l12 12" />
+                  </svg>
+                </button>
+              </DrawerClose>
             </DrawerHeader>
             <DrawerBody>
               <WalkAwayView
@@ -539,5 +555,6 @@ export default function Home() {
         ) : null}
       </div>
     </main>
+    </MotionConfig>
   );
 }
