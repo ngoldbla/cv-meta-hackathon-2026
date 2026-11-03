@@ -113,6 +113,19 @@ Toyota and Honda will take most #1 and #2 slots. The rankings come from the data
 - Zero ads, zero forms, zero sign-ups.
 - A judge can say what to buy, and what leaving would cost, after one screen.
 
+## Additions (Dylan, 2026-11-03)
+- **The message:** "Get a car without regret." Low Key helps you buy for value and quality: the signal, not the noise.
+- **Body type by button:** three large buttons (Sedan, SUV, Pickup), not typing.
+- **No photos.** The vehicles are isometric line drawings (Hairline), one per body type.
+- **The trim is one step above base** (for example Corolla SE, not LE), because a small step up raises satisfaction. There's a guard: drop back to base if the step-up keeps its value clearly worse, or isn't in stock.
+- **Card face, in order:**
+  1. the monthly bills (loan + gas);
+  2. the effective monthly cost to drive (depreciation + interest + fuel over the hold, ÷ 60);
+  3. the distance to the dealer;
+  4. the lifespan ("lasts about N years");
+  5. months underwater.
+- **Lifespan:** a car that lasts longer costs less per year of its life. Source per preflight P18.
+
 ## Open questions
 1. **APR default.** Decided (Dylan, 2026-11-03): the Federal Reserve average for 60-month new-car loans (FRED series `RIFLPBCIANM60NM`), shown with its date, plus "tell me your rate" in the chat.
 2. **Sales tax.** Add an estimate by state to the price, or show it as excluded? Proposed: an estimate by state, labelled.

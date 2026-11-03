@@ -36,7 +36,16 @@ report: ops/reports/028-lowkey-iconiq-ui.md
    - The walk-away view: Iconiq **`slider`** for the sell-month slider, **`rolling-digits`** for the two numbers in the sentences, and **`table`** for the Sell at / You get back / Cost per month table.
    - The worth-vs-owe chart: use Iconiq **`charts`** (Recharts) **only if** it reproduces the task-026 design exactly: two lines, the shaded underwater gap, the shaded "yours if you sell" gap, the crossing dot and the slider marker. Otherwise keep task 026's SVG chart and style it with the Iconiq theme tokens. Record which you chose and why.
    - Use **`drawer`** or **`dialog`** for "If I change my mind" on mobile, if that reads better than navigating.
-5. **Accessibility and motion.**
+5. **Amendment (Dylan, 2026-11-03, added before this task started): body-type buttons, line drawings and the message.**
+   - **Three large buttons, not typing.** After the ZIP (or with it), the user picks the body type with three large buttons, **Sedan**, **SUV** and **Pickup**, each with its drawing (below). A tap sends the choice as a message. Typing "60614, SUV" must still work. The buttons fill the width at 390 px, with 44 px or larger touch targets. Use Iconiq button or toggle-group components.
+   - **Vehicle drawings with Hairline, never photos.** Use the Hairline skill (https://github.com/lucasmarkes/hairline, MIT): clone it to `~/.cache/low-key/hairline/` (not into the repo), and follow `skills/hairline-create/SKILL.md` to draw three figures: an isometric line **sedan**, **SUV** and **pickup**. Pick the concept yourself by its rule ("take the concept with the strongest rest pose and say which you took"). Something calm fits, such as the wheels turning or the car rolling a little toward the pointer.
+     - Run its `validate.mjs` and `look.mjs` checks until they pass.
+     - Then put the figures in the app through the `@lucasmarkes/hairline` package (pinned), or its shadcn wrapper, with the three figures added in the package's figure format.
+     - Theme them with the `--hairline-*` custom properties from Low Key's tokens.
+     - Use the figures on the three buttons and as each card's image, matching the card's body type. Respect reduced motion: no `play` loop.
+   - **No real vehicle photos anywhere.** Don't show the provider's `photo_urls`. The cards show the salient numbers instead (task 029 adds the full set).
+   - **The message: value and quality, signal over noise.** Under the "Get a car without regret." headline, add: "We help you buy for value and quality: the signal, not the noise." Keep the small line "No ads · No sign-up · Not paid by dealers."
+6. **Accessibility and motion.**
    - Respect `prefers-reduced-motion` (the Iconiq components support it; check each).
    - Keep 44 px touch targets and visible keyboard focus.
    - The page must work at 390 px wide with no sideways scroll.
