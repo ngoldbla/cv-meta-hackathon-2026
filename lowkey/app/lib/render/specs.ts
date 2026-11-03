@@ -5,6 +5,7 @@ import {
   trimLineText,
   unitTitle,
 } from "../costs";
+import { bestAtLabels, type BestAt, type ChooserFacts } from "../chooser";
 import { cardSentence } from "../summary";
 
 /**
@@ -225,10 +226,36 @@ function costBarsProps(entry: SpecEntry) {
   };
 }
 
-function badgeLabel(pick: SpecPick): string {
-  if (pick.flag === "badge") return "Cheapest to own";
-  if (pick.flag === "extra") return "Extra pick · cheapest to own";
-  return pick.rank ? `Pick #${pick.rank}` : "Pick";
+/** Closest local unit in miles, or null with none nearby. */
+export function nearestMilesOf(local: SpecLocal | undefined): number | null {
+  if (!local || local.error) return null;
+  const units = local.units ?? [];
+  if (units.length === 0) return null;
+  return Math.min(...units.map((u) => u.distanceMiles));
+}
+
+/** Chooser facts (task 040) for every entry with an ownership result. */
+export function chooserFactsOf(entries: SpecEntry[]): ChooserFacts[] {
+  const facts: ChooserFacts[] = [];
+  for (const entry of entries) {
+    const costs = costBreakdown(entry);
+    if (!costs) continue;
+    facts.push({
+      model: entry.pick.model,
+      label: `${entry.pick.make} ${entry.pick.model}`,
+      retention: entry.pick.retention5y,
+      total: costs.real,
+      bills: costs.bills,
+      nearestMiles: nearestMilesOf(entry.local),
+      lifespanYears: entry.pick.lifespanYears ?? null,
+    });
+  }
+  return facts;
+}
+
+/** Model -> best-at labels for one turn (task 040; no rank numbers). */
+export function turnLabels(entries: SpecEntry[]): Map<string, BestAt[]> {
+  return bestAtLabels(chooserFactsOf(entries));
 }
 
 function modelLabel(pick: SpecPick): string {
@@ -246,6 +273,7 @@ export function buildPickCardSpec(
   entry: SpecEntry,
   peers: SpecPick[],
   category: string,
+  labels: readonly string[] = [],
 ): Spec {
   const { pick, ownership, local } = entry;
   const slug = pickSlug(pick);
@@ -324,8 +352,7 @@ export function buildPickCardSpec(
   elements[slug] = {
     type: "PickCard",
     props: {
-      rank: pick.rank,
-      badgeLabel: badgeLabel(pick),
+      labels: [...labels],
       modelLabel: modelLabel(pick),
       sentence: cardSentence(pick, undefined, peers.length > 0 ? peers : [pick], category),
       trimLine: trimLineText({
@@ -353,15 +380,15 @@ export function buildPickCardSpec(
 }
 
 /**
- * One CostCompare spec per turn: every entry with an ownership
- * result, ordered cheapest to own (lowest real cost) first. The
- * highlighted row is the first ranked pick's (the card the mockup
- * shows), falling back to the first entry. Every row at the lowest
- * real cost is flagged cheapest (task 035) — on a tie, all of them —
- * independently of the highlight, so Pick #1 can carry both. Null
- * with fewer than two comparable entries.
+ * One CostCompare spec per turn, the chooser (task 040): every entry
+ * with an ownership result, in the default "Real cost" order (lowest
+ * real cost first; the view re-sorts on the shopper's choice). Each
+ * row carries the figures every sort needs and its best-at labels.
+ * No rank and no highlight: every car shown is one we stand behind.
+ * Null with fewer than two comparable entries.
  */
 export function buildCostCompareSpec(entries: SpecEntry[], category: string): Spec | null {
+  const labels = turnLabels(entries);
   const rows = entries
     .map((entry) => {
       const costs = costBreakdown(entry);
@@ -370,42 +397,29 @@ export function buildCostCompareSpec(entries: SpecEntry[], category: string): Sp
       return {
         label: `${entry.pick.make} ${entry.pick.model}`,
         model: entry.pick.model,
-        rank: entry.pick.rank,
+        trim: entry.pick.recommendedTrim?.trim() || null,
+        labels: [...(labels.get(entry.pick.model) ?? [])],
         valueLost: costs.valueLost,
         interest: costs.interest,
         gas: costs.gas ?? 0,
         tax: costs.tax,
         total: costs.real,
+        bills: costs.bills,
+        nearestMiles: nearestMilesOf(entry.local),
+        lifespanYears: entry.pick.lifespanYears ?? null,
         price: stats ? stats.price : null,
         listingTotal: stats ? stats.total : null,
       };
     })
     .filter((r): r is NonNullable<typeof r> => r !== null);
   if (rows.length < 2) return null;
-  const shown = entries.find((e) => e.pick.rank === 1) ?? entries[0];
-  const shownModel = shown?.pick.model;
-  rows.sort((a, b) => a.total - b.total);
-  const lowest = Math.min(...rows.map((r) => r.total));
+  rows.sort((a, b) => a.total - b.total || a.label.localeCompare(b.label));
   return {
     root: "compare",
     elements: {
       compare: {
         type: "CostCompare",
-        props: {
-          category,
-          rows: rows.map((r) => ({
-            label: r.label,
-            valueLost: r.valueLost,
-            interest: r.interest,
-            gas: r.gas,
-            tax: r.tax,
-            total: r.total,
-            highlighted: r.model === shownModel,
-            cheapest: r.total === lowest,
-            price: r.price,
-            listingTotal: r.listingTotal,
-          })),
-        },
+        props: { category, rows },
         children: [],
       },
     },
@@ -418,9 +432,13 @@ export function buildTurnSpecs(
   category: string,
 ): { compare: Spec | null; cards: Map<string, Spec> } {
   const peers = entries.map((e) => e.pick);
+  const labels = turnLabels(entries);
   const cards = new Map<string, Spec>();
   for (const entry of entries) {
-    cards.set(entry.pick.model, buildPickCardSpec(entry, peers, category));
+    cards.set(
+      entry.pick.model,
+      buildPickCardSpec(entry, peers, category, labels.get(entry.pick.model) ?? []),
+    );
   }
   return { compare: buildCostCompareSpec(entries, category), cards };
 }

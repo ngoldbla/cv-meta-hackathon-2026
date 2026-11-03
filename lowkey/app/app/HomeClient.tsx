@@ -5,6 +5,7 @@ import { MotionConfig } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
 import { CarFigure } from "@/components/hairline/CarFigure";
+import { CarSheet, type SheetCar } from "@/components/CarSheet";
 import { CreditBlock, CREDIT_POINTS } from "@/components/CreditBlock";
 import { RenderSpec } from "@/components/render/registry";
 import { TextFallback } from "@/components/render/TextFallback";
@@ -66,10 +67,17 @@ import { isCatalogValid } from "@/lib/render/validate";
 import {
   buildCostCompareSpec,
   buildPickCardSpec,
+  turnLabels,
   type SpecEntry,
   type SpecOwnership,
 } from "@/lib/render/specs";
-import { closingLine } from "@/lib/summary";
+import {
+  DEFAULT_SORT,
+  isSortKey,
+  sortFacts,
+  type SortKey,
+  type SortableFacts,
+} from "@/lib/chooser";
 import type { Spec } from "@json-render/core";
 import type { CurveLike } from "@/components/WorthChart";
 
@@ -282,8 +290,8 @@ function turnSteps(parts: Part[]): TurnStep[] {
     groups.push({
       id: "rank",
       label: plural
-        ? `Ranking gas ${plural} by 5-year resale`
-        : "Ranking picks by 5-year resale",
+        ? `Comparing gas ${plural} by 5-year resale`
+        : "Comparing cars by 5-year resale",
       parts: rank,
     });
   }
@@ -336,6 +344,32 @@ function markSearched() {
   }
 }
 
+const SORT_STORAGE_KEY = "lowkey-sort";
+
+/** The chooser's sort, remembered for the session (task 040). */
+function loadSort(): SortKey {
+  try {
+    const v = window.sessionStorage.getItem(SORT_STORAGE_KEY);
+    return isSortKey(v) ? v : DEFAULT_SORT;
+  } catch {
+    return DEFAULT_SORT;
+  }
+}
+
+function persistSort(key: SortKey) {
+  try {
+    window.sessionStorage.setItem(SORT_STORAGE_KEY, key);
+  } catch {
+    // Best-effort only.
+  }
+}
+
+/** One open sheet: which turn's lineup, and which car in it. */
+interface SheetState {
+  turn: string;
+  model: string;
+}
+
 function loadStoredArea(): SearchArea | null {
   try {
     return parseStoredArea(window.localStorage.getItem(AREA_STORAGE_KEY));
@@ -352,6 +386,38 @@ function persistArea(next: SearchArea) {
   }
 }
 
+/**
+ * The open sheet (task 040). A child component so it reads the decks
+ * after the message list has filled them in the same render.
+ */
+function SheetFromDecks({
+  decks,
+  sheet,
+  wide,
+  onChange,
+}: {
+  decks: Map<string, SheetCar[]>;
+  sheet: SheetState;
+  wide: boolean;
+  onChange: (next: SheetState | null) => void;
+}) {
+  const cars = decks.get(sheet.turn) ?? [];
+  const index = cars.findIndex((c) => c.model === sheet.model);
+  if (index < 0) return null;
+  return (
+    <CarSheet
+      cars={cars}
+      index={index}
+      wide={wide}
+      onIndex={(i) => {
+        const car = cars[i];
+        if (car) onChange({ turn: sheet.turn, model: car.model });
+      }}
+      onClose={() => onChange(null)}
+    />
+  );
+}
+
 export default function HomeClient({
   initialArea,
 }: {
@@ -360,6 +426,11 @@ export default function HomeClient({
   const { messages, sendMessage, status, error } = useChat();
   const [aprText, setAprText] = useState<string | null>(null);
   const [walk, setWalk] = useState<WalkSelection | null>(null);
+  // Chooser (task 040): page-owned sort, open sheet, and the sheet to
+  // return to after "If I change my mind".
+  const [sort, setSort] = useState<SortKey>(DEFAULT_SORT);
+  const [sheet, setSheet] = useState<SheetState | null>(null);
+  const [returnSheet, setReturnSheet] = useState<SheetState | null>(null);
   const [bodyPick, setBodyPick] = useState<string[]>([]);
   const [isNarrow, setIsNarrow] = useState(false);
   const [area, setArea] = useState<SearchArea | null>(initialArea);
@@ -395,6 +466,23 @@ export default function HomeClient({
   useEffect(() => {
     if (zipOpen) zipInputRef.current?.focus();
   }, [zipOpen]);
+
+  useEffect(() => {
+    setSort(loadSort());
+  }, []);
+
+  function chooseSort(key: SortKey) {
+    setSort(key);
+    persistSort(key);
+  }
+
+  function closeWalk() {
+    setWalk(null);
+    if (returnSheet) {
+      setSheet(returnSheet);
+      setReturnSheet(null);
+    }
+  }
 
   // First visit: credit block open. After a search: remembered shut.
   useEffect(() => {
@@ -490,6 +578,8 @@ export default function HomeClient({
   function send(text: string) {
     if (!text.trim() || busy) return;
     setWalk(null);
+    setSheet(null);
+    setReturnSheet(null);
     void sendMessage({ text });
   }
 
@@ -602,6 +692,10 @@ export default function HomeClient({
     }
   }
 
+  // Each turn's cards in chooser order, filled while rendering the
+  // messages below and read by the sheet after them (task 040).
+  const decks = new Map<string, SheetCar[]>();
+
   return (
     <MotionConfig reducedMotion="user">
     <main className="shell">
@@ -642,7 +736,7 @@ export default function HomeClient({
                 null,
             }}
             aprText={walk.aprText}
-            onBack={() => setWalk(null)}
+            onBack={closeWalk}
           />
         ) : (
           <>
@@ -655,10 +749,6 @@ export default function HomeClient({
                 />
                 <Typography variant="label-lg" className="mt-3">
                   We help you buy for value and quality: the signal, not the noise.
-                </Typography>
-                <CreditBlock open={creditOpen} onOpenChange={setCreditOpen} />
-                <Typography variant="paragraph-sm" className="mt-2 text-muted-foreground">
-                  No ads · No sign-up · Not paid by dealers.
                 </Typography>
               </div>
             ) : null}
@@ -711,6 +801,7 @@ export default function HomeClient({
                         ),
                       )}
                       {ranks.map((rank, ri) => {
+                        const turnKey = `${message.id}-${ri}`;
                         const shown = [...rank.picks];
                         const commodity = rank.commodity;
                         const badged = commodity
@@ -727,7 +818,6 @@ export default function HomeClient({
                           },
                           ownership: ownershipByModel.get(modelKey(pick.model, pick.make)),
                         }));
-                        const closing = closingLine(entries, rank.category);
                         // Cards render only from specs (task 034): the
                         // server's fast-path specs when present, else
                         // the same pure builders over the tool-result
@@ -742,6 +832,7 @@ export default function HomeClient({
                             ),
                           }),
                         );
+                        const labels = turnLabels(specEntries);
                         const compareSpec =
                           serverCompare ??
                           buildCostCompareSpec(specEntries, rank.category);
@@ -753,68 +844,97 @@ export default function HomeClient({
                         if (compareSpec && !compareCheck?.ok) {
                           logGuardDrop("compare");
                         }
+                        const openWalk = (target: (typeof entries)[number]) => {
+                          if (!target.ownership) return;
+                          if (sheet) {
+                            setReturnSheet(sheet);
+                            setSheet(null);
+                          }
+                          setWalk({
+                            pick: target.pick,
+                            ownership: target.ownership,
+                            aprText:
+                              target.ownership.aprLabel ??
+                              aprText ??
+                              `${target.ownership.aprPercent}% APR`,
+                          });
+                        };
+                        const cards: SheetCar[] = entries.map((e, ei) => {
+                          const { pick } = e;
+                          const entry = specEntries[ei]!;
+                          const spec =
+                            serverCards.get(pick.model) ??
+                            buildPickCardSpec(
+                              entry,
+                              shown,
+                              rank.category,
+                              labels.get(pick.model) ?? [],
+                            );
+                          const check = isCatalogValid(spec)
+                            ? checkPickCardSpec(spec, entry)
+                            : { ok: false, failures: [] as never[] };
+                          if (!check.ok) logGuardDrop("card");
+                          const node = check.ok ? (
+                            <RenderSpec
+                              spec={spec}
+                              onWalkAway={(model) => {
+                                const target = entries.find(
+                                  (x) => x.pick.model === model,
+                                );
+                                if (target) openWalk(target);
+                              }}
+                            />
+                          ) : (
+                            <TextFallback
+                              entry={entry}
+                              peers={shown}
+                              category={rank.category}
+                              onWalkAway={
+                                e.ownership ? () => openWalk(e) : undefined
+                              }
+                            />
+                          );
+                          return {
+                            model: pick.model,
+                            title: `${pick.make} ${pick.model}`,
+                            node,
+                          };
+                        });
+                        const chooserOk = Boolean(compareSpec && compareCheck?.ok);
+                        if (chooserOk && compareSpec) {
+                          // The sheet follows the chooser's order.
+                          const rows = (
+                            compareSpec.elements[compareSpec.root]?.props as {
+                              rows: (SortableFacts & { model: string })[];
+                            }
+                          ).rows;
+                          const order = sortFacts(rows, sort).map((r) => r.model);
+                          decks.set(turnKey, [
+                            ...order
+                              .map((m) => cards.find((c) => c.model === m))
+                              .filter((c): c is SheetCar => Boolean(c)),
+                            ...cards.filter((c) => !order.includes(c.model)),
+                          ]);
+                        }
                         return (
                           <div key={ri} className="w-full">
-                            {compareSpec && compareCheck?.ok ? (
-                              <RenderSpec spec={compareSpec} />
-                            ) : null}
-                            {entries.map(({ pick, ownership }, ei) => {
-                              const entry = specEntries[ei]!;
-                              const spec =
-                                serverCards.get(pick.model) ??
-                                buildPickCardSpec(entry, shown, rank.category);
-                              const check = isCatalogValid(spec)
-                                ? checkPickCardSpec(spec, entry)
-                                : { ok: false, failures: [] as never[] };
-                              if (!check.ok) {
-                                logGuardDrop("card");
-                                return (
-                                  <TextFallback
-                                    key={`${pick.make}-${pick.model}`}
-                                    entry={entry}
-                                    peers={shown}
-                                    category={rank.category}
-                                    onWalkAway={
-                                      ownership
-                                        ? () =>
-                                            setWalk({
-                                              pick,
-                                              ownership,
-                                              aprText:
-                                                ownership.aprLabel ??
-                                                aprText ??
-                                                `${ownership.aprPercent}% APR`,
-                                            })
-                                        : undefined
-                                    }
-                                  />
-                                );
-                              }
-                              return (
-                                <RenderSpec
-                                  key={`${pick.make}-${pick.model}`}
-                                  spec={spec}
-                                  onWalkAway={(model) => {
-                                    const target = entries.find(
-                                      (e) => e.pick.model === model,
-                                    );
-                                    if (target?.ownership) {
-                                      setWalk({
-                                        pick: target.pick,
-                                        ownership: target.ownership,
-                                        aprText:
-                                          target.ownership.aprLabel ??
-                                          aprText ??
-                                          `${target.ownership.aprPercent}% APR`,
-                                      });
-                                    }
-                                  }}
-                                />
-                              );
-                            })}
-                            {closing ? (
-                              <MessageBubble variant="default">{closing}</MessageBubble>
-                            ) : null}
+                            {chooserOk && compareSpec ? (
+                              <RenderSpec
+                                spec={compareSpec}
+                                sort={sort}
+                                onSort={chooseSort}
+                                onOpen={(model) =>
+                                  setSheet({ turn: turnKey, model })
+                                }
+                              />
+                            ) : (
+                              // Fewer than two comparable cars (still
+                              // streaming, or a failed spec): the cards
+                              // show inline, unnumbered.
+                              cards.map((c) => (
+                                <div key={c.model}>{c.node}</div>
+                              ))
+                            )}
                           </div>
                         );
                       })}
@@ -1042,9 +1162,28 @@ export default function HomeClient({
                   </ToggleGroupItem>
                 ))}
               </ToggleGroup>
+            {messages.length === 0 ? (
+              // Confirmed fix 1 (task 040): the area line and the type
+              // buttons come first; how Low Key works sits under them.
+              <div className="mt-4 rounded-xl border border-border bg-card px-5 pb-4">
+                <CreditBlock open={creditOpen} onOpenChange={setCreditOpen} />
+                <Typography variant="paragraph-sm" className="mt-2 text-muted-foreground">
+                  No ads · No sign-up · Not paid by dealers.
+                </Typography>
+              </div>
+            ) : null}
           </>
         )}
       </div>
+
+      {sheet && !walk ? (
+        <SheetFromDecks
+          decks={decks}
+          sheet={sheet}
+          wide={!isNarrow}
+          onChange={setSheet}
+        />
+      ) : null}
 
       {walk && isNarrow ? (
         <Drawer
@@ -1052,11 +1191,11 @@ export default function HomeClient({
           direction="bottom"
           handleOnly
           onOpenChange={(open) => {
-            if (!open) setWalk(null);
+            if (!open) closeWalk();
           }}
         >
           <DrawerContent>
-            <DrawerHeader className="flex items-start justify-between gap-2">
+            <DrawerHeader className="flex flex-row items-start justify-between gap-2 text-left">
               <div>
                 <DrawerTitle>If I change my mind</DrawerTitle>
                 <DrawerDescription>
@@ -1107,14 +1246,14 @@ export default function HomeClient({
                     null,
                 }}
                 aprText={walk.aprText}
-                onBack={() => setWalk(null)}
+                onBack={closeWalk}
               />
             </DrawerBody>
           </DrawerContent>
         </Drawer>
       ) : null}
 
-      <div className="sticky bottom-0 border-t border-border bg-background py-3">
+      <div className="sticky bottom-0 z-10 border-t border-border bg-background py-3">
         <AIInput
           placeholder="Ask a question, or type a ZIP and body type"
           showMessages={false}
@@ -1125,6 +1264,7 @@ export default function HomeClient({
           <Typography variant="paragraph-xs" className="text-muted-foreground">
             10% down · 60 mo
             {footerAprPct !== null ? <> · {footerAprPct}% APR</> : null}
+            {footerTax?.startsWith("Includes") ? <> · est. tax incl.</> : null}
           </Typography>
           <Popover>
             <PopoverTrigger asChild>

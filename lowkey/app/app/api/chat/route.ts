@@ -18,6 +18,7 @@ import { checkCostCompareSpec, checkPickCardSpec } from "@/lib/render/guard";
 import {
   buildCostCompareSpec,
   buildPickCardSpec,
+  turnLabels,
   type SpecEntry,
 } from "@/lib/render/specs";
 import {
@@ -34,7 +35,8 @@ const SYSTEM = `You are Low Key. Your job is helping someone get a car without r
 Rules:
 - Never ask for a ZIP or a body type that the user has already given in this conversation; if one is still missing, ask only for that one, in one short sentence. If neither has been given, ask for both in one short sentence. Do not show picks before you have both.
 - Any mention of sedans, SUVs or pickups as a type to consider is a request for the ranking: call rank_category for that category (map plurals to Sedan, SUV or Pickup). A ZIP never replaces the ranking when a category is named.
-- Show at most 4 ranked picks plus the commodity pick. Never show more, and never turn the chat into a browsing tool.
+- Show at most 4 picks plus the commodity pick. Never show more, and never turn the chat into a browsing tool.
+- The cars have no order of preference: every car shown is one Low Key stands behind, and the shopper sorts them. Never call a car "#1", "number one", "top pick", "the best" or "first choice", and never number the cars. You may repeat a car's best-at label (for example "holds value best" or "cheapest to own") when it is in the results.
 - After rank_category, call local_units for each pick with the user's ZIP, then ownership_math for each pick with model and zip (the server prices the cheapest local unit, or the labelled typical price when there is none; use 10% down over 60 months unless the user said otherwise; omit apr so the server uses the Federal Reserve average, and pass apr only when the user states their own rate, for example "my rate is 5.9%"). In both calls, set model to the exact model string from rank_category (for example "CR-V", not "Honda CR-V").
 - Do not write a "why this car" sentence or any closing summary: the cards already show a code-written summary. Keep your own text to short replies to follow-up questions, with no numbers except ones copied verbatim from tool results. Never invent or compute numbers: if a number is not in a tool result, do not state it.
 - Use plain words and short answers, in a calm tone: no urgency, no pressure, no exclamation marks.
@@ -167,26 +169,30 @@ async function fastPathResponse(req: FastRequest) {
           toolCallId: ownId,
           output: ownOutput,
         });
-        // Server-built card spec (task 034): streamed as a data
-        // part right after its tool results, so the first card is
-        // no slower than the tool path alone. A spec that fails
-        // the number guard is dropped (logged without data) and
-        // the client falls back to text.
-        const entry: SpecEntry = {
+        specEntries.push({
           pick: pick as unknown as SpecEntry["pick"],
           ownership: ownOutput as unknown as SpecEntry["ownership"],
           local: local as unknown as SpecEntry["local"],
-        };
-        specEntries.push(entry);
+        });
+      }
+      // Server-built card specs (task 034), streamed as data parts.
+      // Task 040: built after every car is in, because the best-at
+      // labels compare the whole lineup (the client's chooser fills
+      // in from the tool results meanwhile). A spec that fails the
+      // number guard is dropped (logged without data) and the client
+      // falls back to text.
+      const labels = turnLabels(specEntries);
+      for (const entry of specEntries) {
         const cardSpec = buildPickCardSpec(
           entry,
           shown as unknown as SpecEntry["pick"][],
           req.category,
+          labels.get(entry.pick.model) ?? [],
         );
         if (checkPickCardSpec(cardSpec, entry).ok) {
           writer.write({
             type: "data-lowkey-spec",
-            data: { kind: "card", model: pick.model, spec: cardSpec },
+            data: { kind: "card", model: entry.pick.model, spec: cardSpec },
           });
         } else {
           console.error(

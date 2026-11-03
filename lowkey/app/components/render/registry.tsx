@@ -11,7 +11,9 @@ import { DealerLineView } from "./DealerLine";
 import { LifespanTrackView } from "./LifespanTrack";
 import { PickCardView } from "./PickCardView";
 import { EquityMiniView } from "./EquityMini";
+import { ChooserContext } from "./chooser-context";
 import { WalkAwayContext } from "./walk-context";
+import { DEFAULT_SORT, type SortKey } from "@/lib/chooser";
 
 /**
  * Low Key registry (task 034): maps the catalog to React components
@@ -66,15 +68,24 @@ export const { registry } = defineRegistry(catalog, {
 export function RenderSpec({
   spec,
   onWalkAway,
+  sort = DEFAULT_SORT,
+  onSort,
+  onOpen,
 }: {
   spec: Spec;
   onWalkAway?: (modelKey: string) => void;
+  /** Chooser (task 040): the page-owned sort and row-open handler. */
+  sort?: SortKey;
+  onSort?: (key: SortKey) => void;
+  onOpen?: (modelKey: string) => void;
 }): ReactNode {
   return (
     <WalkAwayContext.Provider value={{ onWalkAway }}>
-      <JSONUIProvider registry={registry}>
-        <Renderer spec={spec} registry={registry} />
-      </JSONUIProvider>
+      <ChooserContext.Provider value={{ sort, onSort, onOpen }}>
+        <JSONUIProvider registry={registry}>
+          <Renderer spec={spec} registry={registry} />
+        </JSONUIProvider>
+      </ChooserContext.Provider>
     </WalkAwayContext.Provider>
   );
 }

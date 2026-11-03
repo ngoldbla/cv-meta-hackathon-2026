@@ -40,20 +40,24 @@ export const catalog = defineCatalog(schema, {
         rows: z.array(
           z.object({
             label: z.string(),
+            model: z.string(),
+            trim: z.string().nullable(),
+            labels: z.array(z.string()),
             valueLost: z.number(),
             interest: z.number(),
             gas: z.number(),
             tax: z.number(),
             total: z.number(),
-            highlighted: z.boolean(),
-            cheapest: z.boolean(),
+            bills: z.number(),
+            nearestMiles: z.number().nullable(),
+            lifespanYears: z.number().nullable(),
             price: z.number().nullable(),
             listingTotal: z.number().nullable(),
           }),
         ),
       }),
       description:
-        "One horizontal segmented bar per pick (value lost, interest, gas, sales tax) on a shared scale, ordered cheapest to own first, with the monthly real-cost total at the right. The first ranked pick's row is highlighted (bold); every row at the lowest total is flagged cheapest and gets a 'cheapest to own' badge. Placed before the pick cards, one per turn.",
+        "The chooser (task 040): one row per car with its best-at labels, a segmented real-cost bar (value lost, interest, gas, sales tax) on a shared scale and the monthly real-cost total, the monthly bills, the nearest unit and the lifespan. A 'Sort by' control (Real cost, Monthly, Nearest, Lasts longest) re-orders the rows; the spec arrives in Real cost order. No rank numbers. Tapping a row opens that car's full card in a sheet. One per turn.",
     },
     CostBars: {
       props: z.object({
@@ -98,8 +102,7 @@ export const catalog = defineCatalog(schema, {
     },
     PickCard: {
       props: z.object({
-        rank: z.number().nullable(),
-        badgeLabel: z.string(),
+        labels: z.array(z.string()),
         modelLabel: z.string(),
         sentence: z.string(),
         trimLine: z.string().nullable(),
@@ -110,7 +113,7 @@ export const catalog = defineCatalog(schema, {
       }),
       slots: ["default"],
       description:
-        "Container for one pick: badge, in-stock dot, Hairline figure, model and trim, code-written sentence, trim-step line, then its children in mockup order (CostBars, LifespanTrack, EquityMini, DealerLine), then 'If I change my mind'.",
+        "Container for one car: best-at labels (no rank), in-stock dot, Hairline figure, model and trim, code-written sentence, trim-step line, then its children in mockup order (CostBars, LifespanTrack, EquityMini, DealerLine), then 'If I change my mind'.",
     },
   },
   actions: {},

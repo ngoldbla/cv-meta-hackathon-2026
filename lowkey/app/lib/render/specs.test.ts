@@ -76,9 +76,12 @@ const CATEGORIES: Category[] = ["Sedan", "SUV", "Pickup"];
 
 type CompareRow = {
   label: string;
+  model: string;
   total: number;
-  highlighted: boolean;
-  cheapest: boolean;
+  bills: number;
+  labels: string[];
+  nearestMiles: number | null;
+  lifespanYears: number | null;
 };
 
 function compareRows(spec: ReturnType<typeof buildCostCompareSpec>): CompareRow[] {
@@ -105,20 +108,16 @@ describe("spec builders + number guard (task 034)", () => {
       }
     });
 
-    it(`orders the ${category} comparison cheapest first with one highlight`, () => {
+    it(`orders the ${category} chooser by real cost, with no highlight or rank`, () => {
       const entries = entriesFor(category);
       const compare = buildCostCompareSpec(entries, category)!;
-      const rows = (
-        compare.elements[compare.root]!.props as {
-          rows: { label: string; total: number; highlighted: boolean }[];
-        }
-      ).rows;
+      const rows = compareRows(compare);
       const totals = rows.map((r) => r.total);
       expect(totals).toEqual([...totals].sort((a, b) => a - b));
-      expect(rows.filter((r) => r.highlighted)).toHaveLength(1);
-      expect(rows.find((r) => r.highlighted)?.label).toContain(
-        entries.find((e) => e.pick.rank === 1)!.pick.model,
-      );
+      for (const r of rows) {
+        expect(r).not.toHaveProperty("highlighted");
+        expect(r).not.toHaveProperty("rank");
+      }
     });
   }
 
@@ -147,32 +146,7 @@ describe("spec builders + number guard (task 034)", () => {
     expect(checkPickCardSpec(spec, entry).ok).toBe(false);
   });
 
-  it("tags exactly the cheapest rows in the comparison (task 035)", () => {
-    const entries = entriesFor("SUV");
-    const spec = buildCostCompareSpec(entries, "SUV")!;
-    const rows = compareRows(spec);
-    const min = Math.min(...rows.map((r) => r.total));
-    expect(rows.length).toBeGreaterThan(1);
-    // The tag goes on every row at the lowest real cost, and no other.
-    expect(
-      rows
-        .filter((r) => r.cheapest)
-        .map((r) => r.label)
-        .sort(),
-    ).toEqual(
-      rows
-        .filter((r) => r.total === min)
-        .map((r) => r.label)
-        .sort(),
-    );
-    // Rows are ordered cheapest first, so the first row is tagged.
-    expect(rows[0]!.cheapest).toBe(true);
-    // The tag is a boolean, not a number: catalog and guard still pass.
-    expect(isCatalogValid(spec)).toBe(true);
-    expect(checkCostCompareSpec(spec, entries).ok).toBe(true);
-  });
-
-  it("tags both rows on a tie, Pick #1 bold plus tag (task 035)", () => {
+  it("labels the cheapest rows 'Cheapest to own', ties shared (task 040)", () => {
     const base = entriesFor("SUV")[0]!;
     const tied: SpecEntry[] = [
       { ...base, pick: { ...base.pick, make: "Alpha", model: "One", rank: 1 } },
@@ -187,37 +161,52 @@ describe("spec builders + number guard (task 034)", () => {
         },
       },
     ];
-    const rows = compareRows(buildCostCompareSpec(tied, "SUV"));
-    const byLabel = new Map(rows.map((r) => [r.label, r]));
-    expect(byLabel.get("Alpha One")!.cheapest).toBe(true);
-    expect(byLabel.get("Beta Two")!.cheapest).toBe(true);
-    expect(byLabel.get("Gamma Three")!.cheapest).toBe(false);
-    // Alpha is Pick #1: bold and tagged on the same row.
-    expect(byLabel.get("Alpha One")!.highlighted).toBe(true);
-    expect(byLabel.get("Beta Two")!.highlighted).toBe(false);
-    expect(byLabel.get("Gamma Three")!.highlighted).toBe(false);
+    const spec = buildCostCompareSpec(tied, "SUV")!;
+    const byLabel = new Map(compareRows(spec).map((r) => [r.label, r]));
+    expect(byLabel.get("Alpha One")!.labels).toContain("Cheapest to own");
+    expect(byLabel.get("Beta Two")!.labels).toContain("Cheapest to own");
+    expect(byLabel.get("Gamma Three")!.labels).not.toContain("Cheapest to own");
+    expect(checkCostCompareSpec(spec, tied).ok).toBe(true);
   });
 
-  it("keeps the tag off a Pick #1 that is not cheapest (task 035)", () => {
-    const base = entriesFor("SUV")[0]!;
-    const entries: SpecEntry[] = [
-      { ...base, pick: { ...base.pick, make: "Alpha", model: "One", rank: 2 } },
-      {
-        ...base,
-        pick: { ...base.pick, make: "Beta", model: "Two", rank: 1 },
-        local: {
-          model: base.pick.model,
-          fuel: { perMonth: (base.local?.fuel?.perMonth ?? 150) + 200 },
-          units: base.local?.units ?? [],
-        },
-      },
-    ];
-    const rows = compareRows(buildCostCompareSpec(entries, "SUV"));
-    const byLabel = new Map(rows.map((r) => [r.label, r]));
-    expect(byLabel.get("Alpha One")!.cheapest).toBe(true);
-    expect(byLabel.get("Alpha One")!.highlighted).toBe(false);
-    expect(byLabel.get("Beta Two")!.cheapest).toBe(false);
-    expect(byLabel.get("Beta Two")!.highlighted).toBe(true);
+  it("the guard rejects tampered labels and sort figures (task 040)", () => {
+    const entries = entriesFor("SUV");
+    for (const tamper of [
+      (r: CompareRow) => { r.labels = [...r.labels, "Nearest"]; },
+      (r: CompareRow) => { r.bills += 5; },
+      (r: CompareRow) => { r.nearestMiles = (r.nearestMiles ?? 0) + 1; },
+      (r: CompareRow) => { r.lifespanYears = 99; },
+    ]) {
+      const spec = buildCostCompareSpec(entries, "SUV")!;
+      tamper(compareRows(spec)[0]!);
+      expect(checkCostCompareSpec(spec, entries).ok).toBe(false);
+    }
+  });
+
+  it("cards carry their best-at labels and no rank (task 040)", () => {
+    for (const category of CATEGORIES) {
+      const entries = entriesFor(category);
+      const { compare, cards } = buildTurnSpecs(entries, category);
+      const rowLabels = new Map(compareRows(compare).map((r) => [r.model, r.labels]));
+      for (const entry of entries) {
+        const spec = cards.get(entry.pick.model)!;
+        const props = spec.elements[spec.root]!.props as Record<string, unknown>;
+        expect(props).not.toHaveProperty("rank");
+        expect(props).not.toHaveProperty("badgeLabel");
+        expect(props.labels).toEqual(rowLabels.get(entry.pick.model));
+      }
+    }
+  });
+
+  it("no spec carries a rank number or ordinal wording (task 040)", () => {
+    for (const category of CATEGORIES) {
+      const entries = entriesFor(category);
+      const { compare, cards } = buildTurnSpecs(entries, category);
+      for (const spec of [compare!, ...cards.values()]) {
+        const text = JSON.stringify(spec);
+        expect(text).not.toMatch(/Pick #|#\d|top pick|number one|Start with/i);
+      }
+    }
   });
 
   it("checks the CR-V 'back to you' figure against resale at 60", () => {

@@ -147,21 +147,3 @@ export function cardSentence(
   void ownership;
   return `${first}${lifespan}`;
 }
-
-/** One closing line for the whole lineup, from tool results. */
-export function closingLine(
-  entries: { pick: SummaryPick; ownership?: SummaryOwnership }[],
-  category: string,
-): string | null {
-  void category;
-  const ranked = entries.filter((e) => e.pick.rank !== null);
-  const pool = ranked.length > 0 ? ranked : entries;
-  if (pool.length === 0) return null;
-  const top = [...pool].sort(
-    (a, b) => (a.pick.rank ?? 99) - (b.pick.rank ?? 99),
-  )[0];
-  // Task 038 (distill): name the pick only; its payment, retention
-  // and leave cost already sit on its card and in the comparison.
-  void top.ownership;
-  return `Start with the ${top.pick.make} ${top.pick.model}.`;
-}

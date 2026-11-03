@@ -4,6 +4,8 @@ import { dealerUnitsFace, effectiveMonthlyCost } from "../costs";
 import {
   interestPerMonth,
   listingStats,
+  nearestMilesOf,
+  turnLabels,
   valueLostPerMonth,
   type SpecEntry,
 } from "./specs";
@@ -318,7 +320,8 @@ export function checkPickCardSpec(spec: Spec, entry: SpecEntry): GuardResult {
     c.fail(spec.root, "root-type");
     return c.finish();
   }
-  c.exact(spec.root, `elements.${spec.root}.props.rank`, rootProps.rank, entry.pick.rank);
+  // Task 040: no rank on the card; best-at labels are strings.
+  if ("rank" in rootProps) c.fail(spec.root, "rank-present");
   for (const [id, el] of Object.entries(spec.elements)) {
     if (id === spec.root) continue;
     if (el.type === "CostBars") checkCostBars(c, spec, id, entry);
@@ -346,9 +349,14 @@ export function checkCostCompareSpec(spec: Spec, entries: SpecEntry[]): GuardRes
     gas: number;
     tax: number;
     total: number;
+    bills: number;
+    nearestMiles: number | null;
+    lifespanYears: number | null;
+    labels: string[];
     price: number | null;
     listingTotal: number | null;
   }[]) ?? [];
+  const labels = turnLabels(entries);
   const byLabel = new Map(entries.map((e) => [`${e.pick.make} ${e.pick.model}`, e]));
   if (rows.length !== entries.filter((e) => e.ownership).length) c.fail(spec.root, "row-count");
   let prev = -Infinity;
@@ -376,6 +384,15 @@ export function checkCostCompareSpec(spec: Spec, entries: SpecEntry[]): GuardRes
     const stats = listingStats(entry.local);
     c.exact(spec.root, `${base}.rows.${idx}.price`, row.price, stats ? stats.price : null);
     c.exact(spec.root, `${base}.rows.${idx}.listingTotal`, row.listingTotal, stats ? stats.total : null);
+    // Task 040: the sort figures copy or round the tool figures, and
+    // the best-at labels are recomputed from them.
+    c.dollar(spec.root, `${base}.rows.${idx}.bills`, row.bills, entry.ownership.monthlyPayment + gasRaw);
+    c.exact(spec.root, `${base}.rows.${idx}.nearestMiles`, row.nearestMiles, nearestMilesOf(entry.local));
+    c.exact(spec.root, `${base}.rows.${idx}.lifespanYears`, row.lifespanYears, entry.pick.lifespanYears ?? null);
+    const expectedLabels = labels.get(entry.pick.model) ?? [];
+    if (JSON.stringify(row.labels ?? []) !== JSON.stringify(expectedLabels)) {
+      c.fail(spec.root, "labels");
+    }
     if (Math.abs(row.total - (row.valueLost + row.interest + row.gas + row.tax)) > 2) {
       c.fail(spec.root, "row-total");
     }

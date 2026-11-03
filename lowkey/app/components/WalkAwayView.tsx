@@ -98,7 +98,6 @@ export default function WalkAwayView({
   const positiveMonth = ownership.positiveEquityMonth;
   const headline = equityHeadline(positiveMonth);
   const downPct = Math.round((ownership.downPayment / ownership.price) * 100);
-  const rankLabel = pick.rank ? `#${pick.rank} · ` : "";
   return (
     <section aria-label="If I change my mind" className="flex flex-col gap-[18px] py-1.5">
       {hideHeader ? null : (
@@ -109,14 +108,13 @@ export default function WalkAwayView({
           size="icon-lg"
           className="size-11 shrink-0"
           onClick={onBack}
-          aria-label="Back to your picks"
+          aria-label="Back"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M15 6l-6 6 6 6" />
           </svg>
         </Button>
         <span className="text-sm font-medium">
-          {rankLabel}
           {pick.make} {pick.model}
         </span>
       </div>

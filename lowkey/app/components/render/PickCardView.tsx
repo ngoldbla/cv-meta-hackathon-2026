@@ -23,13 +23,14 @@ const KIND_BY_CATEGORY: Record<string, CarKind> = {
 };
 
 /**
- * PickCard (task 034): the container. Badge, in-stock dot, Hairline
+ * PickCard (task 034): the container. Best-at labels (task 040; no
+ * rank numbers), in-stock dot, Hairline
  * figure, model and trim, sentence, trim-step line, then its
  * children in the mockup's order (CostBars, LifespanTrack,
  * EquityMini, DealerLine), then "If I change my mind".
  */
 export function PickCardView({
-  badgeLabel,
+  labels,
   modelLabel,
   sentence,
   trimLine,
@@ -39,8 +40,7 @@ export function PickCardView({
   hasWalkAway,
   children,
 }: {
-  rank: number | null;
-  badgeLabel: string;
+  labels: string[];
   modelLabel: string;
   sentence: string;
   trimLine: string | null;
@@ -51,17 +51,26 @@ export function PickCardView({
   children?: ReactNode;
 }) {
   const { onWalkAway } = useContext(WalkAwayContext);
-  const cheapest = badgeLabel.toLowerCase().includes("cheapest");
   const kind = KIND_BY_CATEGORY[category];
   return (
     <Card className="my-3">
       <CardHeader>
-        <div className="flex items-center justify-between gap-2">
-          <Badge color={cheapest ? "amber" : "gray"} shimmer={false}>
-            {badgeLabel}
-          </Badge>
+        <div className="flex items-start justify-between gap-2">
+          <span className="flex min-w-0 flex-wrap gap-1">
+            {labels.map((l) => (
+              <Badge
+                key={l}
+                color={l === "Cheapest to own" ? "amber" : "gray"}
+                shimmer={false}
+              >
+                {l}
+              </Badge>
+            ))}
+          </span>
           {inStock ? (
-            <StatusDot tone="success" showLabel label="In stock" size="sm" />
+            <span className="shrink-0 whitespace-nowrap">
+              <StatusDot tone="success" showLabel label="In stock" size="sm" />
+            </span>
           ) : null}
         </div>
         <div className="flex items-start gap-3">

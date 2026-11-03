@@ -4,7 +4,6 @@ import { RANK_FIXTURES } from "./fixtures";
 import { ownershipMath } from "./ownership";
 import {
   cardSentence,
-  closingLine,
   equityHeadline,
   positiveEquityLabel,
   sellLine,
@@ -112,22 +111,6 @@ describe("cardSentence with trim and lifespan (task 029, part 4)", () => {
     );
     expect(s).not.toContain("one step up");
     expect(s).not.toContain("Built to last");
-  });
-});
-
-describe("closingLine", () => {
-  it("names the #1 pick without repeating card numbers (task 038)", () => {
-    const fixture = RANK_FIXTURES.SUV;
-    const entries = fixture.picks.map((pick) => ({
-      pick,
-      ownership: ownershipFor(pick.price, pick.retention5y),
-    }));
-    const line = closingLine(entries, "SUV")!;
-    expect(line).toBe("Start with the Honda CR-V.");
-  });
-
-  it("returns null for an empty lineup", () => {
-    expect(closingLine([], "SUV")).toBeNull();
   });
 });
 
