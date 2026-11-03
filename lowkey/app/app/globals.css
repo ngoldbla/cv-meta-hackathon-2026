@@ -116,9 +116,18 @@ a {
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 12px;
-  padding: 16px;
+  padding: 20px 16px;
   font-size: 16px;
   line-height: 1.5;
+}
+
+.opening-title {
+  margin: 0 0 10px;
+  font-size: 30px;
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 
 .opening p {

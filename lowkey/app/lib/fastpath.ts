@@ -6,7 +6,7 @@
  * instead of waiting for the model. Follow-ups still use the model.
  */
 
-import type { Category } from "./fixtures";
+import type { Category } from "./table";
 import { parseUserApr } from "./fred";
 
 export interface FastRequest {

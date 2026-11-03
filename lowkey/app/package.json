@@ -13,6 +13,7 @@
     "@ai-sdk/react": "4.0.166",
     "@fontsource/ibm-plex-mono": "5.3.0",
     "@fontsource/ibm-plex-sans": "5.3.0",
+    "@vercel/blob": "2.8.2",
     "ai": "7.0.162",
     "next": "16.4.4",
     "react": "19.3.1",

@@ -95,7 +95,6 @@ export default function WalkAwayView({
           {pick.make} {pick.model}
         </span>
       </div>
-      <span className="sample-tag">SAMPLE DATA</span>
       <h2 className="walk-h">{headline}</h2>
       <p className="walk-intro">
         The gold line is what the car would sell for. The dashed line is what you still owe. Once gold is on top, selling pays off the loan and the difference comes back to you.

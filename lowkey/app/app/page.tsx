@@ -12,21 +12,30 @@ interface PickOut {
   rank: number | null;
   make: string;
   model: string;
+  providerModel?: string;
   price: number;
+  typicalNewPrice?: number;
   retention5y: number;
   depPerMonth: number;
+  mpg?: number | null;
   flag?: "badge" | "extra";
 }
 
 interface RankOutput {
   category: string;
   picks: PickOut[];
-  commodity: PickOut & { flag: "badge" | "extra" };
+  commodity: (PickOut & { flag: "badge" | "extra" }) | null;
+  soldVehicles?: number;
+  providerAsOf?: string;
+  builtAt?: string;
 }
 
 interface OwnershipOutput {
   model: string | null;
   price: number;
+  priceSource?: "local" | "typical" | "given";
+  priceLabel?: string | null;
+  typicalPrice?: number | null;
   downPayment: number;
   aprPercent: number;
   termMonths: number;
@@ -86,6 +95,18 @@ interface WalkSelection {
   aprText: string;
 }
 
+const FOOTER_MONTHS = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+/** "2026-11-03" -> "Nov 3, 2026" for the data-dates footer. */
+function footerDate(iso: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  if (!m) return iso;
+  return `${FOOTER_MONTHS[Number(m[2]) - 1] ?? m[2]} ${Number(m[3])}, ${m[1]}`;
+}
+
 export default function Home() {
   const { messages, sendMessage, status, error } = useChat();
   const [input, setInput] = useState("");
@@ -106,6 +127,20 @@ export default function Home() {
     };
   }, []);
 
+  let footerMeta: { soldVehicles: number; providerAsOf: string } | null = null;
+  for (const message of messages) {
+    for (const part of (message.parts ?? []) as Part[]) {
+      if (part.type !== "tool-rank_category" || part.state !== "output-available") continue;
+      const out = part.output as RankOutput;
+      if (out.soldVehicles && out.providerAsOf) {
+        footerMeta = {
+          soldVehicles: out.soldVehicles,
+          providerAsOf: out.providerAsOf,
+        };
+      }
+    }
+  }
+
   function onSubmit(e: FormEvent) {
     e.preventDefault();
     const text = input.trim();
@@ -122,10 +157,7 @@ export default function Home() {
           <KeyIcon />
           <span>Low Key</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span className="sample-tag">SAMPLE DATA</span>
-          <span className="tagline">No ads · No sign-up</span>
-        </div>
+        <span className="tagline">No ads · No sign-up</span>
       </header>
 
       <div className="messages">
@@ -161,8 +193,9 @@ export default function Home() {
           <>
             {messages.length === 0 ? (
               <div className="opening">
-                <p>What&apos;s your ZIP, and do you need a sedan, an SUV or a pickup?</p>
-                <p className="hint">Try: 60614, SUV — you will get the picks, the monthly cost, and what leaving would cost.</p>
+                <h1 className="opening-title">Get a car without regret.</h1>
+                <p>Tell me your ZIP and whether you need a sedan, an SUV or a pickup. I&apos;ll show you the new gas cars near you that hold their value best, what each costs a month, and what it would cost you to change your mind.</p>
+                <p className="hint">No ads · No sign-up · Not paid by dealers.</p>
               </div>
             ) : null}
 
@@ -194,14 +227,17 @@ export default function Home() {
                   ))}
                   {ranks.map((rank, ri) => {
                     const shown = [...rank.picks];
-                    const badged = shown.some((p) => p.model === rank.commodity.model);
-                    if (!badged) shown.push({ ...rank.commodity });
+                    const commodity = rank.commodity;
+                    const badged = commodity
+                      ? shown.some((p) => p.model === commodity.model)
+                      : true;
+                    if (commodity && !badged) shown.push({ ...commodity });
                     const entries = shown.map((pick) => ({
                       pick: {
                         ...pick,
                         flag:
-                          pick.model === rank.commodity.model
-                            ? rank.commodity.flag
+                          commodity && pick.model === commodity.model
+                            ? commodity.flag
                             : pick.flag,
                       },
                       ownership: ownershipByModel.get(modelKey(pick.model, pick.make)),
@@ -253,7 +289,7 @@ export default function Home() {
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="ZIP and type — e.g. 60614, SUV"
+            placeholder="e.g. 60614, SUV"
             aria-label="ZIP and car type"
           />
           <button type="submit" disabled={busy || !input.trim()}>
@@ -261,8 +297,14 @@ export default function Home() {
           </button>
         </form>
         <div className="assumptions">
-          Prices and stock are sample data in this build. Payment assumes 10% down, 60 months
-          {aprText ? <>, {aprText}</> : null} — say “my rate is 5.9%” in the chat to change it. Fuel, insurance and repairs are extra.
+          Payment assumes 10% down, 60 months
+          {aprText ? <>, {aprText}</> : null} — say “my rate is 5.9%” in the chat to change it. Insurance and repairs are extra.
+          {footerMeta ? (
+            <div>
+              Rankings from {footerMeta.soldVehicles.toLocaleString("en-US")} sold
+              vehicles, as of {footerDate(footerMeta.providerAsOf)} · Local stock live.
+            </div>
+          ) : null}
         </div>
       </div>
     </main>

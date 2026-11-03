@@ -1,66 +1,28 @@
 import { tool } from "ai";
 import { z } from "zod";
 
-import {
-  RANK_FIXTURES,
-  priceForModel,
-  resolvePick,
-  retentionForModel,
-  sampleUnitsFor,
-  type Category,
-} from "./fixtures";
+import { fuelForModel } from "./fuel";
 import { aprLabel, getDefaultApr } from "./fred";
+import { fetchLocalUnits } from "./listings";
 import { ownershipMath } from "./ownership";
+import {
+  getTable,
+  lineupFromTable,
+  resolveTablePick,
+  type Category,
+} from "./table";
 
 /**
- * Stub tools (task 025). Shapes follow the PRD and task 023's P10
- * definitions. rank_category and local_units return SAMPLE DATA
- * fixtures; ownership_math runs the real deterministic maths in
- * lib/ownership.ts — only its inputs are stubbed by the caller.
- * Plain executors are exported so the fast path (task 026, part 5)
- * can call the same code without the model.
+ * Live tools (task 027). rank_category reads the private Blob table
+ * (one category per call), local_units searches the listings provider
+ * over REST, and ownership_math prices the cheapest local unit (or
+ * the table's typical price, labelled). Plain executors are exported
+ * for the fast path in app/api/chat/route.ts.
  */
 
 export async function executeRankCategory(category: Category) {
-  const fixture = RANK_FIXTURES[category];
-  return {
-    sampleData: true as const,
-    category: fixture.category,
-    picks: fixture.picks,
-    commodity: fixture.commodity,
-    note: "SAMPLE DATA: fixture lineups, not live prices.",
-  };
-}
-
-export async function executeOwnership(args: {
-  price: number;
-  down?: number;
-  apr?: number;
-  term?: number;
-  model?: string;
-}) {
-  const { price, down, apr, term, model } = args;
-  const resolved = model ? resolvePick(model) : undefined;
-  const aprInfo = apr === undefined ? await getDefaultApr() : null;
-  const result = ownershipMath({
-    price,
-    down,
-    apr: apr ?? aprInfo?.aprPercent,
-    term,
-    // Canonical fixture model ("CR-V") so the UI can attach this
-    // result to the ranked card even when the caller sent
-    // "Honda CR-V".
-    model: resolved?.model ?? model,
-    retention5y: model ? retentionForModel(model) : undefined,
-  });
-  return {
-    sampleData: true as const,
-    ...result,
-    make: resolved?.make ?? null,
-    aprDate: aprInfo?.dateIso ?? null,
-    aprAssumed: aprInfo?.assumed ?? false,
-    aprLabel: aprInfo ? aprLabel(aprInfo) : null,
-  };
+  const table = await getTable();
+  return lineupFromTable(table, category);
 }
 
 export async function executeLocalUnits(args: {
@@ -69,41 +31,110 @@ export async function executeLocalUnits(args: {
   category?: string;
   radius?: number;
 }) {
-  const { zip, model, category, radius } = args;
-  const resolved = model ? resolvePick(model) : undefined;
-  const basePrice = model ? priceForModel(model) : undefined;
-  if (!model || !resolved || basePrice === undefined) {
-    return {
-      sampleData: true as const,
-      zip,
-      model: model ?? null,
-      category: category ?? null,
-      radius: radius ?? 50,
-      unitsFound: 0,
-      units: [] as ReturnType<typeof sampleUnitsFor>,
-      note: "SAMPLE DATA: name a model from rank_category to see sample units.",
-    };
+  const { zip, model, category } = args;
+  let table = null;
+  try {
+    table = await getTable();
+  } catch {
+    table = null;
   }
-  const units = sampleUnitsFor(resolved.model, basePrice);
-  const best = units.reduce((a, b) => (b.price < a.price ? b : a));
+  const resolved = table && model ? resolveTablePick(table, model) : undefined;
+  const providerModel = resolved?.pick.providerModel ?? (model ?? "");
+  const result = await fetchLocalUnits({ zip, providerModel });
+  const fuel =
+    table && resolved
+      ? fuelForModel({ mpg: resolved.pick.mpg, zip, table })
+      : null;
   return {
-    sampleData: true as const,
     zip,
-    model: resolved.model,
-    make: resolved.make,
+    model: resolved?.pick.model ?? (model ?? null),
+    providerModel: providerModel || null,
+    make: resolved?.pick.make ?? null,
     category: category ?? null,
-    radius: radius ?? 50,
-    unitsFound: units.length,
-    bestPrice: best.price,
-    bestDealer: best.dealer,
-    units,
-    note: "SAMPLE DATA: fixture units, not live stock.",
+    units: result.units,
+    unitsFound: result.unitsFound,
+    totalFound: result.totalFound,
+    bestPrice: result.bestPrice ?? null,
+    bestDealer: result.bestDealer ?? null,
+    radiusUsed: result.radiusUsed,
+    widened: result.widened,
+    error: result.error ?? null,
+    fuel,
+  };
+}
+
+export async function executeOwnership(args: {
+  price?: number;
+  down?: number;
+  apr?: number;
+  term?: number;
+  model?: string;
+  zip?: string;
+  retention5y?: number;
+  /** Set by the fast path when `price` is already the resolved price. */
+  priceSource?: "local" | "typical" | "given";
+}) {
+  const { down, apr, term, model, zip } = args;
+  let table = null;
+  try {
+    table = await getTable();
+  } catch {
+    table = null;
+  }
+  const resolved = table && model ? resolveTablePick(table, model) : undefined;
+  const retention5y =
+    args.retention5y ?? resolved?.pick.retentionAfterDiscount;
+
+  let price = args.price;
+  let priceSource: "local" | "typical" | "given" = args.priceSource ?? "given";
+  let typicalPrice: number | null = resolved?.pick.typicalNewPrice ?? null;
+  if (zip && resolved) {
+    const local = await fetchLocalUnits({
+      zip,
+      providerModel: resolved.pick.providerModel,
+    });
+    if (local.bestPrice !== undefined) {
+      price = local.bestPrice;
+      priceSource = "local";
+    } else {
+      // No usable local unit (none found, or the search failed): the
+      // table's typical price, labelled. The card shows the load
+      // error alongside this typical-price payment.
+      price = resolved.pick.typicalNewPrice;
+      priceSource = "typical";
+    }
+  } else if (price === undefined && resolved) {
+    price = resolved.pick.typicalNewPrice;
+    priceSource = "typical";
+  }
+  if (price === undefined) {
+    throw new Error("ownership_math needs a price or a ranked model");
+  }
+
+  const aprInfo = apr === undefined ? await getDefaultApr() : null;
+  const result = ownershipMath({
+    price,
+    down,
+    apr: apr ?? aprInfo?.aprPercent,
+    term,
+    model: resolved?.pick.model ?? model,
+    retention5y,
+  });
+  return {
+    ...result,
+    make: resolved?.pick.make ?? null,
+    priceSource,
+    priceLabel: priceSource === "typical" ? "typical price" : null,
+    typicalPrice,
+    aprDate: aprInfo?.dateIso ?? null,
+    aprAssumed: aprInfo?.assumed ?? false,
+    aprLabel: aprInfo ? aprLabel(aprInfo) : null,
   };
 }
 
 export const rankCategoryTool = tool({
   description:
-    "Return the ranked picks (at most 4) and the commodity pick for a category. Sample data in this scaffold.",
+    "Return the ranked picks (at most 4) and the commodity pick for a category from the live depreciation table. Call this whenever the user names a sedan, SUV or pickup type to consider.",
   inputSchema: z.object({
     category: z.enum(["Sedan", "SUV", "Pickup"]),
   }),
@@ -113,26 +144,28 @@ export const rankCategoryTool = tool({
 
 export const ownershipMathTool = tool({
   description:
-    "Return the monthly payment, the 61-point worth-vs-owe curve, walk-away costs at 6, 12, 24, 36 and 60 months, and the even (above-water) month for a price, down payment, APR and term. Omit apr to use the Federal Reserve average; pass apr only when the user states their own rate. Deterministic; never estimate these numbers in text.",
+    "Return the monthly payment, the 61-point worth-vs-owe curve, walk-away costs at 6, 12, 24, 36 and 60 months, and the even (above-water) month. Pass model (the exact model string from rank_category) and zip so the server prices the cheapest local unit, or the typical price when there is no local unit. Omit apr to use the Federal Reserve average; pass apr only when the user states their own rate. Deterministic; never estimate these numbers in text.",
   inputSchema: z.object({
-    price: z.number().positive(),
+    price: z.number().positive().optional(),
     down: z.number().nonnegative().optional(),
     apr: z.number().nonnegative().optional(),
     term: z.number().int().positive().optional(),
     model: z.string().optional(),
+    zip: z.string().optional(),
   }),
   execute: async (args: {
-    price: number;
+    price?: number;
     down?: number;
     apr?: number;
     term?: number;
     model?: string;
+    zip?: string;
   }) => executeOwnership(args),
 });
 
 export const localUnitsTool = tool({
   description:
-    "Return new in-stock sample units near a ZIP code for a model. Sample data in this scaffold.",
+    "Return up to 3 new in-stock local units near a ZIP code for a ranked model (cheapest first, radius 50 widening to 150), with the fuel estimate for that ZIP. Set model to the exact model string from rank_category (for example \"CR-V\", not \"Honda CR-V\").",
   inputSchema: z.object({
     zip: z.string(),
     model: z.string().optional(),

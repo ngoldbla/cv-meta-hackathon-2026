@@ -1,11 +1,12 @@
 /**
- * SAMPLE DATA — stub fixtures for task 025. Numbers echo the
- * committed four-pick lineups in lowkey/docs/preflight-results.md
- * (task 023/024) so the scaffold shows realistic cards. Real data
- * comes in a later task; nothing here is a live price.
+ * Test fixtures only (tasks 025–026 stub lineups). Since task 027
+ * the live path reads the Blob table and the listings provider;
+ * nothing here is served to users. Kept for unit tests.
  */
 
-export type Category = "Sedan" | "SUV" | "Pickup";
+import type { Category } from "./table";
+
+export type { Category };
 
 export interface FixturePick {
   rank: number | null;

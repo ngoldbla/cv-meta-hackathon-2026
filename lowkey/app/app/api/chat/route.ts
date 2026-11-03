@@ -19,15 +19,15 @@ import {
 
 export const maxDuration = 60;
 
-const SYSTEM = `You are Low Key, a car-buying chat that tells someone who needs a car now which new gas car to buy nearby, what it costs per month, and what it would cost to walk away from it. No ads, no forms, no shopping.
+const SYSTEM = `You are Low Key. Your job is helping someone get a car without regret, so leaving cheaply (walk-away cost, months underwater) is the main reason to choose a car. You tell someone who needs a car now which new gas car to buy nearby, what it costs per month, and what it would cost to walk away from it. No ads, no forms, no shopping.
 
 Rules:
 - If the user has not yet given a ZIP and a type, ask one question only: "What's your ZIP, and do you need a sedan, an SUV or a pickup?" Do not show picks before you have both.
 - Any mention of sedans, SUVs or pickups as a type to consider is a request for the ranking: call rank_category for that category (map plurals to Sedan, SUV or Pickup). A ZIP never replaces the ranking when a category is named.
 - Show at most 4 ranked picks plus the commodity pick. Never show more, and never turn the chat into a browsing tool.
-- After rank_category, call ownership_math for each pick you will show (use its price and 10% down over 60 months unless the user said otherwise; omit apr so the server uses the Federal Reserve average, and pass apr only when the user states their own rate, for example "my rate is 5.9%") and call local_units for each pick with the user's ZIP. In both calls, set model to the exact model string from rank_category (for example "CR-V", not "Honda CR-V").
+- After rank_category, call local_units for each pick with the user's ZIP, then ownership_math for each pick with model and zip (the server prices the cheapest local unit, or the labelled typical price when there is none; use 10% down over 60 months unless the user said otherwise; omit apr so the server uses the Federal Reserve average, and pass apr only when the user states their own rate, for example "my rate is 5.9%"). In both calls, set model to the exact model string from rank_category (for example "CR-V", not "Honda CR-V").
 - Do not write a "why this car" sentence or any closing summary: the cards already show a code-written summary. Keep your own text to short replies to follow-up questions, with no numbers except ones copied verbatim from tool results. Never invent or compute numbers: if a number is not in a tool result, do not state it.
-- Use plain words and short answers. Say the sample-data tools are sample data when you mention prices or stock.
+- Use plain words and short answers.
 - The user can ask follow-ups in plain words, such as "What if I put $5k down?" — answer by calling ownership_math again.
 - The model never does arithmetic. Every number on screen comes from a tool result.`;
 
@@ -74,77 +74,86 @@ async function fastPathResponse(text: string) {
         toolName: "rank_category",
         input: { category: req.category },
       });
-      const rank = await executeRankCategory(req.category);
+      let rank;
+      try {
+        rank = await executeRankCategory(req.category);
+      } catch {
+        writer.write({ type: "finish-step" });
+        return;
+      }
       writer.write({
         type: "tool-output-available",
         toolCallId: rankId,
         output: rank,
       });
       const shown = [...rank.picks];
-      if (!shown.some((p) => p.model === rank.commodity.model)) {
+      if (
+        rank.commodity &&
+        !shown.some((p) => p.model === rank.commodity!.model)
+      ) {
         shown.push({ ...rank.commodity });
       }
       // One shared FRED lookup (1-day cached) unless the user
       // stated their own rate.
       const aprInfo = req.userApr === null ? await getDefaultApr() : null;
-      const jobs: Promise<void>[] = [];
-      for (const pick of shown) {
-        const ownId = callId("own");
+      // Local stock first (parallel; at most one provider call per
+      // pick at 50 miles): payments price the cheapest local unit.
+      const locals = await Promise.all(
+        shown.map((pick) =>
+          executeLocalUnits({ zip: req.zip, model: pick.model }),
+        ),
+      );
+      for (let i = 0; i < shown.length; i += 1) {
+        const pick = shown[i];
+        const local = locals[i];
         const locId = callId("loc");
+        writer.write({
+          type: "tool-input-available",
+          toolCallId: locId,
+          toolName: "local_units",
+          input: { zip: req.zip, model: pick.model },
+        });
+        writer.write({
+          type: "tool-output-available",
+          toolCallId: locId,
+          output: local,
+        });
+        const price = local.bestPrice ?? pick.typicalNewPrice;
+        const ownId = callId("own");
         const ownInput = {
-          price: pick.price,
-          down: downForPrice(req, pick.price),
+          price,
+          down: downForPrice(req, price),
           apr: req.userApr ?? undefined,
           term: 60,
           model: pick.model,
         };
-        const locInput = { zip: req.zip, model: pick.model };
         writer.write({
           type: "tool-input-available",
           toolCallId: ownId,
           toolName: "ownership_math",
           input: ownInput,
         });
-        writer.write({
-          type: "tool-input-available",
-          toolCallId: locId,
-          toolName: "local_units",
-          input: locInput,
+        const out = await executeOwnership({
+          ...ownInput,
+          retention5y: pick.retention5y,
+          priceSource: local.bestPrice !== null && local.bestPrice !== undefined ? "local" : "typical",
+          apr:
+            req.userApr ??
+            (aprInfo ? aprInfo.aprPercent : undefined),
         });
-        jobs.push(
-          (async () => {
-            const out = await executeOwnership({
-              ...ownInput,
-              apr:
-                req.userApr ??
-                (aprInfo ? aprInfo.aprPercent : undefined),
-            });
-            writer.write({
-              type: "tool-output-available",
-              toolCallId: ownId,
-              output: aprInfo
-                ? {
-                    ...out,
-                    aprDate: aprInfo.dateIso,
-                    aprAssumed: aprInfo.assumed,
-                    aprLabel: aprLabel(aprInfo),
-                  }
-                : out,
-            });
-          })(),
-        );
-        jobs.push(
-          (async () => {
-            const out = await executeLocalUnits(locInput);
-            writer.write({
-              type: "tool-output-available",
-              toolCallId: locId,
-              output: out,
-            });
-          })(),
-        );
+        writer.write({
+          type: "tool-output-available",
+          toolCallId: ownId,
+          output: aprInfo
+            ? {
+                ...out,
+                aprDate: aprInfo.dateIso,
+                aprAssumed: aprInfo.assumed,
+                aprLabel: aprLabel(aprInfo),
+              }
+            : out,
+        });
       }
-      await Promise.all(jobs);
       writer.write({ type: "finish-step" });
     },
   });
