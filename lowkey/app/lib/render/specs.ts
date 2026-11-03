@@ -201,7 +201,7 @@ export function buildPickCardSpec(
   };
   children.push(lifeId);
 
-  if (ownership) {
+  if (ownership && ownership.curve.length > 0) {
     const waterId = `${slug}-water`;
     elements[waterId] = {
       type: "UnderwaterMini",

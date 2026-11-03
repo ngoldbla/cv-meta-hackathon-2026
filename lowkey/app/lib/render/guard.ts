@@ -1,7 +1,6 @@
 import type { Spec } from "@json-render/core";
 
 import { dealerUnitsFace, effectiveMonthlyCost } from "../costs";
-import { catalog } from "./catalog";
 import {
   interestPerMonth,
   valueLostPerMonth,
@@ -262,8 +261,6 @@ function checkDealer(c: Checker, spec: Spec, id: string, entry: SpecEntry) {
 /** Check one PickCard spec against the entry that produced it. */
 export function checkPickCardSpec(spec: Spec, entry: SpecEntry): GuardResult {
   const c = new Checker(spec);
-  const catalogResult = catalog.validate(spec);
-  if (!catalogResult.success) c.fail(spec.root, "catalog");
   const rootProps = propsOf(spec, spec.root);
   if (!rootProps || spec.elements[spec.root]?.type !== "PickCard") {
     c.fail(spec.root, "root-type");
@@ -284,8 +281,6 @@ export function checkPickCardSpec(spec: Spec, entry: SpecEntry): GuardResult {
 /** Check one CostCompare spec against the entries that produced it. */
 export function checkCostCompareSpec(spec: Spec, entries: SpecEntry[]): GuardResult {
   const c = new Checker(spec);
-  const catalogResult = catalog.validate(spec);
-  if (!catalogResult.success) c.fail(spec.root, "catalog");
   const props = propsOf(spec, spec.root);
   if (!props || spec.elements[spec.root]?.type !== "CostCompare") {
     c.fail(spec.root, "root-type");

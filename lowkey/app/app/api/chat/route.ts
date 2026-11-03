@@ -14,6 +14,12 @@ import {
   type FastRequest,
 } from "@/lib/fastpath";
 import { aprLabel, getDefaultApr } from "@/lib/fred";
+import { checkCostCompareSpec, checkPickCardSpec } from "@/lib/render/guard";
+import {
+  buildCostCompareSpec,
+  buildPickCardSpec,
+  type SpecEntry,
+} from "@/lib/render/specs";
 import {
   executeLocalUnits,
   executeOwnership,
@@ -108,6 +114,7 @@ async function fastPathResponse(req: FastRequest) {
           await executeLocalUnits({ zip: req.zip, model: pick.model }),
         );
       }
+      const specEntries: SpecEntry[] = [];
       for (let i = 0; i < shown.length; i += 1) {
         const pick = shown[i];
         const local = locals[i];
@@ -146,18 +153,58 @@ async function fastPathResponse(req: FastRequest) {
             req.userApr ??
             (aprInfo ? aprInfo.aprPercent : undefined),
         });
+        const ownOutput = aprInfo
+          ? {
+              ...out,
+              aprDate: aprInfo.dateIso,
+              aprAssumed: aprInfo.assumed,
+              aprLabel: aprLabel(aprInfo),
+            }
+          : out;
         writer.write({
           type: "tool-output-available",
           toolCallId: ownId,
-          output: aprInfo
-            ? {
-                ...out,
-                aprDate: aprInfo.dateIso,
-                aprAssumed: aprInfo.assumed,
-                aprLabel: aprLabel(aprInfo),
-              }
-            : out,
+          output: ownOutput,
         });
+        // Server-built card spec (task 034): streamed as a data
+        // part right after its tool results, so the first card is
+        // no slower than the tool path alone. A spec that fails
+        // the number guard is dropped (logged without data) and
+        // the client falls back to text.
+        const entry: SpecEntry = {
+          pick: pick as unknown as SpecEntry["pick"],
+          ownership: ownOutput as unknown as SpecEntry["ownership"],
+          local: local as unknown as SpecEntry["local"],
+        };
+        specEntries.push(entry);
+        const cardSpec = buildPickCardSpec(
+          entry,
+          shown as unknown as SpecEntry["pick"][],
+          req.category,
+        );
+        if (checkPickCardSpec(cardSpec, entry).ok) {
+          writer.write({
+            type: "data-lowkey-spec",
+            data: { kind: "card", model: pick.model, spec: cardSpec },
+          });
+        } else {
+          console.error(
+            "lowkey: dropped a render spec that failed the number guard",
+          );
+        }
+      }
+      const compareSpec = buildCostCompareSpec(specEntries, req.category);
+      if (compareSpec) {
+        if (checkCostCompareSpec(compareSpec, specEntries).ok) {
+          writer.write({
+            type: "data-lowkey-spec",
+            data: { kind: "compare", spec: compareSpec },
+          });
+        } else {
+          console.error(
+            "lowkey: dropped a render spec that failed the number guard",
+          );
+        }
       }
       writer.write({ type: "finish-step" });
     },

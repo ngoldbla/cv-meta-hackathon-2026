@@ -1,12 +1,15 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  GEO_FETCH_TIMEOUT_MS,
+  STILL_LOOKING_AFTER_MS,
   areaAfterSearch,
   areaPlaceLabel,
   censusCoordsUrl,
   confirmArea,
   isAreaConfirmed,
   isBareGeoResult,
+  isSlowLookup,
   lookupWithRetry,
   parseCensusGeographies,
   parseStoredArea,
@@ -312,5 +315,18 @@ describe("city lookup retry (task 032 part 2)", () => {
     expect(
       isBareGeoResult({ zip: "60614", city: "Chicago", state: "IL" }),
     ).toBe(false);
+  });
+});
+
+describe("location lookup timing (task 034)", () => {
+  it("uses a 5 s per-attempt timeout, not 12 s", () => {
+    expect(GEO_FETCH_TIMEOUT_MS).toBe(5000);
+  });
+
+  it("shows 'Still looking…' only from 3 s", () => {
+    expect(STILL_LOOKING_AFTER_MS).toBe(3000);
+    expect(isSlowLookup(2999)).toBe(false);
+    expect(isSlowLookup(3000)).toBe(true);
+    expect(isSlowLookup(8000)).toBe(true);
   });
 });

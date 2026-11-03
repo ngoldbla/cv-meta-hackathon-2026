@@ -1,4 +1,5 @@
 import {
+  GEO_FETCH_TIMEOUT_MS,
   censusCoordsUrl,
   lookupWithRetry,
   parseCensusGeographies,
@@ -16,7 +17,7 @@ const EMPTY: GeoOut = { zip: null, city: null, state: null };
 async function fetchJson(url: string): Promise<unknown | null> {
   try {
     const res = await fetch(url, {
-      signal: AbortSignal.timeout(12000),
+      signal: AbortSignal.timeout(GEO_FETCH_TIMEOUT_MS),
       headers: { accept: "application/json" },
     });
     if (!res.ok) return null;

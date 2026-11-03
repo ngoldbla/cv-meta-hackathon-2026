@@ -147,6 +147,17 @@ export function isBareGeoResult(
   return !result || !result.city;
 }
 
+/** Per-attempt timeout for a location lookup fetch (task 034: 5 s, not 12 s). */
+export const GEO_FETCH_TIMEOUT_MS = 5000;
+
+/** "Still looking…" appears after this long (task 034). */
+export const STILL_LOOKING_AFTER_MS = 3000;
+
+/** True when a lookup has run long enough to show "Still looking…". */
+export function isSlowLookup(elapsedMs: number): boolean {
+  return elapsedMs >= STILL_LOOKING_AFTER_MS;
+}
+
 const defaultSleep = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
 

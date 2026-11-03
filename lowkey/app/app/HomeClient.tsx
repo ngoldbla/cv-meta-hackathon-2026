@@ -5,7 +5,8 @@ import { MotionConfig } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
 import { CarFigure } from "@/components/hairline/CarFigure";
-import PickCard, { type LocalLike } from "@/components/PickCard";
+import { RenderSpec } from "@/components/render/registry";
+import { TextFallback } from "@/components/render/TextFallback";
 import WalkAwayView from "@/components/WalkAwayView";
 import { AIInput } from "@/components/ui/ai-input";
 import {
@@ -48,7 +49,17 @@ import {
   type GeoLookupResult,
   type SearchArea,
 } from "@/lib/geo";
+import { STILL_LOOKING_AFTER_MS } from "@/lib/geo";
+import { checkCostCompareSpec, checkPickCardSpec } from "@/lib/render/guard";
+import { isCatalogValid } from "@/lib/render/validate";
+import {
+  buildCostCompareSpec,
+  buildPickCardSpec,
+  type SpecEntry,
+  type SpecOwnership,
+} from "@/lib/render/specs";
 import { closingLine } from "@/lib/summary";
+import type { Spec } from "@json-render/core";
 import type { CurveLike } from "@/components/WorthChart";
 
 interface PickOut {
@@ -112,9 +123,37 @@ interface OwnershipOutput {
   aprLabel?: string | null;
 }
 
-interface LocalOutput extends LocalLike {
-  model?: string;
-  bestPrice?: number;
+interface LocalOutput {
+  model?: string | null;
+  zip?: string;
+  bestPrice?: number | null;
+  bestDealer?: string | null;
+  unitsFound?: number;
+  totalFound?: number;
+  radiusUsed?: number;
+  widened?: boolean;
+  error?: string | null;
+  fuel?: {
+    text: string;
+    perMonth: number;
+    low: number;
+    high: number;
+    seriesDisplay: string;
+    latestDate: string;
+  } | null;
+  recommendedTrim?: string | null;
+  baseTrim?: string | null;
+  trimUsed?: string | null;
+  fellBackToBase?: boolean;
+  units: {
+    dealer: string;
+    distanceMiles: number;
+    daysOnLot?: number | null;
+    year?: number | null;
+    trim?: string | null;
+    price: number;
+    url: string;
+  }[];
 }
 
 type Part = {
@@ -123,7 +162,33 @@ type Part = {
   state?: string;
   input?: unknown;
   output?: unknown;
+  data?: unknown;
 };
+
+/** Tool output -> spec-builder ownership (task 034). */
+function toSpecOwnership(o: OwnershipOutput | undefined): SpecOwnership | undefined {
+  if (!o) return undefined;
+  return {
+    price: o.price,
+    downPayment: o.downPayment,
+    loanAmount: o.loanAmount ?? o.price - o.downPayment,
+    monthlyPayment: o.monthlyPayment,
+    aprPercent: o.aprPercent,
+    termMonths: o.termMonths,
+    evenMonth: o.evenMonth ?? o.underwaterMonth ?? null,
+    underwaterMonth: o.underwaterMonth ?? null,
+    curve: o.curve ?? [],
+  };
+}
+
+const loggedGuardDrops = new Set<string>();
+
+/** A failed spec is dropped and logged without data (task 034). */
+function logGuardDrop(kind: string) {
+  if (loggedGuardDrops.has(kind)) return;
+  loggedGuardDrops.add(kind);
+  console.error("lowkey: dropped a render spec that failed the number guard");
+}
 
 function toolName(partType: string): string {
   return partType.replace(/^tool-/, "");
@@ -266,6 +331,7 @@ export default function HomeClient({
   const [pendingBody, setPendingBody] = useState<string | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
   const [geoBusy, setGeoBusy] = useState(false);
+  const [geoSlow, setGeoSlow] = useState(false);
   const zipInputRef = useRef<HTMLInputElement>(null);
   const busy = status === "submitted" || status === "streaming";
 
@@ -290,6 +356,16 @@ export default function HomeClient({
   useEffect(() => {
     if (zipOpen) zipInputRef.current?.focus();
   }, [zipOpen]);
+
+  // "Still looking…" after 3 s of a location lookup (task 034).
+  useEffect(() => {
+    if (!geoBusy) {
+      setGeoSlow(false);
+      return;
+    }
+    const t = setTimeout(() => setGeoSlow(true), STILL_LOOKING_AFTER_MS);
+    return () => clearTimeout(t);
+  }, [geoBusy]);
 
   useEffect(() => {
     let live = true;
@@ -520,6 +596,18 @@ export default function HomeClient({
                     if (out.model) localByModel.set(modelKey(out.model, out.make), out);
                   }
                 }
+                const serverCards = new Map<string, Spec>();
+                let serverCompare: Spec | null = null;
+                for (const part of parts) {
+                  if (part.type !== "data-lowkey-spec") continue;
+                  const d = part.data as
+                    | { kind?: string; model?: string; spec?: Spec }
+                    | undefined;
+                  if (d?.kind === "card" && d.model && d.spec) {
+                    serverCards.set(d.model, d.spec);
+                  }
+                  if (d?.kind === "compare" && d.spec) serverCompare = d.spec;
+                }
                 const texts = parts.filter((p) => p.type === "text" && p.text);
                 const isUser = message.role === "user";
                 return (
@@ -554,31 +642,90 @@ export default function HomeClient({
                           ownership: ownershipByModel.get(modelKey(pick.model, pick.make)),
                         }));
                         const closing = closingLine(entries, rank.category);
+                        // Cards render only from specs (task 034): the
+                        // server's fast-path specs when present, else
+                        // the same pure builders over the tool-result
+                        // parts. Every spec passes the number guard
+                        // first; a failure drops to text.
+                        const specEntries: SpecEntry[] = entries.map(
+                          ({ pick, ownership }) => ({
+                            pick,
+                            ownership: toSpecOwnership(ownership),
+                            local: localByModel.get(
+                              modelKey(pick.model, pick.make),
+                            ),
+                          }),
+                        );
+                        const compareSpec =
+                          serverCompare ??
+                          buildCostCompareSpec(specEntries, rank.category);
+                        const compareCheck = compareSpec
+                          ? isCatalogValid(compareSpec)
+                            ? checkCostCompareSpec(compareSpec, specEntries)
+                            : { ok: false, failures: [] }
+                          : null;
+                        if (compareSpec && !compareCheck?.ok) {
+                          logGuardDrop("compare");
+                        }
                         return (
                           <div key={ri} className="w-full">
-                            {entries.map(({ pick, ownership }) => (
-                              <PickCard
-                                key={`${pick.make}-${pick.model}`}
-                                pick={pick}
-                                ownership={ownership}
-                                local={localByModel.get(modelKey(pick.model, pick.make))}
-                                peers={shown}
-                                category={rank.category}
-                                onWalkAway={
-                                  ownership
-                                    ? () =>
-                                        setWalk({
-                                          pick,
-                                          ownership,
-                                          aprText:
-                                            ownership.aprLabel ??
-                                            aprText ??
-                                            `${ownership.aprPercent}% APR`,
-                                        })
-                                    : undefined
-                                }
-                              />
-                            ))}
+                            {compareSpec && compareCheck?.ok ? (
+                              <RenderSpec spec={compareSpec} />
+                            ) : null}
+                            {entries.map(({ pick, ownership }, ei) => {
+                              const entry = specEntries[ei]!;
+                              const spec =
+                                serverCards.get(pick.model) ??
+                                buildPickCardSpec(entry, shown, rank.category);
+                              const check = isCatalogValid(spec)
+                                ? checkPickCardSpec(spec, entry)
+                                : { ok: false, failures: [] as never[] };
+                              if (!check.ok) {
+                                logGuardDrop("card");
+                                return (
+                                  <TextFallback
+                                    key={`${pick.make}-${pick.model}`}
+                                    entry={entry}
+                                    peers={shown}
+                                    category={rank.category}
+                                    onWalkAway={
+                                      ownership
+                                        ? () =>
+                                            setWalk({
+                                              pick,
+                                              ownership,
+                                              aprText:
+                                                ownership.aprLabel ??
+                                                aprText ??
+                                                `${ownership.aprPercent}% APR`,
+                                            })
+                                        : undefined
+                                    }
+                                  />
+                                );
+                              }
+                              return (
+                                <RenderSpec
+                                  key={`${pick.make}-${pick.model}`}
+                                  spec={spec}
+                                  onWalkAway={(model) => {
+                                    const target = entries.find(
+                                      (e) => e.pick.model === model,
+                                    );
+                                    if (target?.ownership) {
+                                      setWalk({
+                                        pick: target.pick,
+                                        ownership: target.ownership,
+                                        aprText:
+                                          target.ownership.aprLabel ??
+                                          aprText ??
+                                          `${target.ownership.aprPercent}% APR`,
+                                      });
+                                    }
+                                  }}
+                                />
+                              );
+                            })}
                             {closing ? (
                               <MessageBubble variant="default">{closing}</MessageBubble>
                             ) : null}
@@ -709,6 +856,11 @@ export default function HomeClient({
                     {geoBusy ? "Locating…" : "Use my location"}
                   </button>
                 </div>
+              ) : null}
+              {geoBusy && geoSlow ? (
+                <p role="status" className="mt-2 text-sm text-muted-foreground">
+                  Still looking…
+                </p>
               ) : null}
               {geoError ? (
                 <div

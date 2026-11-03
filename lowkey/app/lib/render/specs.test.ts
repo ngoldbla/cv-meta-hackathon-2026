@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { RANK_FIXTURES, sampleUnitsFor, type Category } from "../fixtures";
 import { ownershipMath } from "../ownership";
 import { checkCostCompareSpec, checkPickCardSpec, collectSpecNumbers } from "./guard";
+import { isCatalogValid } from "./validate";
 import {
   buildCostCompareSpec,
   buildPickCardSpec,
@@ -69,12 +70,14 @@ describe("spec builders + number guard (task 034)", () => {
       const entries = entriesFor(category);
       const { compare, cards } = buildTurnSpecs(entries, category);
       expect(compare).not.toBeNull();
+      expect(isCatalogValid(compare!)).toBe(true);
       const compareCheck = checkCostCompareSpec(compare!, entries);
       expect(compareCheck.failures).toEqual([]);
       expect(compareCheck.ok).toBe(true);
       for (const entry of entries) {
         const spec = cards.get(entry.pick.model)!;
         expect(spec.elements[spec.root]?.type).toBe("PickCard");
+        expect(isCatalogValid(spec)).toBe(true);
         const check = checkPickCardSpec(spec, entry);
         expect(check.failures).toEqual([]);
         expect(check.ok).toBe(true);
