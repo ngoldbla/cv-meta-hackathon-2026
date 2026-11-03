@@ -3,9 +3,14 @@
 import { useChat } from "@ai-sdk/react";
 import { useEffect, useState } from "react";
 
+import { CarFigure } from "@/components/hairline/CarFigure";
 import PickCard, { type LocalLike } from "@/components/PickCard";
 import WalkAwayView from "@/components/WalkAwayView";
 import { AIInput } from "@/components/ui/ai-input";
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from "@/components/ui/b-togglegroup";
 import {
   Drawer,
   DrawerBody,
@@ -202,6 +207,7 @@ export default function Home() {
   const { messages, sendMessage, status, error } = useChat();
   const [aprText, setAprText] = useState<string | null>(null);
   const [walk, setWalk] = useState<WalkSelection | null>(null);
+  const [bodyPick, setBodyPick] = useState<string[]>([]);
   const [isNarrow, setIsNarrow] = useState(false);
   const busy = status === "submitted" || status === "streaming";
 
@@ -239,6 +245,12 @@ export default function Home() {
       }
     }
   }
+
+  const hasRank = messages.some((m) =>
+    ((m.parts ?? []) as Part[]).some(
+      (p) => p.type === "tool-rank_category" && p.state === "output-available",
+    ),
+  );
 
   const lastAssistant = [...messages]
     .reverse()
@@ -301,7 +313,10 @@ export default function Home() {
                   text="Get a car without regret."
                   className="block text-[30px] leading-[1.15] font-semibold tracking-[-0.02em] text-balance"
                 />
-                <Typography variant="paragraph-md" className="mt-3">
+                <Typography variant="label-lg" className="mt-3">
+                  We help you buy for value and quality: the signal, not the noise.
+                </Typography>
+                <Typography variant="paragraph-md" className="mt-2">
                   Tell me your ZIP and whether you need a sedan, an SUV or a pickup. I&apos;ll show you the new gas cars near you that hold their value best, what each costs a month, and what it would cost you to change your mind.
                 </Typography>
                 <Typography variant="paragraph-sm" className="mt-2 text-muted-foreground">
@@ -418,6 +433,38 @@ export default function Home() {
               <div role="alert" className="text-sm text-destructive">
                 Something went wrong. Please try again.
               </div>
+            ) : null}
+            {!hasRank ? (
+              <ToggleGroup
+                aria-label="Car type"
+                multiple={false}
+                value={bodyPick}
+                disabled={busy}
+                onValueChange={(next) => {
+                  const picked = next[0];
+                  if (!picked || busy) return;
+                  setBodyPick([picked]);
+                  send(picked);
+                }}
+                className="w-full"
+              >
+                {(
+                  [
+                    ["Sedan", "sedan"],
+                    ["SUV", "suv"],
+                    ["Pickup", "pickup"],
+                  ] as const
+                ).map(([label, kind]) => (
+                  <ToggleGroupItem
+                    key={kind}
+                    value={label}
+                    className="h-auto min-h-11 flex-1 flex-col gap-1 px-1 py-2"
+                  >
+                    <CarFigure kind={kind} className="w-full max-w-[120px]" />
+                    <span>{label}</span>
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
             ) : null}
           </>
         )}

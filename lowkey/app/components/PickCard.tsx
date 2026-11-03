@@ -18,7 +18,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cardSentence, underwaterLabel } from "@/lib/summary";
+import { CarFigure } from "./hairline/CarFigure";
+import type { CarKind } from "@/lib/hairline/cars";
 import { MiniChart, type CurveLike } from "./WorthChart";
+
+const KIND_BY_CATEGORY: Record<string, CarKind> = {
+  Sedan: "sedan",
+  SUV: "suv",
+  Pickup: "pickup",
+};
 
 interface PickLike {
   rank: number | null;
@@ -153,6 +161,11 @@ export default function PickCard({
         ) : null}
       </CardHeader>
       <CardContent>
+        {category && KIND_BY_CATEGORY[category] ? (
+          <div className="mx-auto w-[176px] max-w-full">
+            <CarFigure kind={KIND_BY_CATEGORY[category]} />
+          </div>
+        ) : null}
         <dl className="grid grid-cols-1 gap-x-4 gap-y-3 min-[420px]:grid-cols-2">
           <div>
             <dt className="text-xs text-muted-foreground">Per month</dt>

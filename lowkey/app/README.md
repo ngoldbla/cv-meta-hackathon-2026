@@ -43,5 +43,8 @@ Installed with the pinned shadcn CLI `npx shadcn@4.23.0 add @iconiq/<name>` (reg
 - `slider` → `components/ui/slider.tsx` (sell-month slider)
 - `table` → `components/ui/table.tsx` (Sell at / You get back / Cost per month tables)
 - `drawer` → `components/ui/drawer.tsx` (walk-away bottom sheet on narrow screens; chosen over `dialog` — a phone-height chart + slider reads better as a sheet than as a centred modal)
+- `b-togglegroup` → `components/ui/b-togglegroup.tsx` (Sedan / SUV / Pickup buttons)
+
+Hairline car figures (`@lucasmarkes/hairline` 0.5.1, MIT © Lucas Marques): three isometric line cars (sedan, SUV, pickup) drawn with the `hairline-create` skill from a clone at `~/.cache/low-key/hairline/` (never in the repo), validated with its `validate.mjs`/`look.mjs` in `~/.cache/low-key/hairline-work/`. The package does not export its mount/core for new figures, so the mounts in `lib/hairline/cars.ts` use the package's `Figure`/`HairlineOptions` contract on the same 0.5.1 core copied to `lib/hairline/core/`, themed with `--hairline-*` from Low Key's tokens (plate = card, hi = brass, edge = ink). They never `play` (no loop; reduced motion lands springs at once). No provider `photo_urls` are shown anywhere.
 
 Tailwind CSS 4.1.18 (`@tailwindcss/postcss` 4.1.18, `postcss` 8.5.6, `tw-animate-css` 1.4.0) is the version the registry expects. All new dependencies are pinned exactly in `package.json` / `package-lock.json` (Iconiq lockfile versions: `motion` 12.42.0, `@base-ui/react` 1.5.0, `lucide-react` 0.564.0, `class-variance-authority` 0.7.1, `clsx` 2.1.1, `tailwind-merge` 3.6.0, `@radix-ui/react-slot` 1.3.3, `vaul` 1.1.2, `@lucasmarkes/hairline` 0.5.1).
