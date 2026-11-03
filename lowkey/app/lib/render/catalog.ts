@@ -20,6 +20,7 @@ const curvePointSchema = z.object({
   month: z.number(),
   resale: z.number(),
   balance: z.number(),
+  equity: z.number(),
 });
 
 const dealerUnitSchema = z.object({

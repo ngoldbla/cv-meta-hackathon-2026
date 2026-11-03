@@ -19,7 +19,9 @@
  *           R(60) = price * Ra.
  * Walk-away(t) = down + P*t - (R(t) - B(t))
  *              = depreciation(t) + interest paid by t.
- * Underwater month = first t with R(t) >= B(t).
+ * Equity(t) = R(t) - B(t) (negative while the owner owes more
+ * than the car would sell for).
+ * Positive-equity month = first t with R(t) >= B(t).
  */
 
 export const TRADE_IN_FACTOR = 0.85;
@@ -47,6 +49,8 @@ export interface CurvePoint {
   month: number;
   resale: number;
   balance: number;
+  /** resale − balance; negative while the owner owes more than the car would sell for. */
+  equity: number;
 }
 
 export interface WalkAwayPoint {
@@ -81,9 +85,11 @@ export interface OwnershipResult {
   walkAway: WalkAwayPoint[];
   /** P10-compatible map: month_6, month_12, month_24, month_36, month_60. */
   walkAwayCost: Record<string, number>;
-  /** First month where resale ≥ balance, or null within the term. */
+  /** First month where resale ≥ balance (equity ≥ 0), or null within the term. */
+  positiveEquityMonth: number | null;
+  /** Legacy alias of positiveEquityMonth; kept until every caller moves. */
   evenMonth: number | null;
-  /** Alias of evenMonth (task 026 renamed underwaterMonth). */
+  /** Legacy alias of positiveEquityMonth; kept until every caller moves. */
   underwaterMonth: number | null;
 }
 
@@ -161,10 +167,13 @@ export function ownershipMath(input: OwnershipInput): OwnershipResult {
 
   const curve: CurvePoint[] = [];
   for (let m = 0; m <= 60; m += 1) {
+    const resale = resaleAt(price, retention5y, m);
+    const balance = balanceAt(loanAmount, aprPercent, termMonths, m);
     curve.push({
       month: m,
-      resale: round2(resaleAt(price, retention5y, m)),
-      balance: round2(balanceAt(loanAmount, aprPercent, termMonths, m)),
+      resale: round2(resale),
+      balance: round2(balance),
+      equity: round2(resale - balance),
     });
   }
 
@@ -175,12 +184,12 @@ export function ownershipMath(input: OwnershipInput): OwnershipResult {
   const walkAwayCost: Record<string, number> = {};
   for (const p of walkAway) walkAwayCost[`month_${p.month}`] = p.walkAwayCost;
 
-  let evenMonth: number | null = null;
+  let positiveEquityMonth: number | null = null;
   for (let t = 0; t <= termMonths; t += 1) {
     const balance = balanceAt(loanAmount, aprPercent, termMonths, t);
     const resale = resaleAt(price, retention5y, t);
     if (resale >= balance) {
-      evenMonth = t;
+      positiveEquityMonth = t;
       break;
     }
   }
@@ -199,7 +208,8 @@ export function ownershipMath(input: OwnershipInput): OwnershipResult {
     monthly,
     walkAway,
     walkAwayCost,
-    evenMonth,
-    underwaterMonth: evenMonth,
+    positiveEquityMonth,
+    evenMonth: positiveEquityMonth,
+    underwaterMonth: positiveEquityMonth,
   };
 }

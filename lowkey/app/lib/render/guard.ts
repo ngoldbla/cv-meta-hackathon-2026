@@ -216,7 +216,7 @@ function checkLifespan(c: Checker, spec: Spec, id: string, entry: SpecEntry) {
   c.exact(id, `${base}.loanYears`, props.loanYears, (entry.ownership?.termMonths ?? 60) / 12);
 }
 
-function checkUnderwater(c: Checker, spec: Spec, id: string, entry: SpecEntry) {
+function checkEquity(c: Checker, spec: Spec, id: string, entry: SpecEntry) {
   const props = propsOf(spec, id);
   const ownership = entry.ownership;
   if (!props || !ownership) {
@@ -224,10 +224,24 @@ function checkUnderwater(c: Checker, spec: Spec, id: string, entry: SpecEntry) {
     return;
   }
   const base = `elements.${id}.props`;
-  const even =
-    ownership.evenMonth !== undefined ? ownership.evenMonth : (ownership.underwaterMonth ?? null);
-  c.exact(id, `${base}.evenMonth`, props.evenMonth, even);
-  const curve = (props.curve as { month: number; resale: number; balance: number }[]) ?? [];
+  const expectedMonth =
+    ownership.positiveEquityMonth !== undefined
+      ? ownership.positiveEquityMonth
+      : ownership.evenMonth !== undefined
+        ? ownership.evenMonth
+        : (ownership.underwaterMonth ?? null);
+  // New specs carry positiveEquityMonth; legacy specs carry evenMonth.
+  if (props.positiveEquityMonth !== undefined) {
+    c.exact(id, `${base}.positiveEquityMonth`, props.positiveEquityMonth, expectedMonth);
+  } else {
+    c.exact(id, `${base}.evenMonth`, props.evenMonth, expectedMonth);
+  }
+  const curve = (props.curve as {
+    month: number;
+    resale: number;
+    balance: number;
+    equity?: number;
+  }[]) ?? [];
   if (curve.length !== ownership.curve.length) c.fail(id, "curve-length");
   curve.forEach((point, idx) => {
     const src = ownership.curve[idx];
@@ -235,8 +249,22 @@ function checkUnderwater(c: Checker, spec: Spec, id: string, entry: SpecEntry) {
     c.exact(id, `${base}.curve.${idx}.month`, point.month, src.month);
     c.exact(id, `${base}.curve.${idx}.resale`, point.resale, src.resale);
     c.exact(id, `${base}.curve.${idx}.balance`, point.balance, src.balance);
+    const srcEquity = src.equity ?? src.resale - src.balance;
+    c.exact(id, `${base}.curve.${idx}.equity`, point.equity, srcEquity);
+    // Equity must also tie to its own resale and balance in the spec.
+    if (
+      typeof point.equity === "number" &&
+      typeof point.resale === "number" &&
+      typeof point.balance === "number" &&
+      Math.abs(point.equity - (point.resale - point.balance)) > 0.02
+    ) {
+      c.fail(id, "equity-identity");
+    }
   });
 }
+
+/** Legacy name kept for any external caller. */
+const checkUnderwater = checkEquity;
 
 function checkDealer(c: Checker, spec: Spec, id: string, entry: SpecEntry) {
   const props = propsOf(spec, id);

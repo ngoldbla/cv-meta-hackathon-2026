@@ -57,9 +57,10 @@ export interface SpecOwnership {
   monthlyPayment: number;
   aprPercent: number;
   termMonths: number;
+  positiveEquityMonth?: number | null;
   evenMonth?: number | null;
   underwaterMonth?: number | null;
-  curve: { month: number; resale: number; balance: number }[];
+  curve: { month: number; resale: number; balance: number; equity?: number }[];
 }
 
 export interface SpecUnit {
@@ -127,6 +128,24 @@ export function pickSlug(pick: Pick<SpecPick, "make" | "model">): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+/** Positive-equity month from any ownership shape (new field first). */
+export function positiveMonthOf(ownership: SpecOwnership): number | null {
+  if (ownership.positiveEquityMonth !== undefined) {
+    return ownership.positiveEquityMonth;
+  }
+  if (ownership.evenMonth !== undefined) return ownership.evenMonth;
+  return ownership.underwaterMonth ?? null;
+}
+
+/** Equity of one curve point; old outputs without equity derive it. */
+export function equityOfPoint(point: {
+  resale: number;
+  balance: number;
+  equity?: number;
+}): number {
+  return point.equity ?? point.resale - point.balance;
 }
 
 /** Monthly value lost (depreciation) from tool outputs, unrounded. */
@@ -262,14 +281,12 @@ export function buildPickCardSpec(
     elements[waterId] = {
       type: "UnderwaterMini",
       props: {
-        evenMonth:
-          ownership.evenMonth !== undefined
-            ? ownership.evenMonth
-            : (ownership.underwaterMonth ?? null),
+        evenMonth: positiveMonthOf(ownership),
         curve: ownership.curve.map((p) => ({
           month: p.month,
           resale: p.resale,
           balance: p.balance,
+          equity: equityOfPoint(p),
         })),
       },
       children: [],

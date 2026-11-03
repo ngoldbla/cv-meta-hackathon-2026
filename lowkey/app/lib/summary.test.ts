@@ -2,7 +2,15 @@ import { describe, expect, it } from "vitest";
 
 import { RANK_FIXTURES } from "./fixtures";
 import { ownershipMath } from "./ownership";
-import { cardSentence, closingLine, underwaterLabel } from "./summary";
+import {
+  cardSentence,
+  closingLine,
+  equityHeadline,
+  positiveEquityLabel,
+  sellLine,
+  underwaterLabel,
+  yoursAt5YearsLabel,
+} from "./summary";
 
 function ownershipFor(modelPrice: number, retention: number) {
   return ownershipMath({
@@ -70,7 +78,13 @@ describe("cardSentence (code-written, task 026 part 4)", () => {
     // Single-peer lineup: no superlative claim, and no walk-away
     // numbers on the card face (they live in the walk-away view).
     expect(s).toBe("Keeps about 63% of its price after 5 years.");
-    expect(underwaterLabel(own.evenMonth)).toBe("Underwater for 7 months");
+    expect(positiveEquityLabel(own.positiveEquityMonth)).toBe(
+      "Positive equity by month 7",
+    );
+    // Legacy alias returns the same positive-equity phrasing.
+    expect(underwaterLabel(own.positiveEquityMonth)).toBe(
+      "Positive equity by month 7",
+    );
   });
 });
 
@@ -117,11 +131,33 @@ describe("closingLine", () => {
   });
 });
 
-describe("underwaterLabel", () => {
+describe("positiveEquityLabel (task 039 templates)", () => {
   it("labels the small chart", () => {
-    expect(underwaterLabel(7)).toBe("Underwater for 7 months");
-    expect(underwaterLabel(1)).toBe("Underwater for 1 month");
-    expect(underwaterLabel(0)).toBe("Never underwater");
-    expect(underwaterLabel(null)).toBe("Underwater for the whole term");
+    expect(positiveEquityLabel(7)).toBe("Positive equity by month 7");
+    expect(positiveEquityLabel(1)).toBe("Positive equity by month 1");
+    expect(positiveEquityLabel(0)).toBe("Positive equity from day one");
+    expect(positiveEquityLabel(null)).toBe(
+      "Equity stays below zero for the loan",
+    );
+    expect(positiveEquityLabel(undefined)).toBe(
+      "Equity stays below zero for the loan",
+    );
+  });
+
+  it("headlines the walk-away view with a full stop", () => {
+    expect(equityHeadline(7)).toBe("Positive equity by month 7.");
+    expect(equityHeadline(0)).toBe("Positive equity from day one.");
+    expect(equityHeadline(null)).toBe("Equity stays below zero for the loan.");
+  });
+
+  it("names what is yours at 5 years from the equity figure", () => {
+    expect(yoursAt5YearsLabel(20113)).toBe("$20,113 yours at 5 years");
+    expect(yoursAt5YearsLabel(0)).toBe("$0 yours at 5 years");
+  });
+
+  it("sells at the slider month with about-dollars (nearest $100)", () => {
+    expect(sellLine(36, 10118)).toBe("Sell at month 36: about $10,100 is yours");
+    expect(sellLine(6, -1234)).toBe("Sell at month 6: you'd owe about $1,200");
+    expect(sellLine(36, 0)).toBe("Sell at month 36: about $0 is yours");
   });
 });
