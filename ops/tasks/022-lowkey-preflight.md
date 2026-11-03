@@ -1,7 +1,7 @@
 ---
 id: "022"
 title: "Low Key: finish the engineering preflight (data checks only; no app code)"
-status: open
+status: in_progress
 created: 2026-11-03
 report: ops/reports/022-lowkey-preflight.md
 ---
