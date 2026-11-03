@@ -52,3 +52,26 @@ Provider usage for the whole account on 2026-11-03: 24 requests, 101000 charged 
   - SUV top 5: CR-V 0.74 ($151/mo), Corolla Cross 0.73 ($146/mo), CX-50 0.70 ($178/mo), 4Runner 0.69 ($303/mo), Bronco 0.68 ($285/mo). Commodity pick: Venue 0.68 ($134/mo).
   - Pickup top 5: Tacoma 0.75 ($196/mo), F-350 0.73 ($264/mo), "1500" 0.72 ($264/mo; model name as returned by the provider), F-250 0.71 ($279/mo), Silverado 3500HD 0.70 ($323/mo). Commodity pick: Tacoma, $196/mo (also #1).
   - Sample sizes per age are in the analysis output; every ranked model has n at least 30 at each fitted age except where noted in the report (F-350 age 5 n=23 was excluded from its fit).
+- **P8 Local price search: PASS.**
+  - Units in stock within 50 miles (top model per category): 60614 (dense): Accord Sedan 351, CR-V 923, Tacoma 194. 30097 (suburban): 297, 490, 384. 59001 (rural): Accord Sedan 0, CR-V 6, Tacoma 4.
+  - Widening to 150 miles was needed once: Accord Sedan near 59001, 0 units at 50 miles, 5 at 150. The PRD's widening rule covers the rural case; a rural sedan buyer may still face a thin choice.
+  - Listings carry `vdp_url` (dealer listing link), `selected_price`, `price_with_fees` and `distance_miles`, as the PRD's cards require.
+- **P12 MCP check: PASS.**
+  - The listings provider's hosted MCP server answers with 2 tools: `search` (query, limit: finds API operations and their parameter schemas) and `execute` (runs JavaScript against the provider's SDK). Initialize 0.13 s, tools/list 0.13 s.
+  - One local search through `execute` (new Tacoma, in stock, ZIP 30097, radius 50, cheapest first, strict gas filter) returned priced units with dealer, distance and listing link in 0.70 s. The MCP surface covers the P8 search with the same parameters and filters as REST, so no `local_units` fallback tool is needed for search.
+- **P13 Trade-in discount: one factor proposed, 0.85 (15% off the provider's sold retail median).**
+  - Provider sold retail medians: Civic Sedan age 3 $24,589 (n=1183), age 5 $20,926 (n=697); CR-V age 3 $29,975 (n=826), age 5 $25,507 (n=1330); Tacoma age 3 $37,647 (n=3246), age 5 $34,130 (n=2013).
+  - Published values for the same models (KBB model pages, accessed 2026-11-03): 2021 Civic private-party $15,650, trade-in $12,000 (ratio 0.77); 2021 CR-V $19,550 / $17,050 (0.87); 2021 Tacoma trims $27,500–$31,400 / $24,100–$29,200 (about 0.88); 2023 Civic $19,650 / $16,850 (0.86); 2023 Tacoma $29,700 / $25,000 (0.84). Sources: https://www.kbb.com/honda/civic/2021/depreciation/, https://www.kbb.com/honda/cr-v/2021/depreciation/, https://www.kbb.com/toyota/tacoma-double-cab/2023/depreciation/
+  - Edmunds appraisal for the 2021 Civic (clean condition) lists trade-in / private-party / dealer-retail of $18,004 / $20,794 / $23,484, so private-party sits about 11% below dealer retail (https://www.edmunds.com/honda/civic/2021/appraisal-value/).
+  - The PRD defines resale as what a buyer would pay the owner, i.e. private-party, not trade-in. Private-party runs 11–15% below dealer retail in these sources, and trade-in a further 13–23% below private-party. A single 15% discount (factor 0.85) on the provider's retail medians approximates private-party resale without flattering walk-away costs. It sits inside the PRD's expected 10–20%.
+- **P17 MPG: PASS with one gap.**
+  - EPA combined MPG (2026 model year, fueleconomy.gov dataset, base gas powertrain; EPA vehicle id in `lowkey/preflight/p17_mpg.py` output): Accord Sedan 31, Civic Sedan 36, Civic Si Sedan 31, Mazda3 Sedan 30, Elantra 34, CR-V 29, Corolla Cross 30, CX-50 26, 4Runner 21, Bronco 20, Venue 31, Tacoma 21, Ram 1500 ("1500") 20.
+  - **No EPA rating exists for the heavy-duty pickups** F-250, F-350 and Silverado 3500HD (heavy-duty trucks are exempt from EPA fuel-economy ratings; the dataset's last F250 rating is 1999). If a heavy-duty truck ever ranked, the PRD's fuel forecast could not price its fuel. None is a plausible consumer pick at $264–$323/mo depreciation, but the ranking code should expect a missing MPG.
+- **P10, P15, P16: blocked, key missing.** `META_API_KEY` and `EIA_API_KEY` are empty in the environment, as the task states. Not run.
+
+## What the data does to the PRD
+
+- The hypothesis holds for SUV and Pickup (#1 CR-V, #1 Tacoma; Honda and Toyota take 4 of 6 top-2 slots across categories) but the Sedan #1 is the Accord, narrowly ahead of the Civic (0.772 vs 0.768 fitted 5-year retention) — inside any reasonable noise band, so Sedan effectively has co-leaders.
+- Corolla, the expected commodity sedan, is not cheap to hold on the new basis ($151/mo, retention 0.68): its 2026 new price has risen against its used values. The Civic is both #2 and the commodity pick.
+- Heavy-duty trucks occupy 3 of the Pickup top 5 by percentage retention while costing $264–$323/mo. Percentage retention alone promotes expensive trucks; the commodity pick (Tacoma on both measures) is the safeguard, and the PRD may want a price or class guard for #1/#2 as well.
+- Rural coverage is real but thin: 0 Accord Sedans within 50 miles of 59001 (5 at 150), 4–6 units for the other two models. The "3 local units per car" promise is not guaranteed in rural ZIPs.
