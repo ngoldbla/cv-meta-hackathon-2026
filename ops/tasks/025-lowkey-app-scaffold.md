@@ -11,6 +11,12 @@ report: ops/reports/025-lowkey-app-scaffold.md
 
 **Goal:** a minimal, deployable Next.js chat app in `lowkey/app` that Vercel can build with Root Directory `lowkey/app`. It talks to Muse Spark and uses stub tools. Real data comes in a later task.
 
+## Deploys (added 2026-11-03, before this task started)
+- **Every push or merged PR to `low-key` deploys to production at https://low-key-murex.vercel.app.** Vercel builds `lowkey/app` with Next.js on Node 22.x. The environment variables are already set in Vercel.
+- Your push for this task will be the first deploy that can succeed, so `npm ci && npm run build` must pass before you push.
+- Read `lowkey/docs/deploy.md` and follow its rules.
+- In the report, give the commit you pushed. If you check, also say whether the URL served the app.
+
 ## Read first
 - `lowkey/docs/prd.md`: the product, especially "Architecture (minimal)", "What the user sees" and the lineup rules.
 - The mockup (four phone screens: ask, picks, walk-away, cost to run). Its look: IBM Plex Sans for text and IBM Plex Mono for numbers; ground `#F3F2EE`, card `#FFFFFF`, ink `#1B1C1E`, muted `#5A5C60`, line `#DAD8D1`, brass accent `#7A5A10`; a key icon next to the "Low Key" name; "No ads · No sign-up" in the header.

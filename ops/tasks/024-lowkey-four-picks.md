@@ -1,7 +1,7 @@
 ---
 id: "024"
 title: "Low Key: four picks per category (amends task 023's lineup rule)"
-status: open
+status: in_progress
 created: 2026-11-03
 report: ops/reports/024-lowkey-four-picks.md
 ---
