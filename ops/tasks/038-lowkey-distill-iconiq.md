@@ -1,7 +1,7 @@
 ---
 id: "038"
 title: "Low Key: distill the UI (remove flavour text) and use Iconiq UI wherever it fits"
-status: in_progress
+status: done
 created: 2026-11-03
 report: ops/reports/038-lowkey-distill-iconiq.md
 ---

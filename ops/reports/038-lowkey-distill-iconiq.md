@@ -1,12 +1,15 @@
 # Report 038: Low Key: distill the UI (remove flavour text) and use Iconiq UI wherever it fits
-Status: in_progress
-Branch head at start: 438e1e95c3d43570136a59b3e6016cf83931f9ff · at finish: —
+Status: done
+Branch head at start: 438e1e95c3d43570136a59b3e6016cf83931f9ff · at finish: 1cd6049 (live code; finish commit follows)
 
 ## Summary
-In progress.
+Done. The UI is distilled around one goal — which car, what it costs a month, what leaving costs — and Iconiq registry controls now cover every hand-built control that had a registry fit. The card face drops from 223 to 153 words (−31%) with every dollar legend kept; assumptions and sources collapse into one “Sources & assumptions” popover; the opening gains Dylan's credit block (full on first visit, one “How Low Key works” line after a search, remembered) with “among the best” substituted so the retention claim stays true; and every card and comparison row now shows its listed-price position (“lowest of 184 listed within 50 mi”) at zero extra provider calls, all figures through the number guard. First card 809 ms warm, inside the allowed budget.
 
 ## Work done
-- Claimed task 038 on branch `low-key` (head `438e1e9`). Inbox sync on `main` not followed per the task's `low-key`-only rule — same approved deviation as tasks 022–037; work stays on `low-key` only.
+- Claimed task 038 on branch `low-key` (head `438e1e9`, claim `caf4c6a`). Inbox sync on `main` not followed per the task's `low-key`-only rule — same approved deviation as tasks 022–037; work stays on `low-key` only.
+- Inventory + claims (commit `df23c49`): cloned impeccable to `~/.cache/low-key/impeccable/`, read the distill method, inventoried every visible string (table in Results), verified the three part-5 claims, and captured before screenshots, the 789 ms first-card baseline and the 223-word card baseline on the live URL.
+- Implementation (commit `1cd6049`, live): distilled copy in [summary.ts](/home/ndgold/cv-meta-hackathon-2026/lowkey/app/lib/summary.ts) and [costs.ts](/home/ndgold/cv-meta-hackathon-2026/lowkey/app/lib/costs.ts); spec/catalog/guard price position in [specs.ts](/home/ndgold/cv-meta-hackathon-2026/lowkey/app/lib/render/specs.ts), [catalog.ts](/home/ndgold/cv-meta-hackathon-2026/lowkey/app/lib/render/catalog.ts) and [guard.ts](/home/ndgold/cv-meta-hackathon-2026/lowkey/app/lib/render/guard.ts); distilled views in `components/render/` and [WalkAwayView.tsx](/home/ndgold/cv-meta-hackathon-2026/lowkey/app/components/WalkAwayView.tsx); credit block in [CreditBlock.tsx](/home/ndgold/cv-meta-hackathon-2026/lowkey/app/components/CreditBlock.tsx); Iconiq wiring, popovers, alerts and skeleton in [HomeClient.tsx](/home/ndgold/cv-meta-hackathon-2026/lowkey/app/app/HomeClient.tsx). Seven registry components copied from their registry JSON payloads (the pinned CLI fails on `input`'s dependency string, as with `ai-input` in task 028; no new npm dependency, `package.json` unchanged) and listed in [README.md](/home/ndgold/cv-meta-hackathon-2026/lowkey/app/README.md).
+- Verification: `npm ci && npm run build` clean; app tests **152 passed**; `pytest -q` **154 passed, 1 skipped**; `scripts/name_guard.py` exit 0; `scripts/secret_guard.py --all` clean; TypeScript clean inside the build. Deployed checks at 390 px in light and dark (opening, SUV 60614 comparison + card, expanded list, walk-away, returned-visit opening) plus scripted probes of both popovers, the walk-away drawer close and the remembered collapse. Provider spend $0.00 (cache-served turns); Muse Spark $0 (fast path).
 
 ## Results
 
@@ -77,8 +80,32 @@ Type scale after: 30 px headline, 19 px card title, 14 px body, 12 px caption/mu
 - **Anonymous — true, with this exact collection.** Stored in the browser only: the search area (`lowkey-area`: ZIP, city, state, confirmed flag) and, new in this task, `lowkey-searched` (that a search ran, for the collapsed credit block). Sent to run the service: chat text to the Muse Spark model API; ZIP + model to the listings provider and the Census/TIGERweb geocoders (coordinates rounded to 2 decimals first, never logged or stored); Vercel's IP-area headers are read per request to guess the area and are not stored. Nothing is sent to dealers; a dealer learns of the visit only when the shopper clicks “See the car”. No account, phone, cookie tracker or third-party analytics exists today. Task 041 (not yet run) proposes only a category + model click count via Vercel Web Analytics custom events, skipping it if unavailable — no ZIP, IP or personal field — which keeps the claim true when it lands.
 - **Price position at zero extra calls.** `local_units` already returns the provider's pagination total and the radius used, so “$31,950 · lowest of 9 listed within 50 mi” costs no new request and every figure passes the number guard. The full listed range needs the dearest listing, which the cheapest-first search (limit 3) does not return; a `sort=-price` call or a facets `price.max` metric would add one billed call per model (4–5 per fresh turn), breaking the task's at-most-5 fresh-turn budget (a fresh dense turn already bills one search per pick; repeat searches hit the 6-hour fetch cache). The range is therefore shown only when the total is already fully returned (total ≤ units shown, so the maximum is known for free), as “listed $low–$high”; otherwise the range is omitted, never estimated. Comparison rows gain the same cheapest price + “lowest of N” line from the same tool result.
 
+### Iconiq added (task part 3)
+| Registry item | Used for |
+|---|---|
+| `b-button` | Area Change / Use my location, ZIP Use/Cancel, “If I change my mind” (card + fallback), walk-away back, drawer close, popover triggers |
+| `input` | ZIP field |
+| `b-popover` | “Why no photos?” by the car drawings; “Sources & assumptions” in the footer |
+| `b-accordion` | “How Low Key works” credit block (quiet variant) |
+| `alert` | Location error and chat error (persistent, `timeout={0}`) |
+| `skeleton` | Card-area placeholder while the first result loads (AI reasoning blocks kept above it) |
+| `spinner` | Locating / “Still looking…” states |
+
+Already Iconiq and kept: `ai-input` composer, `message`, `reasoning-steps`, `thinking-indicator`, `streaming-text`, `reveal-text`, `typography`, `card`, `badge`, `status-dot`, `rolling-digits`, `slider`, `table`, `drawer`, `b-togglegroup`, `b-collapsible`, `b-switch`.
+
+Still hand-built, and why: the json-render chart components (CostBars, CostCompare, LifespanTrack, UnderwaterMini, WorthChart SVG) and the Hairline car figures stay custom on theme tokens (task part 4; exact crossing/gap rendering, no registry equivalent); the header/brand (no registry header exists); the walk-away chart card and sell-at panel (registry `card`/`table`/`slider` already inside a custom layout); the dealer unit list inside `b-collapsible` (registry container, custom list content); the area/ZIP layout shell (registry field and buttons inside).
+
+### Word counts, timing, screenshots
+- Card face (first card, Honda CR-V, same `/tmp/count038.mjs` method, collapsed DOM `innerText`): **223 → 153 words (−70, −31%)**; visible-only (collapsed “more” units excluded both times): about **191 → 121**. Every removed word is itemised in the inventory table; no dollar legend, total or segment was removed (the comparison's colour-only legend went, its dollars live in the `aria-label` and on the cards).
+- Time to first card (SUV 60614, warm cache, same CDP poll): **789 ms before → 809 ms after (+20 ms)**. Task 037 published no first-card figure; the nearest published baseline (task 034, same turn and method family) is 1,072 ms, so the after figure is inside “037 + 0.3 s” on any reading.
+- Screenshots (390 px, not in git) under `~/.cache/low-key/screens/038/`: `before-01…07` and `after-01…07` (opening light/dark, SUV 60614, card light, expanded, walk-away, card dark) plus `after-08-opening-returned.png` (collapsed credit block on a return visit). Live commit `1cd6049`. No sideways scroll (`scrollWidth` 390) before or after. Scripted probes confirmed: credit full → collapsed after search → remembered on reload → reopens on tap; both popovers open with assumptions, tax, rankings, lifespan and gas sources; walk-away opens without the old explainer and its drawer close works.
+
 ## Deviations
-None yet.
+- Inbox sync on `main` not followed (task and run instruction say `low-key` only) — same approved deviation as tasks 022–037.
+- Registry files were copied from the registry JSON payloads instead of written by the pinned CLI, because CLI 4.23.0 fails installing `input` (it treats `@base-ui/react/input` as a package). Same failure and remedy as `ai-input` in task 028; the bytes are the registry's own and no dependency changed. Recorded in [README.md](/home/ndgold/cv-meta-hackathon-2026/lowkey/app/README.md).
+- Dylan's point 2 is worded “is among the best at holding its value” instead of “holds its value best” — the one change the task itself instructs when a reserved pick is not the top retainer (evidence in Claims). No other credit copy was shortened; all five points fit at 390 px.
+- The listed-price range appears only when the search already returned every listing (total ≤ 3 shown); otherwise only “lowest of N” shows. A true full range would cost one extra billed call per model and break the task's fresh-turn call budget (see Claims). Nothing is estimated.
+- The per-card tax sentence and lifespan footnote left the card face for the single footer line + popover, as the protected list expressly allows (one tap away, screen-reader readable in the popover; the “Sales tax $” segment stays on every card). The unknown-state wording (“Tax not included: unknown state”) still reaches the shopper through the same footer tax line, which carries `taxNotice` verbatim.
 
 ## Blocked / questions
-Pending.
+Nothing blocked. For Dylan: (1) On a first visit the full credit block pushes the body-type buttons just below the fold at 390×844 (they return to the first screen once the block collapses after a search) — keep the full block first, or start collapsed with the block one tap away? (2) The comparison rows now wrap the price line in the 104 px label column (“$31,950 · lowest / of 184 listed”); widen the column (narrower bars) or keep the wrap? (3) Confirm the footer’s single visible line (“10% down · 60 mo · APR” + popover) is enough prominence for the tax estimate, which now lives only in the popover and the card’s tax segment.
