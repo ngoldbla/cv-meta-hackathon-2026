@@ -1,7 +1,7 @@
 ---
 id: "039"
 title: "Low Key: show equity as one rising line — \"Positive equity by month X\""
-status: open
+status: in_progress
 created: 2026-11-03
 report: ops/reports/039-lowkey-equity-chart.md
 ---
