@@ -14,7 +14,7 @@ report: ops/reports/044-lowkey-about-and-credits.md
 ## Rules for this task
 - **Don't name the listings/sold-data provider anywhere** (the existing rule; `scripts/name_guard.py` must still pass). Say "a licensed automotive listings and sold-vehicle data provider".
 - **Credit only what is true in the code at this commit.** Check each claim against the repo, and drop any that isn't true. In particular:
-  - Laya appears only if task 043 shipped it;
+  - Laya and the decapitated Glimmer appear only as `lowkey/docs/decision-model.md` says (shipped, or tried and dropped). A dropped contender may be mentioned as tried, never as running;
   - impeccable only if task 038 used it;
   - Timestral is the weekly forecasting pipeline, not per request;
   - Muse Spark answers follow-ups; the cards are built by code.
