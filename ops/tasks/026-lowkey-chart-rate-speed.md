@@ -1,7 +1,7 @@
 ---
 id: "026"
 title: "Low Key: worth-vs-owe chart, Federal Reserve loan rate, code-written summary, faster first cards"
-status: open
+status: in_progress
 created: 2026-11-03
 report: ops/reports/026-lowkey-chart-rate-speed.md
 ---
