@@ -12,8 +12,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from trim import (  # noqa: E402
     TrimPrice,
     choose_trim,
+    cosmetic_base_name,
     fit_retention_5y,
     guard_triggers,
+    merge_cosmetic_variants,
     order_trims,
     trim_retention_from_sold,
 )
@@ -108,6 +110,60 @@ def test_trim_retention_needs_thirty_per_age_and_three_ages() -> None:
     thin = {1: (100, 21000.0), 2: (100, 20000.0), 3: (10, 19000.0)}
     assert trim_retention_from_sold(thin, 25000) is None
     assert trim_retention_from_sold(sold, None) is None
+
+
+def test_cosmetic_variant_is_not_a_trim_step_venue() -> None:
+    # Venue shape (task 031): SE -> SEL, not "SEL w/ 2-Tone Roof".
+    choice = choose_trim(
+        [
+            TrimPrice("SE", 21390),
+            TrimPrice("SEL w/ 2-Tone Roof", 23440),
+            TrimPrice("SEL", 23950),
+            TrimPrice("Limited", 25990),
+        ],
+        source="specs",
+    )
+    assert choice.base_trim == "SE"
+    assert choice.step_trim == "SEL"
+    assert choice.recommended_trim == "SEL"
+    # The merged SEL keeps its cheapest variant's MSRP.
+    assert choice.recommended_msrp == 23440
+
+
+def test_only_higher_variant_cosmetic_falls_back_to_next_real_trim() -> None:
+    merged, merges = merge_cosmetic_variants(
+        [
+            TrimPrice("LE", 22925),
+            TrimPrice("LE Black Edition", 23800),
+            TrimPrice("SE", 25365),
+        ]
+    )
+    assert [t.trim for t in order_trims(merged)] == ["LE", "SE"]
+    assert merges == [("LE Black Edition", "LE", 22925)]
+    choice = choose_trim(
+        [
+            TrimPrice("LE", 22925),
+            TrimPrice("LE Black Edition", 23800),
+            TrimPrice("SE", 25365),
+        ],
+        source="specs",
+    )
+    assert choice.recommended_trim == "SE"
+
+
+def test_drivetrain_variant_is_not_merged() -> None:
+    assert cosmetic_base_name("LX AWD") is None
+    assert cosmetic_base_name("SEL w/ 2-Tone Roof") == "SEL"
+    merged, merges = merge_cosmetic_variants(
+        [TrimPrice("LX", 30000), TrimPrice("LX AWD", 31500), TrimPrice("EX", 33000)]
+    )
+    assert merges == []
+    assert [t.trim for t in order_trims(merged)] == ["LX", "LX AWD", "EX"]
+    choice = choose_trim(
+        [TrimPrice("LX", 30000), TrimPrice("LX AWD", 31500), TrimPrice("EX", 33000)],
+        source="specs",
+    )
+    assert choice.recommended_trim == "LX AWD"
 
 
 def test_order_trims_drops_unpriced_rows() -> None:

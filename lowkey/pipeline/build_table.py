@@ -452,6 +452,15 @@ def trim_for_pick(category: str, pick: dict) -> dict:
             ]
             refs = {}
             source = "facets" if trims else None
+        # Task 031: merge appearance-only variants before ordering and
+        # log every merge the build makes.
+        trims, trim_merges = trim_mod.merge_cosmetic_variants(trims)
+        for variant, base_name, kept_msrp in trim_merges:
+            print(
+                f"trim merge {provider_model}: {variant!r} -> {base_name!r} "
+                f"(kept MSRP {kept_msrp})",
+                flush=True,
+            )
         ordered = trim_mod.order_trims(trims)
         base, step = trim_mod.step_up(ordered)
         if base is None:

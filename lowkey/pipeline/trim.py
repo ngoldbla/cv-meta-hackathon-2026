@@ -2,8 +2,10 @@
 
 The weekly build fetches each ranked model's current-year trims
 from the listings provider (specs first, facets as fallback; see
-build_table.py for which source answered per model), orders them by
-MSRP, and recommends the trim one step above the base trim.
+build_table.py for which source answered per model), merges
+appearance-only variants into their base trim (task 031; see
+COSMETIC_MARKERS below), orders them by MSRP, and recommends the
+trim one step above the base trim.
 
 Guard: when the step-up trim's own 5-year retention can be measured
 with the task-022 method (log-linear fit over ages with at least 30
@@ -48,6 +50,131 @@ class TrimChoice:
     trim_retention_5y: float | None
     source: str | None  # "specs" | "facets"
     features: list[str] = field(default_factory=list)
+
+
+# --- Cosmetic variants (task 031, part 4) -------------------------------
+# A variant is cosmetic-only when its name carries an appearance marker
+# and no real-difference marker. Cosmetic markers (case-insensitive):
+#   "2-Tone", "Two-Tone", "Two Tone", "w/ ... Roof", "Roof", "Paint",
+#   "Color", "Appearance", "Black Edition", "Nightshade",
+#   "Midnight Edition", "Graphite Edition", "Bronze Edition".
+# Real-difference markers (never merged): "AWD", "4WD", "4x4",
+# "Crew Cab", "Extended Cab", "Double Cab", "King Cab", "Short Bed",
+# "Long Bed", "Hybrid", "Turbo", "Diesel", "V6", "V8", "Passenger".
+COSMETIC_MARKERS = (
+    "2-TONE",
+    "TWO-TONE",
+    "TWO TONE",
+    "ROOF",
+    "PAINT",
+    "COLOR",
+    "COLOUR",
+    "APPEARANCE",
+    "BLACK EDITION",
+    "NIGHTSHADE",
+    "MIDNIGHT EDITION",
+    "GRAPHITE EDITION",
+    "BRONZE EDITION",
+)
+REAL_MARKERS = (
+    "AWD",
+    "4WD",
+    "4X4",
+    "CREW CAB",
+    "EXTENDED CAB",
+    "DOUBLE CAB",
+    "KING CAB",
+    "SHORT BED",
+    "LONG BED",
+    "HYBRID",
+    "TURBO",
+    "DIESEL",
+    "V6",
+    "V8",
+    "PASSENGER",
+)
+_COSMETIC_SUFFIXES = (
+    " W/ 2-TONE ROOF",
+    " 2-TONE ROOF",
+    " W/ TWO-TONE ROOF",
+    " TWO-TONE ROOF",
+    " BLACK EDITION",
+    " MIDNIGHT EDITION",
+    " GRAPHITE EDITION",
+    " BRONZE EDITION",
+    " NIGHTSHADE",
+    " 2-TONE",
+    " TWO-TONE",
+    " TWO TONE",
+)
+
+
+def cosmetic_base_name(name: str) -> str | None:
+    """Base trim name if `name` is an appearance-only variant, else None.
+
+    Strips a trailing cosmetic phrase (or a " w/ ..." cosmetic tail)
+    from the name. Variants carrying a real-difference marker (engine,
+    drivetrain, cab, bed, seats) are never cosmetic.
+    """
+    upper = name.strip().upper()
+    if any(marker in upper for marker in REAL_MARKERS):
+        return None
+    if " W/ " in upper:
+        head, _, tail = upper.partition(" W/ ")
+        if any(marker in tail for marker in COSMETIC_MARKERS):
+            return name.strip()[: len(head)].strip()
+    for suffix in _COSMETIC_SUFFIXES:
+        if upper.endswith(suffix):
+            return name.strip()[: -len(suffix)].strip()
+    return None
+
+
+def merge_cosmetic_variants(
+    trims: list[TrimPrice],
+) -> tuple[list[TrimPrice], list[tuple[str, str, float]]]:
+    """Merge appearance-only variants into their base trim.
+
+    Returns (merged trims, merges) where each merge is
+    (variant name, base trim name, MSRP kept). The merged trim keeps
+    the base trim's name and its cheapest variant's MSRP. Variants
+    whose base trim is not listed still collapse to the base name, so
+    a cosmetic variant never counts as a trim step.
+    """
+    groups: dict[str, list[TrimPrice]] = {}
+    order: list[str] = []
+    for t in trims:
+        if not t.trim or t.msrp is None or t.msrp <= 0:
+            key = t.trim
+            groups.setdefault(key, []).append(t)
+            order.append(key)
+            continue
+        base = cosmetic_base_name(t.trim)
+        key = (base or t.trim).strip()
+        if key not in groups:
+            groups[key] = []
+            order.append(key)
+        groups[key].append(t)
+    merged: list[TrimPrice] = []
+    merges: list[tuple[str, str, float]] = []
+    for key in order:
+        rows = groups[key]
+        if len(rows) == 1:
+            only = rows[0]
+            if only.trim.strip() != key:
+                # A lone cosmetic variant still collapses to its base.
+                merged.append(TrimPrice(key, only.msrp, only.spec_ref))
+                merges.append((only.trim, key, only.msrp))
+            else:
+                merged.append(only)
+            continue
+        # Prefer the listed base trim's own row as the name carrier.
+        carrier = next((r for r in rows if r.trim.strip() == key), rows[0])
+        cheapest = min(r.msrp for r in rows)
+        merged.append(TrimPrice(key, cheapest, carrier.spec_ref))
+        for r in rows:
+            if r is not carrier:
+                merges.append((r.trim, key, cheapest))
+    return merged, merges
 
 
 def order_trims(trims: list[TrimPrice]) -> list[TrimPrice]:
@@ -122,7 +249,10 @@ def choose_trim(
     features: list[str] | None = None,
 ) -> TrimChoice:
     """Recommend the one-step-up trim unless the guard drops to base."""
-    ordered = order_trims(trims)
+    # Task 031: cosmetic variants merge into their base trim before
+    # ordering, so an appearance package never counts as a step.
+    merged, _merges = merge_cosmetic_variants(trims)
+    ordered = order_trims(merged)
     base, step = step_up(ordered)
     if base is None:
         return TrimChoice(
