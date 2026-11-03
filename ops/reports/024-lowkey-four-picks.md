@@ -1,6 +1,6 @@
 # Report 024: Low Key: four picks per category (amends task 023's lineup rule)
-Status: in_progress
-Branch head at start: f3cdaedb1179f221a38a67fbc470e100de97ab6e  ·  at finish: (open)
+Status: done
+Branch head at start: f3cdaedb1179f221a38a67fbc470e100de97ab6e  ·  at finish: (this commit)
 
 ## Summary
 Done. The four-pick rule and the three lineups were already implemented and recorded by task 023 (which followed the PRD as pulled); this task re-ran the fixture tests (9 passed), recomputed the lineups from the cached fits and confirmed they are unchanged, and spot-checked local supply for the six new #3/#4 picks at ZIP 60614: all six have 30–912 units within 50 miles. Spend: $0.010 of the $0.25 cap; no category is short of 4.
@@ -11,6 +11,7 @@ Done. The four-pick rule and the three lineups were already implemented and reco
 - Part 1: read `lowkey/preflight/lineup.py` and `lowkey/preflight/test_lineup.py`. The code already defaults to `top_k=4, max_per_make=2` with the 15% discount, heavy-duty exclusion, the ≥30-per-fitted-age (≥3 ages) rule and the `badge`/`extra` commodity flag. No code or test change was needed. Ran `.venv/bin/python -m pytest lowkey/preflight/test_lineup.py -q`: 9 passed. Coverage includes the third same-make skip, commodity `badge` and `extra`, fewer-than-4 qualifying, heavy-duty exclusion, the two-pick form, the discount arithmetic and the unresolved-make refusal.
 - Part 2: recomputed with `.venv/bin/python lowkey/preflight/lineup.py` from the cached task-022 fits (`analysis.json` + `make_map.json` outside git; machine output `lineups.json` outside git). Output is identical to the four-pick lineups already recorded in `lowkey/docs/preflight-results.md` (task 023 section), so no replacement text was needed there.
 - Part 3: added `lowkey/preflight/p8_four_picks.py` and ran it (new, in stock, ZIP 60614, radius 50, cheapest first, limit 3, strict gas filter; responses cached outside git, summary `p8_four_picks_summary.json` outside git). Usage before: 125 requests / 455,000 charged micros; after: 130 / 465,000 (+5 requests, +$0.010). Recorded in `lowkey/docs/preflight-results.md` (task 024 section).
+- Finish (this commit): `.venv/bin/python -m pytest -q` 154 passed, 1 skipped; lineup tests 9 passed standalone; `scripts/name_guard.py` and `scripts/secret_guard.py` clean; journal entry added. Commits: `Start task 024`, `Task 024 parts 1-2: verify four-pick rule and lineups`, `Task 024 part 3: P8 spot-check of #3/#4 picks`, this commit.
 
 ## Results
 Lineups (fitted 5-year retention after the 15% discount, with the retail fit in parentheses; dollars per month of depreciation; sold n by age; source: `lowkey/docs/preflight-results.md`, task 023 section, re-verified above from `lineups.json`):
