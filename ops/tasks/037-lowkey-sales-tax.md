@@ -1,7 +1,7 @@
 ---
 id: "037"
 title: "Low Key: include sales tax in payments, the real cost and the walk-away; a weekly refresh wrapper"
-status: open
+status: in_progress
 created: 2026-11-03
 report: ops/reports/037-lowkey-sales-tax.md
 ---
