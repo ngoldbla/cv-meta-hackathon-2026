@@ -25,9 +25,6 @@ export function UnderwaterMiniView({
       </div>
       <div className="flex flex-col gap-[2px]">
         <span className="text-sm font-medium">{label}</span>
-        {evenMonth !== null && evenMonth > 0 ? (
-          <span className="text-xs text-muted-foreground">then selling pays off the loan</span>
-        ) : null}
       </div>
     </section>
   );

@@ -225,12 +225,6 @@
   flex: none;
 }
 
-.tagline {
-  color: var(--muted);
-  font-size: 13px;
-  white-space: nowrap;
-}
-
 /* Hairline figures: their svg always fills the figure box (beats
    component utilities that size descendant svgs, e.g. toggle items). */
 [data-hairline] > svg {

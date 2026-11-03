@@ -85,9 +85,6 @@ export function LifespanTrackView({
         <span>{loanYears} yrs: loan paid</span>
         <span>{max} yrs</span>
       </div>
-      <span className="text-xs text-muted-foreground">
-        Dark: while you pay it off. Gold: years after that with no car payment.
-      </span>
     </section>
   );
 }

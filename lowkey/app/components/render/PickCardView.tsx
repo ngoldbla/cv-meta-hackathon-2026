@@ -3,6 +3,7 @@
 import { useContext, type ReactNode } from "react";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/b-button";
 import {
   Card,
   CardContent,
@@ -31,28 +32,22 @@ export function PickCardView({
   badgeLabel,
   modelLabel,
   sentence,
-  taxLine,
   trimLine,
   inStock,
   category,
   modelKey,
   hasWalkAway,
-  lifespanSource,
-  lifespanAsOf,
   children,
 }: {
   rank: number | null;
   badgeLabel: string;
   modelLabel: string;
   sentence: string;
-  taxLine: string | null;
   trimLine: string | null;
   inStock: boolean;
   category: string;
   modelKey: string;
   hasWalkAway: boolean;
-  lifespanSource: string | null;
-  lifespanAsOf: string | null;
   children?: ReactNode;
 }) {
   const { onWalkAway } = useContext(WalkAwayContext);
@@ -82,27 +77,19 @@ export function PickCardView({
         </div>
       </CardHeader>
       <CardContent>
-        {taxLine ? (
-          <p className="mb-3 text-[13px] leading-relaxed text-foreground/80">{taxLine}</p>
-        ) : null}
         {trimLine ? (
-          <p className="mb-3 text-[13px] leading-relaxed text-foreground/80">{trimLine}</p>
+          <p className="mb-3 text-sm leading-relaxed text-foreground/80">{trimLine}</p>
         ) : null}
         <div className="flex flex-col gap-3">{children}</div>
-        {lifespanSource ? (
-          <p className="mt-3 text-xs text-muted-foreground">
-            Lifespan: {lifespanSource}
-            {lifespanAsOf ? `, as of ${lifespanAsOf}` : ""}.
-          </p>
-        ) : null}
         {hasWalkAway && onWalkAway ? (
-          <button
+          <Button
             type="button"
-            className="mt-3 flex min-h-11 w-full items-center justify-center rounded-[10px] border border-foreground px-3 text-sm font-medium text-foreground"
+            variant="outline"
+            className="mt-3 min-h-11 w-full"
             onClick={() => onWalkAway(modelKey)}
           >
             If I change my mind
-          </button>
+          </Button>
         ) : null}
       </CardContent>
     </Card>

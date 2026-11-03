@@ -82,7 +82,7 @@ export function CostBarsView({
       <div className="flex items-center gap-2 rounded-lg bg-[var(--cost-back-bg)] px-2.5 py-2 text-[13px] text-[var(--cost-back-ink)]">
         <span aria-hidden="true" className="inline-block h-[14px] w-[14px] shrink-0 rounded-[2px]" style={{ background: BACK_FILL }} />
         <span>
-          <strong className="mono">{fmtUsd(backWhenSold)}</strong> a month of what you pay comes back to you when you sell at 5 years.
+          <strong className="mono">{fmtUsd(backWhenSold)}/mo</strong> back when you sell at 5 years.
         </span>
       </div>
     </section>

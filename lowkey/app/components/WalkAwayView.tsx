@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { Button } from "@/components/ui/b-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { RollingDigits } from "@/components/ui/rolling-digits";
 import { Slider } from "@/components/ui/slider";
@@ -106,17 +107,19 @@ export default function WalkAwayView({
     <section aria-label="If I change my mind" className="flex flex-col gap-[18px] py-1.5">
       {hideHeader ? null : (
       <div className="flex items-center gap-2">
-        <button
+        <Button
           type="button"
-          className="flex size-11 shrink-0 items-center justify-center"
+          variant="ghost"
+          size="icon-lg"
+          className="size-11 shrink-0"
           onClick={onBack}
           aria-label="Back to your picks"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M15 6l-6 6 6 6" />
           </svg>
-        </button>
-        <span className="text-[15px] font-medium">
+        </Button>
+        <span className="text-sm font-medium">
           {rankLabel}
           {pick.make} {pick.model}
         </span>
@@ -124,9 +127,6 @@ export default function WalkAwayView({
       )}
       <Typography variant="h4" as="h2" className="text-[30px] leading-[1.15] text-balance">
         {headline}
-      </Typography>
-      <Typography variant="paragraph-md" className="text-foreground/80">
-        The gold line is what the car would sell for. The dashed line is what you still owe. Once gold is on top, selling pays off the loan and the difference comes back to you.
       </Typography>
       <Card>
         <CardContent className="flex flex-col gap-2.5 pt-4">
@@ -220,22 +220,16 @@ export default function WalkAwayView({
           </TableBody>
         </Table>
         <Typography variant="paragraph-sm" className="text-muted-foreground">
-          Cost per month falls the longer you keep it. A minus sign means you would owe the difference to sell.
+          A minus means you&apos;d owe to sell.
         </Typography>
       </section>
-      {pick.lifespanYears ? (
-        <Typography variant="paragraph-sm" className="text-muted-foreground">
-          Lasts about {Math.round(pick.lifespanYears)} years: {money(ownership.price)} with
-          fees is about {money(ownership.price / pick.lifespanYears)} a year of life.
-        </Typography>
-      ) : null}
       <Typography variant="paragraph-xs" className="text-muted-foreground">
         {money(ownership.price)} with fees
         {ownership.taxAmount
-          ? ` plus ${money(ownership.taxAmount)} sales tax financed in the loan`
+          ? ` + ${money(ownership.taxAmount)} tax in the loan`
           : ""}
-        , {downPct}% down (of the price with fees), {ownership.termMonths} months, {aprText}. Say “my rate is 5.9%” to change it. Worth if sold = recent sales of this model, less 15% (the tax does not come back).
-        {ownership.taxNotice ? ` ${ownership.taxNotice}` : ""} Excludes insurance, fuel and repairs.
+        {" "}· {downPct}% down · {ownership.termMonths} mo · {aprText}. Resale: recent sales −15% (tax doesn&apos;t come back).
+        {ownership.taxNotice ? ` ${ownership.taxNotice}` : ""} Excl. insurance, fuel, repairs. Say “my rate is 5.9%” to change the rate.
       </Typography>
     </section>
   );

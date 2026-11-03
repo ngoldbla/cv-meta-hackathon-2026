@@ -13,6 +13,8 @@ export interface CostCompareRow {
   total: number;
   highlighted: boolean;
   cheapest: boolean;
+  price: number | null;
+  listingTotal: number | null;
 }
 
 function categoryNoun(category: string): string {
@@ -46,7 +48,7 @@ export function CostCompareView({
     rows
       .map(
         (r) =>
-          `${r.label}${r.cheapest ? ", cheapest to own" : ""}: ${r.total} dollars a month: ${r.valueLost} value lost, ${r.interest} interest, ${r.gas} gas, ${r.tax} sales tax`,
+          `${r.label}${r.cheapest ? ", cheapest to own" : ""}: ${r.total} dollars a month: ${r.valueLost} value lost, ${r.interest} interest, ${r.gas} gas, ${r.tax} sales tax${r.price !== null && r.listingTotal !== null ? `, lowest listed ${r.price} dollars of ${r.listingTotal} listed` : ""}`,
       )
       .join(". ") +
     ".";
@@ -57,9 +59,7 @@ export function CostCompareView({
     >
       <div className="flex flex-col gap-[2px]">
         <span className="text-base font-semibold">What each one really costs a month</span>
-        <span className="text-xs text-muted-foreground">
-          Over 5 years, after you sell it. Shortest bar is cheapest to own.
-        </span>
+        <span className="text-xs text-muted-foreground">Over 5 years, after resale.</span>
       </div>
       <div className="flex flex-col gap-2">
         {rows.map((r) => (
@@ -67,12 +67,19 @@ export function CostCompareView({
             key={r.label}
             className={`grid grid-cols-[104px_1fr_44px] items-center gap-2 text-[13px] ${r.highlighted ? "font-semibold" : ""}`}
           >
-            <span className="flex min-w-0 flex-wrap items-center gap-1">
-              <span className="leading-tight">{r.label}</span>
-              {r.cheapest ? (
-                <Badge color="amber" size="sm" animate={false} shimmer={false}>
-                  cheapest to own
-                </Badge>
+            <span className="flex min-w-0 flex-col gap-[2px]">
+              <span className="flex flex-wrap items-center gap-1">
+                <span className="leading-tight">{r.label}</span>
+                {r.cheapest ? (
+                  <Badge color="amber" size="sm" animate={false} shimmer={false}>
+                    cheapest to own
+                  </Badge>
+                ) : null}
+              </span>
+              {r.price !== null && r.listingTotal !== null ? (
+                <span className="text-xs font-normal text-muted-foreground">
+                  {fmtUsd(r.price)} · lowest of {r.listingTotal} listed
+                </span>
               ) : null}
             </span>
             <div className="flex h-4 gap-[2px] overflow-hidden rounded-[5px] bg-card" aria-hidden="true">
@@ -84,24 +91,6 @@ export function CostCompareView({
             <span className="mono text-right">{fmtUsd(r.total)}</span>
           </div>
         ))}
-      </div>
-      <div className="flex flex-wrap gap-3 text-xs text-foreground/80">
-        <span className="inline-flex items-center gap-[5px]">
-          <span aria-hidden="true" className="inline-block h-[10px] w-[10px] rounded-[2px]" style={{ background: SEGMENT_COLOR.valueLost }} />
-          Value it loses
-        </span>
-        <span className="inline-flex items-center gap-[5px]">
-          <span aria-hidden="true" className="inline-block h-[10px] w-[10px] rounded-[2px]" style={{ background: SEGMENT_COLOR.interest }} />
-          Loan interest
-        </span>
-        <span className="inline-flex items-center gap-[5px]">
-          <span aria-hidden="true" className="inline-block h-[10px] w-[10px] rounded-[2px]" style={{ background: SEGMENT_COLOR.gas }} />
-          Gas
-        </span>
-        <span className="inline-flex items-center gap-[5px]">
-          <span aria-hidden="true" className="inline-block h-[10px] w-[10px] rounded-[2px]" style={{ background: SEGMENT_COLOR.tax }} />
-          Sales tax
-        </span>
       </div>
     </section>
   );

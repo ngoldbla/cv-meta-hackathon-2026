@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/b-button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { effectiveMonthlyCost, lifespanRowText, monthlyBills } from "@/lib/costs";
 import type { SpecEntry } from "@/lib/render/specs";
@@ -66,13 +67,14 @@ export function TextFallback({
           <p>{ownership ? underwaterLabel(even) : "Worth vs owe: —"}</p>
         </div>
         {ownership && onWalkAway ? (
-          <button
+          <Button
             type="button"
-            className="mt-3 flex min-h-11 w-full items-center justify-center rounded-[10px] border border-foreground px-3 text-sm font-medium text-foreground"
+            variant="outline"
+            className="mt-3 min-h-11 w-full"
             onClick={onWalkAway}
           >
             If I change my mind
-          </button>
+          </Button>
         ) : null}
       </CardContent>
     </Card>

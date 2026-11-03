@@ -52,21 +52,38 @@ export function DealerLineView({
   face,
   more,
   error,
+  listingTotal,
+  listingRadius,
+  listingMax,
 }: {
   face: DealerUnitView | null;
   more: DealerUnitView[];
   error: string | null;
+  listingTotal: number | null;
+  listingRadius: number | null;
+  listingMax: number | null;
 }) {
   const [moreOpen, setMoreOpen] = useState(false);
   const moreLabel = more.length > 0 ? `${more.length} more nearby` : null;
+  // Task 038: where the face price sits among local listings. The
+  // range appears only when every listing is already returned.
+  const position =
+    face && listingTotal !== null
+      ? `Lowest of ${listingTotal} listed${listingRadius !== null ? ` within ${listingRadius} mi` : ""}${listingMax !== null && listingMax > face.price ? ` · listed ${fmtUsd(face.price)}–${fmtUsd(listingMax)}` : ""}`
+      : null;
   return (
     <section className="flex flex-col gap-1 border-t border-border pt-3 text-[13px]">
       {error ? (
         <span>{error}</span>
       ) : face ? (
-        <ul className="flex flex-col gap-1.5">
-          <UnitLine unit={face} />
-        </ul>
+        <>
+          <ul className="flex flex-col gap-1.5">
+            <UnitLine unit={face} />
+          </ul>
+          {position ? (
+            <span className="text-xs text-muted-foreground">{position}</span>
+          ) : null}
+        </>
       ) : (
         <span>No local stock found. Payment uses the typical price.</span>
       )}

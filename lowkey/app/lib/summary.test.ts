@@ -29,7 +29,7 @@ describe("cardSentence (code-written, task 026 part 4)", () => {
   it("builds the top pick sentence from tool numbers only", () => {
     const s = cardSentence(crv, crvOwn, peers, "SUV");
     expect(s).toBe(
-      "Keeps about 63% of its price: what you'd likely get selling it after 5 years, the most of any gas SUV here.",
+      "Keeps about 63% of its price after 5 years — most here.",
     );
     // Number check: each sentence number traces to a tool result.
     const allowed = new Set<number>([
@@ -57,7 +57,7 @@ describe("cardSentence (code-written, task 026 part 4)", () => {
   it("handles missing ownership without inventing numbers", () => {
     const s = cardSentence(crv, undefined, peers, "SUV");
     expect(s).toBe(
-      "Keeps about 63% of its price: what you'd likely get selling it after 5 years, the most of any gas SUV here.",
+      "Keeps about 63% of its price after 5 years — most here.",
     );
   });
 
@@ -69,7 +69,7 @@ describe("cardSentence (code-written, task 026 part 4)", () => {
     const s = cardSentence(pick, own, [pick], "SUV");
     // Single-peer lineup: no superlative claim, and no walk-away
     // numbers on the card face (they live in the walk-away view).
-    expect(s).toBe("Keeps about 63% of its price: what you'd likely get selling it after 5 years.");
+    expect(s).toBe("Keeps about 63% of its price after 5 years.");
     expect(underwaterLabel(own.evenMonth)).toBe("Underwater for 7 months");
   });
 });
@@ -83,8 +83,8 @@ describe("cardSentence with trim and lifespan (task 029, part 4)", () => {
       trimIsStepUp: true, lifespanYears: 11.3,
     };
     const s = cardSentence(pick, ownershipFor(28295, 0.577), [pick], "Sedan");
-    expect(s).toContain("The SE is one step up from base and keeps about 58%");
-    expect(s).toContain("Built to last about 11 years.");
+    expect(s).toContain("SE (one step up): keeps about 58%");
+    expect(s).toContain("Lasts about 11 years.");
   });
 
   it("omits trim and lifespan clauses when they are unknown", () => {
@@ -102,17 +102,14 @@ describe("cardSentence with trim and lifespan (task 029, part 4)", () => {
 });
 
 describe("closingLine", () => {
-  it("names the #1 pick with payment, retention and leave cost", () => {
+  it("names the #1 pick without repeating card numbers (task 038)", () => {
     const fixture = RANK_FIXTURES.SUV;
     const entries = fixture.picks.map((pick) => ({
       pick,
       ownership: ownershipFor(pick.price, pick.retention5y),
     }));
     const line = closingLine(entries, "SUV")!;
-    expect(line).toContain("Honda CR-V");
-    const top = entries[0].ownership!;
-    expect(line).toContain(`$${Math.round(top.monthlyPayment).toLocaleString("en-US")}`);
-    expect(line).toContain("63%");
+    expect(line).toBe("Start with the Honda CR-V.");
   });
 
   it("returns null for an empty lineup", () => {

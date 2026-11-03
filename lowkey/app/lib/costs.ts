@@ -184,7 +184,7 @@ export function trimLineText(args: {
   const recommended = args.recommendedTrim ?? null;
   if (!base && !recommended) return null;
   if (args.fellBackToBase && base && recommended && recommended !== base) {
-    return `${base} (base): no ${recommended} in stock within 150 miles, so the base trim is shown.`;
+    return `${base} (base): no ${recommended} in stock within 150 mi — base shown.`;
   }
   if (args.trimGuardHit && base) {
     const step = args.stepUpTrim ?? "the step-up trim";
@@ -200,9 +200,9 @@ export function trimLineText(args: {
       const factor = args.tradeInFactor ?? TRADE_IN_FACTOR;
       const trimPct = Math.round(args.trimRetention5y * factor * 100);
       const modelPct = Math.round(args.modelRetentionRetail * factor * 100);
-      return `${base} (base): the ${step} keeps ${trimPct}% of its price after 5 years, more than 3 points below the model's ${modelPct}%, so the base trim is recommended.`;
+      return `${base} (base): the ${step} keeps ${trimPct}% after 5 years vs model's ${modelPct}% — base recommended.`;
     }
-    return `${base} (base): the step-up trim keeps its value clearly worse, so the base trim is recommended.`;
+    return `${base} (base): step-up keeps value clearly worse — base recommended.`;
   }
   if (args.trimIsStepUp && recommended && base && args.trimStepCost) {
     const monthly =

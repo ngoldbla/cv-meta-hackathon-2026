@@ -78,6 +78,36 @@ export interface SpecLocal {
   fellBackToBase?: boolean;
   fuel?: { perMonth: number } | null;
   units: SpecUnit[];
+  /** Cheapest local price (task 038 price position). */
+  bestPrice?: number | null;
+  /** Provider total at the radius used. */
+  totalFound?: number;
+  /** Radius the search settled on (50, widened to 150). */
+  radiusUsed?: number;
+}
+
+/**
+ * Listing position for one entry (task 038, part 5.6): the cheapest
+ * price, how many listings it is the lowest of, the radius, and the
+ * dearest price only when every listing is already returned (so the
+ * full listed range is known without an extra provider call).
+ */
+export interface ListingStats {
+  price: number;
+  total: number;
+  radius: number | null;
+  max: number | null;
+}
+
+export function listingStats(local: SpecLocal | undefined): ListingStats | null {
+  if (!local || local.error) return null;
+  const units = local.units ?? [];
+  if (units.length === 0) return null;
+  const prices = units.map((u) => u.price);
+  const price = local.bestPrice ?? Math.min(...prices);
+  const total = local.totalFound ?? units.length;
+  const max = total <= units.length ? Math.max(...prices) : null;
+  return { price, total, radius: local.radiusUsed ?? null, max };
 }
 
 export interface SpecEntry {
@@ -251,6 +281,7 @@ export function buildPickCardSpec(
   const units = local?.units ?? [];
   const modelForUnits = local?.model ?? pick.model;
   const facePlan = dealerUnitsFace(units, pick.currentYear);
+  const stats = listingStats(local);
   const toUnit = (u: SpecUnit, note: string | null) => ({
     title: unitTitle(u.year, modelForUnits, u.trim),
     miles: u.distanceMiles,
@@ -265,6 +296,9 @@ export function buildPickCardSpec(
       face: facePlan.face ? toUnit(facePlan.face, facePlan.faceNote) : null,
       more: facePlan.more.map(({ unit, note }) => toUnit(unit, note)),
       error: local?.error ?? null,
+      listingTotal: stats ? stats.total : null,
+      listingRadius: stats ? stats.radius : null,
+      listingMax: stats ? stats.max : null,
     },
     children: [],
   };
@@ -277,9 +311,6 @@ export function buildPickCardSpec(
       badgeLabel: badgeLabel(pick),
       modelLabel: modelLabel(pick),
       sentence: cardSentence(pick, undefined, peers.length > 0 ? peers : [pick], category),
-      taxLine: ownership
-        ? (ownership.taxNotice ?? "Tax not included: unknown state")
-        : null,
       trimLine: trimLineText({
         baseTrim: pick.baseTrim,
         stepUpTrim: pick.stepUpTrim,
@@ -298,8 +329,6 @@ export function buildPickCardSpec(
       category,
       modelKey: pick.model,
       hasWalkAway: Boolean(ownership),
-      lifespanSource: pick.lifespanSource ?? null,
-      lifespanAsOf: pick.lifespanAsOf ?? null,
     },
     children,
   };
@@ -320,6 +349,7 @@ export function buildCostCompareSpec(entries: SpecEntry[], category: string): Sp
     .map((entry) => {
       const costs = costBreakdown(entry);
       if (!costs) return null;
+      const stats = listingStats(entry.local);
       return {
         label: `${entry.pick.make} ${entry.pick.model}`,
         model: entry.pick.model,
@@ -329,6 +359,8 @@ export function buildCostCompareSpec(entries: SpecEntry[], category: string): Sp
         gas: costs.gas ?? 0,
         tax: costs.tax,
         total: costs.real,
+        price: stats ? stats.price : null,
+        listingTotal: stats ? stats.total : null,
       };
     })
     .filter((r): r is NonNullable<typeof r> => r !== null);
@@ -353,6 +385,8 @@ export function buildCostCompareSpec(entries: SpecEntry[], category: string): Sp
             total: r.total,
             highlighted: r.model === shownModel,
             cheapest: r.total === lowest,
+            price: r.price,
+            listingTotal: r.listingTotal,
           })),
         },
         children: [],

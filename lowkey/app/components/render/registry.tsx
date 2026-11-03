@@ -43,7 +43,14 @@ export const { registry } = defineRegistry(catalog, {
       <UnderwaterMiniView evenMonth={props.evenMonth} curve={props.curve} />
     ),
     DealerLine: ({ props }) => (
-      <DealerLineView face={props.face} more={props.more} error={props.error} />
+      <DealerLineView
+        face={props.face}
+        more={props.more}
+        error={props.error}
+        listingTotal={props.listingTotal}
+        listingRadius={props.listingRadius}
+        listingMax={props.listingMax}
+      />
     ),
     PickCard: ({ props, children }) => (
       <PickCardView {...props}>{children}</PickCardView>

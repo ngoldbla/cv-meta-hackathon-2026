@@ -58,6 +58,9 @@ function entriesFor(category: Category, opts?: { fuel?: number | null }): SpecEn
       local: {
         model: pick.model,
         fuel: opts?.fuel === null ? null : { perMonth: opts?.fuel ?? 150 },
+        bestPrice: pick.price,
+        totalFound: 9,
+        radiusUsed: 50,
         units: sampleUnitsFor(pick.model, pick.price).map((u) => ({
           ...u,
           year: 2026,
@@ -223,7 +226,7 @@ describe("spec builders + number guard (task 034)", () => {
     expect(checkPickCardSpec(spec, entry).ok).toBe(true);
   });
 
-  it("shows the sales-tax segment and tax line (task 037)", () => {
+  it("shows the sales-tax segment; card carries no tax line (tasks 037/038)", () => {
     const entries = entriesFor("SUV");
     const crv = entries.find((e) => e.pick.model === "CR-V")!;
     const costs = costBreakdown(crv)!;
@@ -233,8 +236,8 @@ describe("spec builders + number guard (task 034)", () => {
     const bars = Object.values(spec.elements).find((e) => e.type === "CostBars")!;
     const props = bars.props as { real: { part: string; usd: number }[] };
     expect(props.real.map((s) => s.part)).toContain("tax");
-    const root = spec.elements[spec.root]!.props as { taxLine: string };
-    expect(root.taxLine).toContain("Illinois sales tax");
+    // Tax wording lives once in the footer/popover, not per card.
+    expect(spec.elements[spec.root]!.props).not.toHaveProperty("taxLine");
     expect(checkPickCardSpec(spec, crv).ok).toBe(true);
     const compare = buildCostCompareSpec(entries, "SUV")!;
     const rows = (
@@ -246,7 +249,58 @@ describe("spec builders + number guard (task 034)", () => {
     expect(checkCostCompareSpec(compare, entries).ok).toBe(true);
   });
 
-  it("shows no tax segment in a no-tax state and the unknown line without a mapping", () => {
+  it("carries the price position from listing totals (task 038)", () => {
+    const entries = entriesFor("SUV");
+    const crv = entries.find((e) => e.pick.model === "CR-V")!;
+    const spec = buildPickCardSpec(crv, entries.map((e) => e.pick), "SUV");
+    const dealer = Object.values(spec.elements).find(
+      (e) => e.type === "DealerLine",
+    )!;
+    const dp = dealer.props as {
+      listingTotal: number | null;
+      listingRadius: number | null;
+      listingMax: number | null;
+    };
+    // 9 listed, only 3 returned: position known, full range not.
+    expect(dp.listingTotal).toBe(9);
+    expect(dp.listingRadius).toBe(50);
+    expect(dp.listingMax).toBeNull();
+    expect(checkPickCardSpec(spec, crv).ok).toBe(true);
+    const compare = buildCostCompareSpec(entries, "SUV")!;
+    const rows = (
+      compare.elements[compare.root]!.props as {
+        rows: { label: string; price: number | null; listingTotal: number | null }[];
+      }
+    ).rows;
+    const crvRow = rows.find((r) => r.label.includes("CR-V"))!;
+    expect(crvRow.price).toBe(crv.pick.price);
+    expect(crvRow.listingTotal).toBe(9);
+    expect(checkCostCompareSpec(compare, entries).ok).toBe(true);
+
+    // Every listing returned: the dearest price is known for free.
+    const all: SpecEntry = {
+      ...crv,
+      local: { ...crv.local!, totalFound: 3 },
+    };
+    const allSpec = buildPickCardSpec(all, [all.pick], "SUV");
+    const allDealer = Object.values(allSpec.elements).find(
+      (e) => e.type === "DealerLine",
+    )!;
+    expect(
+      (allDealer.props as { listingMax: number | null }).listingMax,
+    ).toBe(crv.pick.price + 700);
+    expect(checkPickCardSpec(allSpec, all).ok).toBe(true);
+
+    // Tampered position fails the guard.
+    const bad = buildPickCardSpec(crv, entries.map((e) => e.pick), "SUV");
+    const badDealer = Object.values(bad.elements).find(
+      (e) => e.type === "DealerLine",
+    )!;
+    (badDealer.props as { listingTotal: number }).listingTotal = 99;
+    expect(checkPickCardSpec(bad, crv).ok).toBe(false);
+  });
+
+  it("shows no tax segment in a no-tax state", () => {
     const base = entriesFor("SUV")[0]!;
     // Genuinely untaxed ownership, so the guard's back-to-you check
     // still ties to resale (a taxed loan with taxAmount 0 must fail).
@@ -280,9 +334,7 @@ describe("spec builders + number guard (task 034)", () => {
     const bars = Object.values(spec.elements).find((e) => e.type === "CostBars")!;
     const props = bars.props as { real: { part: string }[] };
     expect(props.real.map((s) => s.part)).not.toContain("tax");
-    expect((spec.elements[spec.root]!.props as { taxLine: string }).taxLine).toBe(
-      "No state sales tax on cars in Montana.",
-    );
+    expect(spec.elements[spec.root]!.props).not.toHaveProperty("taxLine");
     expect(checkPickCardSpec(spec, noTax).ok).toBe(true);
 
     const unknown: SpecEntry = {
@@ -294,9 +346,9 @@ describe("spec builders + number guard (task 034)", () => {
       },
     };
     const unknownSpec = buildPickCardSpec(unknown, [unknown.pick], "SUV");
-    expect(
-      (unknownSpec.elements[unknownSpec.root]!.props as { taxLine: string }).taxLine,
-    ).toBe("Tax not included: unknown state");
+    expect(unknownSpec.elements[unknownSpec.root]!.props).not.toHaveProperty(
+      "taxLine",
+    );
     expect(checkPickCardSpec(unknownSpec, unknown).ok).toBe(true);
   });
 

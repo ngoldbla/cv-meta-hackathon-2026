@@ -5,10 +5,21 @@ import { MotionConfig } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
 import { CarFigure } from "@/components/hairline/CarFigure";
+import { CreditBlock, CREDIT_POINTS } from "@/components/CreditBlock";
 import { RenderSpec } from "@/components/render/registry";
 import { TextFallback } from "@/components/render/TextFallback";
 import WalkAwayView from "@/components/WalkAwayView";
 import { AIInput } from "@/components/ui/ai-input";
+import { Alert } from "@/components/ui/alert";
+import { Button } from "@/components/ui/b-button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/b-popover";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
 import {
   ToggleGroup,
   ToggleGroupItem,
@@ -303,7 +314,24 @@ function turnSteps(parts: Part[]): TurnStep[] {
 }
 
 const AREA_STORAGE_KEY = "lowkey-area";
+const SEARCHED_STORAGE_KEY = "lowkey-searched";
 const GEO_ERROR = "Couldn't get your location. Type a ZIP instead.";
+
+function loadSearched(): boolean {
+  try {
+    return window.localStorage.getItem(SEARCHED_STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markSearched() {
+  try {
+    window.localStorage.setItem(SEARCHED_STORAGE_KEY, "1");
+  } catch {
+    // Best-effort only, like the stored area.
+  }
+}
 
 function loadStoredArea(): SearchArea | null {
   try {
@@ -338,6 +366,8 @@ export default function HomeClient({
   const [geoError, setGeoError] = useState<string | null>(null);
   const [geoBusy, setGeoBusy] = useState(false);
   const [geoSlow, setGeoSlow] = useState(false);
+  // Credit block (task 038): full until the first search, then one line.
+  const [creditOpen, setCreditOpen] = useState(false);
   const zipInputRef = useRef<HTMLInputElement>(null);
   const busy = status === "submitted" || status === "streaming";
 
@@ -362,6 +392,18 @@ export default function HomeClient({
   useEffect(() => {
     if (zipOpen) zipInputRef.current?.focus();
   }, [zipOpen]);
+
+  // First visit: credit block open. After a search: remembered shut.
+  useEffect(() => {
+    setCreditOpen(!loadSearched());
+  }, []);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      markSearched();
+      setCreditOpen(false);
+    }
+  }, [messages.length]);
 
   // "Still looking…" after 3 s of a location lookup (task 034).
   useEffect(() => {
@@ -388,6 +430,9 @@ export default function HomeClient({
 
   let footerMeta: { soldVehicles: number; providerAsOf: string } | null = null;
   let footerTax: string | null = null;
+  let footerAprPct: number | null = null;
+  const lifespanSources = new Map<string, string>();
+  const gasSources = new Map<string, string>();
   for (const message of messages) {
     for (const part of (message.parts ?? []) as Part[]) {
       if (part.type === "tool-rank_category" && part.state === "output-available") {
@@ -398,13 +443,39 @@ export default function HomeClient({
             providerAsOf: out.providerAsOf,
           };
         }
+        for (const pick of out.picks ?? []) {
+          if (pick.lifespanSource) {
+            lifespanSources.set(
+              pick.lifespanSource,
+              pick.lifespanAsOf ?? "",
+            );
+          }
+        }
+        if (out.commodity?.lifespanSource) {
+          lifespanSources.set(
+            out.commodity.lifespanSource,
+            out.commodity.lifespanAsOf ?? "",
+          );
+        }
       }
       if (part.type === "tool-ownership_math" && part.state === "output-available") {
         const out = part.output as OwnershipOutput;
         if (out.taxNotice) footerTax = out.taxNotice;
+        footerAprPct = out.aprPercent;
+      }
+      if (part.type === "tool-local_units" && part.state === "output-available") {
+        const out = part.output as LocalOutput;
+        if (out.fuel) {
+          gasSources.set(out.fuel.seriesDisplay, out.fuel.latestDate);
+        }
       }
     }
   }
+  const hasResults = messages.some((m) =>
+    ((m.parts ?? []) as Part[]).some(
+      (p) => p.type === "tool-rank_category" && p.state === "output-available",
+    ),
+  );
 
   const lastAssistant = [...messages]
     .reverse()
@@ -536,7 +607,6 @@ export default function HomeClient({
           <KeyIcon />
           <span>Low Key</span>
         </div>
-        <span className="tagline">No ads · No sign-up</span>
       </header>
 
       <div className="messages">
@@ -582,9 +652,7 @@ export default function HomeClient({
                 <Typography variant="label-lg" className="mt-3">
                   We help you buy for value and quality: the signal, not the noise.
                 </Typography>
-                <Typography variant="paragraph-md" className="mt-2">
-                  Pick a body type and I&apos;ll show you the new gas cars near you that hold their value best, what each costs a month, and what it would cost you to change your mind.
-                </Typography>
+                <CreditBlock open={creditOpen} onOpenChange={setCreditOpen} />
                 <Typography variant="paragraph-sm" className="mt-2 text-muted-foreground">
                   No ads · No sign-up · Not paid by dealers.
                 </Typography>
@@ -766,10 +834,22 @@ export default function HomeClient({
                 <ThinkingIndicator words={["Thinking"]} className="text-sm" />
               )
             ) : null}
-            {error ? (
-              <div role="alert" className="text-sm text-destructive">
-                Something went wrong. Please try again.
+            {busy && !hasResults ? (
+              <div aria-hidden="true" className="mt-3 flex flex-col gap-2">
+                <Skeleton className="h-5 w-2/3" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-5 w-1/2" />
               </div>
+            ) : null}
+            {error ? (
+              <Alert
+                appearance="destructive"
+                timeout={0}
+                dismissible={false}
+                width="100%"
+                message="Something went wrong. Please try again."
+                className="mt-2"
+              />
             ) : null}
             <div className="mt-4">
               {zipOpen ? (
@@ -786,52 +866,62 @@ export default function HomeClient({
                     <label className="sr-only" htmlFor="lowkey-zip">
                       ZIP code
                     </label>
-                    <input
-                      id="lowkey-zip"
-                      ref={zipInputRef}
-                      type="text"
-                      inputMode="numeric"
-                      autoComplete="postal-code"
-                      placeholder="ZIP code"
-                      aria-label="ZIP code"
-                      maxLength={5}
-                      value={zipInput}
-                      disabled={busy || geoBusy}
-                      onChange={(e) =>
-                        setZipInput(
-                          e.target.value.replace(/\D/g, "").slice(0, 5),
-                        )
-                      }
-                      className="min-h-11 w-32 rounded-lg border border-input bg-card px-3 text-base"
-                    />
-                    <button
+                    <div className="w-32">
+                      <Input
+                        id="lowkey-zip"
+                        ref={zipInputRef}
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="postal-code"
+                        placeholder="ZIP code"
+                        aria-label="ZIP code"
+                        maxLength={5}
+                        value={zipInput}
+                        disabled={busy || geoBusy}
+                        onChange={(e) =>
+                          setZipInput(
+                            e.target.value.replace(/\D/g, "").slice(0, 5),
+                          )
+                        }
+                        className="min-h-11"
+                      />
+                    </div>
+                    <Button
                       type="submit"
                       disabled={
                         busy || geoBusy || zipInput.trim().length !== 5
                       }
-                      className="min-h-11 rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground disabled:opacity-50"
+                      className="min-h-11"
                     >
                       Use this ZIP
-                    </button>
+                    </Button>
                     {area ? (
-                      <button
+                      <Button
                         type="button"
+                        variant="outline"
                         disabled={busy || geoBusy}
                         onClick={() => setZipOpen(false)}
-                        className="min-h-11 rounded-lg border border-input px-3 text-sm font-medium disabled:opacity-50"
+                        className="min-h-11"
                       >
                         Cancel
-                      </button>
+                      </Button>
                     ) : null}
                   </form>
-                  <button
+                  <Button
                     type="button"
+                    variant="outline"
                     disabled={busy || geoBusy}
                     onClick={handleUseLocation}
-                    className="mt-2 min-h-11 rounded-lg border border-input px-3 text-sm font-medium disabled:opacity-50"
+                    className="mt-2 min-h-11"
                   >
-                    {geoBusy ? "Locating…" : "Use my location"}
-                  </button>
+                    {geoBusy ? (
+                      <>
+                        <Spinner size="sm" /> Locating…
+                      </>
+                    ) : (
+                      "Use my location"
+                    )}
+                  </Button>
                   {pendingBody && !area ? (
                     <Typography
                       variant="paragraph-sm"
@@ -848,42 +938,73 @@ export default function HomeClient({
                     {area.approximate ? " (approximate)" : ""}
                   </span>
                   <span aria-hidden="true">·</span>
-                  <button
+                  <Button
                     type="button"
+                    variant="link"
+                    linkUnderline="static"
                     disabled={busy || geoBusy}
                     onClick={() => {
                       setZipInput(area.zip);
                       setGeoError(null);
                       setZipOpen(true);
                     }}
-                    className="min-h-11 font-medium underline underline-offset-2 disabled:opacity-50"
+                    className="min-h-11 underline underline-offset-2"
                   >
                     Change
-                  </button>
+                  </Button>
                   <span aria-hidden="true">·</span>
-                  <button
+                  <Button
                     type="button"
+                    variant="link"
+                    linkUnderline="static"
                     disabled={busy || geoBusy}
                     onClick={handleUseLocation}
-                    className="min-h-11 font-medium underline underline-offset-2 disabled:opacity-50"
+                    className="min-h-11 underline underline-offset-2"
                   >
-                    {geoBusy ? "Locating…" : "Use my location"}
-                  </button>
+                    {geoBusy ? (
+                      <>
+                        <Spinner size="sm" /> Locating…
+                      </>
+                    ) : (
+                      "Use my location"
+                    )}
+                  </Button>
                 </div>
               ) : null}
               {geoBusy && geoSlow ? (
-                <p role="status" className="mt-2 text-sm text-muted-foreground">
-                  Still looking…
+                <p role="status" className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                  <Spinner size="sm" /> Still looking…
                 </p>
               ) : null}
               {geoError ? (
-                <div
-                  role="alert"
-                  className="mt-2 text-sm text-destructive"
-                >
-                  {geoError}
-                </div>
+                <Alert
+                  appearance="destructive"
+                  timeout={0}
+                  dismissible={false}
+                  width="100%"
+                  message={geoError}
+                  className="mt-2"
+                />
               ) : null}
+            </div>
+            <div className="mt-2 flex items-center justify-end">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="min-h-11 shrink-0 text-xs underline underline-offset-2"
+                  >
+                    Why no photos?
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent side="top" className="w-[min(20rem,calc(100vw-2rem))] p-3 text-sm leading-relaxed">
+                  <strong className="font-semibold">
+                    {CREDIT_POINTS[4]!.lead}
+                  </strong>{" "}
+                  {CREDIT_POINTS[4]!.text}
+                </PopoverContent>
+              </Popover>
             </div>
             <ToggleGroup
               aria-label="Car type"
@@ -939,15 +1060,17 @@ export default function HomeClient({
                 </DrawerDescription>
               </div>
               <DrawerClose asChild>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon-lg"
                   aria-label="Close"
-                  className="flex size-11 shrink-0 items-center justify-center"
+                  className="size-11 shrink-0"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                     <path d="M18 6 6 18M6 6l12 12" />
                   </svg>
-                </button>
+                </Button>
               </DrawerClose>
             </DrawerHeader>
             <DrawerBody>
@@ -993,22 +1116,64 @@ export default function HomeClient({
           disabled={busy}
           onSend={(message) => send(message)}
         />
-        <Typography variant="paragraph-xs" className="mt-2 text-muted-foreground">
-          Payment assumes 10% down (of the price with fees), 60 months
-          {aprText ? <>, {aprText}</> : null} — say “my rate is 5.9%” in the chat to change it.
-          {footerTax?.startsWith("Includes") ? " Sales tax is financed in the loan." : ""} Insurance and repairs are extra.
-        </Typography>
-        {footerTax ? (
-          <Typography variant="paragraph-xs" className="mt-1 text-muted-foreground">
-            {footerTax}
+        <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+          <Typography variant="paragraph-xs" className="text-muted-foreground">
+            10% down · 60 mo
+            {footerAprPct !== null ? <> · {footerAprPct}% APR</> : null}
           </Typography>
-        ) : null}
-        {footerMeta ? (
-          <Typography variant="paragraph-xs" className="mt-1 text-muted-foreground">
-            Rankings from {footerMeta.soldVehicles.toLocaleString("en-US")} sold
-            vehicles, as of {footerDate(footerMeta.providerAsOf)} · Local stock live.
-          </Typography>
-        ) : null}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                className="min-h-11 text-xs underline underline-offset-2"
+              >
+                Sources &amp; assumptions
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              side="top"
+              className="w-[min(22rem,calc(100vw-2rem))] p-3 text-sm leading-relaxed"
+            >
+              <div className="flex flex-col gap-2">
+                <p>
+                  Payment assumes 10% down (of the price with fees), 60
+                  months
+                  {aprText ? <>, {aprText}</> : null} — say “my rate is
+                  5.9%” in the chat to change it.
+                  {footerTax?.startsWith("Includes")
+                    ? " Sales tax is financed in the loan."
+                    : ""}{" "}
+                  Insurance and repairs are extra.
+                </p>
+                {footerTax ? <p>{footerTax}</p> : null}
+                <p>
+                  “Keeps about N%” is what you&apos;d likely get selling
+                  after 5 years, as a share of the price.
+                </p>
+                {footerMeta ? (
+                  <p>
+                    Rankings from{" "}
+                    {footerMeta.soldVehicles.toLocaleString("en-US")} sold
+                    vehicles, as of {footerDate(footerMeta.providerAsOf)} ·
+                    Local stock live.
+                  </p>
+                ) : null}
+                {[...lifespanSources.entries()].map(([source, asOf]) => (
+                  <p key={source}>
+                    Lifespan: {source}
+                    {asOf ? `, as of ${asOf}` : ""}.
+                  </p>
+                ))}
+                {[...gasSources.entries()].map(([display, latest]) => (
+                  <p key={display}>
+                    Gas: {display}, as of {footerDate(latest)}.
+                  </p>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
       </div>
     </main>
     </MotionConfig>

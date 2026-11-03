@@ -263,7 +263,7 @@ describe("trimLineText (task 029, part 1)", () => {
       fellBackToBase: true,
     })!;
     expect(line).toBe(
-      "LE (base): no SE in stock within 150 miles, so the base trim is shown.",
+      "LE (base): no SE in stock within 150 mi — base shown.",
     );
   });
 

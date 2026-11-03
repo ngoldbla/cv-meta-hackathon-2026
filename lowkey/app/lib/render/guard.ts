@@ -3,6 +3,7 @@ import type { Spec } from "@json-render/core";
 import { dealerUnitsFace, effectiveMonthlyCost } from "../costs";
 import {
   interestPerMonth,
+  listingStats,
   valueLostPerMonth,
   type SpecEntry,
 } from "./specs";
@@ -274,6 +275,11 @@ function checkDealer(c: Checker, spec: Spec, id: string, entry: SpecEntry) {
     c.exact(id, `${base}.more.${idx}.miles`, unit.miles, src.distanceMiles);
     c.exact(id, `${base}.more.${idx}.price`, unit.price, src.price);
   });
+  // Task 038: price-position figures copy the listing totals exactly.
+  const stats = listingStats(entry.local);
+  c.exact(id, `${base}.listingTotal`, props.listingTotal, stats ? stats.total : null);
+  c.exact(id, `${base}.listingRadius`, props.listingRadius, stats ? stats.radius : null);
+  c.exact(id, `${base}.listingMax`, props.listingMax, stats ? stats.max : null);
 }
 
 /** Check one PickCard spec against the entry that produced it. */
@@ -312,6 +318,8 @@ export function checkCostCompareSpec(spec: Spec, entries: SpecEntry[]): GuardRes
     gas: number;
     tax: number;
     total: number;
+    price: number | null;
+    listingTotal: number | null;
   }[]) ?? [];
   const byLabel = new Map(entries.map((e) => [`${e.pick.make} ${e.pick.model}`, e]));
   if (rows.length !== entries.filter((e) => e.ownership).length) c.fail(spec.root, "row-count");
@@ -336,6 +344,10 @@ export function checkCostCompareSpec(spec: Spec, entries: SpecEntry[]): GuardRes
       taxAmount: entry.ownership.taxAmount ?? 0,
     });
     c.dollar(spec.root, `${base}.rows.${idx}.total`, row.total, expectedReal);
+    // Task 038: the row's listed-price position copies the totals.
+    const stats = listingStats(entry.local);
+    c.exact(spec.root, `${base}.rows.${idx}.price`, row.price, stats ? stats.price : null);
+    c.exact(spec.root, `${base}.rows.${idx}.listingTotal`, row.listingTotal, stats ? stats.total : null);
     if (Math.abs(row.total - (row.valueLost + row.interest + row.gas + row.tax)) > 2) {
       c.fail(spec.root, "row-total");
     }
