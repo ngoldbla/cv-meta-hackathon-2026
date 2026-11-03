@@ -29,5 +29,12 @@ Installed with the pinned shadcn CLI `npx shadcn@4.23.0 add @iconiq/<name>` (reg
 
 - `iconiq-theme` → `lib/registry-theme.ts` (shared registry tokens)
 - `typography` → `components/ui/typography.tsx`
+- `ai-input` → `components/ui/ai-input.tsx` (composer; agent/model chips omitted, plus/mic buttons removed and a `disabled` prop added in the copied source; file copied from `https://iconiqui.com/r/ai-input.json` because the pinned CLI resolves its un-namespaced `b-switch` dependency against the default registry and fails — same bytes the CLI would write)
+- `b-switch` → `components/ui/b-switch.tsx` (dependency of `ai-input`)
+- `message` → `components/ui/message.tsx` (user/assistant messages)
+- `reasoning-steps` → `components/ui/reasoning-steps.tsx` (live tool steps)
+- `thinking-indicator` → `components/ui/thinking-indicator.tsx` (before the first step)
+- `streaming-text` → `components/ui/streaming-text.tsx` (follow-up replies; copied source now keeps already-shown words when the model appends text)
+- `reveal-text` → `components/ui/reveal-text.tsx` (opening headline; chosen over `dia-text` as the calmer, non-looping reveal)
 
 Tailwind CSS 4.1.18 (`@tailwindcss/postcss` 4.1.18, `postcss` 8.5.6, `tw-animate-css` 1.4.0) is the version the registry expects. All new dependencies are pinned exactly in `package.json` / `package-lock.json` (Iconiq lockfile versions: `motion` 12.42.0, `@base-ui/react` 1.5.0, `lucide-react` 0.564.0, `class-variance-authority` 0.7.1, `clsx` 2.1.1, `tailwind-merge` 3.6.0, `@radix-ui/react-slot` 1.3.3, `vaul` 1.1.2, `@lucasmarkes/hairline` 0.5.1).

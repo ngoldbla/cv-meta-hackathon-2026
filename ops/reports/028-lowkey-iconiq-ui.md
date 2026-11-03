@@ -11,8 +11,10 @@ In progress. Rebuilding the Low Key UI on Iconiq UI (AI blocks first) on branch 
 
 - Part 2 (this commit): mapped the Low Key palette onto Iconiq theme tokens in `app/globals.css` — `@theme inline` colours/fonts/radius, light `:root` (ground `#F3F2EE`, card `#FFFFFF`, ink `#1B1C1E`, muted `#5A5C60`, line `#DAD8D1`, brass `#7A5A10`, IBM Plex Sans/Mono) and a `.dark` theme through the same tokens (dark ground `#17181A`, card `#232426`, foreground `#F3F2EE`, brass `#D9B96A`). Iconiq's embedded `--ic-*` defaults are remapped centrally by un-layered `*` rules to these tokens (no per-component colour overrides); legacy `--ground/--ink/--line` aliases keep the pre-rebuild components working. Dark follows `prefers-color-scheme` via a tiny class script in `app/layout.tsx` (no settings UI — Low Key has no settings). Build passes; app tests 64 passed.
 
+- Part 3 (this commit): installed the AI blocks with the pinned CLI — `message`, `reasoning-steps`, `thinking-indicator`, `streaming-text`, `reveal-text` (plus `b-switch`); `ai-input` was copied from its registry JSON because CLI 4.23.0 resolves its un-namespaced `b-switch` dependency against the default shadcn registry and 404s (verified by dry-run; same bytes the CLI would write). Rebuilt `app/page.tsx`: Iconiq `ai-input` composer (placeholder `e.g. 60614, SUV`, `showMessages` off, no agent/model/setting chips, send wave kept; copied source: plus/mic buttons removed, `disabled` while busy added, send target 44 px), `message` bubbles for every user/assistant message, `reasoning-steps` fed only from real tool-call parts (rank → local → ownership, done when each kind's results arrive; never a timer), `thinking-indicator` before the first step, `streaming-text` for follow-up replies (copied source fixed to append rather than restart on growing text), and the opening on `typography` + `reveal-text` (chosen over `dia-text`: calmer, no loop). Build passes; app tests 64 passed.
+
 ## Results
-Pending (parts 3–6).
+Pending (parts 4–6).
 
 ## Deviations
 - Inbox sync step not followed (see above); synced `origin/low-key` instead.

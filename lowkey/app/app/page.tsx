@@ -5,6 +5,23 @@ import { useEffect, useState, type FormEvent } from "react";
 
 import PickCard, { type LocalLike } from "@/components/PickCard";
 import WalkAwayView from "@/components/WalkAwayView";
+import { AIInput } from "@/components/ui/ai-input";
+import {
+  Message,
+  MessageBubble,
+  MessageContent,
+  MessageGroup,
+} from "@/components/ui/message";
+import {
+  ReasoningStep,
+  ReasoningSteps,
+  ReasoningStepsContent,
+  ReasoningStepsTrigger,
+} from "@/components/ui/reasoning-steps";
+import { RevealText } from "@/components/ui/reveal-text";
+import { StreamingText } from "@/components/ui/streaming-text";
+import { ThinkingIndicator } from "@/components/ui/thinking-indicator";
+import { Typography } from "@/components/ui/typography";
 import { closingLine } from "@/lib/summary";
 import type { CurveLike } from "@/components/WorthChart";
 
@@ -63,6 +80,7 @@ type Part = {
   type: string;
   text?: string;
   state?: string;
+  input?: unknown;
   output?: unknown;
 };
 
@@ -107,9 +125,73 @@ function footerDate(iso: string): string {
   return `${FOOTER_MONTHS[Number(m[2]) - 1] ?? m[2]} ${Number(m[3])}, ${m[1]}`;
 }
 
+const CATEGORY_PLURAL: Record<string, string> = {
+  SUV: "SUVs",
+  Sedan: "sedans",
+  Pickup: "pickups",
+};
+
+interface TurnStep {
+  id: string;
+  label: string;
+  status: "active" | "done";
+}
+
+/**
+ * Real reasoning steps from the tool-call parts in the stream (task
+ * 028, part 3). A step appears when its first tool call starts and
+ * ticks to done when every call of that kind has its result. No timers.
+ */
+function turnSteps(parts: Part[]): TurnStep[] {
+  const groups: { id: string; label: string; parts: Part[] }[] = [];
+  const rank = parts.filter((p) => p.type === "tool-rank_category");
+  const local = parts.filter((p) => p.type === "tool-local_units");
+  const own = parts.filter((p) => p.type === "tool-ownership_math");
+  if (rank.length > 0) {
+    const input = rank[0]?.input as { category?: string } | undefined;
+    const output = rank.find((p) => p.state === "output-available")
+      ?.output as RankOutput | undefined;
+    const category = output?.category ?? input?.category;
+    const plural = category ? (CATEGORY_PLURAL[category] ?? category) : null;
+    groups.push({
+      id: "rank",
+      label: plural
+        ? `Ranking gas ${plural} by 5-year resale`
+        : "Ranking picks by 5-year resale",
+      parts: rank,
+    });
+  }
+  if (local.length > 0) {
+    const input = local[0]?.input as { zip?: string } | undefined;
+    const output = local.find((p) => p.state === "output-available")
+      ?.output as LocalOutput | undefined;
+    const zip = output?.zip ?? input?.zip;
+    groups.push({
+      id: "local",
+      label: zip ? `Finding units near ${zip}` : "Finding units near you",
+      parts: local,
+    });
+  }
+  if (own.length > 0) {
+    groups.push({
+      id: "own",
+      label: "Working out payments and walk-away costs",
+      parts: own,
+    });
+  }
+  return groups.map((g) => ({
+    id: g.id,
+    label: g.label,
+    status: g.parts.every(
+      (p) => p.state === "output-available" || p.state === "output-error",
+    )
+      ? "done"
+      : "active",
+  }));
+}
+
 export default function Home() {
   const { messages, sendMessage, status, error } = useChat();
-  const [input, setInput] = useState("");
   const [aprText, setAprText] = useState<string | null>(null);
   const [walk, setWalk] = useState<WalkSelection | null>(null);
   const busy = status === "submitted" || status === "streaming";
@@ -141,11 +223,15 @@ export default function Home() {
     }
   }
 
-  function onSubmit(e: FormEvent) {
-    e.preventDefault();
-    const text = input.trim();
-    if (!text || busy) return;
-    setInput("");
+  const lastAssistant = [...messages]
+    .reverse()
+    .find((m) => m.role === "assistant");
+  const steps = busy
+    ? turnSteps((lastAssistant?.parts ?? []) as Part[])
+    : [];
+
+  function send(text: string) {
+    if (!text.trim() || busy) return;
     setWalk(null);
     void sendMessage({ text });
   }
@@ -192,120 +278,151 @@ export default function Home() {
         ) : (
           <>
             {messages.length === 0 ? (
-              <div className="opening">
-                <h1 className="opening-title">Get a car without regret.</h1>
-                <p>Tell me your ZIP and whether you need a sedan, an SUV or a pickup. I&apos;ll show you the new gas cars near you that hold their value best, what each costs a month, and what it would cost you to change your mind.</p>
-                <p className="hint">No ads · No sign-up · Not paid by dealers.</p>
+              <div className="rounded-xl border border-border bg-card p-5">
+                <RevealText
+                  as="h1"
+                  text="Get a car without regret."
+                  className="block text-[30px] leading-[1.15] font-semibold tracking-[-0.02em] text-balance"
+                />
+                <Typography variant="paragraph-md" className="mt-3">
+                  Tell me your ZIP and whether you need a sedan, an SUV or a pickup. I&apos;ll show you the new gas cars near you that hold their value best, what each costs a month, and what it would cost you to change your mind.
+                </Typography>
+                <Typography variant="paragraph-sm" className="mt-2 text-muted-foreground">
+                  No ads · No sign-up · Not paid by dealers.
+                </Typography>
               </div>
             ) : null}
 
-            {messages.map((message) => {
-              const parts = (message.parts ?? []) as Part[];
-              const ranks: RankOutput[] = [];
-              const ownershipByModel = new Map<string, OwnershipOutput>();
-              const localByModel = new Map<string, LocalOutput>();
-              for (const part of parts) {
-                if (!part.type.startsWith("tool-") || part.state !== "output-available") continue;
-                const name = toolName(part.type);
-                if (name === "rank_category") ranks.push(part.output as RankOutput);
-                if (name === "ownership_math") {
-                  const out = part.output as OwnershipOutput & { make?: string | null };
-                  if (out.model) ownershipByModel.set(modelKey(out.model, out.make), out);
+            <MessageGroup>
+              {messages.map((message) => {
+                const parts = (message.parts ?? []) as Part[];
+                const ranks: RankOutput[] = [];
+                const ownershipByModel = new Map<string, OwnershipOutput>();
+                const localByModel = new Map<string, LocalOutput>();
+                for (const part of parts) {
+                  if (!part.type.startsWith("tool-") || part.state !== "output-available") continue;
+                  const name = toolName(part.type);
+                  if (name === "rank_category") ranks.push(part.output as RankOutput);
+                  if (name === "ownership_math") {
+                    const out = part.output as OwnershipOutput & { make?: string | null };
+                    if (out.model) ownershipByModel.set(modelKey(out.model, out.make), out);
+                  }
+                  if (name === "local_units") {
+                    const out = part.output as LocalOutput & { make?: string | null };
+                    if (out.model) localByModel.set(modelKey(out.model, out.make), out);
+                  }
                 }
-                if (name === "local_units") {
-                  const out = part.output as LocalOutput & { make?: string | null };
-                  if (out.model) localByModel.set(modelKey(out.model, out.make), out);
-                }
-              }
-              const texts = parts.filter((p) => p.type === "text" && p.text);
-              return (
-                <div key={message.id} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  {texts.map((part, i) => (
-                    <div key={i} className={`bubble ${message.role === "user" ? "user" : "assistant"}`}>
-                      {part.text}
-                    </div>
-                  ))}
-                  {ranks.map((rank, ri) => {
-                    const shown = [...rank.picks];
-                    const commodity = rank.commodity;
-                    const badged = commodity
-                      ? shown.some((p) => p.model === commodity.model)
-                      : true;
-                    if (commodity && !badged) shown.push({ ...commodity });
-                    const entries = shown.map((pick) => ({
-                      pick: {
-                        ...pick,
-                        flag:
-                          commodity && pick.model === commodity.model
-                            ? commodity.flag
-                            : pick.flag,
-                      },
-                      ownership: ownershipByModel.get(modelKey(pick.model, pick.make)),
-                    }));
-                    const closing = closingLine(entries, rank.category);
-                    return (
-                      <div key={ri}>
-                        {entries.map(({ pick, ownership }) => (
-                          <PickCard
-                            key={`${pick.make}-${pick.model}`}
-                            pick={pick}
-                            ownership={ownership}
-                            local={localByModel.get(modelKey(pick.model, pick.make))}
-                            peers={shown}
-                            category={rank.category}
-                            onWalkAway={
-                              ownership
-                                ? () =>
-                                    setWalk({
-                                      pick,
-                                      ownership,
-                                      aprText:
-                                        ownership.aprLabel ??
-                                        aprText ??
-                                        `${ownership.aprPercent}% APR`,
-                                    })
-                                : undefined
-                            }
-                          />
-                        ))}
-                        {closing ? (
-                          <div className="bubble assistant closing-line">{closing}</div>
-                        ) : null}
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
+                const texts = parts.filter((p) => p.type === "text" && p.text);
+                const isUser = message.role === "user";
+                return (
+                  <Message key={message.id} align={isUser ? "end" : "start"}>
+                    <MessageContent>
+                      {texts.map((part, i) =>
+                        isUser ? (
+                          <MessageBubble key={i} variant="primary">
+                            {part.text}
+                          </MessageBubble>
+                        ) : (
+                          <MessageBubble key={i} variant="default">
+                            <StreamingText text={part.text ?? ""} speed={36} />
+                          </MessageBubble>
+                        ),
+                      )}
+                      {ranks.map((rank, ri) => {
+                        const shown = [...rank.picks];
+                        const commodity = rank.commodity;
+                        const badged = commodity
+                          ? shown.some((p) => p.model === commodity.model)
+                          : true;
+                        if (commodity && !badged) shown.push({ ...commodity });
+                        const entries = shown.map((pick) => ({
+                          pick: {
+                            ...pick,
+                            flag:
+                              commodity && pick.model === commodity.model
+                                ? commodity.flag
+                                : pick.flag,
+                          },
+                          ownership: ownershipByModel.get(modelKey(pick.model, pick.make)),
+                        }));
+                        const closing = closingLine(entries, rank.category);
+                        return (
+                          <div key={ri} className="w-full">
+                            {entries.map(({ pick, ownership }) => (
+                              <PickCard
+                                key={`${pick.make}-${pick.model}`}
+                                pick={pick}
+                                ownership={ownership}
+                                local={localByModel.get(modelKey(pick.model, pick.make))}
+                                peers={shown}
+                                category={rank.category}
+                                onWalkAway={
+                                  ownership
+                                    ? () =>
+                                        setWalk({
+                                          pick,
+                                          ownership,
+                                          aprText:
+                                            ownership.aprLabel ??
+                                            aprText ??
+                                            `${ownership.aprPercent}% APR`,
+                                        })
+                                    : undefined
+                                }
+                              />
+                            ))}
+                            {closing ? (
+                              <MessageBubble variant="default">{closing}</MessageBubble>
+                            ) : null}
+                          </div>
+                        );
+                      })}
+                    </MessageContent>
+                  </Message>
+                );
+              })}
+            </MessageGroup>
 
-            {busy ? <div className="status-line">Looking at the picks…</div> : null}
-            {error ? <div className="error-line">Something went wrong. Please try again.</div> : null}
+            {busy ? (
+              steps.length > 0 ? (
+                <ReasoningSteps defaultOpen>
+                  <ReasoningStepsTrigger />
+                  <ReasoningStepsContent>
+                    {steps.map((s) => (
+                      <ReasoningStep key={s.id} label={s.label} status={s.status} />
+                    ))}
+                  </ReasoningStepsContent>
+                </ReasoningSteps>
+              ) : (
+                <ThinkingIndicator words={["Thinking"]} className="text-sm" />
+              )
+            ) : null}
+            {error ? (
+              <div role="alert" className="text-sm text-destructive">
+                Something went wrong. Please try again.
+              </div>
+            ) : null}
           </>
         )}
       </div>
 
-      <div className="composer">
-        <form onSubmit={onSubmit}>
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="e.g. 60614, SUV"
-            aria-label="ZIP and car type"
-          />
-          <button type="submit" disabled={busy || !input.trim()}>
-            Send
-          </button>
-        </form>
-        <div className="assumptions">
+      <div className="sticky bottom-0 border-t border-border bg-background py-3">
+        <AIInput
+          placeholder="e.g. 60614, SUV"
+          showMessages={false}
+          disabled={busy}
+          onSend={(message) => send(message)}
+        />
+        <Typography variant="paragraph-xs" className="mt-2 text-muted-foreground">
           Payment assumes 10% down, 60 months
           {aprText ? <>, {aprText}</> : null} — say “my rate is 5.9%” in the chat to change it. Insurance and repairs are extra.
-          {footerMeta ? (
-            <div>
-              Rankings from {footerMeta.soldVehicles.toLocaleString("en-US")} sold
-              vehicles, as of {footerDate(footerMeta.providerAsOf)} · Local stock live.
-            </div>
-          ) : null}
-        </div>
+        </Typography>
+        {footerMeta ? (
+          <Typography variant="paragraph-xs" className="mt-1 text-muted-foreground">
+            Rankings from {footerMeta.soldVehicles.toLocaleString("en-US")} sold
+            vehicles, as of {footerDate(footerMeta.providerAsOf)} · Local stock live.
+          </Typography>
+        ) : null}
       </div>
     </main>
   );
