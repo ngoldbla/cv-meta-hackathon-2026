@@ -1,7 +1,7 @@
 ---
 id: "035"
 title: "Low Key: dark-mode segment colours and a \"cheapest to own\" tag in the comparison"
-status: open
+status: in_progress
 created: 2026-11-03
 report: ops/reports/035-lowkey-chart-polish.md
 ---
