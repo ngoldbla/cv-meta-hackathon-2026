@@ -1,7 +1,7 @@
 ---
 id: "028"
 title: "Low Key: rebuild the whole UI on Iconiq UI, using its AI blocks"
-status: in_progress
+status: done
 created: 2026-11-03
 report: ops/reports/028-lowkey-iconiq-ui.md
 ---

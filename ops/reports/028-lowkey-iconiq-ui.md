@@ -1,9 +1,9 @@
 # Report 028: Low Key: rebuild the whole UI on Iconiq UI, using its AI blocks
-Status: in_progress
-Branch head at start: b1fde816657851c2981df41f8d33d5b9e1cdc563  ·  at finish: (pending)
+Status: done
+Branch head at start: b1fde816657851c2981df41f8d33d5b9e1cdc563  ·  at finish: 80e3d64f21fcc1b0db64af1113dd3a860b12a9a1
 
 ## Summary
-In progress. Rebuilding the Low Key UI on Iconiq UI (AI blocks first) on branch `low-key` only, keeping behaviour, data and the words from tasks 026 and 027.
+Done. The whole Low Key UI now runs on Iconiq UI (Tailwind + shadcn copies in `components/ui/`), AI blocks first: Iconiq composer, message bubbles, reasoning steps fed only by real tool calls, thinking/streaming text, and the opening on typography + reveal-text. Pick cards and walk-away use Iconiq card/badge/status-dot/rolling-digits/slider/table (+ drawer on phones, task-026 SVG chart kept on theme tokens). Three Hairline line cars (Roller concept) sit on the Sedan/SUV/Pickup buttons and on every card. Behaviour, data and words from tasks 026/027 are unchanged; one deployed `60614, SUV` turn takes 1.00 s end to end (task 027: 0.86 s, within the allowed 1 s).
 
 ## Work done
 - Claimed this task: set `ops/tasks/028-lowkey-iconiq-ui.md` to `in_progress` and created this report (branch `low-key` only; inbox `git checkout main` step not followed per task instruction and session constraint — same approved deviation as tasks 022–027).
@@ -19,11 +19,25 @@ In progress. Rebuilding the Low Key UI on Iconiq UI (AI blocks first) on branch 
 
 - Part 6 (this commit): accessibility and motion pass. `MotionConfig reducedMotion="user"` wraps the app (RollingDigits/Card/Slider springs settle at once); Message, StreamingText, ThinkingIndicator, ReasoningSteps, RevealText and the AIInput wave already honour `useReducedMotion`, and Hairline cars never `play`. Touch targets: send (44 px), body buttons (figures + label, >100 px), walk back/close (44 px), “If I change my mind” and the walk-away summary (44 px), slider lg hit area (56 px), “See the car” links padded to 44 px hit height. Visible brass `:focus-visible` outline is un-layered so it survives component `outline-none`s. Dead pre-Iconiq CSS (bubbles/opening/composer) pruned. Build passes; app tests 64 passed.
 
+- Fixes after first deployed screenshots: Hairline figures were 0×0 inside the toggle items (percentage width in a shrink-wrapped span) — sized explicitly (`dd5ec93`); then stacked figure over label in one column (`80e3d64`). Style-only fixes, no logic change; the app has no DOM test harness, so no maintained test was added for them (verified by the re-taken deployed screenshots below).
+- Final checks (this commit): clean `npm ci && npm run build` passes; app tests, `pytest`, and both guards pass (below). One deployed `60614, SUV` turn with reasoning steps ticking, cards and the walk slider (dragged to month ~45) exercised in a real browser at 390 px; screenshots under `~/.cache/low-key/screens/028/` (not in git). PinchTab 0.15.2 has no viewport control, so the 390 px captures use headless Chrome directly (same browser binary).
+
 ## Results
-Pending (final checks).
+| Check | Result |
+|---|---|
+| `npm ci && npm run build` (clean) | Pass (Next 16.4.4, `/`, `/api/chat`, `/api/apr`) |
+| App tests (`npm test`) | 64 passed (7 files) |
+| `pytest -q` | 154 passed, 1 skipped |
+| `scripts/name_guard.py` | Pass (no output) |
+| `scripts/secret_guard.py --all` | Clean |
+
+Deployed turn `60614, SUV` (https://low-key-murex.vercel.app/api/chat, streamed): rank output at 0.86 s, first ownership (first card) output at 0.98 s, full stream 1.00 s. Task 027 for the same turn: first card 0.83 s, full 0.86 s — +0.15 s / +0.14 s, inside the allowed 1 s. No sideways scroll at 390 px (`scrollWidth` 390). Screenshots (390×844, not in git): `~/.cache/low-key/screens/028/01-opening.png` (headline, value line, three car buttons), `02-running.png` (“Ranking gas SUVs by 5-year resale” ticked while running), `03-cards.png` (badges, in-stock dot, walk link), `04-walkaway.png` (drawer, chart, slider dragged). Spend: two uncached provider ZIP turns for screenshots plus cached repeats (≈3¢ at task-027 search rates, under the $0.25 task / $0.50 Muse caps; Muse $0 — fast path only).
 
 ## Deviations
 - Inbox sync step not followed (see above); synced `origin/low-key` instead.
+- `ai-input` copied from its registry JSON (pinned CLI 4.23.0 mis-resolves its un-namespaced `b-switch` dependency; dry-run verified, same bytes — part 3).
+- Iconiq `charts` (Recharts) not installed; task-026 SVG kept on theme tokens (part 4). `dialog` not installed; `drawer` covers the mobile walk-away.
+- Hairline figures run on the pinned 0.5.1 core copied into the app (package exports no custom-figure mount in 0.5.1 — part 5). No maintained test for the two CSS-only button fixes (no DOM harness in the app).
 
 ## Blocked / questions
-None yet.
+- Hairline tour stops were not judged (no reader available); the three bench pages and look sheets stay in `~/.cache/low-key/hairline-work/` if Dylan wants the play-tour read.
