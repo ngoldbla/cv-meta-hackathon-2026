@@ -3,7 +3,7 @@
 *Status: draft for review, 2026-11-02. Owner: Dylan Goldblatt. Branch `low-key`. The mockup comes first; no product code is written until Dylan approves it.*
 
 ## One line
-Low Key is a chat that tells someone who needs a car now which new gas car to buy nearby, what it costs per month, and what it would cost them to walk away from it at any point. No ads, no forms, no shopping.
+**Get a car without regret.** Low Key is a chat that tells someone who needs a car now which new gas car to buy nearby, what it costs per month, and what it would cost them to walk away from it at any point. No ads, no forms, no shopping.
 
 ## What "low key" means
 1. **A low-key experience.** One question (your ZIP), a few answers, a clear recommendation. Nothing gets in the way.
@@ -52,7 +52,7 @@ The pitch in one sentence: *"If you change your mind after a year, leaving costs
 **Note:** some expected winners may not qualify. I believe Toyota's newest Camry is hybrid-only; preflight P5 checks this. If it's true, it is not in the sedan list. The data decides.
 
 ## What the user sees
-1. **The chat opens with one question:** "What's your ZIP, and do you need a sedan, an SUV or a pickup?"
+1. **The chat opens with the goal, then one question** (Dylan, 2026-11-03): the headline **"Get a car without regret."**, one sentence on what Low Key will show (the cars near you that hold their value best, what each costs a month, and what it would cost to change your mind), then "What's your ZIP, and do you need a sedan, an SUV or a pickup?"
 2. **Lineup rules (Dylan, 2026-11-03):**
    - **Four ranked picks per category** (Dylan, 2026-11-03; was two): #1–#4 by 5-year resale.
    - **More than one brand in every lineup:** no make may hold more than 2 of the 4 slots. When a third model of the same make would qualify, it is skipped for the next-best model of another make.
