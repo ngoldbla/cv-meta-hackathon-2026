@@ -17,10 +17,15 @@ export const metadata: Metadata = {
     "A chat that tells you which new gas car to buy nearby, what it costs per month, and what walking away would cost. No ads, no sign-up.",
 };
 
+const THEME_SCRIPT = `(function(){try{var m=window.matchMedia("(prefers-color-scheme: dark)");var apply=function(){document.documentElement.classList.toggle("dark",m.matches)};apply();if(m.addEventListener){m.addEventListener("change",apply)}}catch(e){}})();`;
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        {children}
+      </body>
     </html>
   );
 }

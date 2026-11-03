@@ -3,35 +3,160 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted-surface);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-brass: var(--brass);
+  --color-brass-foreground: var(--brass-foreground);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+/* Low Key palette on Iconiq theme tokens (task 028, part 2).
+   Light: ground #F3F2EE, card #FFFFFF, ink #1B1C1E, muted #5A5C60,
+   line #DAD8D1, brass #7A5A10. Dark uses the same tokens. */
 :root {
-  --ground: #f3f2ee;
+  --background: #f3f2ee;
+  --foreground: #1b1c1e;
+  --primary: #1b1c1e;
+  --primary-foreground: #ffffff;
+  --secondary: #5a5c60;
+  --secondary-foreground: #ffffff;
+  --border: #dad8d1;
   --card: #ffffff;
-  --ink: #1b1c1e;
-  --muted: #5a5c60;
-  --line: #dad8d1;
+  --card-foreground: #1b1c1e;
+  --muted-surface: #eceae4;
+  --muted-foreground: #5a5c60;
+  --accent: #efe6cc;
+  --accent-foreground: #1b1c1e;
+  --input: #dad8d1;
+  --ring: rgba(122, 90, 16, 0.55);
+  --destructive: #8a1f1f;
+  --popover: #ffffff;
+  --popover-foreground: #1b1c1e;
   --brass: #7a5a10;
+  --brass-foreground: #ffffff;
+  --chart-1: #7a5a10;
+  --chart-2: #1b1c1e;
+  --chart-3: #a67c2e;
+  --chart-4: #c9b458;
+  --chart-5: #5a5c60;
+  --radius: 0.75rem;
+  color-scheme: light;
+  /* Legacy aliases (removed as components are rebuilt). */
+  --ground: var(--background);
+  --ink: var(--foreground);
+  --muted: var(--muted-foreground);
+  --line: var(--border);
 }
 
+.dark {
+  --background: #17181a;
+  --foreground: #f3f2ee;
+  --primary: #f3f2ee;
+  --primary-foreground: #1b1c1e;
+  --secondary: #c9c6bc;
+  --secondary-foreground: #1b1c1e;
+  --border: #3a3b3e;
+  --card: #232426;
+  --card-foreground: #f3f2ee;
+  --muted-surface: #2a2b2d;
+  --muted-foreground: #a9a7a1;
+  --accent: #3a3320;
+  --accent-foreground: #f3f2ee;
+  --input: #3a3b3e;
+  --ring: rgba(217, 185, 106, 0.6);
+  --destructive: #e9a198;
+  --popover: #232426;
+  --popover-foreground: #f3f2ee;
+  --brass: #d9b96a;
+  --brass-foreground: #1b1c1e;
+  --chart-1: #d9b96a;
+  --chart-2: #f3f2ee;
+  --chart-3: #bfa15a;
+  --chart-4: #8a7a3a;
+  --chart-5: #a9a7a1;
+  color-scheme: dark;
+}
+
+/* Iconiq components embed their default --ic-* tokens inline. These
+   un-layered rules remap every --ic-* token to the Low Key palette
+   centrally, so no component needs per-component colour overrides.
+   Un-layered author CSS wins over Tailwind's layered utilities. */
 * {
-  box-sizing: border-box;
+  --ic-background: var(--background);
+  --ic-foreground: var(--foreground);
+  --ic-primary: var(--primary);
+  --ic-secondary: var(--secondary);
+  --ic-surface-border: var(--border);
+  --ic-border: var(--border);
+  --ic-card: var(--card);
+  --ic-card-foreground: var(--card-foreground);
+  --ic-muted: var(--muted-surface);
+  --ic-muted-foreground: var(--muted-foreground);
+  --ic-accent: var(--accent);
+  --ic-accent-foreground: var(--accent-foreground);
+  --ic-input: var(--input);
+  --ic-ring: var(--ring);
+  --ic-destructive: var(--destructive);
+  --ic-paper: var(--card);
+  --ic-popover-foreground: var(--popover-foreground);
+  --ic-brand: var(--brass);
+  --ic-brand-soft: var(--accent);
+  --ic-chart-1: var(--chart-1);
+  --ic-chart-2: var(--chart-2);
+  --ic-chart-3: var(--chart-3);
+  --ic-chart-4: var(--chart-4);
+  --ic-chart-5: var(--chart-5);
 }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  background: var(--ground);
-  color: var(--ink);
-  font-family: "IBM Plex Sans", system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
+@layer base {
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
 
-a {
-  color: var(--brass);
+  a {
+    color: var(--brass);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--brass);
+    outline-offset: 2px;
+  }
 }
 
 .mono {
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
 
@@ -193,7 +318,7 @@ a {
 }
 
 .error-line {
-  color: #8a1f1f;
+  color: var(--destructive);
   font-size: 13px;
   padding: 4px 0;
 }
@@ -202,4 +327,12 @@ a {
   color: var(--muted);
   font-size: 12px;
   margin-top: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
 }
