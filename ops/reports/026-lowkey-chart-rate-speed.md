@@ -1,15 +1,16 @@
 # Report 026: Low Key: worth-vs-owe chart, Federal Reserve loan rate, code-written summary, faster first cards
-Status: in_progress
+Status: done
 Branch head at start: 899f20bbcb591ee074d1ea428afe362caf9ba88c  ·  at finish: (this commit)
 
 ## Summary
-In progress.
+Done. `ownership_math` now returns the 61-point worth-vs-owe curve, `evenMonth` and the `{getBack, costPerMonth}` table; every card carries a hand-written mini chart and a code-written sentence, and "If I change my mind" opens the full mockup chart with a working slider. The default rate is the Federal Reserve 60-month average (7.54%, Aug 2026, 1-day cache, 8.0% "assumed" fallback), and a ZIP+category fast path serves the first cards in ~0.2–0.5 s deployed (was 16–23 s), with `reasoning: "minimal"` on the remaining model path. App tests 46 passed; `pytest` 154 passed, 1 skipped; guards clean; live commit 59f6b31 verified at https://low-key-murex.vercel.app.
 
 ## Work done
 - Stayed on branch `low-key` throughout (fetched and pulled `origin/low-key`; head 899f20b at start). The inbox skill's `git checkout main` step was not followed, per this task's "Branch: `low-key` only" and the session instruction to work only on `low-key` — the same approved deviation as tasks 022–025.
 - Claimed this task (commit `Start task 026`): set `ops/tasks/026-lowkey-chart-rate-speed.md` to `in_progress` and created this report.
 - Parts 1–4 + chart (commit a06c8a5): `ownership_math` curve/evenMonth/table, FRED rate, code-written summary, full + mini charts. `npm ci && npm run build` and app tests pass before the push (see Results).
-- Part 5 (this commit): reasoning-effort probe, `reasoning: "minimal"` on the model path, and the ZIP+category fast path. Timings below; deployed "after" runs follow the push.
+- Part 5 (commit 59f6b31): reasoning-effort probe, `reasoning: "minimal"` on the model path, and the ZIP+category fast path. Deployed "after" runs measured post-push (below).
+- Finish (this commit): report, journal entry and task status only (no `lowkey/app` change). Final checks: `npm ci && npm run build` + app tests, `pytest -q`, `scripts/name_guard.py`, `scripts/secret_guard.py --all`.
 
 ## Results
 - **`ownership_math` (part 1):** added `curve` (61 points, months 0–60, `{month, resale, balance}` from `resaleAt`/`balanceAt`), `monthly` (per-month walk-away detail for the slider), `evenMonth` (first month resale ≥ balance; `underwaterMonth` kept as alias) and walk-away entries `{month, getBack, costPerMonth}` (`getBack` = resale − balance, `costPerMonth` = walk-away cost ÷ month; `walkAwayCost`/`perMonth`/`equity` kept alongside). Sample check ($33,000, 10% down, 8.0% APR, 60 months, retention 0.629): `evenMonth` 7, `getBack` at 36 $10,099 (task ≈ $10,118, within $35), `costPerMonth` at 60 $311. App tests after parts 1–4: **43 passed** (was 18).
@@ -17,10 +18,13 @@ In progress.
 - **Summary (part 4, code):** `lib/summary.ts` builds each card sentence and the closing line from tool results only (template + unit tests against fixtures).
 - **Chart (part 2, code):** hand-written SVG in `components/WorthChart.tsx` (gold `#7A5A10` solid worth, ink `#1B1C1E` dashed owe, warm underwater fill, green yours fill, crossing dot), full view `components/WalkAwayView.tsx` with native range slider (months 1–60, default 36), dark two-sentence box and three-column table matching the mockup; mini chart on every card labelled "Underwater for N months".
 - **Speed (part 5):** lower reasoning effort **is** supported. Probe of `muse-spark-1.3` (tiny "OK" prompt): `reasoning_effort: "none"` is rejected (supported: minimal, low, medium, high, xhigh, max); `minimal` cut reasoning to 5–74 tokens / 0.6–0.9 s vs baseline 158–188 tokens / 1.7–1.9 s (`low` ≈ baseline). On a stub-tool "60614, SUV" turn: default 14.31 s total (1,901 reasoning tokens) vs `minimal` 5.46 s (339 reasoning), tools correct both times. The model path now sends `reasoning: "minimal"`, but the fast path was still added because the deployed model path measured over target (below), so **the fast path was needed**: a first message with ZIP + category calls `rank_category`, `ownership_math` and `local_units` directly in parallel and streams tool-result parts with the code-written summary; follow-ups still use the model (verified: "$5k down on the CR-V" → `ownership_math` at 7.54% in 9.9 s local).
-- **Timings for "60614, SUV"** (server stream: first `ownership_math` output = first card; stream end = full answer; 3 runs each). Before (model path): local first card 12.29 / 12.63 / 23.11 s, full 39.33 / 37.01 / 48.01 s; deployed first card 22.60 / 20.44 / 16.19 s, full 54.46 / 59.89 / 49.42 s. After (fast path): local first card = full **0.09 / 0.02 / 0.01 s** (FRED cache warm). Deployed after: pending post-push measurement.
+- **Timings for "60614, SUV"** (server stream: first `ownership_math` output = first card; stream end = full answer; 3 runs each). Before (model path): local first card 12.29 / 12.63 / 23.11 s, full 39.33 / 37.01 / 48.01 s; deployed first card 22.60 / 20.44 / 16.19 s, full 54.46 / 59.89 / 49.42 s. After (fast path): local first card = full **0.09 / 0.02 / 0.01 s** (FRED cache warm); deployed first card **0.53 / 0.22 / 0.21 s**, full **0.55 / 0.25 / 0.24 s** — well under the 15-second target. Commit live on the URL: **59f6b31** (fast timings + payload prove it; homepage HTTP 200). Deployed payload check: 5 `ownership_math` + 5 `local_units` results, `curve` length 61, CR-V `evenMonth` 6 at 7.54%, so the cards render with charts.
+- **Checks:** `npm ci && npm run build` succeeds (routes `/`, `/api/apr`, `/api/chat`); app tests **46 passed** (ownership 19, fred 12, summary 7, fixtures 5, fastpath 3); `pytest -q` **154 passed, 1 skipped**; `scripts/name_guard.py` clean; `scripts/secret_guard.py --all` clean. Spark spend: probes ≈9k tokens plus 10 measured model turns (server logs 1.5k–15.4k each; the API reports tokens, not dollars — tracked in tokens as in tasks 023–025 against the $1.00 cap). No listings-provider calls; FRED/EIA free (EIA unused).
 
 ## Deviations
 - Inbox sync step not followed (see above); synced `origin/low-key` instead.
+- Sample `getBack` at 36 is $10,099 vs the task's ≈ $10,118 ($19, 0.2%): the task's 0.629 is the rounded form of 0.85 × 0.741 = 0.62985; computing from retail 0.741 reproduces $10,118 exactly. The code keeps the stated after-discount input (0.629) and the test allows $35.
+- Deployed chart confirmation is via the `/api/chat` stream payload (curves present for all 5 cards) plus build/tests, not a browser screenshot; the slider is a native range input whose sentences read the server-computed `monthly` table.
 
 ## Blocked / questions
-- None yet.
+- Nothing blocked. For Dylan: (1) The fast path answers only a first-turn ZIP+category (follow-ups, including a category switch on turn 2, still pay model latency with `minimal` reasoning, ~10 s locally) — extend it to later turns, or keep the model there? (2) Card sentences use the after-discount retention (CR-V "Keeps 63%…"); the task example phrases retail retention ("Keeps 74%…") — confirm which percentage the card should quote.
