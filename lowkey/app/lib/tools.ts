@@ -185,7 +185,7 @@ export const rankCategoryTool = tool({
 
 export const ownershipMathTool = tool({
   description:
-    "Return the monthly payment (sales tax for the ZIP's state financed into the loan), the 61-point worth-vs-owe curve, walk-away costs at 6, 12, 24, 36 and 60 months, and the even (above-water) month. Pass model (the exact model string from rank_category) and zip so the server prices the cheapest local unit, or the typical price when there is no local unit. Omit apr to use the Federal Reserve average; pass apr only when the user states their own rate. Deterministic; never estimate these numbers in text.",
+    "Return the monthly payment (sales tax for the ZIP's state financed into the loan), the 61-point equity curve (resale, balance, equity), walk-away costs at 6, 12, 24, 36 and 60 months, and positiveEquityMonth (the first month the car is worth more than the loan). Pass model (the exact model string from rank_category) and zip so the server prices the cheapest local unit, or the typical price when there is no local unit. Omit apr to use the Federal Reserve average; pass apr only when the user states their own rate. Deterministic; never estimate these numbers in text.",
   inputSchema: z.object({
     price: z.number().positive().optional(),
     down: z.number().nonnegative().optional(),

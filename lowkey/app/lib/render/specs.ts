@@ -239,7 +239,7 @@ function modelLabel(pick: SpecPick): string {
 
 /**
  * One PickCard spec per pick. Children follow the mockup order
- * (CostBars, LifespanTrack, UnderwaterMini, DealerLine); a child is
+ * (CostBars, LifespanTrack, EquityMini, DealerLine); a child is
  * omitted when its tool output is missing.
  */
 export function buildPickCardSpec(
@@ -277,11 +277,11 @@ export function buildPickCardSpec(
   children.push(lifeId);
 
   if (ownership && ownership.curve.length > 0) {
-    const waterId = `${slug}-water`;
+    const waterId = `${slug}-equity`;
     elements[waterId] = {
-      type: "UnderwaterMini",
+      type: "EquityMini",
       props: {
-        evenMonth: positiveMonthOf(ownership),
+        positiveEquityMonth: positiveMonthOf(ownership),
         curve: ownership.curve.map((p) => ({
           month: p.month,
           resale: p.resale,

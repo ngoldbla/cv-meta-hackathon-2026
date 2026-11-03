@@ -323,7 +323,7 @@ export function checkPickCardSpec(spec: Spec, entry: SpecEntry): GuardResult {
     if (id === spec.root) continue;
     if (el.type === "CostBars") checkCostBars(c, spec, id, entry);
     else if (el.type === "LifespanTrack") checkLifespan(c, spec, id, entry);
-    else if (el.type === "UnderwaterMini") checkUnderwater(c, spec, id, entry);
+    else if (el.type === "EquityMini" || el.type === "UnderwaterMini") checkUnderwater(c, spec, id, entry);
     else if (el.type === "DealerLine") checkDealer(c, spec, id, entry);
     else c.fail(id, "unknown-type");
   }

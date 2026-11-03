@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/table";
 import { Typography } from "@/components/ui/typography";
 
+import { aboutUsd, equityHeadline } from "@/lib/summary";
+
 import { FullChart, type CurveLike } from "./WorthChart";
 
 export interface WalkAwayOwnership {
@@ -38,7 +40,8 @@ export interface WalkAwayOwnership {
     getBack: number;
     costPerMonth: number;
   }[];
-  evenMonth: number | null;
+  /** First month with positive equity (resale ≥ balance), or null. */
+  positiveEquityMonth: number | null;
 }
 
 export interface WalkAwayPick {
@@ -92,15 +95,8 @@ export default function WalkAwayView({
     ownership.monthly[ownership.monthly.length - 1];
   const getBack = detail?.getBack ?? 0;
   const costPerMonth = detail?.costPerMonth ?? 0;
-  const even = ownership.evenMonth;
-  const headline =
-    even === null
-      ? "Underwater for the whole term."
-      : even <= 0
-        ? "Never underwater. It's yours from day one."
-        : even === 1
-          ? "Underwater for 1 month. Then it's yours."
-          : `Underwater for ${even} months. Then it's yours.`;
+  const positiveMonth = ownership.positiveEquityMonth;
+  const headline = equityHeadline(positiveMonth);
   const downPct = Math.round((ownership.downPayment / ownership.price) * 100);
   const rankLabel = pick.rank ? `#${pick.rank} · ` : "";
   return (
@@ -130,22 +126,11 @@ export default function WalkAwayView({
       </Typography>
       <Card>
         <CardContent className="flex flex-col gap-2.5 pt-4">
-          <div className="flex flex-wrap gap-3.5 px-1 text-xs text-foreground/80" aria-hidden="true">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block h-[3px] w-[18px] rounded-sm bg-brass" />
-              Worth if sold
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block w-[18px] border-t-2 border-dashed border-foreground" />
-              You owe
-            </span>
-          </div>
           <div>
             <FullChart
               curve={ownership.curve}
-              evenMonth={even}
+              positiveEquityMonth={positiveMonth}
               selectedMonth={month}
-              selectedGetBack={getBack}
             />
           </div>
           <Slider
@@ -166,21 +151,21 @@ export default function WalkAwayView({
             <span className="text-base leading-[1.45]">
               {getBack >= 0 ? (
                 <>
-                  You walk away with{" "}
+                  About{" "}
                   <strong className="mono text-[#a9d3b3]">
                     $
-                    <RollingDigits value={Math.round(getBack)} locale="en-US" coalesceUpdates startOnView={false} />
+                    <RollingDigits value={aboutUsd(getBack)} locale="en-US" coalesceUpdates startOnView={false} />
                   </strong>{" "}
-                  after the loan is paid off.
+                  is yours after you sell and pay off the loan.
                 </>
               ) : (
                 <>
-                  You would still owe{" "}
-                  <strong className="mono text-[#e9b8a4]">
+                  You&apos;d owe about{" "}
+                  <strong className="mono text-[#c9c6bc]">
                     $
-                    <RollingDigits value={Math.round(-getBack)} locale="en-US" coalesceUpdates startOnView={false} />
+                    <RollingDigits value={aboutUsd(getBack)} locale="en-US" coalesceUpdates startOnView={false} />
                   </strong>{" "}
-                  to sell.
+                  to sell this early.
                 </>
               )}
             </span>
@@ -201,7 +186,7 @@ export default function WalkAwayView({
           <TableHeader>
             <TableRow variant="header">
               <TableHead>Sell at</TableHead>
-              <TableHead align="right">You get back</TableHead>
+              <TableHead align="right">Your equity</TableHead>
               <TableHead align="right">Cost per month</TableHead>
             </TableRow>
           </TableHeader>
@@ -220,7 +205,7 @@ export default function WalkAwayView({
           </TableBody>
         </Table>
         <Typography variant="paragraph-sm" className="text-muted-foreground">
-          A minus means you&apos;d owe to sell.
+          A minus means you&apos;d still owe something to sell.
         </Typography>
       </section>
       <Typography variant="paragraph-xs" className="text-muted-foreground">

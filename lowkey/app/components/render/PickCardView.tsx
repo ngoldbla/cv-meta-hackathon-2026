@@ -26,7 +26,7 @@ const KIND_BY_CATEGORY: Record<string, CarKind> = {
  * PickCard (task 034): the container. Badge, in-stock dot, Hairline
  * figure, model and trim, sentence, trim-step line, then its
  * children in the mockup's order (CostBars, LifespanTrack,
- * UnderwaterMini, DealerLine), then "If I change my mind".
+ * EquityMini, DealerLine), then "If I change my mind".
  */
 export function PickCardView({
   badgeLabel,

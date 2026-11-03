@@ -76,13 +76,13 @@ export const catalog = defineCatalog(schema, {
       description:
         "A 0-20 year track (widened past 20 when needed), dark for the loan years and gold after, with a marker at the expected lifespan. Null years renders the unrated state: an empty track and 'Lifespan: not yet rated'.",
     },
-    UnderwaterMini: {
+    EquityMini: {
       props: z.object({
-        evenMonth: z.number().nullable(),
+        positiveEquityMonth: z.number().nullable(),
         curve: z.array(curvePointSchema),
       }),
       description:
-        "The task-026 worth-vs-owe mini chart, wrapped: 61-point resale/balance curve from ownership_math with the even (above-water) month.",
+        "Single-line equity mini chart (task 039): 61-point equity curve (resale, balance, equity) from ownership_math with the positive-equity month; green fill above zero, muted band below.",
     },
     DealerLine: {
       props: z.object({
@@ -110,7 +110,7 @@ export const catalog = defineCatalog(schema, {
       }),
       slots: ["default"],
       description:
-        "Container for one pick: badge, in-stock dot, Hairline figure, model and trim, code-written sentence, trim-step line, then its children in mockup order (CostBars, LifespanTrack, UnderwaterMini, DealerLine), then 'If I change my mind'.",
+        "Container for one pick: badge, in-stock dot, Hairline figure, model and trim, code-written sentence, trim-step line, then its children in mockup order (CostBars, LifespanTrack, EquityMini, DealerLine), then 'If I change my mind'.",
     },
   },
   actions: {},

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/b-button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { effectiveMonthlyCost, lifespanRowText, monthlyBills } from "@/lib/costs";
 import type { SpecEntry } from "@/lib/render/specs";
-import { cardSentence, underwaterLabel } from "@/lib/summary";
+import { cardSentence, positiveEquityLabel } from "@/lib/summary";
 import { fmtUsd } from "./format";
 
 /**
@@ -64,7 +64,7 @@ export function TextFallback({
           </p>
           <p>Cost to drive: {effective !== null ? `${fmtUsd(effective)} a month` : "—"}</p>
           <p>Lifespan: {lifespanRowText(pick.lifespanYears)}</p>
-          <p>{ownership ? underwaterLabel(even) : "Worth vs owe: —"}</p>
+          <p>{ownership ? positiveEquityLabel(even) : "Equity: —"}</p>
         </div>
         {ownership && onWalkAway ? (
           <Button

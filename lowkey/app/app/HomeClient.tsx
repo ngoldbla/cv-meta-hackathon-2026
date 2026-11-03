@@ -123,6 +123,7 @@ interface OwnershipOutput {
   aprPercent: number;
   termMonths: number;
   monthlyPayment: number;
+  positiveEquityMonth?: number | null;
   evenMonth?: number | null;
   underwaterMonth?: number | null;
   curve?: CurveLike[];
@@ -192,6 +193,8 @@ function toSpecOwnership(o: OwnershipOutput | undefined): SpecOwnership | undefi
     monthlyPayment: o.monthlyPayment,
     aprPercent: o.aprPercent,
     termMonths: o.termMonths,
+    positiveEquityMonth:
+      o.positiveEquityMonth ?? o.evenMonth ?? o.underwaterMonth ?? null,
     evenMonth: o.evenMonth ?? o.underwaterMonth ?? null,
     underwaterMonth: o.underwaterMonth ?? null,
     curve: o.curve ?? [],
@@ -632,10 +635,11 @@ export default function HomeClient({
                 getBack: p.getBack ?? 0,
                 costPerMonth: p.costPerMonth ?? p.perMonth,
               })),
-              evenMonth:
-                walk.ownership.evenMonth !== undefined
-                  ? walk.ownership.evenMonth
-                  : (walk.ownership.underwaterMonth ?? null),
+              positiveEquityMonth:
+                walk.ownership.positiveEquityMonth ??
+                walk.ownership.evenMonth ??
+                walk.ownership.underwaterMonth ??
+                null,
             }}
             aprText={walk.aprText}
             onBack={() => setWalk(null)}
@@ -1096,10 +1100,11 @@ export default function HomeClient({
                     getBack: p.getBack ?? 0,
                     costPerMonth: p.costPerMonth ?? p.perMonth,
                   })),
-                  evenMonth:
-                    walk.ownership.evenMonth !== undefined
-                      ? walk.ownership.evenMonth
-                      : (walk.ownership.underwaterMonth ?? null),
+                  positiveEquityMonth:
+                    walk.ownership.positiveEquityMonth ??
+                    walk.ownership.evenMonth ??
+                    walk.ownership.underwaterMonth ??
+                    null,
                 }}
                 aprText={walk.aprText}
                 onBack={() => setWalk(null)}

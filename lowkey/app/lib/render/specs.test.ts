@@ -10,6 +10,7 @@ import {
   buildTurnSpecs,
   costBreakdown,
   type SpecEntry,
+  positiveMonthOf,
 } from "./specs";
 
 /** Tool-output fixtures: rank fixtures + real ownership maths. */
@@ -120,6 +121,31 @@ describe("spec builders + number guard (task 034)", () => {
       );
     });
   }
+
+  it("cards carry an EquityMini with the positive-equity month (task 039)", () => {
+    for (const category of CATEGORIES) {
+      for (const entry of entriesFor(category)) {
+        const spec = buildTurnSpecs(entriesFor(category), category).cards.get(entry.pick.model)!;
+        const els = Object.values(spec.elements);
+        expect(els.some((el) => el.type === "UnderwaterMini")).toBe(false);
+        const eq = els.find((el) => el.type === "EquityMini");
+        expect(eq).toBeDefined();
+        const props = eq!.props as { positiveEquityMonth: number | null; curve: { equity: number; resale: number; balance: number }[] };
+        expect(props.positiveEquityMonth).toBe(positiveMonthOf(entry.ownership!));
+        for (const pt of props.curve) expect(pt.equity).toBeCloseTo(pt.resale - pt.balance, 1);
+      }
+    }
+  });
+
+  it("the guard rejects a tampered positive-equity month (task 039)", () => {
+    const entries = entriesFor("SUV");
+    const entry = entries[0]!;
+    const spec = buildTurnSpecs(entries, "SUV").cards.get(entry.pick.model)!;
+    const id = Object.keys(spec.elements).find((k) => spec.elements[k]!.type === "EquityMini")!;
+    const props = spec.elements[id]!.props as { positiveEquityMonth: number | null };
+    props.positiveEquityMonth = (props.positiveEquityMonth ?? 0) + 3;
+    expect(checkPickCardSpec(spec, entry).ok).toBe(false);
+  });
 
   it("tags exactly the cheapest rows in the comparison (task 035)", () => {
     const entries = entriesFor("SUV");

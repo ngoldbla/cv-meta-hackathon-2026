@@ -10,7 +10,7 @@ import { CostCompareView } from "./CostCompare";
 import { DealerLineView } from "./DealerLine";
 import { LifespanTrackView } from "./LifespanTrack";
 import { PickCardView } from "./PickCardView";
-import { UnderwaterMiniView } from "./UnderwaterMini";
+import { EquityMiniView } from "./EquityMini";
 import { WalkAwayContext } from "./walk-context";
 
 /**
@@ -39,8 +39,11 @@ export const { registry } = defineRegistry(catalog, {
         source={props.source}
       />
     ),
-    UnderwaterMini: ({ props }) => (
-      <UnderwaterMiniView evenMonth={props.evenMonth} curve={props.curve} />
+    EquityMini: ({ props }) => (
+      <EquityMiniView
+        positiveEquityMonth={props.positiveEquityMonth}
+        curve={props.curve}
+      />
     ),
     DealerLine: ({ props }) => (
       <DealerLineView

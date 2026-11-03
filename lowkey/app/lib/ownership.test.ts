@@ -159,6 +159,15 @@ describe("ownershipMath curve, evenMonth and walk-away table (task 026)", () => 
     }
   });
 
+  it("equity points are resale − balance, and month 60 equity equals resale (task 039)", () => {
+    const r = ownershipMath({ price: 33000, down: 3300, apr: 8, term: 60, retention5y: 0.629 });
+    for (const p of r.curve) expect(p.equity).toBeCloseTo(p.resale - p.balance, 1);
+    const last = r.curve[60]!;
+    expect(last.balance).toBeCloseTo(0, 1);
+    expect(last.equity).toBeCloseTo(last.resale, 1);
+    expect(r.positiveEquityMonth).toBe(r.evenMonth);
+  });
+
   it("sample check: $33k, 10% down, 8% APR, 60 mo, retention 0.629", () => {
     const r = ownershipMath({ price: 33000, down: 3300, apr: 8, term: 60, retention5y: 0.629 });
     expect(r.evenMonth).toBe(7);
