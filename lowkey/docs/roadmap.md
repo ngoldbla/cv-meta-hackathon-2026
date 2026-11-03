@@ -5,9 +5,9 @@
 ## Used cars, 1–5 years old
 - **Which cars:**
   - model years 1–5 old;
-  - mileage up to about 15,000 a year of age;
+  - mileage up to 20,000 a year of age;
   - a clean title (no salvage, rebuilt, flood or lemon brand);
-  - no severe accident;
+  - **no reported accidents** and **one previous owner only** (Dylan, 2026-11-03);
   - what the listing data can't verify (smoking, the full history) is labelled "not checked by Low Key: ask the dealer" and goes into the deal sheet's questions.
 - **History and safety:**
   - the dealer's Carfax or AutoCheck link when the listing has one;
@@ -21,7 +21,7 @@
 - **Shopping both ways:**
   - a New | Used toggle;
   - on each card, "What about used?" or "What about new?" with the real monthly cost difference.
-- **Open questions:** minor accidents; one-owner and certified pre-owned as labels or filters; the mileage cap.
+- **Decided (Dylan, 2026-11-03):** no accidents, single owner only, at most 20,000 miles a year. Certified pre-owned is shown as a label.
 - **Preflight (P21):**
   - the used and certified listing fields;
   - sold data at ages 1–10, by mileage;
@@ -31,13 +31,12 @@
 - **Insurance (est.):**
   - the state's average full-coverage premium (NAIC), adjusted for inflation;
   - × a dampened model factor from HLDI insurance-loss data by make and model;
-  - an optional "Driver under 25?" choice (never sex), stored only on the device;
-  - shown as a range, with a switch to leave it out.
+  - an optional "Driver under 25?" checkbox (never sex), stored only on the device;
+  - shown as a range, included in the total by default, with an "Include insurance" checkbox to leave it out (Dylan liked the checkbox, 2026-11-03).
 - **Maintenance and repairs (est.):**
   - scheduled maintenance, tires and brakes;
   - repairs near zero under the factory warranty, then rising by age and the model's reliability.
   This matters most for used cars.
-- **Open questions:** whether insurance is in the total by default; the under-25 option.
 - **Preflight (P22):** the terms and coverage of NAIC, HLDI and the maintenance-cost sources.
 
 ## Popularity, calmly
