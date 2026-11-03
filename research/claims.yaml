@@ -154,3 +154,45 @@
   source: iSeeCars, How Many Miles Can a Car Last?, https://www.iseecars.com/car-lifespan-study (fetched 2026-11-03)
   verdict: overstated if used as an expected lifespan; covers only 20 models
   evidence: '"analyzed over two million cars produced and sold for at least 10 of the past 20 model years, ranking each model by its highest mileage-achieving cars"; "the top 1 percent of these vehicles delivered between 230,000 and 297,000 miles"; "this study isn''t reporting the maximum lifespan of these vehicles. This is simply a measure of current odometer readings." The figure is a 99th-percentile odometer reading, not a mean life, and none of Low Keys sedan/SUV ranked models except 4Runner, CR-V, Tacoma and Silverado 1500 appears in the relevant top-20/segment lists.'
+# Task 037 P19 (2026-11-03): vehicle sales-tax sources checked before the
+# Blob tax table was finalized. Fetched 2026-11-03.
+- id: lowkey037-taxfoundation-combined
+  claim: The Tax Foundation Midyear 2026 table gives, per state, the state sales-tax rate and a population-weighted average local rate whose sum is the published average combined rate (Illinois 6.25% + 2.73% = 8.98%)
+  source: Tax Foundation, State and Local Sales Tax Rates, Midyear 2026 (rates as of July 1, 2026), https://taxfoundation.org/data/all/state/2026-sales-tax-rates-midyear/ (fetched 2026-11-03)
+  verdict: supported (table arithmetic recomputed for all 51 rows)
+  evidence: 'Recomputed from the fetched table: IL 6.25 + 2.73 = 8.98, GA 4.00 + 3.56 = 7.56, NC 4.75 + 2.35 = 7.10, WA 6.50 + 3.07 = 9.57; each matches the published combined column. The averages are population-weighted general-sales-tax averages, so Low Key uses them only where local taxes apply to vehicles and labels the result an estimate.'
+- id: lowkey037-georgia-tavt
+  claim: Georgia charges no sales tax on vehicle purchases; it collects a one-time Title Ad Valorem Tax of 7% of fair market value at titling
+  source: Georgia Department of Revenue, Vehicle Taxes - Title Ad Valorem Tax (TAVT), https://dor.georgia.gov/vehicle-taxes-title-ad-valorem-tax-tavt-and-annual-ad-valorem-tax (accessed 2026-11-03)
+  verdict: supported
+  evidence: 'State source classifies the levy as TAVT instead of sales tax; the 7.0% standard rate (3% for new residents bringing a vehicle in) was corroborated against the DOR rate history (6.6% from Jan 2020 to Jun 2023, 7.0% from Jul 1, 2023). Low Key uses 7% on the price with fees as an FMV proxy and notes the simplification.'
+- id: lowkey037-nc-hut
+  claim: North Carolina collects a 3% highway use tax instead of sales tax on vehicles, with no cap for ordinary passenger vehicles
+  source: North Carolina DMV, Vehicle Taxes, https://www.ncdot.gov/dmv/title-registration/taxes/Pages/default.aspx (accessed 2026-11-03); N.C.G.S. 105-187.3
+  verdict: supported
+  evidence: 'NCDMV states North Carolina collects the highway-use tax instead of sales tax whenever a title is transferred. The $2,000 maximum in the statute covers only Class A/B commercial motor vehicles and recreational vehicles, so no cap is applied to the passenger cars Low Key prices.'
+- id: lowkey037-sc-imf
+  claim: South Carolina charges a 5% Infrastructure Maintenance Fee on vehicle sales, capped at $500, instead of sales tax
+  source: South Carolina DMV, Vehicle Owners Registration (IMF), https://dmv.sc.gov/Vehicle-Owners/Registration (accessed 2026-11-03); S.C. Code 56-3-627
+  verdict: supported
+  evidence: 'The fee is 5% of the purchase price (dealer) or fair market value (private sale) and maxes out at $500, so the cap binds on every app price over $10,000; the table models rate plus cap, not the uncapped percentage.'
+- id: lowkey037-no-state-tax
+  claim: Alaska, Delaware, Montana, New Hampshire and Oregon charge no state sales tax on cars
+  source: Tax Foundation Midyear 2026 (five states have no statewide sales tax), https://taxfoundation.org/data/all/state/2026-sales-tax-rates-midyear/ plus MT https://mvdmt.gov/, NH https://www.revenue.nh.gov/, OR https://www.oregon.gov/dor/programs/businesses/Pages/vehicle-privilege-and-use-taxes.aspx, DE https://revenue.delaware.gov/, AK https://tax.alaska.gov/ (accessed 2026-11-03)
+  verdict: supported (state tax only; other fees excluded by design)
+  evidence: 'Tax Foundation: "Five states have no statewide sales tax: Alaska, Delaware, Montana, New Hampshire, and Oregon. Of these, only Alaska allows localities to impose local sales taxes." Oregon separately levies a 0.5% dealer privilege/use tax on new vehicles and Delaware a 4.25% document fee; both are recorded as excluded notes in the table, and the card says "No state sales tax on cars in <state>."'
+- id: lowkey037-wa-vehicle-add
+  claim: Washington adds a motor-vehicle sales/lease tax on top of the general sales tax, 0.5% from January 1, 2026 (raised from 0.3%)
+  source: Washington Department of Revenue, Motor vehicle sales/use tax, https://dor.wa.gov/taxes-rates/other-taxes/motor-vehicle-salesuse-tax and Q1 2026 local-change notices (accessed 2026-11-03)
+  verdict: supported (current pages still showing 0.3% are stale)
+  evidence: 'DOR change notices state the five-tenths of one percent (.005) motor vehicle rate applies from January 1, 2026 under SB 5814 (from .003); the older industry-guide page still quoting 0.3% was not used. Table rate is state 6.50% + average local 3.07% + 0.50%.'
+- id: lowkey037-va-sut
+  claim: Virginia collects a 4.15% motor vehicle sales and use tax at titling on the gross sales price (minimum $75)
+  source: Virginia DMV, Motor Vehicle Sales and Use Tax, https://www.dmv.virginia.gov/vehicles/taxes-fees/sut (accessed 2026-11-03)
+  verdict: supported
+  evidence: '"Virginia is required to collect a 4.15% Sales and Use Tax (SUT) at the time of titling whenever a vehicle is sold"; "based on the vehicle''s gross sales price, or $75, whichever is greater". The $75 floor never binds at app prices and is not modelled.'
+- id: lowkey037-dc-excise-tiers
+  claim: DC vehicle excise tax is tiered by unladen weight and fuel economy (about 1% to 11%), not the 6% general sales tax
+  source: DC DMV, Vehicle Title and Excise Tax Fees, https://dmv.dc.gov/book/dmv-fees/dmv-fees-0 (accessed 2026-11-03; rates effective February 17, 2025)
+  verdict: supported (app mapping is a stated simplification)
+  evidence: 'DMV formula: Fair Market Value x MPG Taxable Percentage, with the percentage set by weight band and MPG band. Low Key knows combined MPG but not city MPG or weight, so it proxies city MPG with combined MPG in the middle weight band and notes the simplification in the table.'
