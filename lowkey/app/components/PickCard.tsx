@@ -1,7 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
-  CardAction,
   CardContent,
   CardHeader,
   CardTitle,
@@ -196,27 +195,29 @@ export default function PickCard({
   return (
     <Card className="my-3">
       <CardHeader>
-        <div>
+        <div className="flex items-center justify-between gap-2">
           <Badge color={cheapest ? "amber" : "gray"} shimmer={false}>
             {label}
           </Badge>
-        </div>
-        <CardTitle className="text-[19px]">
-          {pick.make} {pick.model}
-        </CardTitle>
-        <CardDescription>{sentence}</CardDescription>
-        {units.length > 0 ? (
-          <CardAction>
+          {units.length > 0 ? (
             <StatusDot tone="success" showLabel label="In stock" size="sm" />
-          </CardAction>
-        ) : null}
+          ) : null}
+        </div>
+        <div className="flex items-start gap-3">
+          {category && KIND_BY_CATEGORY[category] ? (
+            <div className="h-24 w-[120px] shrink-0 overflow-hidden">
+              <CarFigure kind={KIND_BY_CATEGORY[category]} />
+            </div>
+          ) : null}
+          <div className="min-w-0">
+            <CardTitle className="text-[19px]">
+              {pick.make} {pick.model}
+            </CardTitle>
+            <CardDescription>{sentence}</CardDescription>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
-        {category && KIND_BY_CATEGORY[category] ? (
-          <div className="mx-auto w-[176px] max-w-full">
-            <CarFigure kind={KIND_BY_CATEGORY[category]} />
-          </div>
-        ) : null}
         {trimLine ? (
           <p className="mb-3 text-[13px] leading-relaxed text-foreground/80">{trimLine}</p>
         ) : null}
