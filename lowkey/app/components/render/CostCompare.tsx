@@ -57,7 +57,7 @@ export function CostCompareView({
             key={r.label}
             className={`grid grid-cols-[96px_1fr_44px] items-center gap-2 text-[13px] ${r.highlighted ? "font-semibold" : ""}`}
           >
-            <span className="truncate">{r.label}</span>
+            <span className="leading-tight">{r.label}</span>
             <div className="flex h-4 overflow-hidden rounded-[5px] bg-background" aria-hidden="true">
               <span style={{ width: pct(r.valueLost), background: SEGMENT_COLOR.valueLost }} className="block h-full" />
               <span style={{ width: pct(r.interest), background: SEGMENT_COLOR.interest }} className="block h-full" />
