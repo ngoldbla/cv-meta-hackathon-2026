@@ -53,7 +53,13 @@ The pitch in one sentence: *"If you change your mind after a year, leaving costs
 
 ## What the user sees
 1. **The chat opens with one question:** "What's your ZIP, and do you need a sedan, an SUV or a pickup?"
-2. **For the chosen category, three cards:**
+2. **Lineup rules (Dylan, 2026-11-03):**
+   - **More than one brand in every lineup.** #1 and #2 must be different makes. If the top two share a make, #2 is the best-retaining model of another make. The commodity pick may be any make.
+   - **Defaults until Dylan changes them:**
+     - Pickups exclude heavy-duty trucks (¾-ton and 1-ton: F-250/350, 2500/3500HD); they have no EPA MPG rating and are not a "need keys now" purchase.
+     - Resale uses a 15% trade-in discount off sold retail medians (preflight P13).
+     - A card may show 1–2 local units when fewer than 3 are in stock within 150 miles, and says so.
+3. **For the chosen category, three cards:**
    - **#1 and #2, best resale.** The lowest 5-year depreciation as % of price.
    - **The commodity pick.** The lowest rent in dollars per month: the plain, cheap-to-hold car of that type. If it is already #1 or #2, the app says so and shows only two cards.
 3. **Each card shows:**
