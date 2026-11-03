@@ -64,6 +64,32 @@ describe("effectiveMonthlyCost (hand-worked example)", () => {
     // walkAwayCost(60) is depreciation + interest by construction.
     expect(eff).toBeCloseTo(at60.walkAwayCost / 60 + 150, 1);
   });
+
+  it("adds financed sales tax as tax / 60 (task 037)", () => {
+    const own = ownershipMath({
+      price: 31950, tax: 2869.11, apr: 8, term: 60, retention5y: 0.629,
+    });
+    const eff = effectiveMonthlyCost({
+      price: 31950,
+      retentionAfterDiscount: 0.629,
+      monthlyPayment: own.monthlyPayment,
+      loanAmount: own.loanAmount,
+      fuelPerMonth: 100,
+      taxAmount: own.taxAmount,
+    });
+    const at60 = own.walkAway.find((p) => p.month === 60)!;
+    // With tax financed, walkAwayCost(60) already includes the tax,
+    // so the real cost is still walk-away / 60 plus fuel.
+    expect(eff).toBeCloseTo(at60.walkAwayCost / 60 + 100, 1);
+    const untaxed = effectiveMonthlyCost({
+      price: 31950,
+      retentionAfterDiscount: 0.629,
+      monthlyPayment: own.monthlyPayment,
+      loanAmount: own.loanAmount,
+      fuelPerMonth: 100,
+    });
+    expect(eff - untaxed).toBeCloseTo(2869.11 / 60, 1);
+  });
 });
 
 describe("lifespan conversion (task 029, part 2)", () => {

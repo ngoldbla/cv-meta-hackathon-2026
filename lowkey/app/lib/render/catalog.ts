@@ -12,7 +12,7 @@ import { z } from "zod";
  */
 
 const segmentSchema = z.object({
-  part: z.enum(["loan", "gas", "valueLost", "interest"]),
+  part: z.enum(["loan", "gas", "valueLost", "interest", "tax"]),
   usd: z.number(),
 });
 
@@ -42,6 +42,7 @@ export const catalog = defineCatalog(schema, {
             valueLost: z.number(),
             interest: z.number(),
             gas: z.number(),
+            tax: z.number(),
             total: z.number(),
             highlighted: z.boolean(),
             cheapest: z.boolean(),
@@ -49,7 +50,7 @@ export const catalog = defineCatalog(schema, {
         ),
       }),
       description:
-        "One horizontal segmented bar per pick (value lost, interest, gas) on a shared scale, ordered cheapest to own first, with the monthly real-cost total at the right. The first ranked pick's row is highlighted (bold); every row at the lowest total is flagged cheapest and gets a 'cheapest to own' badge. Placed before the pick cards, one per turn.",
+        "One horizontal segmented bar per pick (value lost, interest, gas, sales tax) on a shared scale, ordered cheapest to own first, with the monthly real-cost total at the right. The first ranked pick's row is highlighted (bold); every row at the lowest total is flagged cheapest and gets a 'cheapest to own' badge. Placed before the pick cards, one per turn.",
     },
     CostBars: {
       props: z.object({
@@ -60,7 +61,7 @@ export const catalog = defineCatalog(schema, {
         backWhenSold: z.number(),
       }),
       description:
-        "Two bars on one scale (the bills total): 'You pay each month' (loan + gas) and 'What it really costs you' (value lost + interest + gas); the remainder of the second bar is the hatched 'back to you' segment, backWhenSold = bills - real cost.",
+        "Two bars on one scale (the bills total): 'You pay each month' (loan + gas) and 'What it really costs you' (value lost + interest + gas + sales tax); the remainder of the second bar is the hatched 'back to you' segment, backWhenSold = bills - real cost.",
     },
     LifespanTrack: {
       props: z.object({
@@ -95,6 +96,7 @@ export const catalog = defineCatalog(schema, {
         badgeLabel: z.string(),
         modelLabel: z.string(),
         sentence: z.string(),
+        taxLine: z.string().nullable(),
         trimLine: z.string().nullable(),
         inStock: z.boolean(),
         category: z.string(),

@@ -138,6 +138,7 @@ async function fastPathResponse(req: FastRequest) {
           apr: req.userApr ?? undefined,
           term: 60,
           model: pick.model,
+          zip: req.zip,
         };
         writer.write({
           type: "tool-input-available",

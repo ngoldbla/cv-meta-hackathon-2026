@@ -15,6 +15,7 @@ export const SEGMENT_COLOR: Record<string, string> = {
   gas: "var(--cost-gas)",
   valueLost: "var(--cost-lost)",
   interest: "var(--cost-interest)",
+  tax: "var(--cost-tax)",
 };
 
 export const SEGMENT_LABEL: Record<string, string> = {
@@ -22,6 +23,7 @@ export const SEGMENT_LABEL: Record<string, string> = {
   gas: "Gas",
   valueLost: "Value lost",
   interest: "Interest",
+  tax: "Sales tax",
 };
 
 /** Hatched "back to you" fill (mockup greens through tokens). */

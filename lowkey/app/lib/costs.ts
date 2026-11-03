@@ -23,7 +23,9 @@ export function monthlyBills(
 
 /**
  * Effective monthly cost to drive over the 5-year hold:
- * (depreciation over 5 years + interest paid + fuel over 5 years) / 60.
+ * (depreciation over 5 years + interest paid + fuel over 5 years
+ * + financed sales tax) / 60. Sales tax is its own segment on the
+ * card (tax / 60 a month); resale never returns it.
  * Depreciation is price x (1 - retention after discount); interest is
  * payments x 60 - loan amount. Fuel is the median monthly estimate.
  */
@@ -33,11 +35,14 @@ export function effectiveMonthlyCost(args: {
   monthlyPayment: number;
   loanAmount: number;
   fuelPerMonth: number | null | undefined;
+  /** Financed sales tax in dollars (task 037); spread over 60 months. */
+  taxAmount?: number | null;
 }): number {
   const depreciation = args.price * (1 - args.retentionAfterDiscount);
   const interest = args.monthlyPayment * 60 - args.loanAmount;
   const fuel = (args.fuelPerMonth ?? 0) * 60;
-  return (depreciation + interest + fuel) / 60;
+  const tax = args.taxAmount ?? 0;
+  return (depreciation + interest + fuel + tax) / 60;
 }
 
 /** Expected life in years at 12,000 miles a year. */

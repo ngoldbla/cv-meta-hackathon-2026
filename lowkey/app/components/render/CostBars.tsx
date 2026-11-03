@@ -3,7 +3,7 @@
 import { BACK_FILL, SEGMENT_COLOR, SEGMENT_LABEL, fmtUsd } from "./format";
 
 export interface CostSegment {
-  part: "loan" | "gas" | "valueLost" | "interest";
+  part: "loan" | "gas" | "valueLost" | "interest" | "tax";
   usd: number;
 }
 

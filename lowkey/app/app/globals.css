@@ -76,6 +76,7 @@
   --cost-gas: #d9c08a;
   --cost-lost: #7a5a10;
   --cost-interest: #8e8a80;
+  --cost-tax: #6e8fae;
   --cost-back-a: #bfd6c4;
   --cost-back-b: #d7e6da;
   --cost-back-bg: #eef5ef;
@@ -124,6 +125,7 @@
   --cost-gas: #eed9a0;
   --cost-lost: #c98a1f;
   --cost-interest: #64788d;
+  --cost-tax: #9cc3e5;
   --cost-back-a: #5f9273;
   --cost-back-b: #84b998;
   --cost-back-bg: #243528;

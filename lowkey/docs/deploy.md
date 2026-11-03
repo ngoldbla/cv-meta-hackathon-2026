@@ -25,12 +25,30 @@ data stay outside git (under `~/.cache/low-key/`); never commit them.
 
 One-time setup on dylan-pc: `npm --prefix lowkey/pipeline ci`.
 
-Weekly re-run (the reviewer schedules this):
+Weekly re-run (task 037): run the wrapper from any checkout (the
+reviewer runs it from a separate detached worktree and installs the
+timer):
+
+```bash
+lowkey/pipeline/weekly.sh
+```
+
+The wrapper loads `~/.config/low-key/env` (never printed), runs
+`npm --prefix lowkey/pipeline ci`, rebuilds with
+`build_table.py --refresh-provider --refresh-eia --refresh-tax`
+(provider facets, EIA series and the P19 sales-tax rules), uploads
+with `upload_table.mjs`, then reads the blob back with
+`check_table.mjs` (version and size, 3 categories, gas series count,
+51 tax rows, every EIA `asOf` no older than 8 days). It appends one
+summary line to `~/.cache/low-key/weekly.log` (dates, sizes and
+provider usage before/after; no secrets) and exits non-zero on any
+failure. The manual equivalent is:
 
 ```bash
 set -a; . ~/.config/low-key/env; set +a
-~/.cache/low-key/venv-timestral/bin/python lowkey/pipeline/build_table.py --refresh-provider --refresh-eia
+~/.cache/low-key/venv-timestral/bin/python lowkey/pipeline/build_table.py --refresh-provider --refresh-eia --refresh-tax
 node lowkey/pipeline/upload_table.mjs ~/.cache/low-key/table.json
+node lowkey/pipeline/check_table.mjs
 ```
 
 The app reads the blob server-side only and caches it in memory for

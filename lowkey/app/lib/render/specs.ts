@@ -46,7 +46,12 @@ export interface SpecPick {
 }
 
 export interface SpecOwnership {
+  /** Price with fees, before tax. */
   price: number;
+  /** Financed sales tax in dollars (task 037); absent on old outputs. */
+  taxAmount?: number;
+  taxStatus?: "included" | "none" | "unknown";
+  taxNotice?: string | null;
   downPayment: number;
   loanAmount: number;
   monthlyPayment: number;
@@ -114,9 +119,11 @@ export interface CostBreakdown {
   gas: number | null;
   valueLost: number;
   interest: number;
+  /** Sales tax a month (financed tax / 60), whole dollars. */
+  tax: number;
   /** loan + gas, whole dollars (the CostBars scale). */
   bills: number;
-  /** valueLost + interest + gas, whole dollars. */
+  /** valueLost + interest + gas + tax, whole dollars. */
   real: number;
   /** bills - real: what comes back when sold at 5 years. */
   back: number;
@@ -136,19 +143,22 @@ export function costBreakdown(entry: SpecEntry): CostBreakdown | null {
   // its rounded segment sum by a dollar. Guarded to $1 (totals) and
   // $2 (segment-sum drift) in guard.ts.
   const gasRaw = gas ?? 0;
+  const taxRaw = (ownership.taxAmount ?? 0) / 60;
+  const tax = usd(taxRaw);
   const bills = usd(ownership.monthlyPayment + gasRaw);
   const real = usd(
     valueLostPerMonth(entry.pick, ownership) +
       interestPerMonth(ownership) +
-      gasRaw,
+      gasRaw +
+      taxRaw,
   );
-  return { loan, gas: gasUsd, valueLost, interest, bills, real, back: bills - real };
+  return { loan, gas: gasUsd, valueLost, interest, tax, bills, real, back: bills - real };
 }
 
 function costBarsProps(entry: SpecEntry) {
   const costs = costBreakdown(entry);
   if (!costs) return null;
-  type Segment = { part: "loan" | "gas" | "valueLost" | "interest"; usd: number };
+  type Segment = { part: "loan" | "gas" | "valueLost" | "interest" | "tax"; usd: number };
   const pay: Segment[] = [{ part: "loan", usd: costs.loan }];
   if (costs.gas !== null) pay.push({ part: "gas", usd: costs.gas });
   const real: Segment[] = [
@@ -156,6 +166,7 @@ function costBarsProps(entry: SpecEntry) {
     { part: "interest", usd: costs.interest },
   ];
   if (costs.gas !== null) real.push({ part: "gas", usd: costs.gas });
+  if (costs.tax > 0) real.push({ part: "tax", usd: costs.tax });
   return {
     pay,
     real,
@@ -266,6 +277,9 @@ export function buildPickCardSpec(
       badgeLabel: badgeLabel(pick),
       modelLabel: modelLabel(pick),
       sentence: cardSentence(pick, undefined, peers.length > 0 ? peers : [pick], category),
+      taxLine: ownership
+        ? (ownership.taxNotice ?? "Tax not included: unknown state")
+        : null,
       trimLine: trimLineText({
         baseTrim: pick.baseTrim,
         stepUpTrim: pick.stepUpTrim,
@@ -313,6 +327,7 @@ export function buildCostCompareSpec(entries: SpecEntry[], category: string): Sp
         valueLost: costs.valueLost,
         interest: costs.interest,
         gas: costs.gas ?? 0,
+        tax: costs.tax,
         total: costs.real,
       };
     })
@@ -334,6 +349,7 @@ export function buildCostCompareSpec(entries: SpecEntry[], category: string): Sp
             valueLost: r.valueLost,
             interest: r.interest,
             gas: r.gas,
+            tax: r.tax,
             total: r.total,
             highlighted: r.model === shownModel,
             cheapest: r.total === lowest,

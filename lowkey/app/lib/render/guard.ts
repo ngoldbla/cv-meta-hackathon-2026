@@ -18,8 +18,12 @@ import {
  * figure checks two ways: exactly as bills - real inside the spec,
  * and within $3 of (resale at month 60 - down payment) / 60 from the
  * ownership curve (accumulated rounding of five rounded quantities;
- * the report hand-checks one live card to within $1). Years, curve
- * points, miles and prices are copied unchanged and check exactly.
+ * the report hand-checks one live card to within $1). The sales-tax
+ * segment (task 037) checks against financed tax / 60 the same way,
+ * and the real-cost total cross-checks through effectiveMonthlyCost
+ * with the tax included, so the back-to-you identity still holds.
+ * Years, curve points, miles and prices are copied unchanged and
+ * check exactly.
  *
  * Failures carry only an element id and a check name, never a value,
  * so a runtime failure can be logged without data.
@@ -143,6 +147,7 @@ function checkCostBars(c: Checker, spec: Spec, id: string, entry: SpecEntry) {
     i += 1;
   }
   if (gasRaw !== null && segmentUsd(props, "pay", "gas") === undefined) c.fail(id, "missing-gas");
+  const taxRaw = (ownership.taxAmount ?? 0) / 60;
   let j = 0;
   for (const seg of (props.real as { part: string }[]) ?? []) {
     const path = `${base}.real.${j}.usd`;
@@ -153,8 +158,13 @@ function checkCostBars(c: Checker, spec: Spec, id: string, entry: SpecEntry) {
     } else if (seg.part === "gas") {
       if (gasRaw === null) c.fail(id, "unexpected-gas");
       else c.dollar(id, path, segmentUsd(props, "real", "gas"), gasRaw);
+    } else if (seg.part === "tax") {
+      c.dollar(id, path, segmentUsd(props, "real", "tax"), taxRaw);
     } else c.fail(id, "unexpected-segment");
     j += 1;
+  }
+  if (Math.round(taxRaw) > 0 && segmentUsd(props, "real", "tax") === undefined) {
+    c.fail(id, "missing-tax");
   }
   // Totals are rounded unrounded sums (mockup rounding), checked
   // to $1 against the raw tool figures; the pre-existing
@@ -168,6 +178,7 @@ function checkCostBars(c: Checker, spec: Spec, id: string, entry: SpecEntry) {
     monthlyPayment: ownership.monthlyPayment,
     loanAmount: ownership.loanAmount,
     fuelPerMonth: gasRaw,
+    taxAmount: ownership.taxAmount ?? 0,
   });
   c.dollar(id, `${base}.realTotal`, realTotal, expectedReal);
   c.checked.add(`${base}.backWhenSold`);
@@ -299,6 +310,7 @@ export function checkCostCompareSpec(spec: Spec, entries: SpecEntry[]): GuardRes
     valueLost: number;
     interest: number;
     gas: number;
+    tax: number;
     total: number;
   }[]) ?? [];
   const byLabel = new Map(entries.map((e) => [`${e.pick.make} ${e.pick.model}`, e]));
@@ -314,15 +326,17 @@ export function checkCostCompareSpec(spec: Spec, entries: SpecEntry[]): GuardRes
     c.dollar(spec.root, `${base}.rows.${idx}.interest`, row.interest, interestPerMonth(entry.ownership));
     const gasRaw = entry.local?.fuel?.perMonth ?? 0;
     c.dollar(spec.root, `${base}.rows.${idx}.gas`, row.gas, gasRaw);
+    c.dollar(spec.root, `${base}.rows.${idx}.tax`, row.tax, (entry.ownership.taxAmount ?? 0) / 60);
     const expectedReal = effectiveMonthlyCost({
       price: entry.ownership.price,
       retentionAfterDiscount: entry.pick.retention5y,
       monthlyPayment: entry.ownership.monthlyPayment,
       loanAmount: entry.ownership.loanAmount,
       fuelPerMonth: entry.local?.fuel?.perMonth,
+      taxAmount: entry.ownership.taxAmount ?? 0,
     });
     c.dollar(spec.root, `${base}.rows.${idx}.total`, row.total, expectedReal);
-    if (Math.abs(row.total - (row.valueLost + row.interest + row.gas)) > 2) {
+    if (Math.abs(row.total - (row.valueLost + row.interest + row.gas + row.tax)) > 2) {
       c.fail(spec.root, "row-total");
     }
     if (row.total < prev) c.fail(spec.root, "row-order");

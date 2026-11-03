@@ -31,6 +31,7 @@ export function PickCardView({
   badgeLabel,
   modelLabel,
   sentence,
+  taxLine,
   trimLine,
   inStock,
   category,
@@ -44,6 +45,7 @@ export function PickCardView({
   badgeLabel: string;
   modelLabel: string;
   sentence: string;
+  taxLine: string | null;
   trimLine: string | null;
   inStock: boolean;
   category: string;
@@ -80,6 +82,9 @@ export function PickCardView({
         </div>
       </CardHeader>
       <CardContent>
+        {taxLine ? (
+          <p className="mb-3 text-[13px] leading-relaxed text-foreground/80">{taxLine}</p>
+        ) : null}
         {trimLine ? (
           <p className="mb-3 text-[13px] leading-relaxed text-foreground/80">{trimLine}</p>
         ) : null}

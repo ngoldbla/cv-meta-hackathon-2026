@@ -35,6 +35,7 @@ export function TextFallback({
           monthlyPayment: ownership.monthlyPayment,
           loanAmount: ownership.loanAmount,
           fuelPerMonth: local?.fuel?.perMonth,
+          taxAmount: ownership.taxAmount ?? 0,
         })
       : null;
   const even = ownership

@@ -17,8 +17,10 @@ all other imports are stdlib plus the preflight modules:
 
 Flags: --refresh-provider / --refresh-eia force fresh upstream pulls
 (the weekly re-run); without them, same-day caches are reused so a
-rebuild costs no provider calls. --skip-forecast and --series exist
-for debugging only; the live table always carries forecasts.
+rebuild costs no provider calls. --refresh-tax requires a valid
+researched tax-rule cache (P19, tax_table.py) and merges it as the
+table's `tax` section. --skip-forecast and --series exist for
+debugging only; the live table always carries forecasts.
 """
 
 from __future__ import annotations
@@ -43,6 +45,7 @@ import make_map  # noqa: E402
 import p6_sold_depth  # noqa: E402
 import p15_gas  # noqa: E402
 import provider_client  # noqa: E402
+import tax_table as tax_mod  # noqa: E402
 import trim as trim_mod  # noqa: E402
 
 CACHE_DIR = Path.home() / ".cache" / "low-key"
@@ -568,6 +571,7 @@ def main() -> None:
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
     parser.add_argument("--refresh-provider", action="store_true")
     parser.add_argument("--refresh-eia", action="store_true")
+    parser.add_argument("--refresh-tax", action="store_true")
     parser.add_argument("--skip-forecast", action="store_true")
     parser.add_argument("--series", default=None, help="comma list of duoareas (debug)")
     args = parser.parse_args()
@@ -621,6 +625,20 @@ def main() -> None:
                 pick["lifespanSource"] = None
                 pick["lifespanAsOf"] = None
 
+    # Task 037, P19: researched vehicle sales-tax rules (outside-git
+    # cache) merged with their sources and dates. --refresh-tax makes
+    # a missing/invalid cache a build failure; without it the table
+    # still carries tax when the cache validates, and weekly.sh's
+    # read-back check fails loudly when it does not.
+    tax_section = tax_mod.load_tax_rules()
+    tax_rows = len(tax_section["states"])
+    if tax_rows:
+        print(f"tax rules: {tax_rows} jurisdictions (as of {tax_section['asOf']})", flush=True)
+    elif args.refresh_tax:
+        raise SystemExit("tax rules unavailable or invalid; --refresh-tax requires them")
+    else:
+        print("tax rules: unavailable; table will carry no tax section", flush=True)
+
     records = ensure_eia_series(args.refresh_eia, only)
     gas_series = forecast_all(records, args.skip_forecast)
     eia_as_of = max((s["latestDate"] for s in gas_series.values()), default=None)
@@ -632,6 +650,7 @@ def main() -> None:
         "tradeInFactor": lineup_mod.TRADE_IN_FACTOR,
         "lineups": lineups,
         "mpg": mpg,
+        "tax": tax_section if tax_rows else None,
         "gasSeries": gas_series,
         "zipMap": {
             "cityZip3": {k: sorted(v) for k, v in p15_gas.CITY_ZIP3.items()},
@@ -657,6 +676,11 @@ def main() -> None:
                 "model": "mistralai/Timestral-28M",
                 "asOf": date.today().isoformat(),
                 "horizonWeeks": 52,
+            },
+            "tax": {
+                "asOf": tax_section["asOf"],
+                "rows": tax_rows,
+                "foundation": (tax_section["taxFoundation"] or {}).get("title"),
             },
         },
     }

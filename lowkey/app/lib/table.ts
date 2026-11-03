@@ -1,5 +1,7 @@
 import { get } from "@vercel/blob";
 
+import type { TaxSection } from "./tax";
+
 /**
  * Server-only access to the private depreciation table (task 027).
  *
@@ -88,6 +90,8 @@ export interface LowkeyTable {
     { mpg: number; epaId: string; epaModel: string; drive: string } | null
   >;
   gasSeries: Record<string, GasSeriesEntry>;
+  /** Task 037, P19: vehicle sales-tax rules (null on older tables). */
+  tax?: TaxSection | null;
   zipMap: {
     cityZip3: Record<string, number[]>;
     zip3Ranges: [number, number, string][];

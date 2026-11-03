@@ -193,3 +193,57 @@ describe("ownershipMath curve, evenMonth and walk-away table (task 026)", () => 
     expect(r.evenMonth!).toBeLessThanOrEqual(60);
   });
 });
+
+describe("financed sales tax (task 037, part 3)", () => {
+  const taxed = ownershipMath({
+    price: 31950,
+    tax: 2869.11,
+    apr: 8,
+    term: 60,
+    retention5y: 0.629,
+  });
+  const untaxed = ownershipMath({
+    price: 31950,
+    apr: 8,
+    term: 60,
+    retention5y: 0.629,
+  });
+
+  it("finances the tax: loan is price with fees plus tax less down", () => {
+    // Down stays 10% of the price with fees, not of price plus tax.
+    expect(taxed.downPayment).toBe(3195);
+    expect(taxed.taxAmount).toBe(2869.11);
+    expect(taxed.loanAmount).toBeCloseTo(31950 + 2869.11 - 3195, 2);
+    expect(taxed.monthlyPayment).toBeCloseTo(
+      monthlyPayment(31950 + 2869.11 - 3195, 8, 60),
+      2,
+    );
+    expect(taxed.monthlyPayment).toBeGreaterThan(untaxed.monthlyPayment);
+  });
+
+  it("leaves the resale value unchanged", () => {
+    for (const month of [0, 12, 36, 60]) {
+      expect(taxed.curve[month]!.resale).toBe(untaxed.curve[month]!.resale);
+    }
+    expect(taxed.curve[60]!.resale).toBeCloseTo(31950 * 0.629, 1);
+  });
+
+  it("moves evenMonth later (or keeps it) and deepens the walk-away", () => {
+    expect(taxed.evenMonth).not.toBeNull();
+    expect(untaxed.evenMonth).not.toBeNull();
+    expect(taxed.evenMonth!).toBeGreaterThanOrEqual(untaxed.evenMonth!);
+    // The financed tax is underwater longer on this fixture.
+    expect(taxed.evenMonth!).toBeGreaterThan(untaxed.evenMonth!);
+    const taxed60 = taxed.walkAway.find((p) => p.month === 60)!;
+    const plain60 = untaxed.walkAway.find((p) => p.month === 60)!;
+    expect(taxed60.walkAwayCost).toBeGreaterThan(plain60.walkAwayCost);
+  });
+
+  it("walk-away at 60 is depreciation plus interest plus tax", () => {
+    const at60 = taxed.walkAway.find((p) => p.month === 60)!;
+    const depreciation = 31950 - taxed.curve[60]!.resale;
+    const interest =
+      monthlyPayment(taxed.loanAmount, 8, 60) * 60 - taxed.loanAmount;
+    expect(at60.walkAwayCost).toBeCloseTo(depreciation + interest + 2869.11, 1);
+  });
+});

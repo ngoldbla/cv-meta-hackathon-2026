@@ -101,6 +101,9 @@ interface RankOutput {
 interface OwnershipOutput {
   model: string | null;
   price: number;
+  taxAmount?: number;
+  taxStatus?: "included" | "none" | "unknown";
+  taxNotice?: string | null;
   priceSource?: "local" | "typical" | "given";
   priceLabel?: string | null;
   typicalPrice?: number | null;
@@ -170,8 +173,11 @@ function toSpecOwnership(o: OwnershipOutput | undefined): SpecOwnership | undefi
   if (!o) return undefined;
   return {
     price: o.price,
+    taxAmount: o.taxAmount,
+    taxStatus: o.taxStatus,
+    taxNotice: o.taxNotice,
     downPayment: o.downPayment,
-    loanAmount: o.loanAmount ?? o.price - o.downPayment,
+    loanAmount: o.loanAmount ?? o.price + (o.taxAmount ?? 0) - o.downPayment,
     monthlyPayment: o.monthlyPayment,
     aprPercent: o.aprPercent,
     termMonths: o.termMonths,
@@ -381,15 +387,21 @@ export default function HomeClient({
   }, []);
 
   let footerMeta: { soldVehicles: number; providerAsOf: string } | null = null;
+  let footerTax: string | null = null;
   for (const message of messages) {
     for (const part of (message.parts ?? []) as Part[]) {
-      if (part.type !== "tool-rank_category" || part.state !== "output-available") continue;
-      const out = part.output as RankOutput;
-      if (out.soldVehicles && out.providerAsOf) {
-        footerMeta = {
-          soldVehicles: out.soldVehicles,
-          providerAsOf: out.providerAsOf,
-        };
+      if (part.type === "tool-rank_category" && part.state === "output-available") {
+        const out = part.output as RankOutput;
+        if (out.soldVehicles && out.providerAsOf) {
+          footerMeta = {
+            soldVehicles: out.soldVehicles,
+            providerAsOf: out.providerAsOf,
+          };
+        }
+      }
+      if (part.type === "tool-ownership_math" && part.state === "output-available") {
+        const out = part.output as OwnershipOutput;
+        if (out.taxNotice) footerTax = out.taxNotice;
       }
     }
   }
@@ -533,6 +545,8 @@ export default function HomeClient({
             pick={walk.pick}
             ownership={{
               price: walk.ownership.price,
+              taxAmount: walk.ownership.taxAmount,
+              taxNotice: walk.ownership.taxNotice,
               downPayment: walk.ownership.downPayment,
               aprPercent: walk.ownership.aprPercent,
               termMonths: walk.ownership.termMonths,
@@ -942,6 +956,8 @@ export default function HomeClient({
                 pick={walk.pick}
                 ownership={{
                   price: walk.ownership.price,
+                  taxAmount: walk.ownership.taxAmount,
+                  taxNotice: walk.ownership.taxNotice,
                   downPayment: walk.ownership.downPayment,
                   aprPercent: walk.ownership.aprPercent,
                   termMonths: walk.ownership.termMonths,
@@ -978,9 +994,14 @@ export default function HomeClient({
           onSend={(message) => send(message)}
         />
         <Typography variant="paragraph-xs" className="mt-2 text-muted-foreground">
-          Payment assumes 10% down, 60 months
-          {aprText ? <>, {aprText}</> : null} — say “my rate is 5.9%” in the chat to change it. Insurance and repairs are extra.
+          Payment assumes 10% down (of the price with fees), 60 months
+          {aprText ? <>, {aprText}</> : null} — say “my rate is 5.9%” in the chat to change it. Sales tax is financed in the loan. Insurance and repairs are extra.
         </Typography>
+        {footerTax ? (
+          <Typography variant="paragraph-xs" className="mt-1 text-muted-foreground">
+            {footerTax}
+          </Typography>
+        ) : null}
         {footerMeta ? (
           <Typography variant="paragraph-xs" className="mt-1 text-muted-foreground">
             Rankings from {footerMeta.soldVehicles.toLocaleString("en-US")} sold

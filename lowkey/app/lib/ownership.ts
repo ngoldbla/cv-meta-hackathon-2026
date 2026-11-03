@@ -3,8 +3,12 @@
  * that matter", preflight "The ownership math"). No network, no
  * model arithmetic: every number the UI shows comes from here.
  *
- * Payment:  P = L * r / (1 - (1 + r)^-n),  L = price - down,
+ * Payment:  P = L * r / (1 - (1 + r)^-n),  L = price + tax - down,
  *           r = APR / 12, n = term in months (P = L / n if r = 0).
+ *           The sales tax is financed with the car (task 037): the
+ *           down payment stays 10% of the price with fees, and the
+ *           resale value is unchanged, so the tax never comes back
+ *           and walk-away(60) = depreciation + interest + tax.
  * Balance:  B(t) = L*(1+r)^t - P*((1+r)^t - 1)/r.
  * Resale:   R(t) = price * 0.85 * Rr^(t/60), where Rr is the
  *           fitted retail 5-year retention and 0.85 is the P13
@@ -25,7 +29,10 @@ export const DEFAULT_RETENTION_5Y = 0.6;
 export const WALK_AWAY_MONTHS = [6, 12, 24, 36, 60] as const;
 
 export interface OwnershipInput {
+  /** Price with fees, before tax (the resale basis; tax excluded). */
   price: number;
+  /** Sales tax in dollars, financed into the loan (task 037). */
+  tax?: number;
   down?: number;
   /** Annual percentage rate, e.g. 8 means 8% per year. */
   apr?: number;
@@ -57,7 +64,10 @@ export interface WalkAwayPoint {
 
 export interface OwnershipResult {
   model: string | null;
+  /** Price with fees, before tax. */
   price: number;
+  /** Financed sales tax in dollars (0 when none or unknown). */
+  taxAmount: number;
   downPayment: number;
   loanAmount: number;
   aprPercent: number;
@@ -127,7 +137,8 @@ export function ownershipMath(input: OwnershipInput): OwnershipResult {
   const aprPercent = input.apr ?? DEFAULT_APR_PERCENT;
   const termMonths = input.term ?? DEFAULT_TERM_MONTHS;
   const retention5y = input.retention5y ?? DEFAULT_RETENTION_5Y;
-  const loanAmount = Math.max(0, price - downPayment);
+  const taxAmount = Math.max(0, input.tax ?? 0);
+  const loanAmount = Math.max(0, price + taxAmount - downPayment);
   const payment = monthlyPayment(loanAmount, aprPercent, termMonths);
 
   const pointAt = (month: number): WalkAwayPoint => {
@@ -177,6 +188,7 @@ export function ownershipMath(input: OwnershipInput): OwnershipResult {
   return {
     model: input.model ?? null,
     price,
+    taxAmount: round2(taxAmount),
     downPayment: round2(downPayment),
     loanAmount: round2(loanAmount),
     aprPercent,

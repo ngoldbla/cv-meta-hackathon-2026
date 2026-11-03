@@ -5,6 +5,7 @@ import { fuelForModel } from "./fuel";
 import { aprLabel, getDefaultApr } from "./fred";
 import { fetchUnitsWithTrimFallback } from "./listings";
 import { ownershipMath } from "./ownership";
+import { resolveTax, taxNoticeText } from "./tax";
 import {
   getTable,
   lineupFromTable,
@@ -129,8 +130,20 @@ export async function executeOwnership(args: {
   }
 
   const aprInfo = apr === undefined ? await getDefaultApr() : null;
+  // Task 037: sales tax on the price with fees for the shopper's
+  // state (ZIP -> state via the table's ZIP3 rules; DC uses MPG).
+  // Unknown state means no tax in the loan and an explicit card
+  // line, never a guessed rate.
+  const taxRes = resolveTax({
+    zip,
+    priceWithFees: price,
+    mpg: resolved?.pick.mpg,
+    zip3Ranges: table?.zipMap.zip3Ranges,
+    tax: table?.tax,
+  });
   const result = ownershipMath({
     price,
+    tax: taxRes.status === "included" ? taxRes.tax : 0,
     down,
     apr: apr ?? aprInfo?.aprPercent,
     term,
@@ -139,6 +152,12 @@ export async function executeOwnership(args: {
   });
   return {
     ...result,
+    taxStatus: taxRes.status,
+    taxState: taxRes.state,
+    taxStateName: taxRes.rule?.name ?? null,
+    taxLabel: taxRes.rule?.label ?? null,
+    taxRate: taxRes.effectiveRate,
+    taxNotice: taxNoticeText(taxRes),
     make: resolved?.pick.make ?? null,
     priceSource,
     priceLabel: priceSource === "typical" ? "typical price" : null,
@@ -166,7 +185,7 @@ export const rankCategoryTool = tool({
 
 export const ownershipMathTool = tool({
   description:
-    "Return the monthly payment, the 61-point worth-vs-owe curve, walk-away costs at 6, 12, 24, 36 and 60 months, and the even (above-water) month. Pass model (the exact model string from rank_category) and zip so the server prices the cheapest local unit, or the typical price when there is no local unit. Omit apr to use the Federal Reserve average; pass apr only when the user states their own rate. Deterministic; never estimate these numbers in text.",
+    "Return the monthly payment (sales tax for the ZIP's state financed into the loan), the 61-point worth-vs-owe curve, walk-away costs at 6, 12, 24, 36 and 60 months, and the even (above-water) month. Pass model (the exact model string from rank_category) and zip so the server prices the cheapest local unit, or the typical price when there is no local unit. Omit apr to use the Federal Reserve average; pass apr only when the user states their own rate. Deterministic; never estimate these numbers in text.",
   inputSchema: z.object({
     price: z.number().positive().optional(),
     down: z.number().nonnegative().optional(),

@@ -18,7 +18,10 @@ import { Typography } from "@/components/ui/typography";
 import { FullChart, type CurveLike } from "./WorthChart";
 
 export interface WalkAwayOwnership {
+  /** Price with fees, before tax. */
   price: number;
+  taxAmount?: number;
+  taxNotice?: string | null;
   downPayment: number;
   aprPercent: number;
   termMonths: number;
@@ -227,7 +230,12 @@ export default function WalkAwayView({
         </Typography>
       ) : null}
       <Typography variant="paragraph-xs" className="text-muted-foreground">
-        {money(ownership.price)}, {downPct}% down, {ownership.termMonths} months, {aprText}. Say “my rate is 5.9%” to change it. Worth if sold = recent sales of this model, less 15%. Excludes tax, insurance, fuel and repairs.
+        {money(ownership.price)} with fees
+        {ownership.taxAmount
+          ? ` plus ${money(ownership.taxAmount)} sales tax financed in the loan`
+          : ""}
+        , {downPct}% down (of the price with fees), {ownership.termMonths} months, {aprText}. Say “my rate is 5.9%” to change it. Worth if sold = recent sales of this model, less 15% (the tax does not come back).
+        {ownership.taxNotice ? ` ${ownership.taxNotice}` : ""} Excludes insurance, fuel and repairs.
       </Typography>
     </section>
   );

@@ -8,6 +8,9 @@ In progress.
 ## Work done
 - Claimed task 037 on branch `low-key` (head `27fedd3`). Inbox sync on `main` not followed per the task's `low-key`-only rule — same approved deviation as tasks 022–036.
 - Part 1 (price-fields check): read the listings provider's public OpenAPI document (fetched 2026-11-03, cached outside git) and sampled live listings (3 searches; raw responses outside git). See Results. Tax is not included, so parts 2–4 proceed.
+- Part 2 (P19): researched the 51-jurisdiction vehicle-tax rule table (state revenue/DMV source + date each, Tax Foundation Midyear 2026 average locals; full table only in the outside-git cache and the Blob `tax` section). Added P19 to [preflight.md](/home/ndgold/cv-meta-hackathon-2026/lowkey/docs/preflight.md) and the summary/citations to [preflight-results.md](/home/ndgold/cv-meta-hackathon-2026/lowkey/docs/preflight-results.md). Loader/validation in [tax_table.py](/home/ndgold/cv-meta-hackathon-2026/lowkey/pipeline/tax_table.py) with fixture tests.
+- Part 3 (math + cards): financed-tax loan in [ownership.ts](/home/ndgold/cv-meta-hackathon-2026/lowkey/app/lib/ownership.ts), tax resolver in [tax.ts](/home/ndgold/cv-meta-hackathon-2026/lowkey/app/lib/tax.ts), `Sales tax` segment (own theme token, 2 px gaps kept) in CostBars/CostCompare, guard updated, tax line on the card plus footer/walk-away wording. App tests 151 passed; `pytest lowkey/` 34 passed; ruff and both guards clean at this stage.
+- Part 4 (code): added [weekly.sh](/home/ndgold/cv-meta-hackathon-2026/lowkey/pipeline/weekly.sh) and [check_table.mjs](/home/ndgold/cv-meta-hackathon-2026/lowkey/pipeline/check_table.mjs), documented in [deploy.md](/home/ndgold/cv-meta-hackathon-2026/lowkey/docs/deploy.md). The real weekly run and deployed checks follow below.
 
 ## Results
 ### Part 1: what the price already includes — tax is NOT included; do not stop
