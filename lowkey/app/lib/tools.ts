@@ -17,7 +17,89 @@ import { ownershipMath } from "./ownership";
  * definitions. rank_category and local_units return SAMPLE DATA
  * fixtures; ownership_math runs the real deterministic maths in
  * lib/ownership.ts — only its inputs are stubbed by the caller.
+ * Plain executors are exported so the fast path (task 026, part 5)
+ * can call the same code without the model.
  */
+
+export async function executeRankCategory(category: Category) {
+  const fixture = RANK_FIXTURES[category];
+  return {
+    sampleData: true as const,
+    category: fixture.category,
+    picks: fixture.picks,
+    commodity: fixture.commodity,
+    note: "SAMPLE DATA: fixture lineups, not live prices.",
+  };
+}
+
+export async function executeOwnership(args: {
+  price: number;
+  down?: number;
+  apr?: number;
+  term?: number;
+  model?: string;
+}) {
+  const { price, down, apr, term, model } = args;
+  const resolved = model ? resolvePick(model) : undefined;
+  const aprInfo = apr === undefined ? await getDefaultApr() : null;
+  const result = ownershipMath({
+    price,
+    down,
+    apr: apr ?? aprInfo?.aprPercent,
+    term,
+    // Canonical fixture model ("CR-V") so the UI can attach this
+    // result to the ranked card even when the caller sent
+    // "Honda CR-V".
+    model: resolved?.model ?? model,
+    retention5y: model ? retentionForModel(model) : undefined,
+  });
+  return {
+    sampleData: true as const,
+    ...result,
+    make: resolved?.make ?? null,
+    aprDate: aprInfo?.dateIso ?? null,
+    aprAssumed: aprInfo?.assumed ?? false,
+    aprLabel: aprInfo ? aprLabel(aprInfo) : null,
+  };
+}
+
+export async function executeLocalUnits(args: {
+  zip: string;
+  model?: string;
+  category?: string;
+  radius?: number;
+}) {
+  const { zip, model, category, radius } = args;
+  const resolved = model ? resolvePick(model) : undefined;
+  const basePrice = model ? priceForModel(model) : undefined;
+  if (!model || !resolved || basePrice === undefined) {
+    return {
+      sampleData: true as const,
+      zip,
+      model: model ?? null,
+      category: category ?? null,
+      radius: radius ?? 50,
+      unitsFound: 0,
+      units: [] as ReturnType<typeof sampleUnitsFor>,
+      note: "SAMPLE DATA: name a model from rank_category to see sample units.",
+    };
+  }
+  const units = sampleUnitsFor(resolved.model, basePrice);
+  const best = units.reduce((a, b) => (b.price < a.price ? b : a));
+  return {
+    sampleData: true as const,
+    zip,
+    model: resolved.model,
+    make: resolved.make,
+    category: category ?? null,
+    radius: radius ?? 50,
+    unitsFound: units.length,
+    bestPrice: best.price,
+    bestDealer: best.dealer,
+    units,
+    note: "SAMPLE DATA: fixture units, not live stock.",
+  };
+}
 
 export const rankCategoryTool = tool({
   description:
@@ -25,16 +107,8 @@ export const rankCategoryTool = tool({
   inputSchema: z.object({
     category: z.enum(["Sedan", "SUV", "Pickup"]),
   }),
-  execute: async ({ category }: { category: Category }) => {
-    const fixture = RANK_FIXTURES[category];
-    return {
-      sampleData: true as const,
-      category: fixture.category,
-      picks: fixture.picks,
-      commodity: fixture.commodity,
-      note: "SAMPLE DATA: fixture lineups, not live prices.",
-    };
-  },
+  execute: async ({ category }: { category: Category }) =>
+    executeRankCategory(category),
 });
 
 export const ownershipMathTool = tool({
@@ -47,41 +121,13 @@ export const ownershipMathTool = tool({
     term: z.number().int().positive().optional(),
     model: z.string().optional(),
   }),
-  execute: async ({
-    price,
-    down,
-    apr,
-    term,
-    model,
-  }: {
+  execute: async (args: {
     price: number;
     down?: number;
     apr?: number;
     term?: number;
     model?: string;
-  }) => {
-    const resolved = model ? resolvePick(model) : undefined;
-    const aprInfo = apr === undefined ? await getDefaultApr() : null;
-    const result = ownershipMath({
-      price,
-      down,
-      apr: apr ?? aprInfo?.aprPercent,
-      term,
-      // Canonical fixture model ("CR-V") so the UI can attach this
-      // result to the ranked card even when the caller sent
-      // "Honda CR-V".
-      model: resolved?.model ?? model,
-      retention5y: model ? retentionForModel(model) : undefined,
-    });
-    return {
-      sampleData: true as const,
-      ...result,
-      make: resolved?.make ?? null,
-      aprDate: aprInfo?.dateIso ?? null,
-      aprAssumed: aprInfo?.assumed ?? false,
-      aprLabel: aprInfo ? aprLabel(aprInfo) : null,
-    };
-  },
+  }) => executeOwnership(args),
 });
 
 export const localUnitsTool = tool({
@@ -93,47 +139,12 @@ export const localUnitsTool = tool({
     category: z.string().optional(),
     radius: z.number().int().positive().optional(),
   }),
-  execute: async ({
-    zip,
-    model,
-    category,
-    radius,
-  }: {
+  execute: async (args: {
     zip: string;
     model?: string;
     category?: string;
     radius?: number;
-  }) => {
-    const resolved = model ? resolvePick(model) : undefined;
-    const basePrice = model ? priceForModel(model) : undefined;
-    if (!model || !resolved || basePrice === undefined) {
-      return {
-        sampleData: true as const,
-        zip,
-        model: model ?? null,
-        category: category ?? null,
-        radius: radius ?? 50,
-        unitsFound: 0,
-        units: [],
-        note: "SAMPLE DATA: name a model from rank_category to see sample units.",
-      };
-    }
-    const units = sampleUnitsFor(resolved.model, basePrice);
-    const best = units.reduce((a, b) => (b.price < a.price ? b : a));
-    return {
-      sampleData: true as const,
-      zip,
-      model: resolved.model,
-      make: resolved.make,
-      category: category ?? null,
-      radius: radius ?? 50,
-      unitsFound: units.length,
-      bestPrice: best.price,
-      bestDealer: best.dealer,
-      units,
-      note: "SAMPLE DATA: fixture units, not live stock.",
-    };
-  },
+  }) => executeLocalUnits(args),
 });
 
 export const lowkeyTools = {
