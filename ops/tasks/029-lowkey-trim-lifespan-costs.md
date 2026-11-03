@@ -1,7 +1,7 @@
 ---
 id: "029"
 title: "Low Key: the one-step-up trim, vehicle lifespan, and the salient cost numbers on each card"
-status: in_progress
+status: done
 created: 2026-11-03
 report: ops/reports/029-lowkey-trim-lifespan-costs.md
 ---
