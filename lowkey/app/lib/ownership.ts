@@ -1,0 +1,158 @@
+/**
+ * Deterministic loan and walk-away maths (PRD "The two numbers
+ * that matter", preflight "The ownership math"). No network, no
+ * model arithmetic: every number the UI shows comes from here.
+ *
+ * Payment:  P = L * r / (1 - (1 + r)^-n),  L = price - down,
+ *           r = APR / 12, n = term in months (P = L / n if r = 0).
+ * Balance:  B(t) = L*(1+r)^t - P*((1+r)^t - 1)/r.
+ * Resale:   R(t) = price * 0.85 * Rr^(t/60), where Rr is the
+ *           fitted retail 5-year retention and 0.85 is the P13
+ *           trade-in discount. Callers pass the adjusted (after
+ *           discount) 5-year retention Ra = 0.85 * Rr, so
+ *           R(t) = price * 0.85 * (Ra / 0.85)^(t/60).
+ *           R(0) = 0.85 * price (the car leaves the lot) and
+ *           R(60) = price * Ra.
+ * Walk-away(t) = down + P*t - (R(t) - B(t))
+ *              = depreciation(t) + interest paid by t.
+ * Underwater month = first t with R(t) >= B(t).
+ */
+
+export const TRADE_IN_FACTOR = 0.85;
+export const DEFAULT_APR_PERCENT = 8;
+export const DEFAULT_TERM_MONTHS = 60;
+export const DEFAULT_RETENTION_5Y = 0.6;
+export const WALK_AWAY_MONTHS = [6, 12, 24, 36, 60] as const;
+
+export interface OwnershipInput {
+  price: number;
+  down?: number;
+  /** Annual percentage rate, e.g. 8 means 8% per year. */
+  apr?: number;
+  /** Term in months. */
+  term?: number;
+  model?: string;
+  /** Fitted 5-year retention after the 15% discount (0..1). */
+  retention5y?: number;
+}
+
+export interface WalkAwayPoint {
+  month: number;
+  walkAwayCost: number;
+  perMonth: number;
+  balance: number;
+  resale: number;
+  equity: number;
+}
+
+export interface OwnershipResult {
+  model: string | null;
+  price: number;
+  downPayment: number;
+  loanAmount: number;
+  aprPercent: number;
+  termMonths: number;
+  retention5y: number;
+  monthlyPayment: number;
+  walkAway: WalkAwayPoint[];
+  /** P10-compatible map: month_6, month_12, month_24, month_36, month_60. */
+  walkAwayCost: Record<string, number>;
+  underwaterMonth: number | null;
+}
+
+function round2(n: number): number {
+  return Math.round(n * 100) / 100;
+}
+
+export function monthlyPayment(
+  principal: number,
+  aprPercent: number,
+  termMonths: number,
+): number {
+  if (principal <= 0) return 0;
+  const r = aprPercent / 100 / 12;
+  if (r === 0) return principal / termMonths;
+  return (principal * r) / (1 - Math.pow(1 + r, -termMonths));
+}
+
+export function balanceAt(
+  principal: number,
+  aprPercent: number,
+  termMonths: number,
+  t: number,
+): number {
+  if (t <= 0) return principal;
+  if (t >= termMonths) return 0;
+  const p = monthlyPayment(principal, aprPercent, termMonths);
+  const r = aprPercent / 100 / 12;
+  if (r === 0) return Math.max(0, principal - p * t);
+  const growth = Math.pow(1 + r, t);
+  return principal * growth - (p * (growth - 1)) / r;
+}
+
+export function resaleAt(
+  price: number,
+  retention5yAdjusted: number,
+  tMonths: number,
+): number {
+  if (tMonths <= 0) return price * TRADE_IN_FACTOR;
+  const retail = Math.min(
+    1,
+    Math.max(0.01, retention5yAdjusted / TRADE_IN_FACTOR),
+  );
+  return price * TRADE_IN_FACTOR * Math.pow(retail, tMonths / 60);
+}
+
+export function ownershipMath(input: OwnershipInput): OwnershipResult {
+  const price = input.price;
+  if (!(price > 0)) throw new Error("price must be positive");
+  const downPayment = input.down ?? price * 0.1;
+  const aprPercent = input.apr ?? DEFAULT_APR_PERCENT;
+  const termMonths = input.term ?? DEFAULT_TERM_MONTHS;
+  const retention5y = input.retention5y ?? DEFAULT_RETENTION_5Y;
+  const loanAmount = Math.max(0, price - downPayment);
+  const payment = monthlyPayment(loanAmount, aprPercent, termMonths);
+
+  const pointAt = (month: number): WalkAwayPoint => {
+    const balance = balanceAt(loanAmount, aprPercent, termMonths, month);
+    const resale = resaleAt(price, retention5y, month);
+    const equity = resale - balance;
+    const cost = downPayment + payment * month - equity;
+    return {
+      month,
+      walkAwayCost: round2(cost),
+      perMonth: month > 0 ? round2(cost / month) : round2(cost),
+      balance: round2(balance),
+      resale: round2(resale),
+      equity: round2(equity),
+    };
+  };
+
+  const walkAway = WALK_AWAY_MONTHS.map(pointAt);
+  const walkAwayCost: Record<string, number> = {};
+  for (const p of walkAway) walkAwayCost[`month_${p.month}`] = p.walkAwayCost;
+
+  let underwaterMonth: number | null = null;
+  for (let t = 1; t <= termMonths; t += 1) {
+    const balance = balanceAt(loanAmount, aprPercent, termMonths, t);
+    const resale = resaleAt(price, retention5y, t);
+    if (resale >= balance) {
+      underwaterMonth = t;
+      break;
+    }
+  }
+
+  return {
+    model: input.model ?? null,
+    price,
+    downPayment: round2(downPayment),
+    loanAmount: round2(loanAmount),
+    aprPercent,
+    termMonths,
+    retention5y,
+    monthlyPayment: round2(payment),
+    walkAway,
+    walkAwayCost,
+    underwaterMonth,
+  };
+}

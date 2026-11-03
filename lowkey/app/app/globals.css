@@ -1,0 +1,191 @@
+:root {
+  --ground: #f3f2ee;
+  --card: #ffffff;
+  --ink: #1b1c1e;
+  --muted: #5a5c60;
+  --line: #dad8d1;
+  --brass: #7a5a10;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--brass);
+}
+
+.mono {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.shell {
+  max-width: 720px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 0 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+}
+
+.brand svg {
+  color: var(--brass);
+  flex: none;
+}
+
+.tagline {
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.sample-tag {
+  display: inline-block;
+  border: 1px solid var(--brass);
+  color: var(--brass);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.messages {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0 24px;
+}
+
+.bubble {
+  max-width: 92%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 15px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.bubble.user {
+  align-self: flex-end;
+  background: var(--ink);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.bubble.assistant {
+  align-self: flex-start;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-bottom-left-radius: 4px;
+}
+
+.opening {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.opening p {
+  margin: 0 0 8px;
+}
+
+.opening .hint {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0;
+}
+
+.composer {
+  position: sticky;
+  bottom: 0;
+  background: var(--ground);
+  padding: 12px 0 16px;
+  border-top: 1px solid var(--line);
+}
+
+.composer form {
+  display: flex;
+  gap: 8px;
+}
+
+.composer input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 16px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--ink);
+}
+
+.composer button {
+  font: inherit;
+  font-weight: 600;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--brass);
+  color: #fff;
+  cursor: pointer;
+}
+
+.composer button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.status-line {
+  color: var(--muted);
+  font-size: 13px;
+  padding: 4px 0;
+}
+
+.error-line {
+  color: #8a1f1f;
+  font-size: 13px;
+  padding: 4px 0;
+}
+
+.assumptions {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 8px;
+}
