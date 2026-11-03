@@ -16,6 +16,11 @@ Pending.
 ## Results
 - Percentage strings changed (before → after): CR-V trim line "the EX keeps 69% … model's 74%" → "the EX keeps 58% … model's 63%"; card sentence "Keeps 63% of its price after 5 years" → "Keeps about 63% of its price: what you'd likely get selling it after 5 years"; closing line same wording change; `lib/summary.ts` comment example 74% → 58%.
 - PRD grep (`lowkey/docs/prd.md`): no user-visible retail percentage found (only the 15% trade-in discount method note) — nothing to fix there.
+- Part 2 (model years):
+  - Search already sent no year filter; documented in `lowkey/app/lib/listings.ts` and pinned by a test (URL has no `year=`; mixed 2025/2026/2027 rows all kept; missing year kept as `null`).
+  - `lowkey/app/lib/table.ts` attaches `currentYear` (the table's EPA model year) to picks/commodity; `HomeClient.tsx` types it.
+  - `PickCard.tsx` now lists every unit (up to 3) under "Distance to the dealer" as "2027 Civic Sport · $price · N mi · Dealer · See the car" (`unitTitle` in `lib/costs.ts`), with one leftover note per older year via `leftoverYearNote` ("2025 model year: at resale it counts as a year older."). Fixture tests cover same/earlier/later/missing year.
+  - The `lifespanRowText` helper (part 3) also landed in `lib/costs.ts` in this commit; its card wiring follows in part 3. Focused tests 42 passed; `npm run build` passes.
 
 ## Deviations
 - Inbox skill says sync on `main`; the direct instruction for this run is branch `low-key` only, so all work is on `low-key`.

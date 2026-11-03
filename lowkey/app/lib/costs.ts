@@ -58,6 +58,40 @@ export function costPerYearOfLife(
   return priceWithFees / lifespanYears;
 }
 
+/** Unit title on the card, e.g. "2027 Civic Sport" (task 031). */
+export function unitTitle(
+  year: number | null | undefined,
+  model: string,
+  trim: string | null | undefined,
+): string {
+  const parts: Array<string | number> = [];
+  if (year !== null && year !== undefined) parts.push(year);
+  parts.push(model);
+  if (trim) parts.push(trim);
+  return parts.join(" ");
+}
+
+/**
+ * Leftover-year note (task 031): a unit older than the table's
+ * current model year counts as a year older at resale. Same or
+ * later years, or a missing year, get no note.
+ */
+export function leftoverYearNote(
+  year: number | null | undefined,
+  currentModelYear: number | null | undefined,
+): string | null {
+  if (year === null || year === undefined) return null;
+  if (currentModelYear === null || currentModelYear === undefined) return null;
+  if (year >= currentModelYear) return null;
+  return `${year} model year: at resale it counts as a year older.`;
+}
+
+/** Lifespan row text (task 031): unrated models say so, no number. */
+export function lifespanRowText(lifespanYears: number | null | undefined): string {
+  if (lifespanYears === null || lifespanYears === undefined) return "Not yet rated";
+  return lastsAboutLabel(lifespanYears);
+}
+
 /** "Lasts about N years" (whole years, as on the card). */
 export function lastsAboutLabel(lifespanYears: number): string {
   return `Lasts about ${Math.round(lifespanYears)} years`;

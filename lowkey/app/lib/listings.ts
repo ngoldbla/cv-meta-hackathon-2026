@@ -5,6 +5,9 @@
  * per model/ZIP/radius for 6 hours by the Next.js fetch cache, with
  * an 8-second timeout. Any failure returns the "couldn't load" card
  * state; this module never invents sample units.
+ *
+ * Task 031: the search keeps all model years of new units (no year
+ * filter); the card shows each unit's year and notes leftover years.
  */
 
 export interface LocalUnit {

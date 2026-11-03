@@ -4,11 +4,14 @@ import {
   costPerYearOfLife,
   effectiveMonthlyCost,
   lastsAboutLabel,
+  leftoverYearNote,
   lifespanMilesFromYears,
+  lifespanRowText,
   lifespanYearsFromMiles,
   monthlyBills,
   trimLineText,
   trimStepMonthly,
+  unitTitle,
 } from "./costs";
 import { monthlyPayment, ownershipMath } from "./ownership";
 
@@ -82,6 +85,38 @@ describe("trimStepMonthly", () => {
     expect(m).toBeCloseTo(monthlyPayment(2440 * 0.9, 8, 60), 6);
     expect(m).toBeGreaterThan(40);
     expect(m).toBeLessThan(50);
+  });
+});
+
+describe("model years on units (task 031, part 2)", () => {
+  it("shows the year next to the trim", () => {
+    expect(unitTitle(2027, "Civic", "Sport")).toBe("2027 Civic Sport");
+  });
+
+  it("notes a leftover year but not the same or a later year", () => {
+    expect(leftoverYearNote(2026, 2026)).toBeNull();
+    expect(leftoverYearNote(2025, 2026)).toBe(
+      "2025 model year: at resale it counts as a year older.",
+    );
+    expect(leftoverYearNote(2027, 2026)).toBeNull();
+  });
+
+  it("shows no year and no note when the year is missing", () => {
+    expect(unitTitle(null, "Civic", "Sport")).toBe("Civic Sport");
+    expect(leftoverYearNote(null, 2026)).toBeNull();
+    expect(leftoverYearNote(2025, null)).toBeNull();
+  });
+});
+
+describe("lifespan row (task 031, part 3)", () => {
+  it("says not yet rated with no number when there is no lifespan", () => {
+    expect(lifespanRowText(null)).toBe("Not yet rated");
+    expect(lifespanRowText(undefined)).toBe("Not yet rated");
+    expect(lifespanRowText(null)).not.toMatch(/\d/);
+  });
+
+  it("keeps the rated label otherwise", () => {
+    expect(lifespanRowText(13.9)).toBe("Lasts about 14 years");
   });
 });
 

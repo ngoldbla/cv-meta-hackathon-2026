@@ -182,6 +182,8 @@ export function lineupFromTable(table: LowkeyTable, category: Category) {
     // Task 031: the table's discount factor, so the card can show
     // after-discount percentages from the same factor the dollars use.
     tradeInFactor: table.tradeInFactor,
+    // Task 031: the table's current model year, for leftover notes.
+    currentYear: table.sources.epa.modelYear,
   }));
   const commodity = lineup.commodity
     ? {
@@ -192,6 +194,7 @@ export function lineupFromTable(table: LowkeyTable, category: Category) {
             : undefined,
         ),
         tradeInFactor: table.tradeInFactor,
+        currentYear: table.sources.epa.modelYear,
       }
     : null;
   return {

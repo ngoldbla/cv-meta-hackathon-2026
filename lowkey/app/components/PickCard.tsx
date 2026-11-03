@@ -11,8 +11,10 @@ import { StatusDot } from "@/components/ui/status-dot";
 import {
   effectiveMonthlyCost,
   lastsAboutLabel,
+  leftoverYearNote,
   monthlyBills,
   trimLineText,
+  unitTitle,
 } from "@/lib/costs";
 import { cardSentence, underwaterLabel } from "@/lib/summary";
 import { CarFigure } from "./hairline/CarFigure";
@@ -44,6 +46,7 @@ interface PickLike {
   trimRetention5y?: number | null;
   trimFeatures?: string[];
   tradeInFactor?: number;
+  currentYear?: number;
   lifespanYears?: number | null;
   lifespanSource?: string | null;
   lifespanAsOf?: string | null;
@@ -79,6 +82,7 @@ export interface FuelLike {
 }
 
 export interface LocalLike {
+  model?: string | null;
   zip?: string;
   bestPrice?: number | null;
   bestDealer?: string | null;
@@ -129,10 +133,14 @@ export default function PickCard({
   onWalkAway?: () => void;
 }) {
   const units = local?.units ?? [];
-  const bestUnit =
-    units.length > 0
-      ? units.reduce((a, b) => (b.price < a.price ? b : a))
-      : undefined;
+  const modelForUnits = local?.model ?? pick.model;
+  const leftoverNotes = [
+    ...new Set(
+      units
+        .map((u) => leftoverYearNote(u.year, pick.currentYear))
+        .filter((n): n is string => n !== null),
+    ),
+  ];
   const cheapest = pick.flag === "badge" || pick.flag === "extra";
   const label =
     pick.flag === "badge"
@@ -237,27 +245,42 @@ export default function PickCard({
             <dd className="text-[15px]">
               {local?.error ? (
                 <span>{local.error}</span>
-              ) : bestUnit ? (
-                <span>
-                  <span className="mono">{bestUnit.distanceMiles} mi</span>
-                  {" · "}
-                  {bestUnit.dealer}
-                  {" · "}
-                  <a
-                    href={bestUnit.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-block py-[13px] -my-[13px]"
-                  >
-                    See the car
-                  </a>
-                </span>
+              ) : units.length > 0 ? (
+                <ul className="flex flex-col gap-1.5">
+                  {units.map((u, i) => (
+                    <li key={`${u.url}-${i}`} className="text-[13px] leading-relaxed">
+                      <span className="font-medium">
+                        {unitTitle(u.year, modelForUnits, u.trim)}
+                      </span>
+                      {" · "}
+                      <span className="mono">{fmt(u.price)}</span>
+                      {" · "}
+                      <span className="mono">{u.distanceMiles} mi</span>
+                      {" · "}
+                      {u.dealer}
+                      {" · "}
+                      <a
+                        href={u.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-block py-[13px] -my-[13px]"
+                      >
+                        See the car
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               ) : local ? (
                 <span>No local stock found. Payment uses the typical price.</span>
               ) : (
                 "—"
               )}
             </dd>
+            {leftoverNotes.map((note) => (
+              <dd key={note} className="mt-1 text-[13px] leading-relaxed text-foreground/80">
+                {note}
+              </dd>
+            ))}
           </div>
           {pick.lifespanYears !== null && pick.lifespanYears !== undefined ? (
             <div>

@@ -62,6 +62,7 @@ interface PickOut {
   trimRetention5y?: number | null;
   trimFeatures?: string[];
   tradeInFactor?: number;
+  currentYear?: number;
   lifespanYears?: number | null;
   lifespanSource?: string | null;
   lifespanAsOf?: string | null;

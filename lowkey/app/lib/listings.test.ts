@@ -86,6 +86,28 @@ describe("mapListingsResponse (task 027 part 3)", () => {
   });
 });
 
+describe("model years (task 031, part 2)", () => {
+  it("sends no year filter and keeps every model year", () => {
+    const url = listingsUrl("https://provider.example", "CR-V", "60614", 50);
+    expect(url).not.toContain("year=");
+    const { units } = mapListingsResponse(
+      body([
+        row({ year: 2025, price_with_fees: 30000, vdp_url: "https://example.com/fixture/a" }),
+        row({ year: 2026, price_with_fees: 31000, vdp_url: "https://example.com/fixture/b" }),
+        row({ year: 2027, price_with_fees: 32000, vdp_url: "https://example.com/fixture/c" }),
+      ]),
+      "60614",
+    );
+    expect(units.map((u) => u.year)).toEqual([2025, 2026, 2027]);
+  });
+
+  it("keeps a unit whose year is missing, with no year", () => {
+    const { units } = mapListingsResponse(body([row({ year: null })]), "60614");
+    expect(units).toHaveLength(1);
+    expect(units[0]?.year).toBeNull();
+  });
+});
+
 describe("fetchLocalUnits radius widening and failures", () => {
   it("widens 50 -> 150 when fewer than 3 are found and says so", async () => {
     const urls: string[] = [];
