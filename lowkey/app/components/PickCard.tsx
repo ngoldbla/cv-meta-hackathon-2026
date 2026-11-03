@@ -10,8 +10,8 @@ import {
 import { StatusDot } from "@/components/ui/status-dot";
 import {
   effectiveMonthlyCost,
-  lastsAboutLabel,
   leftoverYearNote,
+  lifespanRowText,
   monthlyBills,
   trimLineText,
   unitTitle,
@@ -282,12 +282,10 @@ export default function PickCard({
               </dd>
             ))}
           </div>
-          {pick.lifespanYears !== null && pick.lifespanYears !== undefined ? (
-            <div>
-              <dt className="text-xs text-muted-foreground">Lifespan</dt>
-              <dd className="text-[15px]">{lastsAboutLabel(pick.lifespanYears)}</dd>
-            </div>
-          ) : null}
+          <div>
+            <dt className="text-xs text-muted-foreground">Lifespan</dt>
+            <dd className="text-[15px]">{lifespanRowText(pick.lifespanYears)}</dd>
+          </div>
           <div>
             <dt className="text-xs text-muted-foreground">
               {ownership ? underwaterLabel(even) : "Worth vs owe"}

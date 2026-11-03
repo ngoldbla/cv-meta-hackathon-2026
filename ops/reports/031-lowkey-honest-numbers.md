@@ -21,6 +21,7 @@ Pending.
   - `lowkey/app/lib/table.ts` attaches `currentYear` (the table's EPA model year) to picks/commodity; `HomeClient.tsx` types it.
   - `PickCard.tsx` now lists every unit (up to 3) under "Distance to the dealer" as "2027 Civic Sport · $price · N mi · Dealer · See the car" (`unitTitle` in `lib/costs.ts`), with one leftover note per older year via `leftoverYearNote` ("2025 model year: at resale it counts as a year older."). Fixture tests cover same/earlier/later/missing year.
   - The `lifespanRowText` helper (part 3) also landed in `lib/costs.ts` in this commit; its card wiring follows in part 3. Focused tests 42 passed; `npm run build` passes.
+- Part 3 (unrated lifespan): `PickCard.tsx` now always renders the Lifespan row via `lifespanRowText` — rated models keep "Lasts about N years", unrated show "Not yet rated" with no number, so every card keeps the same rows in the same order. The lifespan footnote still shows only for rated models; `cardSentence` already omits the "Built to last…" clause when unrated; `WalkAwayView` already guards its cost-per-year line on `pick.lifespanYears`. Tests: `lifespanRowText(null)` is "Not yet rated" with no digit (no DOM harness in the app, per report 028, so the row text is tested at the logic level). Focused tests 27 passed; build passes.
 
 ## Deviations
 - Inbox skill says sync on `main`; the direct instruction for this run is branch `low-key` only, so all work is on `low-key`.
