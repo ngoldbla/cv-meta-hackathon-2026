@@ -6,12 +6,24 @@ export interface CurveLike {
   balance: number;
 }
 
-const GOLD = "#7A5A10";
-const INK = "#1B1C1E";
-const WARM_FILL = "#E9B8A4";
-const GREEN_FILL = "#BFD6C4";
-const WARM_TEXT = "#8A3B1E";
-const GREEN_TEXT = "#2E5E3A";
+/* Task 026 design, styled with Iconiq theme tokens (task 028, part 4):
+   worth line --chart-1 (brass), owe line --chart-2 (ink), underwater
+   gap --chart-under, "yours if you sell" gap --chart-yours. The Iconiq
+   `charts` (Recharts) shell was not used: splitting the gap fill at
+   the crossing month with two token colours, the crossing dot and
+   the slider marker are exact in this SVG and would need custom
+   Recharts shapes to reproduce. See the task 028 report. */
+const GOLD = "var(--chart-1)";
+const INK = "var(--chart-2)";
+const WARM_FILL = "var(--chart-under)";
+const GREEN_FILL = "var(--chart-yours)";
+const WARM_TEXT = "var(--chart-under-text)";
+const GREEN_TEXT = "var(--chart-yours-text)";
+const CARD = "var(--card)";
+const GRID = "var(--border)";
+const MUTED = "var(--muted-foreground)";
+const SANS = "var(--font-sans)";
+const MONO = "var(--font-mono)";
 
 function pointsAttr(
   curve: CurveLike[],
@@ -64,23 +76,23 @@ export function MiniChart({
       aria-label="Worth if sold versus what you owe over 60 months"
       style={{ display: "block" }}
     >
-      {under ? <path d={under} fill={WARM_FILL} fillOpacity={0.75} /> : null}
-      {yours ? <path d={yours} fill={GREEN_FILL} fillOpacity={0.8} /> : null}
+      {under ? <path d={under} style={{ fill: WARM_FILL }} fillOpacity={0.75} /> : null}
+      {yours ? <path d={yours} style={{ fill: GREEN_FILL }} fillOpacity={0.8} /> : null}
       <polyline
         points={pointsAttr(curve, "balance", x, y)}
         fill="none"
-        stroke={INK}
+        style={{ stroke: INK }}
         strokeWidth={1.8}
         strokeDasharray="4 3"
       />
       <polyline
         points={pointsAttr(curve, "resale", x, y)}
         fill="none"
-        stroke={GOLD}
+        style={{ stroke: GOLD }}
         strokeWidth={2}
       />
       {cross ? (
-        <circle cx={x(cross.month)} cy={y(cross.resale)} r={3.2} fill="#FFFFFF" stroke={INK} strokeWidth={1.6} />
+        <circle cx={x(cross.month)} cy={y(cross.resale)} r={3.2} style={{ fill: CARD, stroke: INK }} strokeWidth={1.6} />
       ) : null}
     </svg>
   );
@@ -137,60 +149,59 @@ export function FullChart({
     >
       {ticks.map((v) => (
         <g key={v}>
-          <line x1={left} x2={right} y1={y(v)} y2={y(v)} stroke="#E7E5DF" strokeWidth={1} />
-          <text x={left - 6} y={y(v) + 4} textAnchor="end" fontSize={10} fill="#5A5C60" fontFamily="'IBM Plex Mono', monospace">
+          <line x1={left} x2={right} y1={y(v)} y2={y(v)} style={{ stroke: GRID }} strokeWidth={1} />
+          <text x={left - 6} y={y(v) + 4} textAnchor="end" fontSize={10} style={{ fill: MUTED, fontFamily: MONO }}>
             {v / 1000}k
           </text>
         </g>
       ))}
       {xTicks.map((m) => (
-        <text key={m} x={x(m)} y={192} textAnchor="middle" fontSize={10} fill="#5A5C60" fontFamily="'IBM Plex Mono', monospace">
+        <text key={m} x={x(m)} y={192} textAnchor="middle" fontSize={10} style={{ fill: MUTED, fontFamily: MONO }}>
           {m}
         </text>
       ))}
-      {under ? <path d={under} fill={WARM_FILL} fillOpacity={0.75} /> : null}
-      {yours ? <path d={yours} fill={GREEN_FILL} fillOpacity={0.8} /> : null}
+      {under ? <path d={under} style={{ fill: WARM_FILL }} fillOpacity={0.75} /> : null}
+      {yours ? <path d={yours} style={{ fill: GREEN_FILL }} fillOpacity={0.8} /> : null}
       <polyline
         points={pointsAttr(curve, "balance", x, y)}
         fill="none"
-        stroke={INK}
+        style={{ stroke: INK }}
         strokeWidth={2}
         strokeDasharray="5 4"
       />
       <polyline
         points={pointsAttr(curve, "resale", x, y)}
         fill="none"
-        stroke={GOLD}
+        style={{ stroke: GOLD }}
         strokeWidth={2.5}
       />
       {underEnd > 2 ? (
-        <text x={x(midUnder)} y={Math.min(bottom - 6, underY + 22)} textAnchor="middle" fontSize={11} fontWeight={600} fill={WARM_TEXT} fontFamily="'IBM Plex Sans', sans-serif">
+        <text x={x(midUnder)} y={Math.min(bottom - 6, underY + 22)} textAnchor="middle" fontSize={11} fontWeight={600} style={{ fill: WARM_TEXT, fontFamily: SANS }}>
           underwater
         </text>
       ) : null}
       {evenMonth !== null ? (
-        <text x={x(midYours)} y={Math.max(top + 10, yoursY - 10)} textAnchor="middle" fontSize={11} fontWeight={600} fill={GREEN_TEXT} fontFamily="'IBM Plex Sans', sans-serif">
+        <text x={x(midYours)} y={Math.max(top + 10, yoursY - 10)} textAnchor="middle" fontSize={11} fontWeight={600} style={{ fill: GREEN_TEXT, fontFamily: SANS }}>
           yours if you sell
         </text>
       ) : null}
       {cross ? (
         <>
-          <circle cx={x(cross.month)} cy={y(cross.resale)} r={5} fill="#FFFFFF" stroke={INK} strokeWidth={2} />
-          <text x={Math.min(right - 52, x(cross.month) + 8)} y={Math.max(top + 10, y(cross.resale) - 9)} fontSize={11} fontWeight={600} fill={INK} fontFamily="'IBM Plex Sans', sans-serif">
+          <circle cx={x(cross.month)} cy={y(cross.resale)} r={5} style={{ fill: CARD, stroke: INK }} strokeWidth={2} />
+          <text x={Math.min(right - 52, x(cross.month) + 8)} y={Math.max(top + 10, y(cross.resale) - 9)} fontSize={11} fontWeight={600} style={{ fill: INK, fontFamily: SANS }}>
             {`month ${cross.month}: even`}
           </text>
         </>
       ) : null}
-      <line x1={selX} x2={selX} y1={top} y2={bottom} stroke={INK} strokeWidth={1.5} />
-      <circle cx={selX} cy={y(sel.resale)} r={4.5} fill={GOLD} />
-      <circle cx={selX} cy={y(sel.balance)} r={4.5} fill={INK} />
+      <line x1={selX} x2={selX} y1={top} y2={bottom} style={{ stroke: INK }} strokeWidth={1.5} />
+      <circle cx={selX} cy={y(sel.resale)} r={4.5} style={{ fill: GOLD }} />
+      <circle cx={selX} cy={y(sel.balance)} r={4.5} style={{ fill: INK }} />
       <text
         x={Math.min(right - 30, Math.max(left + 30, selX + (selX > 240 ? -34 : 10)))}
         y={(y(sel.resale) + y(sel.balance)) / 2 + 4}
         fontSize={11}
         fontWeight={600}
-        fill={backColor}
-        fontFamily="'IBM Plex Mono', monospace"
+        style={{ fill: backColor, fontFamily: MONO }}
       >
         {backLabel}
       </text>

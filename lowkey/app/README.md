@@ -36,5 +36,12 @@ Installed with the pinned shadcn CLI `npx shadcn@4.23.0 add @iconiq/<name>` (reg
 - `thinking-indicator` → `components/ui/thinking-indicator.tsx` (before the first step)
 - `streaming-text` → `components/ui/streaming-text.tsx` (follow-up replies; copied source now keeps already-shown words when the model appends text)
 - `reveal-text` → `components/ui/reveal-text.tsx` (opening headline; chosen over `dia-text` as the calmer, non-looping reveal)
+- `card` → `components/ui/card.tsx` (pick cards)
+- `badge` → `components/ui/badge.tsx` (rank / cheapest-to-own labels)
+- `status-dot` → `components/ui/status-dot.tsx` (in-stock indicator)
+- `rolling-digits` → `components/ui/rolling-digits.tsx` (monthly payment, walk-away numbers)
+- `slider` → `components/ui/slider.tsx` (sell-month slider)
+- `table` → `components/ui/table.tsx` (Sell at / You get back / Cost per month tables)
+- `drawer` → `components/ui/drawer.tsx` (walk-away bottom sheet on narrow screens; chosen over `dialog` — a phone-height chart + slider reads better as a sheet than as a centred modal)
 
 Tailwind CSS 4.1.18 (`@tailwindcss/postcss` 4.1.18, `postcss` 8.5.6, `tw-animate-css` 1.4.0) is the version the registry expects. All new dependencies are pinned exactly in `package.json` / `package-lock.json` (Iconiq lockfile versions: `motion` 12.42.0, `@base-ui/react` 1.5.0, `lucide-react` 0.564.0, `class-variance-authority` 0.7.1, `clsx` 2.1.1, `tailwind-merge` 3.6.0, `@radix-ui/react-slot` 1.3.3, `vaul` 1.1.2, `@lucasmarkes/hairline` 0.5.1).

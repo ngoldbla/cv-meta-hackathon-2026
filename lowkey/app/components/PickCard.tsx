@@ -1,3 +1,22 @@
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { RollingDigits } from "@/components/ui/rolling-digits";
+import { StatusDot } from "@/components/ui/status-dot";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { cardSentence, underwaterLabel } from "@/lib/summary";
 import { MiniChart, type CurveLike } from "./WorthChart";
 
@@ -95,6 +114,7 @@ export default function PickCard({
     units.length > 0
       ? units.reduce((a, b) => (b.price < a.price ? b : a))
       : undefined;
+  const cheapest = pick.flag === "badge" || pick.flag === "extra";
   const label =
     pick.flag === "badge"
       ? "Cheapest to own"
@@ -115,156 +135,160 @@ export default function PickCard({
   const keepsPrice = ownership?.price ?? pick.price;
   const typical = ownership?.priceSource === "typical";
   return (
-    <article className="pick-card">
-      <div className="pick-head">
-        <span className="pick-rank">{label}</span>
-      </div>
-      <h3 className="pick-title">
-        {pick.make} {pick.model}
-      </h3>
-      <p className="pick-why">{sentence}</p>
-      <dl className="pick-grid">
+    <Card className="my-3">
+      <CardHeader>
         <div>
-          <dt>Per month</dt>
-          <dd className="mono">
-            {ownership ? `${fmt(ownership.monthlyPayment)}/mo` : "—"}
-            {typical ? <span className="price-note"> typical price</span> : null}
-          </dd>
+          <Badge color={cheapest ? "amber" : "gray"} shimmer={false}>
+            {label}
+          </Badge>
         </div>
-        <div>
-          <dt>Keeps after 5 years</dt>
-          <dd className="mono">{`${Math.round(pick.retention5y * 100)}% · ${fmt(keepsPrice * pick.retention5y)}`}</dd>
-        </div>
-        <div>
-          <dt>Leave at 1 year</dt>
-          <dd className="mono">{leave1y ? fmt(leave1y.walkAwayCost) : "—"}</dd>
-        </div>
-        <div>
-          <dt>Best local price</dt>
-          <dd className="mono">{fmt(local?.bestPrice ?? bestUnit?.price)}</dd>
-        </div>
-        <div className="pick-chart-cell">
-          <dt>{ownership ? underwaterLabel(even) : "Worth vs owe"}</dt>
-          <dd>
-            {ownership?.curve ? (
-              <MiniChart curve={ownership.curve} evenMonth={even} />
-            ) : (
-              "—"
-            )}
-          </dd>
-        </div>
-        <div>
-          <dt>Local stock</dt>
-          <dd>
-            {local?.error ? (
-              <span>{local.error}</span>
-            ) : units.length > 0 ? (
-              <span>
-                {units.length} nearby · closest{" "}
-                <span className="mono">{bestUnit?.distanceMiles} mi</span>
-              </span>
-            ) : local ? (
-              <span>No local stock found. Payment uses the typical price.</span>
-            ) : (
-              "—"
-            )}
-          </dd>
-        </div>
-      </dl>
-      {local?.fuel ? <p className="pick-fuel">{local.fuel.text}</p> : null}
-      {local?.widened ? (
-        <p className="widened-note">
-          Searched out to 150 miles.
-          {local.totalFound !== undefined && local.totalFound < 3
-            ? ` Only ${local.totalFound} in stock within 150 miles.`
-            : ""}
-        </p>
-      ) : null}
-      {units.length > 0 ? (
-        <ul className="units">
-          {units.map((u) => (
-            <li key={u.url}>
-              <span className="mono">{fmt(u.price)}</span>
-              {" · "}
-              {u.dealer}
-              {" · "}
-              <span className="mono">{u.distanceMiles} mi</span>
-              {u.daysOnLot !== null && u.daysOnLot !== undefined
-                ? ` · ${u.daysOnLot} days on the lot`
-                : ""}
-              {u.year || u.trim
-                ? ` · ${[u.year, u.trim].filter(Boolean).join(" ")}`
-                : ""}
-              {" · "}
-              <a href={u.url} target="_blank" rel="noreferrer">
-                See the car
-              </a>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-      {ownership && onWalkAway ? (
-        <button type="button" className="walk-link" onClick={onWalkAway}>
-          If I change my mind
-        </button>
-      ) : null}
-      {ownership ? (
-        <details className="walk-table">
-          <summary>Walk-away table</summary>
-          <table>
-            <thead>
-              <tr>
-                <th>Sell at</th>
-                <th>You get back</th>
-                <th>Cost per month</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ownership.walkAway.map((p) => (
-                <tr key={p.month}>
-                  <td className="mono">{p.month} mo</td>
-                  <td className="mono">{p.getBack !== undefined ? signed(p.getBack) : "—"}</td>
-                  <td className="mono">
-                    {fmt(p.costPerMonth ?? p.perMonth)}/mo
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </details>
-      ) : null}
-      <style>{`
-        .pick-card { background: var(--card); border: 1px solid var(--line);
-          border-radius: 12px; padding: 16px; margin: 12px 0; }
-        .pick-head { display: flex; justify-content: space-between;
-          align-items: center; gap: 8px; }
-        .pick-rank { color: var(--brass); font-weight: 700; font-size: 13px;
-          letter-spacing: 0.04em; text-transform: uppercase; }
-        .pick-title { margin: 8px 0 6px; font-size: 19px; }
-        .pick-why { margin: 0 0 12px; font-size: 14px; line-height: 1.5; color: #3E4044; }
-        .pick-grid { display: grid; grid-template-columns: 1fr 1fr;
-          gap: 12px 16px; margin: 0; }
-        .pick-grid dt { color: var(--muted); font-size: 12px; margin-bottom: 2px; }
-        .pick-grid dd { margin: 0; font-size: 15px; }
-        .pick-chart-cell dd { max-width: 220px; }
-        .price-note { font-family: "IBM Plex Sans", system-ui, sans-serif;
-          font-size: 12px; color: var(--muted); }
-        .pick-fuel { margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: #3E4044; }
-        .widened-note { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
-        .units { margin: 10px 0 0; padding-left: 18px; font-size: 13px;
-          line-height: 1.6; color: #3E4044; }
-        .walk-link { margin-top: 12px; font: inherit; font-size: 14px; font-weight: 600;
-          color: var(--brass); background: none; border: 0; padding: 6px 0; cursor: pointer;
-          text-decoration: underline; text-underline-offset: 3px; }
-        .walk-table { margin-top: 12px; border-top: 1px solid var(--line);
-          padding-top: 10px; font-size: 14px; }
-        .walk-table summary { cursor: pointer; font-weight: 600; }
-        .walk-table table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-        .walk-table th, .walk-table td { text-align: left; padding: 6px 4px;
-          border-bottom: 1px solid var(--line); font-size: 13px; }
-        .walk-table th { color: var(--muted); font-weight: 500; }
-        @media (max-width: 420px) { .pick-grid { grid-template-columns: 1fr; } }
-      `}</style>
-    </article>
+        <CardTitle className="text-[19px]">
+          {pick.make} {pick.model}
+        </CardTitle>
+        <CardDescription>{sentence}</CardDescription>
+        {units.length > 0 ? (
+          <CardAction>
+            <StatusDot tone="success" showLabel label="In stock" size="sm" />
+          </CardAction>
+        ) : null}
+      </CardHeader>
+      <CardContent>
+        <dl className="grid grid-cols-1 gap-x-4 gap-y-3 min-[420px]:grid-cols-2">
+          <div>
+            <dt className="text-xs text-muted-foreground">Per month</dt>
+            <dd className="mono text-[15px]">
+              {ownership ? (
+                <>
+                  $
+                  <RollingDigits
+                    value={Math.round(ownership.monthlyPayment)}
+                    locale="en-US"
+                  />
+                  /mo
+                  {typical ? (
+                    <span className="font-sans text-xs text-muted-foreground"> typical price</span>
+                  ) : null}
+                </>
+              ) : (
+                "—"
+              )}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs text-muted-foreground">Keeps after 5 years</dt>
+            <dd className="mono text-[15px]">{`${Math.round(pick.retention5y * 100)}% · ${fmt(keepsPrice * pick.retention5y)}`}</dd>
+          </div>
+          <div>
+            <dt className="text-xs text-muted-foreground">Leave at 1 year</dt>
+            <dd className="mono text-[15px]">{leave1y ? fmt(leave1y.walkAwayCost) : "—"}</dd>
+          </div>
+          <div>
+            <dt className="text-xs text-muted-foreground">Best local price</dt>
+            <dd className="mono text-[15px]">{fmt(local?.bestPrice ?? bestUnit?.price)}</dd>
+          </div>
+          <div>
+            <dt className="text-xs text-muted-foreground">
+              {ownership ? underwaterLabel(even) : "Worth vs owe"}
+            </dt>
+            <dd className="max-w-[220px]">
+              {ownership?.curve ? (
+                <MiniChart curve={ownership.curve} evenMonth={even} />
+              ) : (
+                "—"
+              )}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs text-muted-foreground">Local stock</dt>
+            <dd className="text-[15px]">
+              {local?.error ? (
+                <span>{local.error}</span>
+              ) : units.length > 0 ? (
+                <span>
+                  {units.length} nearby · closest{" "}
+                  <span className="mono">{bestUnit?.distanceMiles} mi</span>
+                </span>
+              ) : local ? (
+                <span>No local stock found. Payment uses the typical price.</span>
+              ) : (
+                "—"
+              )}
+            </dd>
+          </div>
+        </dl>
+        {local?.fuel ? (
+          <p className="mt-3 text-[13px] leading-relaxed text-foreground/80">{local.fuel.text}</p>
+        ) : null}
+        {local?.widened ? (
+          <p className="mt-2 text-[13px] text-muted-foreground">
+            Searched out to 150 miles.
+            {local.totalFound !== undefined && local.totalFound < 3
+              ? ` Only ${local.totalFound} in stock within 150 miles.`
+              : ""}
+          </p>
+        ) : null}
+        {units.length > 0 ? (
+          <ul className="mt-2.5 list-disc pl-[18px] text-[13px] leading-relaxed text-foreground/80">
+            {units.map((u) => (
+              <li key={u.url}>
+                <span className="mono">{fmt(u.price)}</span>
+                {" · "}
+                {u.dealer}
+                {" · "}
+                <span className="mono">{u.distanceMiles} mi</span>
+                {u.daysOnLot !== null && u.daysOnLot !== undefined
+                  ? ` · ${u.daysOnLot} days on the lot`
+                  : ""}
+                {u.year || u.trim
+                  ? ` · ${[u.year, u.trim].filter(Boolean).join(" ")}`
+                  : ""}
+                {" · "}
+                <a href={u.url} target="_blank" rel="noreferrer">
+                  See the car
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {ownership && onWalkAway ? (
+          <button
+            type="button"
+            className="mt-1 min-h-11 py-1.5 text-left text-sm font-semibold text-brass underline underline-offset-[3px]"
+            onClick={onWalkAway}
+          >
+            If I change my mind
+          </button>
+        ) : null}
+        {ownership ? (
+          <details className="mt-2 border-t border-border pt-2.5 text-sm">
+            <summary className="min-h-11 cursor-pointer py-2 font-semibold">
+              Walk-away table
+            </summary>
+            <Table columns="minmax(0,0.7fr) minmax(0,1fr) minmax(0,1fr)" size="compact">
+              <TableHeader>
+                <TableRow variant="header">
+                  <TableHead>Sell at</TableHead>
+                  <TableHead align="right">You get back</TableHead>
+                  <TableHead align="right">Cost per month</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {ownership.walkAway.map((p) => (
+                  <TableRow key={p.month}>
+                    <TableCell className="mono">{p.month} mo</TableCell>
+                    <TableCell align="right" className="mono">
+                      {p.getBack !== undefined ? signed(p.getBack) : "—"}
+                    </TableCell>
+                    <TableCell align="right" className="mono">
+                      {fmt(p.costPerMonth ?? p.perMonth)}/mo
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </details>
+        ) : null}
+      </CardContent>
+    </Card>
   );
 }

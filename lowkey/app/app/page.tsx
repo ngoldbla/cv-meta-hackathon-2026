@@ -1,11 +1,19 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 
 import PickCard, { type LocalLike } from "@/components/PickCard";
 import WalkAwayView from "@/components/WalkAwayView";
 import { AIInput } from "@/components/ui/ai-input";
+import {
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import {
   Message,
   MessageBubble,
@@ -194,7 +202,16 @@ export default function Home() {
   const { messages, sendMessage, status, error } = useChat();
   const [aprText, setAprText] = useState<string | null>(null);
   const [walk, setWalk] = useState<WalkSelection | null>(null);
+  const [isNarrow, setIsNarrow] = useState(false);
   const busy = status === "submitted" || status === "streaming";
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    const update = () => setIsNarrow(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   useEffect(() => {
     let live = true;
@@ -247,7 +264,7 @@ export default function Home() {
       </header>
 
       <div className="messages">
-        {walk ? (
+        {walk && !isNarrow ? (
           <WalkAwayView
             pick={walk.pick}
             ownership={{
@@ -405,6 +422,56 @@ export default function Home() {
           </>
         )}
       </div>
+
+      {walk && isNarrow ? (
+        <Drawer
+          open
+          direction="bottom"
+          handleOnly
+          onOpenChange={(open) => {
+            if (!open) setWalk(null);
+          }}
+        >
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>If I change my mind</DrawerTitle>
+              <DrawerDescription>
+                {walk.pick.make} {walk.pick.model}
+              </DrawerDescription>
+            </DrawerHeader>
+            <DrawerBody>
+              <WalkAwayView
+                hideHeader
+                pick={walk.pick}
+                ownership={{
+                  price: walk.ownership.price,
+                  downPayment: walk.ownership.downPayment,
+                  aprPercent: walk.ownership.aprPercent,
+                  termMonths: walk.ownership.termMonths,
+                  monthlyPayment: walk.ownership.monthlyPayment,
+                  curve: walk.ownership.curve ?? [],
+                  monthly: (walk.ownership.monthly ?? []).map((p) => ({
+                    month: p.month,
+                    getBack: p.getBack,
+                    costPerMonth: p.costPerMonth,
+                  })),
+                  walkAway: walk.ownership.walkAway.map((p) => ({
+                    month: p.month,
+                    getBack: p.getBack ?? 0,
+                    costPerMonth: p.costPerMonth ?? p.perMonth,
+                  })),
+                  evenMonth:
+                    walk.ownership.evenMonth !== undefined
+                      ? walk.ownership.evenMonth
+                      : (walk.ownership.underwaterMonth ?? null),
+                }}
+                aprText={walk.aprText}
+                onBack={() => setWalk(null)}
+              />
+            </DrawerBody>
+          </DrawerContent>
+        </Drawer>
+      ) : null}
 
       <div className="sticky bottom-0 border-t border-border bg-background py-3">
         <AIInput

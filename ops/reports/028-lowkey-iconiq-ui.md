@@ -13,8 +13,10 @@ In progress. Rebuilding the Low Key UI on Iconiq UI (AI blocks first) on branch 
 
 - Part 3 (this commit): installed the AI blocks with the pinned CLI — `message`, `reasoning-steps`, `thinking-indicator`, `streaming-text`, `reveal-text` (plus `b-switch`); `ai-input` was copied from its registry JSON because CLI 4.23.0 resolves its un-namespaced `b-switch` dependency against the default shadcn registry and 404s (verified by dry-run; same bytes the CLI would write). Rebuilt `app/page.tsx`: Iconiq `ai-input` composer (placeholder `e.g. 60614, SUV`, `showMessages` off, no agent/model/setting chips, send wave kept; copied source: plus/mic buttons removed, `disabled` while busy added, send target 44 px), `message` bubbles for every user/assistant message, `reasoning-steps` fed only from real tool-call parts (rank → local → ownership, done when each kind's results arrive; never a timer), `thinking-indicator` before the first step, `streaming-text` for follow-up replies (copied source fixed to append rather than restart on growing text), and the opening on `typography` + `reveal-text` (chosen over `dia-text`: calmer, no loop). Build passes; app tests 64 passed.
 
+- Part 4 (this commit): installed `card`, `badge`, `status-dot`, `rolling-digits`, `slider`, `table` and `drawer`. Rebuilt `PickCard` on Iconiq `card` + `badge` (rank / cheapest-to-own) + `status-dot` (in stock) + `rolling-digits` (per-month payment), and `WalkAwayView` on `slider` + `rolling-digits` (both sentence numbers) + `table` (both Sell at tables). Chart decision: kept the task-026 SVG (`WorthChart`) restyled with theme tokens (`--chart-1/2`, `--chart-under/yours` + text tokens) — Iconiq `charts` (Recharts) was not installed because splitting the shaded gap at the crossing month into two token colours with the crossing dot and slider marker is exact in the current SVG and would need custom Recharts shapes; `recharts` would also add a large dependency for no visual gain. Walk-away on narrow screens (≤640 px) now opens in Iconiq `drawer` (bottom sheet, `handleOnly` so drags never fight the slider); wider screens keep the full view. Build passes; app tests 64 passed.
+
 ## Results
-Pending (parts 4–6).
+Pending (parts 5–6).
 
 ## Deviations
 - Inbox sync step not followed (see above); synced `origin/low-key` instead.

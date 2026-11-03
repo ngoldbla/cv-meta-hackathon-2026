@@ -2,6 +2,19 @@
 
 import { useState } from "react";
 
+import { Card, CardContent } from "@/components/ui/card";
+import { RollingDigits } from "@/components/ui/rolling-digits";
+import { Slider } from "@/components/ui/slider";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Typography } from "@/components/ui/typography";
+
 import { FullChart, type CurveLike } from "./WorthChart";
 
 export interface WalkAwayOwnership {
@@ -59,11 +72,14 @@ export default function WalkAwayView({
   ownership,
   aprText,
   onBack,
+  hideHeader = false,
 }: {
   pick: WalkAwayPick;
   ownership: WalkAwayOwnership;
   aprText: string;
   onBack: () => void;
+  /** Hide the back/title row inside the mobile drawer (it has its own). */
+  hideHeader?: boolean;
 }) {
   const [month, setMonth] = useState(36);
   const detail =
@@ -83,130 +99,129 @@ export default function WalkAwayView({
   const downPct = Math.round((ownership.downPayment / ownership.price) * 100);
   const rankLabel = pick.rank ? `#${pick.rank} · ` : "";
   return (
-    <section aria-label="If I change my mind" className="walk-view">
-      <div className="walk-head">
-        <button type="button" className="walk-back" onClick={onBack} aria-label="Back to your picks">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B1C1E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <section aria-label="If I change my mind" className="flex flex-col gap-[18px] py-1.5">
+      {hideHeader ? null : (
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          className="flex size-11 shrink-0 items-center justify-center"
+          onClick={onBack}
+          aria-label="Back to your picks"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M15 6l-6 6 6 6" />
           </svg>
         </button>
-        <span className="walk-title">
+        <span className="text-[15px] font-medium">
           {rankLabel}
           {pick.make} {pick.model}
         </span>
       </div>
-      <h2 className="walk-h">{headline}</h2>
-      <p className="walk-intro">
+      )}
+      <Typography variant="h4" as="h2" className="text-[30px] leading-[1.15] text-balance">
+        {headline}
+      </Typography>
+      <Typography variant="paragraph-md" className="text-foreground/80">
         The gold line is what the car would sell for. The dashed line is what you still owe. Once gold is on top, selling pays off the loan and the difference comes back to you.
-      </p>
-      <section aria-label="Worth if sold versus what you owe" className="walk-chart-card">
-        <div className="walk-legend">
-          <span className="legend-item">
-            <span className="legend-gold" />
-            Worth if sold
-          </span>
-          <span className="legend-item">
-            <span className="legend-dash" />
-            You owe
-          </span>
-        </div>
-        <FullChart
-          curve={ownership.curve}
-          evenMonth={even}
-          selectedMonth={month}
-          selectedGetBack={getBack}
-        />
-        <div className="walk-slider">
-          <input
-            type="range"
+      </Typography>
+      <Card>
+        <CardContent className="flex flex-col gap-2.5 pt-4">
+          <div className="flex flex-wrap gap-3.5 px-1 text-xs text-foreground/80" aria-hidden="true">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="inline-block h-[3px] w-[18px] rounded-sm bg-brass" />
+              Worth if sold
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="inline-block w-[18px] border-t-2 border-dashed border-foreground" />
+              You owe
+            </span>
+          </div>
+          <div>
+            <FullChart
+              curve={ownership.curve}
+              evenMonth={even}
+              selectedMonth={month}
+              selectedGetBack={getBack}
+            />
+          </div>
+          <Slider
+            value={month}
             min={1}
             max={60}
             step={1}
-            value={month}
-            onChange={(e) => setMonth(Number(e.target.value))}
-            aria-label="Month you sell"
+            size="lg"
+            showValue={false}
+            ariaLabel="Month you sell"
+            description="Drag to pick when you sell"
+            onChange={(v) => setMonth(Array.isArray(v) ? (v[0] ?? 36) : v)}
           />
-          <span className="walk-slider-label">Drag to pick when you sell</span>
-        </div>
-        <div className="walk-dark">
-          <span className="walk-dark-kicker">Sell at month {month}</span>
-          <span className="walk-dark-line">
-            {getBack >= 0 ? (
-              <>
-                You walk away with <strong className="mono walk-green">{money(getBack)}</strong> after the loan is paid off.
-              </>
-            ) : (
-              <>
-                You would still owe <strong className="mono walk-warm">{money(-getBack)}</strong> to sell.
-              </>
-            )}
-          </span>
-          <span className="walk-dark-line">
-            Having the car cost you <strong className="mono walk-gold">{money(costPerMonth)} a month</strong>, interest included.
-          </span>
-        </div>
-      </section>
-      <section aria-label="If you sell at" className="walk-table-section">
-        <div className="walk-table-head mono-head">
-          <span>Sell at</span>
-          <span className="num">You get back</span>
-          <span className="num">Cost per month</span>
-        </div>
-        {ownership.walkAway.map((p) => (
-          <div key={p.month} className="walk-table-row">
-            <span className="walk-when">{whenLabel(p.month)}</span>
-            <span className="mono num">{signedMoney(p.getBack)}</span>
-            <span className="mono num">{money(p.costPerMonth)}</span>
+          <div className="flex flex-col gap-1 rounded-[10px] bg-[#1b1c1e] p-3.5 text-[#f3f2ee]">
+            <span className="text-xs tracking-[0.06em] text-[#c9c6bc] uppercase">
+              Sell at month {month}
+            </span>
+            <span className="text-base leading-[1.45]">
+              {getBack >= 0 ? (
+                <>
+                  You walk away with{" "}
+                  <strong className="mono text-[#a9d3b3]">
+                    $
+                    <RollingDigits value={Math.round(getBack)} locale="en-US" coalesceUpdates startOnView={false} />
+                  </strong>{" "}
+                  after the loan is paid off.
+                </>
+              ) : (
+                <>
+                  You would still owe{" "}
+                  <strong className="mono text-[#e9b8a4]">
+                    $
+                    <RollingDigits value={Math.round(-getBack)} locale="en-US" coalesceUpdates startOnView={false} />
+                  </strong>{" "}
+                  to sell.
+                </>
+              )}
+            </span>
+            <span className="text-base leading-[1.45]">
+              Having the car cost you{" "}
+              <strong className="mono text-[#e2c77e]">
+                $
+                <RollingDigits value={Math.round(costPerMonth)} locale="en-US" coalesceUpdates startOnView={false} />
+                {" "}a month
+              </strong>
+              , interest included.
+            </span>
           </div>
-        ))}
-        <p className="walk-note">
+        </CardContent>
+      </Card>
+      <section aria-label="If you sell at" className="flex flex-col gap-2.5">
+        <Table columns="64px minmax(0,1fr) minmax(0,1fr)">
+          <TableHeader>
+            <TableRow variant="header">
+              <TableHead>Sell at</TableHead>
+              <TableHead align="right">You get back</TableHead>
+              <TableHead align="right">Cost per month</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {ownership.walkAway.map((p) => (
+              <TableRow key={p.month}>
+                <TableCell className="font-medium">{whenLabel(p.month)}</TableCell>
+                <TableCell align="right" className="mono">
+                  {signedMoney(p.getBack)}
+                </TableCell>
+                <TableCell align="right" className="mono">
+                  {money(p.costPerMonth)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <Typography variant="paragraph-sm" className="text-muted-foreground">
           Cost per month falls the longer you keep it. A minus sign means you would owe the difference to sell.
-        </p>
+        </Typography>
       </section>
-      <p className="walk-foot">
+      <Typography variant="paragraph-xs" className="text-muted-foreground">
         {money(ownership.price)}, {downPct}% down, {ownership.termMonths} months, {aprText}. Say “my rate is 5.9%” to change it. Worth if sold = recent sales of this model, less 15%. Excludes tax, insurance, fuel and repairs.
-      </p>
-      <style>{`
-        .walk-view { display: flex; flex-direction: column; gap: 18px; padding: 6px 0 10px; }
-        .walk-head { display: flex; align-items: center; gap: 8px; }
-        .walk-back { width: 44px; height: 44px; display: flex; align-items: center;
-          justify-content: center; background: none; border: 0; cursor: pointer; padding: 0; }
-        .walk-title { font-size: 15px; font-weight: 500; }
-        .walk-view .sample-tag { align-self: flex-start; }
-        .walk-h { margin: 0; font-size: 30px; line-height: 1.15; font-weight: 600;
-          letter-spacing: -0.02em; text-wrap: balance; }
-        .walk-intro { margin: 0; font-size: 15px; line-height: 1.55; color: #3E4044; }
-        .walk-chart-card { background: var(--card); border: 1px solid var(--line);
-          border-radius: 14px; padding: 16px 12px 14px; display: flex;
-          flex-direction: column; gap: 10px; }
-        .walk-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px;
-          color: #3E4044; padding: 0 4px; }
-        .legend-item { display: inline-flex; align-items: center; gap: 6px; }
-        .legend-gold { width: 18px; height: 3px; background: #7A5A10; border-radius: 2px; }
-        .legend-dash { width: 18px; border-top: 2px dashed #1B1C1E; }
-        .walk-slider { padding: 0 4px; display: flex; flex-direction: column; gap: 6px; }
-        .walk-slider input[type="range"] { width: 100%; min-height: 32px; accent-color: #1B1C1E; }
-        .walk-slider-label { font-size: 11px; color: var(--muted); text-align: center; }
-        .walk-dark { background: #1B1C1E; color: #F3F2EE; border-radius: 10px;
-          padding: 14px; display: flex; flex-direction: column; gap: 4px; }
-        .walk-dark-kicker { font-size: 12px; color: #C9C6BC; text-transform: uppercase;
-          letter-spacing: 0.06em; }
-        .walk-dark-line { font-size: 16px; line-height: 1.45; }
-        .walk-green { color: #A9D3B3; }
-        .walk-gold { color: #E2C77E; }
-        .walk-warm { color: #E9B8A4; }
-        .walk-table-section { display: flex; flex-direction: column; gap: 10px; }
-        .walk-table-head { display: grid; grid-template-columns: 64px minmax(0, 1fr) minmax(0, 1fr);
-          gap: 10px; font-size: 11px; color: var(--muted); text-transform: uppercase;
-          letter-spacing: 0.05em; }
-        .walk-table-row { display: grid; grid-template-columns: 64px minmax(0, 1fr) minmax(0, 1fr);
-          gap: 10px; align-items: baseline; border-top: 1px solid var(--line); padding-top: 8px; }
-        .walk-table-row .num, .walk-table-head .num { text-align: right; }
-        .walk-table-row .mono { font-size: 14px; }
-        .walk-when { font-size: 14px; font-weight: 500; }
-        .walk-note { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.5; }
-        .walk-foot { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.5; }
-      `}</style>
+      </Typography>
     </section>
   );
 }

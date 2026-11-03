@@ -65,6 +65,10 @@
   --chart-3: #a67c2e;
   --chart-4: #c9b458;
   --chart-5: #5a5c60;
+  --chart-under: #e9b8a4;
+  --chart-yours: #bfd6c4;
+  --chart-under-text: #8a3b1e;
+  --chart-yours-text: #2e5e3a;
   --radius: 0.75rem;
   color-scheme: light;
   /* Legacy aliases (removed as components are rebuilt). */
@@ -100,6 +104,10 @@
   --chart-3: #bfa15a;
   --chart-4: #8a7a3a;
   --chart-5: #a9a7a1;
+  --chart-under: #6e4536;
+  --chart-yours: #3e5e4a;
+  --chart-under-text: #e9b8a4;
+  --chart-yours-text: #a9d3b3;
   color-scheme: dark;
 }
 
