@@ -52,6 +52,26 @@ report: ops/reports/038-lowkey-distill-iconiq.md
    - List any element that stays hand-built, and why (for example, the json-render chart components and the Hairline figures stay custom).
 4. **The json-render catalog stays the number source.** Distill may remove or merge chart elements' captions and legends, but the legends must keep the dollar values unless the bar shows them some other way, and the number guard and its tests stay green.
 
+5. **Take credit for what Low Key does well** (Dylan, 2026-11-03, added before this task started). This is the one deliberate addition of words, so it must be designed to distill's standard:
+   - one compact block on the opening;
+   - **shown in full on a first visit**;
+   - collapsed to a single "How Low Key works" line (Iconiq `accordion`/`collapsible`) once the visitor has run a search, remembered in `localStorage`.
+   Use this copy (shorten only if it doesn't fit at 390 px, and list any change):
+   - Under the headline: "**A low-key way to buy a car.**"
+   - The five points:
+     1. **Calm by design.** "We can't fix the dealership. We can make the decision simple: a few good choices, side by side."
+     2. **Less risk.** "Every car here holds its value best in its class, and every price includes the loan, gas or electricity, and tax."
+     3. **Shop anonymously.** "No account, no phone number. Dealers don't know you're looking until you contact them."
+     4. **Lowest listed prices.** "We show the cheapest listing we find near you, and how many others there are."
+     5. **Details later.** "No photos, colours or sales gimmicks until you're ready. Good car buying starts with a little distance."
+   - Next to the car drawings, a small "Why no photos?" (Iconiq `tooltip`/`popover`) with point 5's text.
+   - **Claims must stay true** (the reviewer's wording rules):
+     - say "lowest **listed** price", never "best price" (we don't see negotiated prices);
+     - "holds its value best in its class" covers the lineup rule, including the Toyota+Honda slots, so if a reserved pick isn't the top retainer, the block's claim must still hold. Check, and word it "among the best" if it doesn't;
+     - "anonymously" must be true: confirm that no personal data is stored or sent to dealers or third parties (the IP-based area guess is read in the request and not stored; check the task-041 analytics plan when it lands), and list what is collected.
+   - **Price comparison at the outset (point 6).** In the comparison/chooser rows and on each card's dealer line, show where the price sits among local listings: "$31,950 · lowest of 9 listed within 50 mi". Add the range ("$31,950–$34,800") if the provider gives it cheaply (a facet stat or the search's total plus one extra sorted call per model). Stay within the per-turn call limit (at most 5 calls on a fresh dense turn, or measure and report a new figure, cached for 6 hours). Every number comes from tool results, through the number guard.
+   - Add "A low-key way to buy a car." and the five points to the Protected list above.
+
 ## Checks before you finish
 - `npm ci && npm run build`, the app tests, `pytest -q`, `scripts/name_guard.py` and `scripts/secret_guard.py --all` pass.
 - On the deployed URL at 390 px, in light and dark: the opening, SUV near 60614 (the comparison and a card), the expanded dealer list, and the walk-away. Before-and-after screenshots under `~/.cache/low-key/screens/038/` (not in git). Count the words on a card face before and after.
