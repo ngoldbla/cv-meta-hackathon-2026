@@ -7,7 +7,7 @@ report: ops/reports/044-lowkey-about-and-credits.md
 ---
 # Low Key: About and credits
 
-**Run this after task 043 is done.** **Branch: `low-key` only.** The same secrets and commit rules as task 023 apply. Every push to `low-key` deploys to https://low-key-murex.vercel.app; follow `lowkey/docs/deploy.md`. No provider or model spend.
+**Run this after task 045 is done.** **Branch: `low-key` only.** The same secrets and commit rules as task 023 apply. Every push to `low-key` deploys to https://low-key-murex.vercel.app; follow `lowkey/docs/deploy.md`. No provider or model spend.
 
 **Why (Dylan, 2026-11-03):** package the hackathon entry. Low Key is a way to buy a car the calm way, which is why it's called "Low Key": don't get over-invested in the decision, and be confident you made a good one anyway.
 
@@ -27,7 +27,7 @@ report: ops/reports/044-lowkey-about-and-credits.md
    - **The hackathon:** an open-source entry to the **Meta hackathon hosted by Cerebral Valley, Fall 2026**, with a link to the public repo.
    - **How AI was used:**
      - *Built with:* **Muse Code** with **Muse Wonder** (development: every feature was written as a task and built by Muse); the **Hairline** skill (the line-drawn cars); the **impeccable** distill skill (the UI clean-up).
-     - *At runtime:* **Muse Spark** (follow-up questions; it never writes a price or a number, since every number comes from code); **Laya** (composing follow-up answers as json-render UI), only if it shipped in 043; **json-render** (the charts and cards, built from a fixed component catalog); **Iconiq UI** (the interface and its AI blocks).
+     - *At runtime:* **Muse Spark** (follow-up questions; it never writes a price or a number, since every number comes from code); the **decision model** from tasks 043 and 045 (Laya, or Muse Glimmer decapitated to its first layers and trained for one job: composing follow-up answers as json-render UI and keeping replies calm), exactly as `lowkey/docs/decision-model.md` records; **json-render** (the charts and cards, built from a fixed component catalog); **Iconiq UI** (the interface and its AI blocks).
      - *In the weekly data pipeline:* **Timestral** (52-week gas price forecasts).
    - **Our belief:** car buying should be easy and suit your own needs. The open-source bundle makes it simple to roll your own with Muse and Vercel, so you can shop with your own preferences: luxury cars, motorcycles, other markets. Link to the guide in part 3.
    - **Data sources**, each with a link:
@@ -40,7 +40,7 @@ report: ops/reports/044-lowkey-about-and-credits.md
      - iSeeCars (lifespan study);
      - Vercel (hosting, Blob storage, approximate location).
      Use the exact sources the code uses at this commit.
-   - **Open source used:** a list with licences (Next.js, the AI SDK, Tailwind, shadcn, Iconiq UI, json-render, Hairline, motion, zod, Laya if shipped, Timestral), generated from the lockfiles so it's complete.
+   - **Open source used:** a list with licences (Next.js, the AI SDK, Tailwind, shadcn, Iconiq UI, json-render, Hairline, motion, zod, Laya and Muse Glimmer as shipped, Timestral), generated from the lockfiles so it's complete.
    - **Thanks:** Fireworks, Modal, Meta and Vercel, for their support in delivering this project.
    - **Author:** Dylan Goldblatt, ndgold@me.com (shown as selectable text with a copy button; `mailto:` is optional), homepage https://www.ndgold.com.
 2. **README and CREDITS.**
