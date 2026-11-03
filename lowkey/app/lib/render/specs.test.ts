@@ -64,6 +64,17 @@ function entriesFor(category: Category, opts?: { fuel?: number | null }): SpecEn
 
 const CATEGORIES: Category[] = ["Sedan", "SUV", "Pickup"];
 
+type CompareRow = {
+  label: string;
+  total: number;
+  highlighted: boolean;
+  cheapest: boolean;
+};
+
+function compareRows(spec: ReturnType<typeof buildCostCompareSpec>): CompareRow[] {
+  return (spec!.elements[spec!.root]!.props as { rows: CompareRow[] }).rows;
+}
+
 describe("spec builders + number guard (task 034)", () => {
   for (const category of CATEGORIES) {
     it(`builds guarded specs for ${category}`, () => {
@@ -100,6 +111,79 @@ describe("spec builders + number guard (task 034)", () => {
       );
     });
   }
+
+  it("tags exactly the cheapest rows in the comparison (task 035)", () => {
+    const entries = entriesFor("SUV");
+    const spec = buildCostCompareSpec(entries, "SUV")!;
+    const rows = compareRows(spec);
+    const min = Math.min(...rows.map((r) => r.total));
+    expect(rows.length).toBeGreaterThan(1);
+    // The tag goes on every row at the lowest real cost, and no other.
+    expect(
+      rows
+        .filter((r) => r.cheapest)
+        .map((r) => r.label)
+        .sort(),
+    ).toEqual(
+      rows
+        .filter((r) => r.total === min)
+        .map((r) => r.label)
+        .sort(),
+    );
+    // Rows are ordered cheapest first, so the first row is tagged.
+    expect(rows[0]!.cheapest).toBe(true);
+    // The tag is a boolean, not a number: catalog and guard still pass.
+    expect(isCatalogValid(spec)).toBe(true);
+    expect(checkCostCompareSpec(spec, entries).ok).toBe(true);
+  });
+
+  it("tags both rows on a tie, Pick #1 bold plus tag (task 035)", () => {
+    const base = entriesFor("SUV")[0]!;
+    const tied: SpecEntry[] = [
+      { ...base, pick: { ...base.pick, make: "Alpha", model: "One", rank: 1 } },
+      { ...base, pick: { ...base.pick, make: "Beta", model: "Two", rank: 2 } },
+      {
+        ...base,
+        pick: { ...base.pick, make: "Gamma", model: "Three", rank: 3 },
+        local: {
+          model: base.pick.model,
+          fuel: { perMonth: (base.local?.fuel?.perMonth ?? 150) + 200 },
+          units: base.local?.units ?? [],
+        },
+      },
+    ];
+    const rows = compareRows(buildCostCompareSpec(tied, "SUV"));
+    const byLabel = new Map(rows.map((r) => [r.label, r]));
+    expect(byLabel.get("Alpha One")!.cheapest).toBe(true);
+    expect(byLabel.get("Beta Two")!.cheapest).toBe(true);
+    expect(byLabel.get("Gamma Three")!.cheapest).toBe(false);
+    // Alpha is Pick #1: bold and tagged on the same row.
+    expect(byLabel.get("Alpha One")!.highlighted).toBe(true);
+    expect(byLabel.get("Beta Two")!.highlighted).toBe(false);
+    expect(byLabel.get("Gamma Three")!.highlighted).toBe(false);
+  });
+
+  it("keeps the tag off a Pick #1 that is not cheapest (task 035)", () => {
+    const base = entriesFor("SUV")[0]!;
+    const entries: SpecEntry[] = [
+      { ...base, pick: { ...base.pick, make: "Alpha", model: "One", rank: 2 } },
+      {
+        ...base,
+        pick: { ...base.pick, make: "Beta", model: "Two", rank: 1 },
+        local: {
+          model: base.pick.model,
+          fuel: { perMonth: (base.local?.fuel?.perMonth ?? 150) + 200 },
+          units: base.local?.units ?? [],
+        },
+      },
+    ];
+    const rows = compareRows(buildCostCompareSpec(entries, "SUV"));
+    const byLabel = new Map(rows.map((r) => [r.label, r]));
+    expect(byLabel.get("Alpha One")!.cheapest).toBe(true);
+    expect(byLabel.get("Alpha One")!.highlighted).toBe(false);
+    expect(byLabel.get("Beta Two")!.cheapest).toBe(false);
+    expect(byLabel.get("Beta Two")!.highlighted).toBe(true);
+  });
 
   it("checks the CR-V 'back to you' figure against resale at 60", () => {
     const entries = entriesFor("SUV");

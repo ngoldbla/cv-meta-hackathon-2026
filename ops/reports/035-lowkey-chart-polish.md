@@ -3,11 +3,12 @@ Status: in_progress
 Branch head at start: 66c4fbcf375ffe381f3a7cec878830a83daa771d · at finish: (this commit)
 
 ## Summary
-In progress. Part 1 (segment colours) is done; Part 2 (the "cheapest to own" tag) is next.
+In progress. Parts 1 (segment colours) and 2 (the "cheapest to own" tag) are coded and checked; the deployed check at 390 px remains.
 
 ## Work done
 - Claimed task 035 on branch `low-key` (head `66c4fbc`). Inbox sync on `main` not followed per the task's `low-key`-only rule — same approved deviation as tasks 022–034.
 - Part 1 (colours): viewed the task-034 dark screenshot (`~/.cache/low-key/screens/034/03-crv-dark.png`) — "value lost" and "gas" are the same pale gold there — then chose new `--cost-*` values in `lowkey/app/app/globals.css` and checked every contrast numerically (WCAG relative-luminance ratio). All ratios below are computed from the hexes, not estimated.
+- Part 2 (tag): `buildCostCompareSpec` now flags every row at the lowest real cost (`cheapest`, ties included); `CostCompareView` renders a small amber Iconiq `Badge` reading "cheapest to own" beside the name and names it in the `aria-label`. Pick #1 keeps its bold row independently, so a Pick #1 that is also cheapest shows both. New builder tests were written first (3 failed on the missing flag), then passed.
 
 ## Results
 Token values (old → new). `—` means unchanged.
@@ -50,6 +51,10 @@ Adjacent-segment ratios (luminance only). Bar orders are loan|gas ("You pay"), v
 | Value lost vs gas (same bar, not touching) | 1.07 → 2.11 | 3.60 → 1.62 |
 
 Two honest limits. First, 3:1 between every touching pair at once is mathematically impossible alongside 3:1 against the card: in dark every segment must sit within a 5.2:1 luminance range above the card, but three touching steps at 3:1 each would need 27:1 (in light the range above white is 7:1, still short of 27:1). The worst pairs are therefore carried by hue, saturation and the hatch pattern — deep saturated brass against slate and against pale straw in dark; warm grey against olive-gold in light — and never by colour alone, since every legend carries the dollar values and every section's `aria-label` reads its numbers (task 034). Second, following the task's conditional, the light theme was not left untouched: its gas (1.77) and both back stripes (1.54, 1.29) failed 3:1 against the card, so those three tokens were darkened within their families (gas stays gold and lighter than value lost; the backs stay green). That darkening is why light interest|gas falls to 1.14 in luminance — the pair is now told apart by saturation (neutral grey against saturated gold) and by its legend. Light loan, value lost, interest, track and back panel colours are unchanged from the approved mockup.
+
+The tag, in detail: the builder's `cheapest` flag is a boolean, so the number guard is unaffected — it walks numbers only — and the existing guard and catalog tests over all three categories still pass with the flag present. Three new builder tests pin the choice: exactly the lowest-cost rows are tagged on the SUV fixtures; on a constructed tie both tied rows are tagged and the Pick #1 row carries bold plus the tag together; and a Pick #1 priced above the cheapest row stays bold without the tag. The name column widened from 96 px to 104 px and the name plus badge sit in a wrapping flex row, so long names still wrap (the task-034 fix) and the badge drops under the name at 390 px instead of truncating anything. The badge is static (`animate={false}`), so reduced-motion needs nothing extra.
+
+Checks on the final code: clean `npm ci && npm run build`; app tests **135 passed** (render 14, including the 3 new tag tests); `pytest -q` **154 passed, 1 skipped**; `scripts/name_guard.py` exit 0; `scripts/secret_guard.py --all` clean.
 
 ## Deviations
 - Light gas and back stripes changed (see Results): the task says to fix any light pair that fails 3:1, and those three failed against the card.

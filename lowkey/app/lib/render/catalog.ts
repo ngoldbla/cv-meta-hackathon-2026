@@ -44,11 +44,12 @@ export const catalog = defineCatalog(schema, {
             gas: z.number(),
             total: z.number(),
             highlighted: z.boolean(),
+            cheapest: z.boolean(),
           }),
         ),
       }),
       description:
-        "One horizontal segmented bar per pick (value lost, interest, gas) on a shared scale, ordered cheapest to own first, with the monthly real-cost total at the right. Placed before the pick cards, one per turn.",
+        "One horizontal segmented bar per pick (value lost, interest, gas) on a shared scale, ordered cheapest to own first, with the monthly real-cost total at the right. The first ranked pick's row is highlighted (bold); every row at the lowest total is flagged cheapest and gets a 'cheapest to own' badge. Placed before the pick cards, one per turn.",
     },
     CostBars: {
       props: z.object({

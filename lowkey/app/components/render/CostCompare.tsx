@@ -1,5 +1,7 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
+
 import { SEGMENT_COLOR, fmtUsd } from "./format";
 
 export interface CostCompareRow {
@@ -9,6 +11,7 @@ export interface CostCompareRow {
   gas: number;
   total: number;
   highlighted: boolean;
+  cheapest: boolean;
 }
 
 function categoryNoun(category: string): string {
@@ -16,11 +19,14 @@ function categoryNoun(category: string): string {
 }
 
 /**
- * CostCompare (task 034): one segmented bar per pick on a shared
- * scale, cheapest to own first, the shown (first ranked) pick's row
- * in bold. The aria-label reads every row's numbers; the legend
- * names the segments and each row carries its total, so nothing is
- * conveyed by colour alone.
+ * CostCompare (task 034; task 035 adds the tag): one segmented bar
+ * per pick on a shared scale, cheapest to own first, the shown
+ * (first ranked) pick's row in bold, and a "cheapest to own" badge
+ * on every lowest-cost row (all of them on a tie). Names wrap, and
+ * the badge wraps under the name when the row is narrow. The
+ * aria-label reads every row's numbers and names the cheapest
+ * rows; the legend names the segments and each row carries its
+ * total, so nothing is conveyed by colour alone.
  */
 export function CostCompareView({
   category,
@@ -36,7 +42,7 @@ export function CostCompareView({
     rows
       .map(
         (r) =>
-          `${r.label}: ${r.total} dollars a month: ${r.valueLost} value lost, ${r.interest} interest, ${r.gas} gas`,
+          `${r.label}${r.cheapest ? ", cheapest to own" : ""}: ${r.total} dollars a month: ${r.valueLost} value lost, ${r.interest} interest, ${r.gas} gas`,
       )
       .join(". ") +
     ".";
@@ -55,9 +61,16 @@ export function CostCompareView({
         {rows.map((r) => (
           <div
             key={r.label}
-            className={`grid grid-cols-[96px_1fr_44px] items-center gap-2 text-[13px] ${r.highlighted ? "font-semibold" : ""}`}
+            className={`grid grid-cols-[104px_1fr_44px] items-center gap-2 text-[13px] ${r.highlighted ? "font-semibold" : ""}`}
           >
-            <span className="leading-tight">{r.label}</span>
+            <span className="flex min-w-0 flex-wrap items-center gap-1">
+              <span className="leading-tight">{r.label}</span>
+              {r.cheapest ? (
+                <Badge color="amber" size="sm" animate={false} shimmer={false}>
+                  cheapest to own
+                </Badge>
+              ) : null}
+            </span>
             <div className="flex h-4 overflow-hidden rounded-[5px] bg-background" aria-hidden="true">
               <span style={{ width: pct(r.valueLost), background: SEGMENT_COLOR.valueLost }} className="block h-full" />
               <span style={{ width: pct(r.interest), background: SEGMENT_COLOR.interest }} className="block h-full" />

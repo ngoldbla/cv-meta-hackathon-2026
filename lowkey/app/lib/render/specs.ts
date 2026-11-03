@@ -296,8 +296,10 @@ export function buildPickCardSpec(
  * One CostCompare spec per turn: every entry with an ownership
  * result, ordered cheapest to own (lowest real cost) first. The
  * highlighted row is the first ranked pick's (the card the mockup
- * shows), falling back to the first entry. Null with fewer than two
- * comparable entries.
+ * shows), falling back to the first entry. Every row at the lowest
+ * real cost is flagged cheapest (task 035) — on a tie, all of them —
+ * independently of the highlight, so Pick #1 can carry both. Null
+ * with fewer than two comparable entries.
  */
 export function buildCostCompareSpec(entries: SpecEntry[], category: string): Spec | null {
   const rows = entries
@@ -319,6 +321,7 @@ export function buildCostCompareSpec(entries: SpecEntry[], category: string): Sp
   const shown = entries.find((e) => e.pick.rank === 1) ?? entries[0];
   const shownModel = shown?.pick.model;
   rows.sort((a, b) => a.total - b.total);
+  const lowest = Math.min(...rows.map((r) => r.total));
   return {
     root: "compare",
     elements: {
@@ -333,6 +336,7 @@ export function buildCostCompareSpec(entries: SpecEntry[], category: string): Sp
             gas: r.gas,
             total: r.total,
             highlighted: r.model === shownModel,
+            cheapest: r.total === lowest,
           })),
         },
         children: [],
