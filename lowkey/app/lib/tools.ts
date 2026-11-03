@@ -9,6 +9,7 @@ import {
   sampleUnitsFor,
   type Category,
 } from "./fixtures";
+import { aprLabel, getDefaultApr } from "./fred";
 import { ownershipMath } from "./ownership";
 
 /**
@@ -38,7 +39,7 @@ export const rankCategoryTool = tool({
 
 export const ownershipMathTool = tool({
   description:
-    "Return the monthly payment, walk-away costs at 6, 12, 24, 36 and 60 months, and the underwater (above-water) month for a price, down payment, APR and term. Deterministic; never estimate these numbers in text.",
+    "Return the monthly payment, the 61-point worth-vs-owe curve, walk-away costs at 6, 12, 24, 36 and 60 months, and the even (above-water) month for a price, down payment, APR and term. Omit apr to use the Federal Reserve average; pass apr only when the user states their own rate. Deterministic; never estimate these numbers in text.",
   inputSchema: z.object({
     price: z.number().positive(),
     down: z.number().nonnegative().optional(),
@@ -60,10 +61,11 @@ export const ownershipMathTool = tool({
     model?: string;
   }) => {
     const resolved = model ? resolvePick(model) : undefined;
+    const aprInfo = apr === undefined ? await getDefaultApr() : null;
     const result = ownershipMath({
       price,
       down,
-      apr,
+      apr: apr ?? aprInfo?.aprPercent,
       term,
       // Canonical fixture model ("CR-V") so the UI can attach this
       // result to the ranked card even when the caller sent
@@ -75,6 +77,9 @@ export const ownershipMathTool = tool({
       sampleData: true as const,
       ...result,
       make: resolved?.make ?? null,
+      aprDate: aprInfo?.dateIso ?? null,
+      aprAssumed: aprInfo?.assumed ?? false,
+      aprLabel: aprInfo ? aprLabel(aprInfo) : null,
     };
   },
 });

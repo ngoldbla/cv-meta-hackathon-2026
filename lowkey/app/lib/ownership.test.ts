@@ -116,3 +116,80 @@ describe("ownershipMath", () => {
     expect(() => ownershipMath({ price: 0 })).toThrow("price must be positive");
   });
 });
+
+describe("ownershipMath curve, evenMonth and walk-away table (task 026)", () => {
+  it("returns a 61-point curve from month 0 to 60", () => {
+    const r = ownershipMath({ price: 30000, down: 3000, apr: 6, term: 60, retention5y: 0.6 });
+    expect(r.curve).toHaveLength(61);
+    expect(r.curve.map((p) => p.month)).toEqual(
+      Array.from({ length: 61 }, (_, i) => i),
+    );
+    for (const p of r.curve) {
+      expect(p.resale).toBeCloseTo(resaleAt(30000, 0.6, p.month), 1);
+      expect(p.balance).toBeCloseTo(balanceAt(27000, 6, 60, p.month), 1);
+    }
+  });
+
+  it("curve month 0 balance is the loan amount and month 60 balance is 0", () => {
+    const r = ownershipMath({ price: 33000, apr: 8, term: 60, retention5y: 0.629 });
+    expect(r.loanAmount).toBe(29700);
+    expect(r.curve[0].balance).toBe(29700);
+    expect(r.curve[60].balance).toBe(0);
+    expect(r.curve[0].resale).toBeCloseTo(33000 * 0.85, 2);
+  });
+
+  it("evenMonth matches a brute-force scan and aliases underwaterMonth", () => {
+    const cases = [
+      { price: 30000, down: 3000, apr: 6, term: 60, retention5y: 0.6 },
+      { price: 33000, down: 3300, apr: 8, term: 60, retention5y: 0.629 },
+      { price: 24856, down: 2485.6, apr: 8, term: 60, retention5y: 0.575 },
+      { price: 20000, down: 2000, apr: 12, term: 60, retention5y: 0.3 },
+    ];
+    for (const c of cases) {
+      const r = ownershipMath(c);
+      let brute: number | null = null;
+      for (let t = 0; t <= c.term; t += 1) {
+        if (resaleAt(c.price, c.retention5y, t) >= balanceAt(c.price - c.down, c.apr, c.term, t)) {
+          brute = t;
+          break;
+        }
+      }
+      expect(r.evenMonth).toBe(brute);
+      expect(r.underwaterMonth).toBe(brute);
+    }
+  });
+
+  it("sample check: $33k, 10% down, 8% APR, 60 mo, retention 0.629", () => {
+    const r = ownershipMath({ price: 33000, down: 3300, apr: 8, term: 60, retention5y: 0.629 });
+    expect(r.evenMonth).toBe(7);
+    const at36 = r.walkAway.find((p) => p.month === 36)!;
+    expect(Math.abs(at36.getBack - 10118)).toBeLessThan(35);
+    const at60 = r.walkAway.find((p) => p.month === 60)!;
+    expect(at60.costPerMonth).toBeCloseTo(311, 0);
+    expect(Math.abs(at60.costPerMonth - 311)).toBeLessThan(2);
+  });
+
+  it("walk-away table uses getBack and costPerMonth", () => {
+    const r = ownershipMath({ price: 30000, down: 3000, apr: 6, term: 60, retention5y: 0.6 });
+    expect(r.walkAway.map((p) => p.month)).toEqual([6, 12, 24, 36, 60]);
+    for (const p of r.walkAway) {
+      expect(p.getBack).toBeCloseTo(p.resale - p.balance, 1);
+      expect(p.getBack).toBeCloseTo(p.equity, 1);
+      expect(p.costPerMonth).toBeCloseTo(p.walkAwayCost / p.month, 1);
+      expect(p.costPerMonth).toBeCloseTo(p.perMonth, 1);
+    }
+    // Negative getBack means the owner would still owe.
+    const early = ownershipMath({ price: 33000, down: 3300, apr: 8, term: 60, retention5y: 0.629 });
+    expect(early.walkAway.find((p) => p.month === 6)!.getBack).toBeLessThan(0);
+  });
+
+  it("evenMonth falls back to the payoff month at the latest", () => {
+    // Balance is 0 at month 60 and resale is positive, so the
+    // curves always meet by payoff; a very fast-depreciating car
+    // with no down payment crosses only at the end.
+    const r = ownershipMath({ price: 20000, down: 0, apr: 20, term: 60, retention5y: 0.2 });
+    expect(r.evenMonth).not.toBeNull();
+    expect(r.evenMonth!).toBeGreaterThan(12);
+    expect(r.evenMonth!).toBeLessThanOrEqual(60);
+  });
+});
