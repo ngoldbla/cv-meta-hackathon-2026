@@ -6,7 +6,10 @@ import { lastsAboutLabel } from "@/lib/costs";
  * LifespanTrack (task 034): a 0-20 year track (widened past 20 when
  * a lifespan exceeds it), dark for the loan years and gold after,
  * with a marker at the lifespan. Unrated: an empty track and
- * "Lifespan: not yet rated", no number.
+ * "Lifespan: not yet rated", no number. Task 036: the two parts are
+ * separated by a 2 px card-colour gap centred on the loan boundary
+ * (1 px out of each part, marker unmoved, positive parts at least
+ * 2 px wide).
  */
 export function LifespanTrackView({
   years,
@@ -36,6 +39,7 @@ export function LifespanTrackView({
   const loanPct = (Math.min(loanYears, max) / max) * 100;
   const markerPct = (years / max) * 100;
   const goldWidth = Math.max(0, markerPct - loanPct);
+  const hasGap = loanPct > 0 && goldWidth > 0;
   const milesText =
     miles === null
       ? null
@@ -51,12 +55,26 @@ export function LifespanTrackView({
         <div className="absolute inset-x-0 top-[9px] h-1 rounded-sm bg-[var(--cost-track)]" />
         <div
           className="absolute top-[9px] h-1 rounded-sm bg-[var(--cost-loan)]"
-          style={{ left: 0, width: `${loanPct}%` }}
+          style={{
+            left: 0,
+            width: hasGap ? `calc(${loanPct}% - 1px)` : `${loanPct}%`,
+            minWidth: loanPct > 0 ? 2 : undefined,
+          }}
         />
         <div
           className="absolute top-[9px] h-1 bg-[var(--cost-gas)]"
-          style={{ left: `${loanPct}%`, width: `${goldWidth}%` }}
+          style={{
+            left: hasGap ? `calc(${loanPct}% + 1px)` : `${loanPct}%`,
+            width: hasGap ? `calc(${goldWidth}% - 1px)` : `${goldWidth}%`,
+            minWidth: goldWidth > 0 ? 2 : undefined,
+          }}
         />
+        {hasGap ? (
+          <div
+            className="absolute top-[9px] h-1 bg-card"
+            style={{ left: `calc(${loanPct}% - 1px)`, width: 2 }}
+          />
+        ) : null}
         <div
           className="absolute top-1 h-[14px] w-[14px] rounded-full border-2 border-[var(--cost-lost)] bg-card"
           style={{ left: `calc(${markerPct}% - 7px)` }}

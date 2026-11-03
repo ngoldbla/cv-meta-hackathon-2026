@@ -11,7 +11,10 @@ export interface CostSegment {
  * CostBars (task 034): "You pay each month" vs "What it really costs
  * you" on one scale (the bills total). The remainder of the second
  * bar is the hatched "back to you" segment. Static widths: no bar
- * growth animation, so reduced motion needs nothing extra.
+ * growth animation, so reduced motion needs nothing extra. Task 036:
+ * touching segments are separated by a 2 px gap of the card colour
+ * (flex gap over a card background); the gaps come out of the track
+ * width via flex shrink, and a positive segment keeps at least 2 px.
  */
 export function CostBarsView({
   pay,
@@ -42,9 +45,9 @@ export function CostBarsView({
           <span className="text-sm font-medium">You pay each month</span>
           <span className="mono text-lg">{fmtUsd(bills)}</span>
         </div>
-        <div className="flex h-[22px] overflow-hidden rounded-[5px] bg-background" aria-hidden="true">
+        <div className="flex h-[22px] gap-[2px] overflow-hidden rounded-[5px] bg-card" aria-hidden="true">
           {pay.map((s) => (
-            <span key={s.part} style={{ width: pct(s.usd), background: SEGMENT_COLOR[s.part] }} className="block h-full" />
+            <span key={s.part} style={{ width: pct(s.usd), minWidth: s.usd > 0 ? 2 : undefined, background: SEGMENT_COLOR[s.part] }} className="block h-full" />
           ))}
         </div>
         <div className="flex flex-wrap gap-3 text-xs text-foreground/80">
@@ -61,11 +64,11 @@ export function CostBarsView({
           <span className="text-sm font-medium">What it really costs you</span>
           <span className="mono text-lg">{fmtUsd(realTotal)}</span>
         </div>
-        <div className="flex h-[22px] overflow-hidden rounded-[5px] bg-background" aria-hidden="true">
+        <div className="flex h-[22px] gap-[2px] overflow-hidden rounded-[5px] bg-card" aria-hidden="true">
           {real.map((s) => (
-            <span key={s.part} style={{ width: pct(s.usd), background: SEGMENT_COLOR[s.part] }} className="block h-full" />
+            <span key={s.part} style={{ width: pct(s.usd), minWidth: s.usd > 0 ? 2 : undefined, background: SEGMENT_COLOR[s.part] }} className="block h-full" />
           ))}
-          <span style={{ width: pct(backWhenSold), background: BACK_FILL }} className="block h-full" />
+          <span style={{ width: pct(backWhenSold), minWidth: backWhenSold > 0 ? 2 : undefined, background: BACK_FILL }} className="block h-full" />
         </div>
         <div className="flex flex-wrap gap-x-2.5 gap-y-1 text-xs text-foreground/80">
           {real.map((s) => (

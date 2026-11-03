@@ -26,7 +26,10 @@ function categoryNoun(category: string): string {
  * the badge wraps under the name when the row is narrow. The
  * aria-label reads every row's numbers and names the cheapest
  * rows; the legend names the segments and each row carries its
- * total, so nothing is conveyed by colour alone.
+ * total, so nothing is conveyed by colour alone. Task 036: the
+ * three segments are separated by 2 px card-colour gaps (flex gap
+ * over a card background, gaps out of the track width via flex
+ * shrink, positive segments at least 2 px wide).
  */
 export function CostCompareView({
   category,
@@ -71,10 +74,10 @@ export function CostCompareView({
                 </Badge>
               ) : null}
             </span>
-            <div className="flex h-4 overflow-hidden rounded-[5px] bg-background" aria-hidden="true">
-              <span style={{ width: pct(r.valueLost), background: SEGMENT_COLOR.valueLost }} className="block h-full" />
-              <span style={{ width: pct(r.interest), background: SEGMENT_COLOR.interest }} className="block h-full" />
-              <span style={{ width: pct(r.gas), background: SEGMENT_COLOR.gas }} className="block h-full" />
+            <div className="flex h-4 gap-[2px] overflow-hidden rounded-[5px] bg-card" aria-hidden="true">
+              <span style={{ width: pct(r.valueLost), minWidth: r.valueLost > 0 ? 2 : undefined, background: SEGMENT_COLOR.valueLost }} className="block h-full" />
+              <span style={{ width: pct(r.interest), minWidth: r.interest > 0 ? 2 : undefined, background: SEGMENT_COLOR.interest }} className="block h-full" />
+              <span style={{ width: pct(r.gas), minWidth: r.gas > 0 ? 2 : undefined, background: SEGMENT_COLOR.gas }} className="block h-full" />
             </div>
             <span className="mono text-right">{fmtUsd(r.total)}</span>
           </div>
