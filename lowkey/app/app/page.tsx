@@ -50,6 +50,16 @@ function toolName(partType: string): string {
   return partType.replace(/^tool-/, "");
 }
 
+/** Card key: fixture model, tolerant of a "Make Model" echo. */
+function modelKey(model: string, make?: string | null): string {
+  const bare = model.trim().toLowerCase();
+  if (make) {
+    const prefix = `${make.trim().toLowerCase()} `;
+    if (bare.startsWith(prefix)) return bare.slice(prefix.length);
+  }
+  return bare;
+}
+
 function KeyIcon() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -103,12 +113,12 @@ export default function Home() {
             const name = toolName(part.type);
             if (name === "rank_category") ranks.push(part.output as RankOutput);
             if (name === "ownership_math") {
-              const out = part.output as OwnershipOutput;
-              if (out.model) ownershipByModel.set(out.model, out);
+              const out = part.output as OwnershipOutput & { make?: string | null };
+              if (out.model) ownershipByModel.set(modelKey(out.model, out.make), out);
             }
             if (name === "local_units") {
-              const out = part.output as LocalOutput;
-              if (out.model) localByModel.set(out.model, out);
+              const out = part.output as LocalOutput & { make?: string | null };
+              if (out.model) localByModel.set(modelKey(out.model, out.make), out);
             }
           }
           const texts = parts.filter((p) => p.type === "text" && p.text);
@@ -131,8 +141,8 @@ export default function Home() {
                         <PickCard
                           key={`${pick.make}-${pick.model}`}
                           pick={{ ...pick, flag: isCommodity ? rank.commodity.flag : pick.flag }}
-                          ownership={ownershipByModel.get(pick.model)}
-                          local={localByModel.get(pick.model)}
+                          ownership={ownershipByModel.get(modelKey(pick.model, pick.make))}
+                          local={localByModel.get(modelKey(pick.model, pick.make))}
                         />
                       );
                     })}

@@ -1,7 +1,7 @@
 ---
 id: "025"
 title: "Low Key: scaffold the chat app in lowkey/app (deployable to Vercel, stub tools)"
-status: in_progress
+status: done
 created: 2026-11-03
 report: ops/reports/025-lowkey-app-scaffold.md
 ---

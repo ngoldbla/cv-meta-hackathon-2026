@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   RANK_FIXTURES,
   priceForModel,
+  resolvePick,
   retentionForModel,
   sampleUnitsFor,
   type Category,
@@ -58,15 +59,23 @@ export const ownershipMathTool = tool({
     term?: number;
     model?: string;
   }) => {
+    const resolved = model ? resolvePick(model) : undefined;
     const result = ownershipMath({
       price,
       down,
       apr,
       term,
-      model,
+      // Canonical fixture model ("CR-V") so the UI can attach this
+      // result to the ranked card even when the caller sent
+      // "Honda CR-V".
+      model: resolved?.model ?? model,
       retention5y: model ? retentionForModel(model) : undefined,
     });
-    return { sampleData: true as const, ...result };
+    return {
+      sampleData: true as const,
+      ...result,
+      make: resolved?.make ?? null,
+    };
   },
 });
 
@@ -90,11 +99,13 @@ export const localUnitsTool = tool({
     category?: string;
     radius?: number;
   }) => {
+    const resolved = model ? resolvePick(model) : undefined;
     const basePrice = model ? priceForModel(model) : undefined;
-    if (!model || basePrice === undefined) {
+    if (!model || !resolved || basePrice === undefined) {
       return {
         sampleData: true as const,
         zip,
+        model: model ?? null,
         category: category ?? null,
         radius: radius ?? 50,
         unitsFound: 0,
@@ -102,12 +113,13 @@ export const localUnitsTool = tool({
         note: "SAMPLE DATA: name a model from rank_category to see sample units.",
       };
     }
-    const units = sampleUnitsFor(model, basePrice);
+    const units = sampleUnitsFor(resolved.model, basePrice);
     const best = units.reduce((a, b) => (b.price < a.price ? b : a));
     return {
       sampleData: true as const,
       zip,
-      model,
+      model: resolved.model,
+      make: resolved.make,
       category: category ?? null,
       radius: radius ?? 50,
       unitsFound: units.length,

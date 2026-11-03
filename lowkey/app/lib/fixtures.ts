@@ -63,13 +63,34 @@ export const RANK_FIXTURES: Record<Category, RankFixture> = {
   Pickup: PICKUP,
 };
 
-export function retentionForModel(model: string): number | undefined {
-  for (const fixture of Object.values(RANK_FIXTURES)) {
-    for (const pick of [...fixture.picks, fixture.commodity]) {
-      if (pick.model === model) return pick.retention5y;
-    }
+/**
+ * Resolve a caller-supplied model string to a fixture pick. The
+ * model naturally sends "Honda CR-V" while fixtures key "CR-V", so
+ * match case-insensitively on the exact model or on
+ * "<make> <model>", longest model name first (so "Silverado 1500"
+ * wins over the bare Ram "1500").
+ */
+export function resolvePick(model: string): FixturePick | undefined {
+  const wanted = model.trim().toLowerCase();
+  const all = Object.values(RANK_FIXTURES).flatMap((f) => [
+    ...f.picks,
+    f.commodity,
+  ]);
+  const sorted = [...all].sort((a, b) => b.model.length - a.model.length);
+  for (const pick of sorted) {
+    const bare = pick.model.toLowerCase();
+    const full = `${pick.make} ${pick.model}`.toLowerCase();
+    if (wanted === bare || wanted === full) return pick;
+  }
+  for (const pick of sorted) {
+    const bare = pick.model.toLowerCase();
+    if (wanted.endsWith(` ${bare}`) || wanted.endsWith(bare)) return pick;
   }
   return undefined;
+}
+
+export function retentionForModel(model: string): number | undefined {
+  return resolvePick(model)?.retention5y;
 }
 
 export interface SampleUnit {
@@ -90,10 +111,5 @@ export function sampleUnitsFor(model: string, basePrice: number): SampleUnit[] {
 }
 
 export function priceForModel(model: string): number | undefined {
-  for (const fixture of Object.values(RANK_FIXTURES)) {
-    for (const pick of [...fixture.picks, fixture.commodity]) {
-      if (pick.model === model) return pick.price;
-    }
-  }
-  return undefined;
+  return resolvePick(model)?.price;
 }
