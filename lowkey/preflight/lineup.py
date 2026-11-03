@@ -1,4 +1,4 @@
-"""Lineup ranking under the PRD lineup rules (tasks 023/024).
+"""Lineup ranking under the PRD lineup rules (tasks 023/024/029).
 
 Pure logic on already-fitted retention data; no network calls here.
 The live make resolution lives in make_map.py, and the fitted inputs
@@ -15,6 +15,13 @@ Rules (lowkey/docs/prd.md, "Lineup rules", Dylan 2026-11-03):
   Task 023's superseded two-pick form (distinct makes) is the same
   code with top_k=2, max_per_make=1.
 - Pickups exclude heavy-duty trucks (3/4-ton and 1-ton).
+- Sedan and SUV lineups include at least one Toyota and at least one
+  Honda (task 029, part 0): a slot is reserved for the best-retaining
+  qualifying Toyota and for the best-retaining qualifying Honda, the
+  remaining slots are filled by retention under the rules above, and
+  the four are then ordered by retention. If no Toyota or no Honda
+  qualifies, the shortfall is recorded and the lineup fills normally.
+  Pickups are unchanged.
 - The commodity pick (lowest dollars per month) is flagged "badge"
   when it is already among the ranked picks, else "extra".
 - A model is rankable only with a fitted retention, a current new
@@ -33,6 +40,10 @@ TRADE_IN_FACTOR = 0.85
 MIN_SOLD_PER_AGE = 30
 MIN_FITTED_AGES = 3
 CATEGORIES = ("Sedan", "SUV", "Pickup")
+# Task 029, part 0: Sedan/SUV lineups reserve one slot each for the
+# best-retaining qualifying Toyota and Honda. Pickups are unchanged.
+RESERVE_CATEGORIES = ("Sedan", "SUV")
+REQUIRED_MAKES = ("Toyota", "Honda")
 CACHE_DIR = Path.home() / ".cache" / "low-key" / "preflight"
 
 # Heavy-duty pickups: 3/4-ton and 1-ton models with no EPA MPG rating
@@ -116,6 +127,9 @@ class Lineup:
     commodity_flag: str | None = None  # "badge" | "extra"
     excluded_heavy_duty: list[str] = field(default_factory=list)
     skipped_same_make: list[str] = field(default_factory=list)
+    # Task 029, part 0: required makes with no qualifying model in a
+    # Sedan/SUV lineup (e.g. ["Honda"] when no Honda qualifies).
+    missing_brands: list[str] = field(default_factory=list)
 
     @property
     def makes(self) -> list[str]:
@@ -171,15 +185,47 @@ def rank_category(
             m.model,
         ),
     )
+    # Task 029, part 0: in Sedan/SUV reserve one slot each for the
+    # best-retaining qualifying Toyota and Honda. The reserved picks
+    # count toward the per-make cap; the remaining slots fill by
+    # retention and the final four are ordered by retention.
+    selected: list[ModelFit] = []
     per_make: dict[str, int] = {}
-    for m in by_retention:
-        if len(lineup.picks) >= top_k:
-            break
-        if per_make.get(m.make, 0) >= max_per_make:
-            lineup.skipped_same_make.append(m.model)
-            continue
-        per_make[m.make] = per_make.get(m.make, 0) + 1
-        lineup.picks.append(to_pick(m, rank=len(lineup.picks) + 1))
+    if category in RESERVE_CATEGORIES and top_k >= len(REQUIRED_MAKES):
+        for required in REQUIRED_MAKES:
+            best = next((m for m in by_retention if m.make == required), None)
+            if best is None:
+                lineup.missing_brands.append(required)
+            else:
+                selected.append(best)
+                per_make[required] = per_make.get(required, 0) + 1
+        selected_ids = {id(m) for m in selected}
+        for m in by_retention:
+            if len(selected) >= top_k:
+                break
+            if id(m) in selected_ids:
+                continue
+            if per_make.get(m.make, 0) >= max_per_make:  # type: ignore[arg-type]
+                lineup.skipped_same_make.append(m.model)
+                continue
+            per_make[m.make] = per_make.get(m.make, 0) + 1  # type: ignore[arg-type]
+            selected.append(m)
+            selected_ids.add(id(m))
+        # Order the final picks by retention (by_retention order).
+        order = {id(m): i for i, m in enumerate(by_retention)}
+        selected.sort(key=lambda m: order[id(m)])
+        lineup.picks = [
+            to_pick(m, rank=i + 1) for i, m in enumerate(selected[:top_k])
+        ]
+    else:
+        for m in by_retention:
+            if len(lineup.picks) >= top_k:
+                break
+            if per_make.get(m.make, 0) >= max_per_make:  # type: ignore[arg-type]
+                lineup.skipped_same_make.append(m.model)
+                continue
+            per_make[m.make] = per_make.get(m.make, 0) + 1  # type: ignore[arg-type]
+            lineup.picks.append(to_pick(m, rank=len(lineup.picks) + 1))
 
     if eligible:
         best = min(
@@ -240,6 +286,7 @@ def lineup_to_dict(lineup: Lineup) -> dict:
         "commodity_flag": lineup.commodity_flag,
         "excluded_heavy_duty": lineup.excluded_heavy_duty,
         "skipped_same_make": lineup.skipped_same_make,
+        "missing_brands": lineup.missing_brands,
     }
 
 
@@ -285,6 +332,8 @@ def main() -> None:
             print(f" excluded heavy-duty: {', '.join(lu.excluded_heavy_duty)}")
         if lu.skipped_same_make:
             print(f" skipped (make cap): {', '.join(lu.skipped_same_make)}")
+        if lu.missing_brands:
+            print(f" missing required brand(s): {', '.join(lu.missing_brands)}")
     print("wrote", args.out)
 
 

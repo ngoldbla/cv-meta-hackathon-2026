@@ -56,6 +56,7 @@ The pitch in one sentence: *"If you change your mind after a year, leaving costs
 2. **Lineup rules (Dylan, 2026-11-03):**
    - **Four ranked picks per category** (Dylan, 2026-11-03; was two): #1–#4 by 5-year resale.
    - **More than one brand in every lineup:** no make may hold more than 2 of the 4 slots. When a third model of the same make would qualify, it is skipped for the next-best model of another make.
+   - **A Toyota and a Honda in every sedan and SUV lineup** (task 029, part 0): one slot is reserved for the best-retaining qualifying Toyota and one for the best-retaining qualifying Honda; the remaining slots fill by 5-year resale under the rules above (including the 2-per-make cap, which the reserved picks count toward), and the four are then ordered by resale. If no Toyota or no Honda qualifies, the shortfall is recorded and the lineup fills normally. Pickups are unchanged.
    - **The commodity pick** (lowest dollars a month) is extra. If it is already among the four, that card gets a "cheapest to own" badge. Otherwise it appears as a fifth, smaller card. It may be any make.
    - **Defaults until Dylan changes them:**
      - Pickups exclude heavy-duty trucks (¾-ton and 1-ton: F-250/350, 2500/3500HD); they have no EPA MPG rating and are not a "need keys now" purchase.

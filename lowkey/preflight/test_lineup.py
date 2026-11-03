@@ -141,3 +141,81 @@ def test_thin_age_blocks_ranking() -> None:
     ]
     lineup = rank_category("Sedan", models, top_k=4, max_per_make=2)
     assert [p.model for p in lineup.picks] == ["Solid"]
+
+
+def test_reserve_pulls_best_toyota_into_top_four() -> None:
+    # Task 029, part 0: without the reserve the top four would be
+    # Honda/Mazda/Hyundai/Kia; the best Toyota (5th by retention)
+    # must displace the 4th pick, and the four stay ordered by
+    # retention.
+    models = [
+        fit("Accord Sedan", "Honda", 0.80, 31000),
+        fit("Mazda3 Sedan", "Mazda", 0.78, 27000),
+        fit("Elantra", "Hyundai", 0.76, 25000),
+        fit("K5", "Kia", 0.75, 30000),
+        fit("Corolla", "Toyota", 0.70, 28000),
+    ]
+    lineup = rank_category("Sedan", models, top_k=4, max_per_make=2)
+    assert [p.model for p in lineup.picks] == [
+        "Accord Sedan",
+        "Mazda3 Sedan",
+        "Elantra",
+        "Corolla",
+    ]
+    assert lineup.missing_brands == []
+
+
+def test_reserve_respects_two_per_make_cap() -> None:
+    # Task 029, part 0: the reserved Toyota counts toward the cap, so
+    # a third Toyota is skipped even though it out-retains the Mazda,
+    # and the reserved Honda still takes a slot.
+    models = [
+        fit("T1", "Toyota", 0.90, 30000),
+        fit("T2", "Toyota", 0.89, 30000),
+        fit("T3", "Toyota", 0.88, 30000),
+        fit("M1", "Mazda", 0.87, 30000),
+        fit("H1", "Honda", 0.60, 30000),
+    ]
+    lineup = rank_category("Sedan", models, top_k=4, max_per_make=2)
+    assert [p.model for p in lineup.picks] == ["T1", "T2", "M1", "H1"]
+    assert lineup.skipped_same_make == ["T3"]
+    assert lineup.missing_brands == []
+
+
+def test_missing_honda_records_shortfall_and_fills_normally() -> None:
+    # Task 029, part 0: no qualifying Honda (its only model is too
+    # thin to rank) records the shortfall; the rest fill by retention.
+    models = [
+        fit("Corolla", "Toyota", 0.80, 28000),
+        fit("Mazda3 Sedan", "Mazda", 0.78, 27000),
+        fit("Elantra", "Hyundai", 0.76, 25000),
+        fit("K5", "Kia", 0.75, 30000),
+        fit("Thin Honda", "Honda", 0.90, 30000, ages={1: 100, 2: 100}),
+    ]
+    lineup = rank_category("Sedan", models, top_k=4, max_per_make=2)
+    assert lineup.missing_brands == ["Honda"]
+    assert [p.model for p in lineup.picks] == [
+        "Corolla",
+        "Mazda3 Sedan",
+        "Elantra",
+        "K5",
+    ]
+
+
+def test_pickup_lineup_is_unchanged_by_reserve() -> None:
+    # Task 029, part 0: pickups never reserve and never record a
+    # shortfall, even with no Honda present.
+    models = [
+        fit("Tacoma", "Toyota", 0.80, 46000),
+        fit("1500", "Ram", 0.75, 55000),
+        fit("Colorado", "Chevrolet", 0.70, 42000),
+        fit("Ranger", "Ford", 0.68, 41000),
+    ]
+    lineup = rank_category("Pickup", models, top_k=4, max_per_make=2)
+    assert [p.model for p in lineup.picks] == [
+        "Tacoma",
+        "1500",
+        "Colorado",
+        "Ranger",
+    ]
+    assert lineup.missing_brands == []
