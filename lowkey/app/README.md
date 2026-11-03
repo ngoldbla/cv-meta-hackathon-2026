@@ -22,3 +22,12 @@ Node 22. Copy `.env.example` names into your shell or Vercel; never commit value
 - Env names: `META_API_KEY`, `LOWKEY_CHAT_MODEL`, `LOWKEY_PROVIDER_KEY`, `LOWKEY_PROVIDER_BASE_URL`, `LOWKEY_PROVIDER_MCP_URL`, `EIA_API_KEY`, `BLOB_READ_WRITE_TOKEN`
 
 See `lowkey/docs/deploy.md` and `lowkey/docs/prd.md`.
+
+## Iconiq UI (task 028)
+
+Installed with the pinned shadcn CLI `npx shadcn@4.23.0 add @iconiq/<name>` (registry `https://iconiqui.com/r/{name}.json`, configured in `components.json`). Iconiq UI is MIT-licensed (source: https://github.com/edwinvakayil/iconiq); components are copied into `components/ui/` as editable source. Installed 2026-11-03:
+
+- `iconiq-theme` → `lib/registry-theme.ts` (shared registry tokens)
+- `typography` → `components/ui/typography.tsx`
+
+Tailwind CSS 4.1.18 (`@tailwindcss/postcss` 4.1.18, `postcss` 8.5.6, `tw-animate-css` 1.4.0) is the version the registry expects. All new dependencies are pinned exactly in `package.json` / `package-lock.json` (Iconiq lockfile versions: `motion` 12.42.0, `@base-ui/react` 1.5.0, `lucide-react` 0.564.0, `class-variance-authority` 0.7.1, `clsx` 2.1.1, `tailwind-merge` 3.6.0, `@radix-ui/react-slot` 1.3.3, `vaul` 1.1.2, `@lucasmarkes/hairline` 0.5.1).
