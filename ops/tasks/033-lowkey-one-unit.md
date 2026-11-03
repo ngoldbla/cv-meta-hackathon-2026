@@ -1,7 +1,7 @@
 ---
 id: "033"
 title: "Low Key: one dealer unit on the card face, the others behind \"N more nearby\""
-status: open
+status: in_progress
 created: 2026-11-03
 report: ops/reports/033-lowkey-one-unit.md
 ---
