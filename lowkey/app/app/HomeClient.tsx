@@ -995,7 +995,8 @@ export default function HomeClient({
         />
         <Typography variant="paragraph-xs" className="mt-2 text-muted-foreground">
           Payment assumes 10% down (of the price with fees), 60 months
-          {aprText ? <>, {aprText}</> : null} — say “my rate is 5.9%” in the chat to change it. Sales tax is financed in the loan. Insurance and repairs are extra.
+          {aprText ? <>, {aprText}</> : null} — say “my rate is 5.9%” in the chat to change it.
+          {footerTax?.startsWith("Includes") ? " Sales tax is financed in the loan." : ""} Insurance and repairs are extra.
         </Typography>
         {footerTax ? (
           <Typography variant="paragraph-xs" className="mt-1 text-muted-foreground">
