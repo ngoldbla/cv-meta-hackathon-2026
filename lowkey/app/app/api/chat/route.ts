@@ -96,13 +96,15 @@ async function fastPathResponse(text: string) {
       // One shared FRED lookup (1-day cached) unless the user
       // stated their own rate.
       const aprInfo = req.userApr === null ? await getDefaultApr() : null;
-      // Local stock first (parallel; at most one provider call per
-      // pick at 50 miles): payments price the cheapest local unit.
-      const locals = await Promise.all(
-        shown.map((pick) =>
-          executeLocalUnits({ zip: req.zip, model: pick.model }),
-        ),
-      );
+      // Local stock first, one search at a time (Tier 1 rate limit;
+      // at most one provider call per pick at 50 miles): payments
+      // price the cheapest local unit.
+      const locals = [];
+      for (const pick of shown) {
+        locals.push(
+          await executeLocalUnits({ zip: req.zip, model: pick.model }),
+        );
+      }
       for (let i = 0; i < shown.length; i += 1) {
         const pick = shown[i];
         const local = locals[i];

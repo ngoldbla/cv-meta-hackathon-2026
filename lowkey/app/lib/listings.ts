@@ -45,7 +45,11 @@ export type ListingsFetcher = (
   ok: boolean;
   status: number;
   json: () => Promise<unknown>;
+  headers?: { get: (name: string) => string | null };
 }>;
+
+const sleep = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
 
 export function listingsUrl(
   baseUrl: string,
@@ -129,6 +133,8 @@ export async function fetchLocalUnits(args: {
   fetcher?: ListingsFetcher;
   baseUrl?: string;
   apiKey?: string;
+  /** Backoff before each 429 retry; tests pass tiny values. */
+  retryDelaysMs?: number[];
 }): Promise<LocalUnitsResult> {
   const { zip, providerModel } = args;
   const baseUrl = args.baseUrl ?? process.env.LOWKEY_PROVIDER_BASE_URL;
@@ -139,17 +145,32 @@ export async function fetchLocalUnits(args: {
   const fetcher: ListingsFetcher =
     args.fetcher ?? (fetch as unknown as ListingsFetcher);
 
+  const retryDelays = args.retryDelaysMs ?? [700, 1400];
   async function search(radius: number) {
-    const res = await fetcher(listingsUrl(baseUrl!, providerModel, zip, radius), {
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        Accept: "application/json",
-      },
-      next: { revalidate: REVALIDATE_SECONDS },
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!res.ok) throw new Error(`listings HTTP ${res.status}`);
-    return mapListingsResponse(await res.json(), zip);
+    const url = listingsUrl(baseUrl!, providerModel, zip, radius);
+    for (let attempt = 0; ; attempt += 1) {
+      const res = await fetcher(url, {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          Accept: "application/json",
+        },
+        next: { revalidate: REVALIDATE_SECONDS },
+        signal: AbortSignal.timeout(8000),
+      });
+      if (res.ok) return mapListingsResponse(await res.json(), zip);
+      // Tier 1 rate limit: back off and retry the same search before
+      // giving up to the "couldn't load" card state.
+      if (res.status === 429 && attempt < retryDelays.length) {
+        const retryAfter = Number(res.headers?.get("retry-after"));
+        const delay =
+          Number.isFinite(retryAfter) && retryAfter > 0
+            ? Math.min(retryAfter * 1000, 10000)
+            : retryDelays[attempt];
+        await sleep(delay);
+        continue;
+      }
+      throw new Error(`listings HTTP ${res.status}`);
+    }
   }
 
   try {

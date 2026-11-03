@@ -160,6 +160,32 @@ describe("fetchLocalUnits radius widening and failures", () => {
     expect(r.radiusUsed).toBe(50);
   });
 
+  it("retries a 429 and recovers", async () => {
+    let calls = 0;
+    const fetcher: ListingsFetcher = async () => {
+      calls += 1;
+      if (calls === 1) {
+        return { ok: false, status: 429, json: async () => ({}) };
+      }
+      return {
+        ok: true,
+        status: 200,
+        json: async () => body([row()], 4),
+      };
+    };
+    const r = await fetchLocalUnits({
+      zip: "60614",
+      providerModel: "CR-V",
+      fetcher,
+      baseUrl: "https://provider.example",
+      apiKey: "test-key",
+      retryDelaysMs: [1],
+    });
+    expect(calls).toBe(2);
+    expect(r.error).toBeUndefined();
+    expect(r.bestPrice).toBe(34500);
+  });
+
   it("returns the failure card state on HTTP 429, never sample units", async () => {
     const fetcher: ListingsFetcher = async () => ({
       ok: false,
@@ -172,6 +198,7 @@ describe("fetchLocalUnits radius widening and failures", () => {
       fetcher,
       baseUrl: "https://provider.example",
       apiKey: "test-key",
+      retryDelaysMs: [1, 1],
     });
     expect(r.error).toBe("Couldn't load local stock right now");
     expect(r.units).toEqual([]);
