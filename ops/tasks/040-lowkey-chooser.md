@@ -1,7 +1,7 @@
 ---
 id: "040"
 title: "Low Key: no rank numbers — a sortable chooser, best-at labels, full cards in a sheet"
-status: open
+status: done
 created: 2026-11-03
 report: ops/reports/040-lowkey-chooser.md
 ---
