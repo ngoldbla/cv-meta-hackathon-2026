@@ -27,6 +27,15 @@ This deliberately ends the gas-only rule for these two categories. Update the PR
    - **Charging mix:** assume home charging only by default, labelled "home charging at Illinois average residential rate (EIA, Aug 2026)". Mention public fast charging in one line (it can cost 2–3× more) without folding in an unsourced price. If you find a defensible public price source, report it and ask before using it.
    - ZIP → state reuses the existing rules. Store everything in the weekly table, and add the electricity fetch to `weekly.sh`.
    - The card's gas segment becomes **"Electricity"** for EVs, with its own token (both themes, with gaps), and the bills read "$X loan + $Y electricity".
+2b. **MPG (and kWh/100 mi) per unit, not per model** (reviewer, approved by Dylan 2026-11-03).
+   - Today `build_table.py` takes one EPA `comb08` per model: the first by drivetrain hint, non-turbo, smallest displacement. So the recommended trim's engine and the actual unit's drivetrain can differ (for example 4Runner TRD Sport, Silverado Custom, an AWD unit), and the fuel estimate can be optimistic.
+   - Match each local unit to its EPA record by year, model, drivetrain and engine (displacement, cylinders, turbo) when the listing gives them. Check the provider's fields.
+   - The table keeps a small per-model list of EPA variants for the match.
+   - If there's no confident match, use the model figure and label the fuel line "typical MPG".
+   - Keep EPA **combined** (55% city / 45% highway) and say so in the fuel footnote: "EPA combined MPG".
+   - Tests: an exact match, a drivetrain-only match, no match (typical label), and an EV kWh match.
+   - In the report, list every model where the unit-matched MPG differs from today's figure by more than 2 MPG.
+
 3. **Lineup, trims and lifespan** for the new categories, by the existing rules:
    - the step-up trim with the guard;
    - lifespan from the P18 source where covered, otherwise "Not yet rated";

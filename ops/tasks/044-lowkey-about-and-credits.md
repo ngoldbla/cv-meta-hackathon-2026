@@ -12,7 +12,9 @@ report: ops/reports/044-lowkey-about-and-credits.md
 **Why (Dylan, 2026-11-03):** package the hackathon entry. Low Key is a way to buy a car the calm way, which is why it's called "Low Key": don't get over-invested in the decision, and be confident you made a good one anyway.
 
 ## Rules for this task
-- **Don't name the listings/sold-data provider anywhere** (the existing rule; `scripts/name_guard.py` must still pass). Say "a licensed automotive listings and sold-vehicle data provider".
+- **Don't name the listings/sold-data provider in the app, the About page, the main README story or anything user-facing.** There, say "a licensed automotive listings and sold-vehicle data provider". **The exception** (Dylan, 2026-11-03) is the **setup materials only**: `lowkey/docs/roll-your-own.md`, the setup section of `lowkey/README.md`, and comments in `lowkey/app/.env.example`. These may name the provider and link to where a forker signs up for a key, because a fork can't run without it.
+  - **First,** read the provider's terms and record whether naming them and linking to sign-up is allowed. If the terms forbid it or are unclear, don't name them; describe the required API instead, and ask Dylan.
+  - Give `scripts/name_guard.py` a narrow allowlist for exactly those three files (not a weaker check), with a test that the name still fails anywhere else.
 - **Credit only what is true in the code at this commit.** Check each claim against the repo, and drop any that isn't true. In particular:
   - Laya and the decapitated Glimmer appear only as `lowkey/docs/decision-model.md` says (shipped, or tried and dropped). A dropped contender may be mentioned as tried, never as running;
   - impeccable only if task 038 used it;
@@ -47,6 +49,18 @@ report: ops/reports/044-lowkey-about-and-credits.md
    - Update `lowkey/README.md` (create it if missing) with the same story in short, how to run it locally, and the deploy notes.
    - Update the repo's `CREDITS.md` with the Low Key credits, keeping the EMS entries.
    - Keep all keys out and name no provider.
+2b. **`lowkey/app/.env.example`** lists every variable, marked required or optional, with what it's for and where to get it (no values):
+   - `META_API_KEY` and `LOWKEY_CHAT_MODEL`: Muse Spark, from Meta's developer API.
+   - `LOWKEY_PROVIDER_KEY`, `LOWKEY_PROVIDER_BASE_URL` and `LOWKEY_PROVIDER_MCP_URL`: the listings provider's sign-up (paid).
+   - `EIA_API_KEY`: free registration at eia.gov/opendata.
+   - `BLOB_READ_WRITE_TOKEN`: created when you add a Vercel Blob store.
+   - `LOWKEY_DECIDE_URL` and `LOWKEY_DECIDE_TOKEN`: optional, your own Modal deployment of the decision model.
+   - Note that FRED, the Census geocoder and fueleconomy.gov need no key.
+   - `scripts/secret_guard.py` must pass on it.
+2c. **The provider adapter seam.** Put the listings and sold-data calls behind one documented interface in `lowkey/app/lib/provider/` (and the pipeline's equivalent).
+   - Document the exact fields Low Key needs: price with fees, dealer name, distance, days on the lot, year, trim, drivetrain and engine for MPG matching, the listing link, and sold history by age for the depreciation fits.
+   - A fork using another data source then writes one adapter.
+   - No behaviour change; the existing tests stay green, plus one contract test per method with fixtures.
 3. **The roll-your-own guide** at `lowkey/docs/roll-your-own.md`:
    - fork the repo;
    - set the Vercel project (root `lowkey/app`, production branch) and the env vars (names only, with where to get each key);
