@@ -18,6 +18,18 @@ report: ops/reports/029-lowkey-trim-lifespan-costs.md
 - Each card should show only the salient numbers.
 
 ## Parts
+0. **A Toyota and a Honda in every sedan and SUV lineup** (Dylan, 2026-11-03, added before this task started).
+   - In the **Sedan** and **SUV** lineups, the four ranked picks must include at least one Toyota and at least one Honda.
+   - Rule, in `lowkey/preflight/lineup.py`:
+     - reserve a slot for the best-retaining qualifying Toyota and for the best-retaining qualifying Honda;
+     - fill the remaining slots by retention under the existing rules (at most 2 per make, no heavy-duty pickups, at least 30 sold units at each fitted age);
+     - then order the four by retention.
+     - If no Toyota or no Honda qualifies, record the shortfall and fill normally.
+     - Pickups are unchanged.
+   - Expected effect, from the task-023 fits: Sedan becomes Accord, Civic, Mazda3, **Corolla** (Corolla n=1124 replaces the Elantra). SUV already has both brands (CR-V, Corolla Cross) and should not change. Check this rather than assume it.
+   - Tests (fixtures): a lineup with no Toyota in the top four gets its best Toyota; the reserved slot respects the 2-per-make cap; a category with no qualifying Honda records the shortfall.
+   - Rebuild and re-upload the weekly table (task 027's commands), and confirm the live app shows the new sedan lineup.
+   - Update the PRD's "Lineup rules" with this rule.
 1. **The one-step-up trim.**
    - For each ranked model, recommend the trim **one step above the base trim** of the current model year, ordered by MSRP (for example Corolla LE → SE).
    - Use the provider's trims and MSRPs. Check whether specs (`/specs/resolve`, `/specs/{spec_ref}`) or facets give the trim order. Record which you used.
