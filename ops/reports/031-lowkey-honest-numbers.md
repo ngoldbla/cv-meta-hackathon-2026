@@ -1,9 +1,9 @@
 # Report 031: Low Key: one resale basis, model years shown, unrated lifespans, real trim steps
-Status: in_progress
-Branch head at start: fdb7ae1ca5b3b8e1bcd5a10c8eca4ebdcefeab43  ·  at finish: pending
+Status: done
+Branch head at start: fdb7ae1ca5b3b8e1bcd5a10c8eca4ebdcefeab43  ·  at finish: (this commit)
 
 ## Summary
-Pending.
+Done. Every percentage the user sees is now the after-discount figure (the CR-V trim line reads "the EX keeps 58% … below the model's 63%"), every listed unit shows its model year with a leftover-year note where one applies (seen live on a 2025 Venue), unrated models show a "Not yet rated" lifespan row (Corolla Cross, CX-50, Venue), cosmetic variants no longer count as a trim step (Venue now recommends the SEL), and the card figure sits in a 96 px box beside the title with the badge and "In stock" on one row. All checks pass; provider spend $0.010 of the $0.50 cap; Muse Spark $0.
 
 ## Work done
 - Claimed: set task status `in_progress`, created this report (commit at start `fdb7ae1` on `low-key`).
@@ -26,9 +26,19 @@ Pending.
   - Merges the build logged: only `Venue: 'SEL w/ 2-Tone Roof' -> 'SEL' (kept MSRP 22600.0)`.
   - Recommended trims in the new table: Sedan Accord LX→SE, Civic LX→Sport, Mazda3 2.5 S→2.5 S Select Sport, Corolla LE→SE; SUV CR-V LX (guard), Corolla Cross L→LE, CX-50 2.5 S Select→2.5 S Preferred, 4Runner SR5→TRD Sport, Venue SE→**SEL**; Pickup Tacoma SR→SR5, Ram Tradesman→Express, Colorado WT (guard), Silverado WT→Custom, Maverick XL→XLT. Against report 029, only the Venue step moved (SEL w/ 2-Tone Roof → SEL); no other model's step changed.
 - Part 5 (card figure): `PickCard.tsx` header now puts the rank badge and "In stock" on one row, and the Hairline figure in a fixed `h-24 w-[120px]` (96 px tall, keeping the figure's own 5:4 aspect) box beside the model name and sentence; the old centered 176 px figure block in the card body is gone. `CarFigure` is unchanged (package figure format, never `play`; reduced motion still via the core + `MotionConfig`). App tests 102 passed; build passes.
+- Final checks (live commit `79dcb9c`): `npm ci && npm run build` passes; app tests **102 passed**; `pytest -q` **154 passed, 1 skipped**; `pytest lowkey/` **28 passed**; `ruff check lowkey/`, `scripts/name_guard.py` and `scripts/secret_guard.py --all` clean.
+- Deployed checks (https://low-key-murex.vercel.app, headless Chrome, 390×844, fresh profiles; area changed to Chicago, IL 60614):
+  - Sedan near 60614 (4.36 s to cards): Accord/Civic/Mazda3/Corolla sentences in the new plain wording; every unit title year-first ("2026 Accord Sedan SE", "2027 Corolla SE"); no leftover note (all units 2026–2027 against the table's 2026 current year).
+  - SUV near 60614: CR-V sentence "The LX keeps about 63% … the most of any gas SUV here." and trim line "LX (base): the EX keeps 58% of its price after 5 years, more than 3 points below the model's 63%, so the base trim is recommended." — no 74%/69% anywhere on the page. Corolla Cross, CX-50 and Venue lifespan rows all read "Not yet rated". Venue: "The SEL is one step up from base" and "SEL: +$2,050 over SE". Every unit on every card shows its year.
+  - Leftover-year note seen live (one): on the Venue card, for the 2025 unit at Gregory Hyundai — "2025 model year: at resale it counts as a year older."
+  - Layout: measured figure box 120×96 px; the first card's "Monthly bills" label sat at viewport y≈386 (visible without scrolling). Pick #1 and "In stock" render on one row (screenshot `03-suv-60614.png`).
+  - Screenshots (390 px, not in git): `~/.cache/low-key/screens/031/01-opening.png`, `02-sedan-60614.png`, `03-suv-60614.png`, `04-suv-cards-60614.png`.
+- Spend: table rebuild usage delta 0 requests / $0.00; provider `/usage` moved 293 requests / $1.091 (at the build) to 298 / $1.101 after the deployed checks — **$0.010 of the $0.50 cap**; Muse Spark **$0 of the $0.25 cap** (fast path only).
 
 ## Deviations
 - Inbox skill says sync on `main`; the direct instruction for this run is branch `low-key` only, so all work is on `low-key`.
+- The `lifespanRowText` helper landed in the part-2 commit (it shares `lib/costs.ts` with the year helpers); its card wiring is the part-3 commit, as noted in Work done.
+- The "Not yet rated" and leftover-note behaviors are tested at the logic level (`lifespanRowText`, `leftoverYearNote`, `unitTitle` fixtures): the app has no DOM test harness (report 028), so no component-render test was added; both behaviors were confirmed on the deployed page instead.
 
 ## Blocked / questions
-Pending.
+- Nothing blocked. For Dylan: (1) The Venue's merged SEL keeps the cheapest variant's MSRP ($22,600, the former 2-Tone variant's price), so its step cost stays +$2,050 — confirm pricing the step off a variant that no longer appears by name. (2) The card now lists up to three units under "Distance to the dealer" (needed to show every unit's year); say if you want the distance row back to the single cheapest unit with years shown elsewhere.

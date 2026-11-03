@@ -1,7 +1,7 @@
 ---
 id: "031"
 title: "Low Key: one resale basis, model years shown, unrated lifespans, real trim steps"
-status: in_progress
+status: done
 created: 2026-11-03
 report: ops/reports/031-lowkey-honest-numbers.md
 ---
