@@ -14,3 +14,9 @@ artifacts/
 *.pt
 !datasets/**/*.json
 judges/ems/data/cache/
+
+# secrets: never commit
+.env
+.env.*
+*.env
+!.env.example
