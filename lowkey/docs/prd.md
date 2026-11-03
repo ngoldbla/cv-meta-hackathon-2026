@@ -54,7 +54,9 @@ The pitch in one sentence: *"If you change your mind after a year, leaving costs
 ## What the user sees
 1. **The chat opens with one question:** "What's your ZIP, and do you need a sedan, an SUV or a pickup?"
 2. **Lineup rules (Dylan, 2026-11-03):**
-   - **More than one brand in every lineup.** #1 and #2 must be different makes. If the top two share a make, #2 is the best-retaining model of another make. The commodity pick may be any make.
+   - **Four ranked picks per category** (Dylan, 2026-11-03; was two): #1–#4 by 5-year resale.
+   - **More than one brand in every lineup:** no make may hold more than 2 of the 4 slots. When a third model of the same make would qualify, it is skipped for the next-best model of another make.
+   - **The commodity pick** (lowest dollars a month) is extra. If it is already among the four, that card gets a "cheapest to own" badge. Otherwise it appears as a fifth, smaller card. It may be any make.
    - **Defaults until Dylan changes them:**
      - Pickups exclude heavy-duty trucks (¾-ton and 1-ton: F-250/350, 2500/3500HD); they have no EPA MPG rating and are not a "need keys now" purchase.
      - Resale uses a 15% trade-in discount off sold retail medians (preflight P13).
