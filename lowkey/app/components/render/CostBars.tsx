@@ -16,14 +16,17 @@ export interface CostSegment {
 export function CostBarsView({
   pay,
   real,
+  payTotal,
+  realTotal,
   backWhenSold,
 }: {
   pay: CostSegment[];
   real: CostSegment[];
+  payTotal: number;
+  realTotal: number;
   backWhenSold: number;
 }) {
-  const bills = pay.reduce((s, x) => s + x.usd, 0);
-  const realTotal = real.reduce((s, x) => s + x.usd, 0);
+  const bills = payTotal;
   const scale = bills > 0 ? bills : 1;
   const pct = (n: number) => `${(n / scale) * 100}%`;
   const describe = (segs: CostSegment[]) =>

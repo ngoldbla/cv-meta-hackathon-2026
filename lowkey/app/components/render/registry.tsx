@@ -23,7 +23,13 @@ export const { registry } = defineRegistry(catalog, {
       <CostCompareView category={props.category} rows={props.rows} />
     ),
     CostBars: ({ props }) => (
-      <CostBarsView pay={props.pay} real={props.real} backWhenSold={props.backWhenSold} />
+      <CostBarsView
+        pay={props.pay}
+        real={props.real}
+        payTotal={props.payTotal}
+        realTotal={props.realTotal}
+        backWhenSold={props.backWhenSold}
+      />
     ),
     LifespanTrack: ({ props }) => (
       <LifespanTrackView

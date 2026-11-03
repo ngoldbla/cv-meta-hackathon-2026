@@ -39,7 +39,7 @@ export function LifespanTrackView({
   const milesText =
     miles === null
       ? null
-      : `about ${(Math.round(miles / 100) * 100).toLocaleString("en-US")} miles`;
+      : `about ${(Math.round(miles / 1000) * 1000).toLocaleString("en-US")} miles`;
   const label = lastsAboutLabel(years);
   return (
     <section aria-label={label} className="flex flex-col gap-[5px] border-t border-border pt-3">

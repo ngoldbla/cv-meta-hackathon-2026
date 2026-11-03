@@ -54,6 +54,8 @@ export const catalog = defineCatalog(schema, {
       props: z.object({
         pay: z.array(segmentSchema),
         real: z.array(segmentSchema),
+        payTotal: z.number(),
+        realTotal: z.number(),
         backWhenSold: z.number(),
       }),
       description:

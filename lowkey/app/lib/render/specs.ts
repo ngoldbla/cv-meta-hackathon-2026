@@ -131,8 +131,17 @@ export function costBreakdown(entry: SpecEntry): CostBreakdown | null {
   const gasUsd = gas === null ? null : usd(gas);
   const valueLost = usd(valueLostPerMonth(entry.pick, ownership));
   const interest = usd(interestPerMonth(ownership));
-  const bills = loan + (gasUsd ?? 0);
-  const real = valueLost + interest + (gasUsd ?? 0);
+  // Totals are the rounded unrounded sums (the mockup's CR-V: real
+  // $461 from 197 + 97 + 166 segments), so a total can differ from
+  // its rounded segment sum by a dollar. Guarded to $1 (totals) and
+  // $2 (segment-sum drift) in guard.ts.
+  const gasRaw = gas ?? 0;
+  const bills = usd(ownership.monthlyPayment + gasRaw);
+  const real = usd(
+    valueLostPerMonth(entry.pick, ownership) +
+      interestPerMonth(ownership) +
+      gasRaw,
+  );
   return { loan, gas: gasUsd, valueLost, interest, bills, real, back: bills - real };
 }
 
@@ -147,7 +156,13 @@ function costBarsProps(entry: SpecEntry) {
     { part: "interest", usd: costs.interest },
   ];
   if (costs.gas !== null) real.push({ part: "gas", usd: costs.gas });
-  return { pay, real, backWhenSold: costs.back };
+  return {
+    pay,
+    real,
+    payTotal: costs.bills,
+    realTotal: costs.real,
+    backWhenSold: costs.back,
+  };
 }
 
 function badgeLabel(pick: SpecPick): string {

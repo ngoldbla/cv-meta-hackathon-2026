@@ -156,10 +156,12 @@ function checkCostBars(c: Checker, spec: Spec, id: string, entry: SpecEntry) {
     } else c.fail(id, "unexpected-segment");
     j += 1;
   }
-  const payTotal = ((props.pay as { usd: number }[]) ?? []).reduce((s, x) => s + x.usd, 0);
-  const realTotal = ((props.real as { usd: number }[]) ?? []).reduce((s, x) => s + x.usd, 0);
-  // Real total cross-check through the pre-existing effective-cost
-  // helper (depreciation + interest + fuel over 60 months).
+  // Totals are rounded unrounded sums (mockup rounding), checked
+  // to $1 against the raw tool figures; the pre-existing
+  // effective-cost helper cross-checks the real total.
+  const payTotal = props.payTotal;
+  const realTotal = props.realTotal;
+  c.dollar(id, `${base}.payTotal`, payTotal, ownership.monthlyPayment + (gasRaw ?? 0));
   const expectedReal = effectiveMonthlyCost({
     price: ownership.price,
     retentionAfterDiscount: entry.pick.retention5y,
@@ -167,11 +169,16 @@ function checkCostBars(c: Checker, spec: Spec, id: string, entry: SpecEntry) {
     loanAmount: ownership.loanAmount,
     fuelPerMonth: gasRaw,
   });
+  c.dollar(id, `${base}.realTotal`, realTotal, expectedReal);
   c.checked.add(`${base}.backWhenSold`);
   const back = props.backWhenSold;
-  if (typeof back !== "number" || back !== payTotal - realTotal) c.fail(id, "back-identity");
-  if (typeof realTotal === "number" && Math.abs(realTotal - expectedReal) > 2) {
-    c.fail(id, "real-total");
+  if (
+    typeof back !== "number" ||
+    typeof payTotal !== "number" ||
+    typeof realTotal !== "number" ||
+    back !== payTotal - realTotal
+  ) {
+    c.fail(id, "back-identity");
   }
   const at60 = ownership.curve.find((p) => p.month === 60);
   if (typeof back === "number" && at60) {
@@ -307,8 +314,17 @@ export function checkCostCompareSpec(spec: Spec, entries: SpecEntry[]): GuardRes
     c.dollar(spec.root, `${base}.rows.${idx}.interest`, row.interest, interestPerMonth(entry.ownership));
     const gasRaw = entry.local?.fuel?.perMonth ?? 0;
     c.dollar(spec.root, `${base}.rows.${idx}.gas`, row.gas, gasRaw);
-    c.checked.add(`${base}.rows.${idx}.total`);
-    if (row.total !== row.valueLost + row.interest + row.gas) c.fail(spec.root, "row-total");
+    const expectedReal = effectiveMonthlyCost({
+      price: entry.ownership.price,
+      retentionAfterDiscount: entry.pick.retention5y,
+      monthlyPayment: entry.ownership.monthlyPayment,
+      loanAmount: entry.ownership.loanAmount,
+      fuelPerMonth: entry.local?.fuel?.perMonth,
+    });
+    c.dollar(spec.root, `${base}.rows.${idx}.total`, row.total, expectedReal);
+    if (Math.abs(row.total - (row.valueLost + row.interest + row.gas)) > 2) {
+      c.fail(spec.root, "row-total");
+    }
     if (row.total < prev) c.fail(spec.root, "row-order");
     prev = row.total;
   });
