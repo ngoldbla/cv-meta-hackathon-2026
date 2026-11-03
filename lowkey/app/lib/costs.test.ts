@@ -122,7 +122,16 @@ describe("lifespan row (task 031, part 3)", () => {
 });
 
 describe("dealer face units (task 033)", () => {
-  const unit = (over: Partial<{ price: number; year: number | null }> = {}) => ({
+  const unit = (
+    over: Partial<{
+      price: number;
+      year: number | null;
+      dealer: string;
+      distanceMiles: number;
+      trim: string;
+      url: string;
+    }> = {},
+  ) => ({
     price: 31950,
     dealer: "Fixture Motors",
     distanceMiles: 13.7,
