@@ -440,6 +440,7 @@ export default function Home() {
             {!hasRank ? (
               <ToggleGroup
                 aria-label="Car type"
+                variant="outline"
                 multiple={false}
                 value={bodyPick}
                 disabled={busy}
@@ -463,7 +464,7 @@ export default function Home() {
                     value={label}
                     className="h-auto min-h-11 flex-1 flex-col gap-1 px-1 py-2"
                   >
-                    <CarFigure kind={kind} className="w-full max-w-[120px]" />
+                    <CarFigure kind={kind} className="w-[104px]" />
                     <span>{label}</span>
                   </ToggleGroupItem>
                 ))}
