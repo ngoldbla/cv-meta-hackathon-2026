@@ -52,6 +52,10 @@ export interface TablePick {
   lifespanMiles?: number | null;
   lifespanSource?: string | null;
   lifespanAsOf?: string | null;
+  /** Task 057: sold price ÷ new price by age in years (ages with ≥ 30 sales); null on older tables. */
+  retentionByAge?: Record<string, number> | null;
+  /** Task 057: the per-year slope of log(retention) from the same fit. */
+  retentionSlopePerYear?: number | null;
 }
 
 export interface TableLineup {

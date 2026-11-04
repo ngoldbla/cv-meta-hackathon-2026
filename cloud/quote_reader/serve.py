@@ -56,6 +56,16 @@ PROMPT = (
     "Never calculate or guess."
 )
 
+# Task 057: the small read. Only these kinds; the car comes from the VIN lookup.
+TERMS_PROMPT = (
+    "List only these values if they are printed: the vehicle's selling price (also "
+    "printed as sale price, cash price or vehicle price), MSRP, down payment, "
+    "APR, term, monthly payment, out-the-door total, odometer mileage, VIN. "
+    "Copy each label and value exactly, and tag each with its kind. Skip everything else. "
+    "Never calculate or guess."
+)
+TERMS_MAX_TOKENS = 600
+
 
 @app.cls(
     image=image,
@@ -93,22 +103,23 @@ class Reader:
         return "ready"
 
     @modal.method()
-    def read(self, image_b64: str, mime: str = "image/jpeg") -> dict:
+    def read(self, image_b64: str, mime: str = "image/jpeg", mode: str = "full") -> dict:
         import sys
 
         sys.path.insert(0, "/root")
-        from normalize import normalize
-        from schema import RawRead
+        from normalize import normalize, normalize_terms, terms_thin
+        from schema import RawRead, TermsRead
         from vllm import SamplingParams
         from vllm.sampling_params import StructuredOutputsParams
 
-        params = SamplingParams(
-            temperature=0.0,
-            max_tokens=6000,  # a full window sticker transcript runs past 1,500 tokens
-            structured_outputs=StructuredOutputsParams(json=RawRead.model_json_schema()),
-        )
+        def params_for(model_cls, max_tokens):
+            return SamplingParams(
+                temperature=0.0,
+                max_tokens=max_tokens,
+                structured_outputs=StructuredOutputsParams(json=model_cls.model_json_schema()),
+            )
 
-        def run(prompt: str) -> dict:
+        def run(prompt: str, model_cls=RawRead, max_tokens: int = 6000) -> dict:
             messages = [
                 {
                     "role": "user",
@@ -118,12 +129,17 @@ class Reader:
                     ],
                 }
             ]
-            gen = self.llm.chat(messages, params)[0].outputs[0]
+            gen = self.llm.chat(messages, params_for(model_cls, max_tokens))[0].outputs[0]
             # Length and stop reason only; never the page's content.
-            print(f"read: {len(gen.token_ids)} tokens, finish={gen.finish_reason}")
+            print(f"read ({mode}): {len(gen.token_ids)} tokens, finish={gen.finish_reason}")
             # Valid by construction; validate anyway and never trust blindly.
-            return json.loads(RawRead.model_validate_json(gen.text).model_dump_json())
+            return json.loads(model_cls.model_validate_json(gen.text).model_dump_json())
 
+        if mode == "terms":
+            raw = run(TERMS_PROMPT, TermsRead, TERMS_MAX_TOKENS)
+            if not terms_thin(raw):
+                return normalize_terms(raw)
+            print("read: thin terms result, running the full read")
         raw = run(PROMPT)
         if _thin(raw):
             print("read: thin result, retrying with the full transcript prompt")
@@ -156,7 +172,7 @@ hosted_image = (
     scaledown_window=2 * MINUTES,
     timeout=10 * MINUTES,
 )
-def read_quote(image_b64: str, mime: str = "image/jpeg") -> dict:
+def read_quote(image_b64: str, mime: str = "image/jpeg", mode: str = "full") -> dict:
     """Read on the hosted model; fall back to our own GPU if every provider fails."""
     import os
     import sys
@@ -165,19 +181,19 @@ def read_quote(image_b64: str, mime: str = "image/jpeg") -> dict:
     import requests
 
     sys.path.insert(0, "/root")
-    from normalize import normalize
-    from schema import RawRead
+    from normalize import normalize, normalize_terms, terms_thin
+    from schema import RawRead, TermsRead
 
     token = os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN")
 
     # During a warm window (warm_window.py on) our loaded GPU is the faster path.
     if route.get("gpu_until", 0) > time.time():
         try:
-            return Reader().read.remote(image_b64, mime)
+            return Reader().read.remote(image_b64, mime, mode)
         except Exception as e:  # noqa: BLE001  (fall through to the hosted model)
             print(f"warm GPU read failed: {type(e).__name__}; trying the hosted model")
 
-    def run(provider: str, prompt: str) -> dict:
+    def run(provider: str, prompt: str, model_cls=RawRead, max_tokens: int = 6000) -> dict:
         body = {
             "model": f"{HF_MODEL}:{provider}",
             "messages": [
@@ -191,14 +207,14 @@ def read_quote(image_b64: str, mime: str = "image/jpeg") -> dict:
             ],
             "response_format": {
                 "type": "json_schema",
-                "json_schema": {"name": "RawRead", "schema": RawRead.model_json_schema(), "strict": True},
+                "json_schema": {"name": model_cls.__name__, "schema": model_cls.model_json_schema(), "strict": True},
             },
             "temperature": 0,
             # Copying a page needs no hidden reasoning: with it on, the provider's
             # default wrote about 2,000 thinking tokens per read (about 14 s);
             # off, about 700 tokens and 4 s, with the same reads.
             "chat_template_kwargs": {"enable_thinking": False},
-            "max_tokens": 6000,
+            "max_tokens": max_tokens,
         }
         t = time.time()
         r = requests.post(HF_URL, headers={"Authorization": f"Bearer {token}"}, json=body, timeout=90)
@@ -208,14 +224,19 @@ def read_quote(image_b64: str, mime: str = "image/jpeg") -> dict:
         usage = data.get("usage") or {}
         # Timing, length and stop reason only; never the page's content.
         print(
-            f"hosted read ({provider}): {time.time() - t:.1f}s, "
+            f"hosted read ({provider}, {mode}): {time.time() - t:.1f}s, "
             f"{usage.get('completion_tokens')} tokens, finish={choice.get('finish_reason')}"
         )
-        return json.loads(RawRead.model_validate_json(choice["message"]["content"]).model_dump_json())
+        return json.loads(model_cls.model_validate_json(choice["message"]["content"]).model_dump_json())
 
     if token:
         for provider in HF_PROVIDERS:
             try:
+                if mode == "terms":
+                    raw = run(provider, TERMS_PROMPT, TermsRead, TERMS_MAX_TOKENS)
+                    if not terms_thin(raw):
+                        return normalize_terms(raw)
+                    print("hosted read: thin terms result, running the full read")
                 raw = run(provider, PROMPT)
                 if _thin(raw):
                     print("hosted read: thin result, retrying with the full transcript prompt")
@@ -225,7 +246,7 @@ def read_quote(image_b64: str, mime: str = "image/jpeg") -> dict:
                 status = getattr(getattr(e, "response", None), "status_code", None)
                 print(f"hosted read ({provider}) failed: {type(e).__name__} {status or ''}")
     print("hosted read unavailable; falling back to the Modal GPU")
-    return Reader().read.remote(image_b64, mime)
+    return Reader().read.remote(image_b64, mime, mode)
 
 
 # --- The public seam: a small CPU web app in front of the GPU class ---------
@@ -268,6 +289,7 @@ def web():
     class ReadBody(BaseModel):
         image_b64: str
         mime: str = "image/jpeg"
+        mode: str = "full"
 
     @api.post("/warm", status_code=202)
     async def warm(authorization: str | None = Header(None)):
@@ -282,6 +304,8 @@ def web():
         check(authorization)
         if body.mime not in ("image/jpeg", "image/png", "image/webp"):
             raise HTTPException(status_code=415)
+        if body.mode not in ("terms", "full"):
+            raise HTTPException(status_code=422)
         if len(body.image_b64) * 3 // 4 > MAX_IMAGE_BYTES:
             raise HTTPException(status_code=413)
         day = datetime.date.today().isoformat()
@@ -289,7 +313,7 @@ def web():
         if used >= DAILY_CAP:
             raise HTTPException(status_code=429, detail="daily cap")
         await counter.put.aio(day, used + 1)
-        call = await read_quote.spawn.aio(body.image_b64, body.mime)
+        call = await read_quote.spawn.aio(body.image_b64, body.mime, body.mode)
         return {"id": call.object_id}
 
     @api.get("/result/{call_id}")

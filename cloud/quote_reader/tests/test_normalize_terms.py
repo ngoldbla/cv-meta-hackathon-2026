@@ -80,3 +80,12 @@ def test_thin_when_fewer_than_two_money_values():
     assert terms_thin(raw(("price", "Price", "$28,450")))
     assert not terms_thin(raw(("price", "Price", "$28,450"), ("apr", "APR", "6.9%")))
     assert terms_thin({"pairs": []})
+
+
+def test_sticker_base_price_is_not_a_selling_price():
+    out = normalize_terms(raw(
+        ("msrp", "Total MSRP", "$51,300.00"),
+        ("price", "Base price", "$49,500.00"),
+    ))
+    assert out["selling_price"] is None
+    assert out["msrp"] == 51300.0 and out["price_basis"] == "msrp"

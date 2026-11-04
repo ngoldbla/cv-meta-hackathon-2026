@@ -408,7 +408,11 @@ def normalize_terms(raw: dict) -> dict:
     }
 
     def money(kind: str) -> float | None:
+        # The same exclusions as the full read: a sticker's "Base price" is not a selling price.
+        ex = _EXCLUDE.get({"price": "selling_price", "monthly": "stated_monthly"}.get(kind, kind))
         for p in _ranked(pairs, kind):
+            if ex and ex.search(_label_key(p["label"])):
+                continue
             v = parse_money(p["value"])
             if v is not None and v > 0:
                 return v
