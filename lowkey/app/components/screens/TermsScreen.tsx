@@ -68,17 +68,9 @@ export function TermsScreen({
   }
 
   return (
-    <div className="fixed inset-0 z-30 overflow-y-auto bg-background">
-      <div className="shell">
-        <AppBar
-          title="Your terms"
-          fallback={fallback}
-          right={
-            <Button type="button" variant="ghost" className="min-h-11" onClick={done} disabled={Boolean(downError || aprError)}>
-              Done
-            </Button>
-          }
-        />
+    <div>
+      <main className="shell">
+        <AppBar title="Your terms" fallback={fallback} />
         <form
           className="flex flex-col gap-5 py-5"
           onSubmit={(e) => {
@@ -184,7 +176,7 @@ export function TermsScreen({
             </Button>
           </div>
         </form>
-      </div>
+      </main>
     </div>
   );
 }

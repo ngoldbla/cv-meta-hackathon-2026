@@ -87,13 +87,25 @@ export default function ResultsClient({ type }: { type: SearchType }) {
   };
   const compare = data?.compare && isCatalogValid(data.compare) ? data.compare : null;
 
+  if (termsOpen) {
+    return (
+      <TermsScreen
+        terms={v.terms}
+        aprPercent={data?.aprLabel ? data.aprPercent : null}
+        aprLabel={data?.aprLabel ?? null}
+        fallback={resultsPath(type, v)}
+        onDone={(terms) => router.replace(resultsPath(type, { ...v, terms }))}
+      />
+    );
+  }
+
   return (
     <main className="shell">
       <AppBar
         title={`${PLURAL[type]} near ${v.zip}`}
         fallback="/"
         right={
-          <Link href={quotePath({ type, view: v })} className="min-h-11 content-center rounded-full px-2 text-sm font-medium hover:bg-muted">
+          <Link href={quotePath({ type, view: v })} className="min-h-11 content-center whitespace-nowrap rounded-full px-2 text-sm font-medium text-foreground no-underline hover:bg-muted">
             Check a quote
           </Link>
         }
@@ -103,7 +115,7 @@ export default function ResultsClient({ type }: { type: SearchType }) {
         <SlidersIcon />
         <span className="tabular-nums">
           {summary}
-          {sources?.taxIncluded ? " · est. tax incl." : ""}
+          {sources?.taxIncluded ? " · tax incl." : ""}
         </span>
         <span className="flex-1" />
         <Button
@@ -185,15 +197,6 @@ export default function ResultsClient({ type }: { type: SearchType }) {
         </Link>
       </footer>
 
-      {termsOpen ? (
-        <TermsScreen
-          terms={v.terms}
-          aprPercent={data?.aprLabel ? data.aprPercent : null}
-          aprLabel={data?.aprLabel ?? null}
-          fallback={resultsPath(type, v)}
-          onDone={(terms) => router.replace(resultsPath(type, { ...v, terms }))}
-        />
-      ) : null}
     </main>
   );
 }

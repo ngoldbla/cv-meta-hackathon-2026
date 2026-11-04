@@ -181,6 +181,17 @@
   }
 }
 
+/* Browser surfaces in the palette (impeccable craft floor). */
+::selection {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+input,
+textarea {
+  caret-color: var(--brass);
+}
+
 /* Visible keyboard focus everywhere, including components that set
    outline-none for pointer use (un-layered, so it always wins). */
 :focus-visible {

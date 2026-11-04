@@ -3,7 +3,7 @@ import { schema } from "@json-render/react";
 import { z } from "zod";
 
 /**
- * Low Key catalog (task 034). The vocabulary the chat page can draw:
+ * Low Key catalog (task 034). The vocabulary the screens can draw:
  * every component is built on the installed Iconiq components and
  * theme tokens, and every spec is built by server code from tool
  * results (see specs.ts) — the model never writes a spec or a number.

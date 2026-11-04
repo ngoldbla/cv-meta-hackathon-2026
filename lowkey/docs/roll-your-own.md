@@ -14,7 +14,6 @@ Low Key is open source so you can shop with your own preferences: a luxury list,
 | `EIA_API_KEY` | Free at https://www.eia.gov/opendata/ |
 | `BLOB_READ_WRITE_TOKEN` | Created with the Vercel Blob store |
 | `LOWKEY_QUOTE_URL`, `LOWKEY_QUOTE_TOKEN` | Optional: your Modal deployment of the photo reader (step 3) |
-| `LOWKEY_CHAT_MODEL_ON`, `META_API_KEY`, `LOWKEY_CHAT_MODEL` | Optional: Meta's developer API, for model-written chat follow-ups |
 
 FRED, the Census geocoder and fueleconomy.gov need no key.
 

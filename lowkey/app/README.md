@@ -1,6 +1,6 @@
 # Low Key app
 
-Next.js chat app for Low Key. It talks to Muse Spark through the Meta Model API's OpenAI-compatible endpoint. Rankings come from the private Blob depreciation table, local stock from the live listings search, payments from the cheapest local unit (or the labelled typical price), and fuel from EPA MPG with the EIA/Timestral forecast — all server-side (task 027).
+Next.js app for Low Key: an interactive web app with no chat (task 049). Screens: `/` (start), `/[type]` (results), `/[type]/[car]` (a car and its walk-away), `/[type]/[car]/listing/[n]` (a local unit), `/quote` (Check a quote). They read `GET /api/search`, which runs the code in `lib/searchRun.ts`. Rankings come from the private Blob depreciation table, local stock from the live listings search, payments from the cheapest local unit (or the labelled typical price), and fuel from EPA MPG with the EIA/Timestral forecast — all server-side (task 027).
 
 ## Run locally
 
@@ -11,7 +11,7 @@ npm run build
 npm test
 ```
 
-Node 22. Copy `.env.example` names into your shell or Vercel; never commit values. The chat route needs `META_API_KEY` (and optionally `LOWKEY_CHAT_MODEL`, default `muse-spark-1.3`); the tools need the provider, EIA and Blob variables.
+Node 22. Copy `.env.example` names into your shell or Vercel; never commit values. The search needs the provider, EIA and Blob variables; Check a quote's photo reader needs `LOWKEY_QUOTE_URL` and `LOWKEY_QUOTE_TOKEN`.
 
 ## Vercel
 
@@ -19,7 +19,7 @@ Node 22. Copy `.env.example` names into your shell or Vercel; never commit value
 - Framework preset: Next.js
 - Node version: 22.x
 - Install: `npm ci`, Build: `npm run build`
-- Env names: `META_API_KEY`, `LOWKEY_CHAT_MODEL`, `LOWKEY_PROVIDER_KEY`, `LOWKEY_PROVIDER_BASE_URL`, `LOWKEY_PROVIDER_MCP_URL`, `EIA_API_KEY`, `BLOB_READ_WRITE_TOKEN`
+- Env names: `LOWKEY_PROVIDER_KEY`, `LOWKEY_PROVIDER_BASE_URL`, `LOWKEY_PROVIDER_MCP_URL`, `EIA_API_KEY`, `BLOB_READ_WRITE_TOKEN`
 
 See `lowkey/docs/deploy.md` and `lowkey/docs/prd.md`.
 
@@ -29,13 +29,7 @@ Installed with the pinned shadcn CLI `npx shadcn@4.23.0 add @iconiq/<name>` (reg
 
 - `iconiq-theme` → `lib/registry-theme.ts` (shared registry tokens)
 - `typography` → `components/ui/typography.tsx`
-- `ai-input` → `components/ui/ai-input.tsx` (composer; agent/model chips omitted, plus/mic buttons removed and a `disabled` prop added in the copied source; file copied from `https://iconiqui.com/r/ai-input.json` because the pinned CLI resolves its un-namespaced `b-switch` dependency against the default registry and fails — same bytes the CLI would write)
-- `b-switch` → `components/ui/b-switch.tsx` (dependency of `ai-input`)
-- `message` → `components/ui/message.tsx` (user/assistant messages)
-- `reasoning-steps` → `components/ui/reasoning-steps.tsx` (live tool steps)
-- `thinking-indicator` → `components/ui/thinking-indicator.tsx` (before the first step)
-- `streaming-text` → `components/ui/streaming-text.tsx` (follow-up replies; copied source now keeps already-shown words when the model appends text)
-- `reveal-text` → `components/ui/reveal-text.tsx` (opening headline; chosen over `dia-text` as the calmer, non-looping reveal)
+- `b-switch` → `components/ui/b-switch.tsx` (kept from the chat composer; removed with the chat in task 049: `ai-input`, `message`, `reasoning-steps`, `thinking-indicator`, `streaming-text`, `reveal-text`)
 - `card` → `components/ui/card.tsx` (pick cards)
 - `badge` → `components/ui/badge.tsx` (rank / cheapest-to-own labels)
 - `status-dot` → `components/ui/status-dot.tsx` (in-stock indicator)

@@ -17,7 +17,7 @@ import {
  * The listing sheet (task 041, part 1): one local unit in an Iconiq
  * drawer, from the bottom on phones and the right on wide screens,
  * before the shopper ever leaves for the dealer's site. Closing
- * returns to where they were (the car's sheet, or the chat).
+ * returns to where they were (the screen it was opened from).
  */
 export function ListingSheet({
   title,

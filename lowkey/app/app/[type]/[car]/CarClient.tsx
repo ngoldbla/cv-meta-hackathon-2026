@@ -17,7 +17,7 @@ import { carsOf, type CarView } from "@/lib/resultView";
 import { listingPath, parseView, quotePath, resultsPath, searchApiQuery } from "@/lib/routes";
 import type { SearchType } from "@/lib/search";
 
-/** The walk-away view's inputs from one priced car (as the chat page mapped them). */
+/** The walk-away view's inputs from one priced car (the same mapping the chat page used before task 049). */
 function walkInputs(car: CarView) {
   const o = car.ownership!;
   const any = o as typeof o & { evenMonth?: number | null; underwaterMonth?: number | null; perMonth?: number };
@@ -64,7 +64,6 @@ export default function CarClient({ type, slug }: { type: SearchType; slug: stri
     const n = (car?.entry.local?.units ?? []).findIndex((u) => u.url === url);
     if (car && n >= 0) router.push(listingPath(type, car.slug, n + 1, view));
   };
-  const toWalk = () => document.getElementById("walk-away")?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   return (
     <main className="shell pb-24">
@@ -92,9 +91,9 @@ export default function CarClient({ type, slug }: { type: SearchType; slug: stri
         <>
           <div className="pt-3">
             {spec && isCatalogValid(spec) ? (
-              <RenderSpec spec={spec} onWalkAway={toWalk} onListing={openListing} resultsUrl={origin + back} />
+              <RenderSpec spec={spec} onListing={openListing} resultsUrl={origin + back} />
             ) : (
-              <TextFallback entry={car.entry} peers={data!.shown as never} category={data!.category} onWalkAway={toWalk} />
+              <TextFallback entry={car.entry} peers={data!.shown as never} category={data!.category} />
             )}
           </div>
           {car.ownership ? (

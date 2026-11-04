@@ -6,7 +6,7 @@
 - **Production branch: `main`** (it was `low-key` until 2026-11-03, when `low-key` was merged into `main` and retired). Every push or merged PR to `main` triggers a production deploy to that URL within a few minutes. There is no staging step: what lands on `main` is what judges and users see.
 - **Other branches** and open PRs get their own preview URLs. They never touch production.
 - **Build settings** (in Vercel, not the repo): Root Directory `lowkey/app`, framework preset Next.js, Node 22.x, install `npm ci`, build `npm run build`.
-- **Environment variables** are stored in Vercel for Production and Preview: `META_API_KEY`, `LOWKEY_CHAT_MODEL`, `LOWKEY_PROVIDER_KEY`, `LOWKEY_PROVIDER_BASE_URL`, `LOWKEY_PROVIDER_MCP_URL`, `EIA_API_KEY` and `BLOB_READ_WRITE_TOKEN`. Keys are marked sensitive. Never put a value in the repo; ask Dylan if a new variable is needed.
+- **Environment variables** are stored in Vercel for Production and Preview: `LOWKEY_PROVIDER_KEY`, `LOWKEY_PROVIDER_BASE_URL`, `LOWKEY_PROVIDER_MCP_URL`, `EIA_API_KEY` and `BLOB_READ_WRITE_TOKEN`. Keys are marked sensitive. Never put a value in the repo; ask Dylan if a new variable is needed.
 
 ## Rules for anyone pushing to `main`
 1. Before every push that touches `lowkey/app`, run `npm ci && npm run build` and the app's tests in `lowkey/app`. A failing build on `main` means a failed production deploy (the live site keeps the last good one, but it stops updating).

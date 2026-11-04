@@ -43,7 +43,7 @@ function GitHubIcon() {
 export function SiteHeader({ quoteHref = "/quote" }: { quoteHref?: string }) {
   return (
     <header className="topbar">
-      <Link href="/" className="brand min-h-11" aria-label="lowkey.autos, start">
+      <Link href="/" className="brand min-h-11 text-foreground no-underline" aria-label="lowkey.autos, start">
         <KeyIcon />
         <span>
           lowkey<span className="brand-tld">.autos</span>
@@ -52,13 +52,13 @@ export function SiteHeader({ quoteHref = "/quote" }: { quoteHref?: string }) {
       <nav className="flex items-center gap-1" aria-label="Site">
         <Link
           href="/about"
-          className="min-h-11 content-center rounded-full px-2 text-sm text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
+          className="min-h-11 content-center whitespace-nowrap rounded-full px-2 text-sm text-foreground/70 no-underline transition-colors hover:bg-muted hover:text-foreground"
         >
           About
         </Link>
         <Link
           href={quoteHref}
-          className="min-h-11 content-center rounded-full px-2 text-sm font-medium transition-colors hover:bg-muted"
+          className="min-h-11 content-center whitespace-nowrap rounded-full px-2 text-sm font-medium text-foreground no-underline transition-colors hover:bg-muted"
         >
           Check a quote
         </Link>
