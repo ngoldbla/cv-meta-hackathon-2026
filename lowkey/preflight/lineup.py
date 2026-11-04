@@ -15,13 +15,15 @@ Rules (lowkey/docs/prd.md, "Lineup rules", Dylan 2026-11-03):
   Task 023's superseded two-pick form (distinct makes) is the same
   code with top_k=2, max_per_make=1.
 - Pickups exclude heavy-duty trucks (3/4-ton and 1-ton).
-- Sedan and SUV lineups include at least one Toyota and at least one
-  Honda (task 029, part 0): a slot is reserved for the best-retaining
+- Sedan, SUV and (task 042) Hybrid lineups include at least one
+  Toyota and at least one Honda (task 029, part 0): a slot is reserved for the best-retaining
   qualifying Toyota and for the best-retaining qualifying Honda, the
   remaining slots are filled by retention under the rules above, and
   the four are then ordered by retention. If no Toyota or no Honda
   qualifies, the shortfall is recorded and the lineup fills normally.
-  Pickups are unchanged.
+  Pickup, Minivan and Electric are unchanged.
+- A category that cannot fill four shows fewer (task 042); the
+  30-unit floor is never relaxed to fill it.
 - The commodity pick (lowest dollars per month) is flagged "badge"
   when it is already among the ranked picks, else "extra".
 - A model is rankable only with a fitted retention, a current new
@@ -36,13 +38,15 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from categories import CATEGORIES
+
 TRADE_IN_FACTOR = 0.85
 MIN_SOLD_PER_AGE = 30
 MIN_FITTED_AGES = 3
-CATEGORIES = ("Sedan", "SUV", "Pickup")
 # Task 029, part 0: Sedan/SUV lineups reserve one slot each for the
-# best-retaining qualifying Toyota and Honda. Pickups are unchanged.
-RESERVE_CATEGORIES = ("Sedan", "SUV")
+# best-retaining qualifying Toyota and Honda. Task 042 adds Hybrid
+# (both make many); Pickup, Minivan and Electric are unchanged.
+RESERVE_CATEGORIES = ("Sedan", "SUV", "Hybrid")
 REQUIRED_MAKES = ("Toyota", "Honda")
 CACHE_DIR = Path.home() / ".cache" / "low-key" / "preflight"
 

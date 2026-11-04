@@ -19,11 +19,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from categories import CATEGORIES, filters
 from provider_client import get, usage
 
 OUT = Path.home() / ".cache" / "low-key" / "preflight" / "make_map.json"
-CATEGORIES = ("Sedan", "SUV", "Pickup")
-GAS = {"fuel_type": "Gas only", "exclude_powertrain_type": "MHEV,HEV"}
 
 
 def facet_values(category: str, facet: str, **extra: str) -> list[str]:
@@ -32,8 +31,7 @@ def facet_values(category: str, facet: str, **extra: str) -> list[str]:
         {
             "facets": facet,
             "inventory_type": "new",
-            "body_type": category,
-            **GAS,
+            **filters(category),
             "year": "2026",
             "facet_value_limit": "80",
             **extra,

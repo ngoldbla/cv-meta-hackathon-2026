@@ -38,11 +38,11 @@ try {
 }
 if (table.version !== 1) fail(`unexpected version ${table.version}`);
 
-const categories = ["Sedan", "SUV", "Pickup"].filter(
+const categories = ["Sedan", "SUV", "Pickup", "Minivan", "Hybrid"].filter(
   (c) => table.lineups?.[c]?.picks?.length > 0,
 );
-if (categories.length !== 3) {
-  fail(`expected 3 categories with picks, found ${categories.length}`);
+if (categories.length !== 5) {
+  fail(`expected 5 categories with picks, found ${categories.length}`);
 }
 
 const gasCount = Object.keys(table.gasSeries ?? {}).length;
