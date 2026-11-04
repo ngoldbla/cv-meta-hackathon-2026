@@ -38,3 +38,9 @@ Branch: task/058-timestral-on-modal (cut from main)
 - **Pipeline still needs the service.** `build_table.py` needs `LOWKEY_GAS_URL` and `LOWKEY_GAS_TOKEN`; `--skip-forecast` leaves `gasSeries` empty and is for debugging only.
 - **The GPU's weights licence** is a Modified MIT with a revenue cap (see `CREDITS.md`); unchanged by this task.
 - **Production check** at lowkey.autos follows Dylan's merge.
+
+## Preview check
+- **Preview:** https://low-5rzqu6zpb-meta-cv-hackathon.vercel.app (Ready), reached with `vercel curl` past Vercel Authentication.
+- **`/api/search?zip=60614&type=suv`, the CR-V:** `locals[0].fuel.latestDate` is 2026-11-02, equal to the service's YORD `latestDate`.
+- **`fuel.perMonth`:** 155.12, equal to 1000 / 30 mpg x the service's YORD `meanP50` of 4.6536 (= 155.12).
+- The preview reads the live service, not the table.
