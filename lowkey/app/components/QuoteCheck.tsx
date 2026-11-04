@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/b-button";
 import { Input } from "@/components/ui/input";
 import { Typography } from "@/components/ui/typography";
 import { downFor, type DealInputs, type DownRule } from "@/lib/deal";
+import { decodeVin } from "@/lib/quote/barcode";
 import { fileToJpegBase64, UnreadableFileError } from "@/lib/quote/image";
 import { taxAmountFor } from "@/lib/tax";
 import { analyzeQuote, headsUp, type PickDeal, type SameTerms } from "@/lib/quote/compare";
@@ -21,6 +22,8 @@ import {
   type MoneyField,
   type Quote,
 } from "@/lib/quote/schema";
+import { usedRetention } from "@/lib/used";
+import type { VinFacts } from "@/lib/vin";
 
 /**
  * Check a quote (tasks 046 and 047). The shopper types a dealer quote,
@@ -43,8 +46,11 @@ export interface QuotePick {
 
 const MAX_QUOTES = 3;
 const DRAFT_KEY = "lowkey-quote-draft-v1";
-const POLL_MS = 2000;
+const POLL_MS = 1000;
 const READ_LIMIT_MS = 240_000; // a hosted read, then the backup GPU's cold start
+
+/** Task 057: a model's resale history from /api/vin (null when Low Key has none). */
+type VinRetention = { retention5y: number; byAge: Record<string, number> | null; slopePerYear: number | null };
 
 type ReadState = "idle" | "reading" | "failed" | "resting" | "off" | "unsupported";
 
@@ -138,6 +144,40 @@ export function QuoteCheck({
   const [elapsed, setElapsed] = useState(0);
   const [dragging, setDragging] = useState(false);
   const cancelled = useRef(false);
+  // Task 057: each quote's VIN lookup (the car and its model's resale history), by quote index.
+  const [carInfo, setCarInfo] = useState<Record<number, { facts: VinFacts; retention: VinRetention | null } | "none">>({});
+  // The VIN the photo read found, when it differs from the barcode's ("The sheet says …").
+  const [sheetVin, setSheetVin] = useState<Record<number, string>>({});
+  const lastFile = useRef<File | null>(null);
+
+  const lookupCar = useCallback(async (index: number, vin: string) => {
+    try {
+      const res = await fetch(`/api/vin?vin=${encodeURIComponent(vin)}`);
+      const body = (await res.json()) as { ok: boolean; facts?: VinFacts; retention?: VinRetention | null };
+      if (!body.ok || !body.facts) {
+        setCarInfo((c) => ({ ...c, [index]: "none" }));
+        return;
+      }
+      const f = body.facts;
+      setCarInfo((c) => ({ ...c, [index]: { facts: f, retention: body.retention ?? null } }));
+      setQuotes((all) =>
+        all.map((x, i) =>
+          i === index
+            ? {
+                ...x,
+                vin: f.vin,
+                year: x.year ?? f.year,
+                vehicle: x.vehicle ?? ([f.make, f.model, f.trim].filter(Boolean).join(" ") || null),
+                mileage: x.mileage ?? f.miles,
+                car: { year: f.year, make: f.make, model: f.model, trim: f.trim, miles: f.miles, status: f.status },
+              }
+            : x,
+        ),
+      );
+    } catch {
+      setCarInfo((c) => ({ ...c, [index]: "none" }));
+    }
+  }, []);
 
   // Start the reader loading while the shopper finds a photo.
   useEffect(() => {
@@ -166,7 +206,18 @@ export function QuoteCheck({
   const pick = picks.find((p) => p.key === pickKey) ?? null;
   // A model's resale history applies only to that model: use it when the
   // quote's car names one of the picks, else a typical curve.
-  const own = (x: Quote) => {
+  const own = (x: Quote, i: number) => {
+    // Task 057: a car from its VIN is priced on its model's curve by age and miles.
+    const info = carInfo[i];
+    if (info && info !== "none") {
+      const r = usedRetention({
+        buildYear: info.facts.year,
+        odometer: x.mileage ?? info.facts.miles,
+        nowYear: new Date().getFullYear(),
+        retention: info.retention,
+      });
+      if (info.retention || r.basis !== "new") return r;
+    }
     const v = (x.vehicle ?? "").toLowerCase();
     const p = v ? picks.find((pk) => v.includes(pk.deal.model.toLowerCase()) || v.includes(pk.label.toLowerCase())) : undefined;
     return p && p.retention5y !== null ? { retention5y: p.retention5y } : null;
@@ -185,8 +236,20 @@ export function QuoteCheck({
     [active],
   );
 
-  const onPhoto = async (file: File | undefined) => {
+  const onPhoto = async (file: File | undefined, mode: "terms" | "full" = "terms") => {
     if (!file) return;
+    lastFile.current = file;
+    const index = active;
+    let barcodeVin: string | null = null;
+    // Track 1: a VIN barcode, decoded on the device, starts the VIN lookup at once.
+    if (mode === "terms" && file.type !== "application/pdf") {
+      void decodeVin(file).then((vin) => {
+        if (vin && !cancelled.current) {
+          barcodeVin = vin;
+          void lookupCar(index, vin);
+        }
+      });
+    }
     setReadState("reading");
     setElapsed(0);
     const started = Date.now();
@@ -201,7 +264,7 @@ export function QuoteCheck({
       const start = await fetch("/api/quote/read", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ image_b64, mime: "image/jpeg" }),
+        body: JSON.stringify({ image_b64, mime: "image/jpeg", mode }),
       });
       if (start.status === 429) return setReadState("resting");
       if (start.status === 503) return setReadState("off");
@@ -217,7 +280,26 @@ export function QuoteCheck({
         const parsed = readSchema.safeParse(body.read);
         if (body.status !== "done" || !parsed.success) return setReadState("failed");
         const read = quoteFromRead(parsed.data);
-        setQuotes((all) => all.map((x, i) => (i === active ? { ...read, dealerName: x.dealerName } : x)));
+        const sheet = read.vin;
+        setQuotes((all) =>
+          all.map((x, i) =>
+            i === index
+              ? {
+                  ...read,
+                  dealerName: x.dealerName,
+                  // The VIN lookup may have landed first: keep the car it filled in.
+                  car: x.car,
+                  year: read.year ?? x.year,
+                  vehicle: read.vehicle ?? x.vehicle,
+                  mileage: read.mileage ?? x.mileage,
+                  vin: barcodeVin ?? sheet ?? x.vin,
+                }
+              : x,
+          ),
+        );
+        if (sheet) setSheetVin((s) => ({ ...s, [index]: sheet }));
+        // No barcode: the VIN the read found (its check digit already holds) starts the lookup now.
+        if (!barcodeVin && sheet) void lookupCar(index, sheet);
         return setReadState("idle");
       }
       setReadState("failed");
@@ -230,10 +312,10 @@ export function QuoteCheck({
     }
   };
 
-  const analysis = analyzeQuote(q, terms, own(q));
+  const analysis = analyzeQuote(q, terms, own(q, active));
   const compareRows =
     quotes.length > 1
-      ? quotes.map((x, i) => ({ name: quoteName(x, i), r: analyzeQuote(x, terms, own(x)) }))
+      ? quotes.map((x, i) => ({ name: quoteName(x, i), r: analyzeQuote(x, terms, own(x, i)) }))
       : [];
   const di = pick?.dealInputs;
   const estTax =
@@ -244,7 +326,7 @@ export function QuoteCheck({
           di.mpg,
         )
       : null;
-  const hu = pick ? headsUp(q, pick.deal, downRule, own(q), estTax) : null;
+  const hu = pick ? headsUp(q, pick.deal, downRule, own(q, active), estTax) : null;
 
   const unconfirmed = new Set(q.unconfirmed);
   const fieldClass = (f: string) =>
@@ -365,7 +447,7 @@ export function QuoteCheck({
           </div>
           <Typography variant="paragraph-xs" className="text-muted-foreground" aria-live="polite">
             {readState === "reading"
-              ? `Reading… ${elapsed} s. This usually takes 5 to 20 seconds. You can keep typing meanwhile.`
+              ? `Reading… ${elapsed} s. This usually takes a few seconds. You can keep typing meanwhile.`
               : readState === "failed"
                 ? "Couldn't read that one. You can type it in."
                 : readState === "unsupported"
@@ -376,6 +458,17 @@ export function QuoteCheck({
                       ? "Photo reading isn't available right now. You can type it in."
                       : "A photo from your library, a screenshot, or a PDF from email all work; for a PDF, the first page is read. Nothing is stored. A draft stays on this device."}
           </Typography>
+          {q.readMode === "terms" && lastFile.current && readState === "idle" ? (
+            <Button
+              type="button"
+              variant="link"
+              linkUnderline="static"
+              className="min-h-11 self-start underline underline-offset-2"
+              onClick={() => void onPhoto(lastFile.current ?? undefined, "full")}
+            >
+              Read everything, fees included
+            </Button>
+          ) : null}
         </section>
 
         {q.unconfirmed.length ? (
@@ -390,6 +483,21 @@ export function QuoteCheck({
         ) : null}
 
         <section className="grid grid-cols-2 gap-3">
+          {q.car ? (
+            <div className="col-span-2 flex flex-col gap-0.5 rounded-lg bg-muted px-3 py-2">
+              <Typography variant="paragraph-md" className="font-medium">
+                {[q.car.year, q.car.make, q.car.model, q.car.trim].filter(Boolean).join(" ")}
+                {q.mileage !== null ? ` · ${q.mileage.toLocaleString("en-US")} mi` : ""}
+              </Typography>
+              <Typography variant="paragraph-xs" className="text-muted-foreground">
+                {q.car.status === "active" ? "From the car's VIN." : "From the car's VIN. This listing is no longer live."}
+              </Typography>
+            </div>
+          ) : carInfo[active] === "none" && q.vin ? (
+            <Typography variant="paragraph-xs" className="col-span-2 text-muted-foreground">
+              We couldn&apos;t look up this VIN. Type the year, make and model below; the numbers still compare.
+            </Typography>
+          ) : null}
           <label className="col-span-2 flex flex-col gap-1">
             <Typography variant="paragraph-xs" className="text-muted-foreground">
               Dealer (optional)
@@ -429,13 +537,53 @@ export function QuoteCheck({
               autoCapitalize="characters"
               maxLength={17}
               value={q.vin ?? ""}
-              onChange={(e) => update({ vin: e.target.value.toUpperCase() || null }, ["vin"])}
+              onChange={(e) => {
+                const v = e.target.value.toUpperCase();
+                update({ vin: v || null }, ["vin"]);
+                if (vinCheckOk(v)) void lookupCar(active, v);
+              }}
               className={fieldClass("vin")}
+            />
+            {sheetVin[active] && q.vin && sheetVin[active] !== q.vin ? (
+              <Button
+                type="button"
+                variant="link"
+                linkUnderline="static"
+                className="min-h-11 self-start underline underline-offset-2"
+                onClick={() => {
+                  const v = sheetVin[active];
+                  update({ vin: v }, ["vin"]);
+                  void lookupCar(active, v);
+                }}
+              >
+                The sheet says {sheetVin[active]}. Use that instead
+              </Button>
+            ) : null}
+          </label>
+          <label className="col-span-2 flex flex-col gap-1">
+            <Typography variant="paragraph-xs" className="text-muted-foreground">
+              Mileage
+              {unconfirmed.has("mileage")
+                ? " · read from your photo, please check"
+                : q.car?.miles != null && q.mileage === q.car.miles
+                  ? " · from the listing"
+                  : ""}
+            </Typography>
+            <Input
+              type="text"
+              inputMode="numeric"
+              value={q.mileage === null ? "" : String(q.mileage)}
+              onChange={(e) => {
+                const t = e.target.value.replace(/\D/g, "");
+                update({ mileage: t === "" ? null : Number(t) }, ["mileage"]);
+              }}
+              className={fieldClass("mileage")}
             />
           </label>
           {FIELD_ORDER.map(numberField)}
         </section>
 
+        {q.readMode !== "terms" || q.fees.length > 0 ? (
         <section className="flex flex-col gap-2">
           <Typography variant="label-md">Fees and add-ons</Typography>
           {q.fees.map((f, i) => (
@@ -499,6 +647,7 @@ export function QuoteCheck({
             Add a fee line
           </Button>
         </section>
+        ) : null}
 
         <section className="flex flex-col gap-2 rounded-lg border border-border p-4" aria-live="polite">
           <Typography variant="label-md">What this quote really says</Typography>
@@ -567,6 +716,12 @@ export function QuoteCheck({
                   This is the window sticker&apos;s total, not a selling price. Dealers can sell above or below it.
                 </Typography>
               ) : null}
+              {analysis.analysis.feesLump !== null ? (
+                <Typography variant="paragraph-md">
+                  Taxes, fees and adjustments: {fmtUsd(analysis.analysis.feesLump)} (the out-the-door total minus the
+                  price).
+                </Typography>
+              ) : null}
               {analysis.analysis.totalGap !== null ? (
                 <Typography variant="paragraph-md">
                   Their total is {signed(analysis.analysis.totalGap)} from the sum of the lines.
@@ -586,9 +741,15 @@ export function QuoteCheck({
               ) : null}
               <Typography variant="paragraph-xs" className="text-muted-foreground">
                 Positive equity uses{" "}
-                {analysis.analysis.retentionSource === "model"
-                  ? "this model's resale history"
-                  : "a typical resale curve"}
+                {analysis.analysis.resaleBasis === "used-age-miles"
+                  ? "this model's sales by age, placed by this car's age and mileage"
+                  : analysis.analysis.resaleBasis === "used-age"
+                    ? "this model's sales by age (this estimate uses the car's age, not its mileage)"
+                    : analysis.analysis.resaleBasis === "used-typical"
+                      ? "a typical resale curve, since we have no sales history by age for this model"
+                      : analysis.analysis.retentionSource === "model"
+                        ? "this model's resale history"
+                        : "a typical resale curve"}
                 . Insurance and repairs are extra.
               </Typography>
             </>

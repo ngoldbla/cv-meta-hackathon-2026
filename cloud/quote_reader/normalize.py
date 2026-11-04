@@ -355,3 +355,107 @@ def normalize(raw: dict) -> dict:
         {"label": p.get("label", ""), "value": str(p.get("value", ""))} for p in raw.get("pairs", [])
     ]
     return out
+
+
+# --- Task 057: the terms read -------------------------------------------------
+# Label priority within one kind, most specific first (matched on the whole label).
+_TERM_PRIORITY = {
+    "price": ["selling price", "sale price", "sales price", "cash price", "vehicle price", "your price", "price"],
+    "out_the_door": ["out the door", "out-the-door", "otd", "total due", "total cash price", "total"],
+    "monthly": ["monthly payment", "your payment", "payment", "per month"],
+    "down": ["cash down", "down payment", "down"],
+}
+_MONEY_KINDS = ("price", "msrp", "down", "apr", "out_the_door", "monthly")
+
+
+def _ranked(pairs: list[dict], kind: str) -> list[dict]:
+    cands = [p for p in pairs if p["kind"] == kind]
+    pri = _TERM_PRIORITY.get(kind)
+    if not pri:
+        return cands
+
+    def rank(p: dict) -> int:
+        k = _label_key(p["label"])
+        for i, frag in enumerate(pri):
+            if k == frag or (len(frag) > 4 and frag in k):
+                return i
+        return len(pri)
+
+    return sorted(cands, key=rank)  # stable: the page's order breaks ties
+
+
+def _clean_pairs(raw: dict) -> list[dict]:
+    return [
+        {"kind": str(p.get("kind", "")), "label": str(p.get("label", "")), "value": str(p.get("value", ""))}
+        for p in raw.get("pairs", [])
+    ]
+
+
+def terms_thin(raw: dict) -> bool:
+    """Fewer than two money values: run the full read instead."""
+    pairs = _clean_pairs(raw)
+    return sum(1 for p in pairs if p["kind"] in _MONEY_KINDS and parse_money(p["value"]) is not None) < 2
+
+
+def normalize_terms(raw: dict) -> dict:
+    pairs = _clean_pairs(raw)
+    out: dict = {
+        "doc_type": "terms",
+        "mode": "terms",
+        "fees": [],
+        "payment_options": [],
+        "pairs": [{"label": p["label"], "value": p["value"]} for p in pairs],
+    }
+
+    def money(kind: str) -> float | None:
+        # The same exclusions as the full read: a sticker's "Base price" is not a selling price.
+        ex = _EXCLUDE.get({"price": "selling_price", "monthly": "stated_monthly"}.get(kind, kind))
+        for p in _ranked(pairs, kind):
+            if ex and ex.search(_label_key(p["label"])):
+                continue
+            v = parse_money(p["value"])
+            if v is not None and v > 0:
+                return v
+        return None
+
+    out["selling_price"] = money("price")
+    out["msrp"] = money("msrp")
+    out["down"] = money("down")
+    out["out_the_door"] = money("out_the_door")
+    out["stated_monthly"] = money("monthly")
+    out["price_basis"] = (
+        "selling" if out["selling_price"] is not None else ("msrp" if out["msrp"] is not None else None)
+    )
+
+    out["apr"] = None
+    for p in _ranked(pairs, "apr"):
+        m = re.search(r"(\d{1,2}(?:\.\d+)?)", p["value"])
+        if m and 0 <= float(m.group(1)) <= 40:
+            out["apr"] = float(m.group(1))
+            break
+
+    # One printed loan length only; several are a grid of options, not a term.
+    terms = set()
+    for p in _ranked(pairs, "term"):
+        m = re.search(r"\b(\d{2,3})\b", p["value"]) or re.search(r"\b(\d{2,3})\b", p["label"])
+        if m and 6 <= int(m.group(1)) <= 120:
+            terms.add(int(m.group(1)))
+    out["term_months"] = terms.pop() if len(terms) == 1 else None
+
+    out["mileage"] = None
+    for p in _ranked(pairs, "mileage"):
+        digits = re.sub(r"[^\d]", "", p["value"])
+        if digits and int(digits) < 1_000_000:
+            out["mileage"] = int(digits)
+            break
+
+    out["vin"], out["vin_check_ok"] = None, False
+    for p in _ranked(pairs, "vin"):
+        cand = re.sub(r"[^A-Z0-9]", "", p["value"].upper())
+        if len(cand) == 17:
+            if vin_check_ok(cand):
+                out["vin"], out["vin_check_ok"] = cand, True
+                break
+            out["vin"] = out["vin"] or cand
+    out["make_from_vin"] = _WMI.get(out["vin"][:3]) if out["vin"] and out["vin_check_ok"] else None
+    return out

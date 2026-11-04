@@ -16,6 +16,7 @@
 
 import { downFor, type DownRule } from "../deal";
 import { DEFAULT_RETENTION_5Y, monthlyPayment, ownershipMath } from "../ownership";
+import type { UsedBasis } from "../used";
 import type { FeeKind, Quote } from "./schema";
 
 export const PAYMENT_TOLERANCE = 5;
@@ -82,6 +83,10 @@ export interface QuoteAnalysis {
   estimates: PaymentEstimate[];
   sameTerms: Priced;
   retentionSource: "model" | "typical";
+  /** Task 057: out-the-door − price on a terms read (taxes, fees and adjustments; negative with a rebate), else null. */
+  feesLump: number | null;
+  /** Task 057: how resale was estimated (a new car, or a used car by age and miles). */
+  resaleBasis: UsedBasis;
   /** Short, calm questions to take back to the dealer. */
   questions: string[];
 }
@@ -102,6 +107,8 @@ export function priceDeal(args: {
   aprPercent: number;
   termMonths: number;
   retention5y: number;
+  /** Task 057: a used car's resale curve (see lib/used.ts). */
+  resaleFactor?: (tMonths: number) => number;
 }): Priced {
   const { price, outTheDoor, aprPercent, termMonths, retention5y } = args;
   // Costs above the car's price (fees, tax) are financed and never come
@@ -116,6 +123,7 @@ export function priceDeal(args: {
     apr: aprPercent,
     term: termMonths,
     retention5y,
+    resaleFactor: args.resaleFactor,
   });
   const amountFinanced = Math.max(0, outTheDoor - down);
   const monthly = monthlyPayment(amountFinanced, aprPercent, termMonths);
@@ -133,7 +141,7 @@ export function priceDeal(args: {
 export function analyzeQuote(
   q: Quote,
   terms: SameTerms,
-  retention?: { retention5y: number } | null,
+  retention?: { retention5y: number; resaleFactor?: (tMonths: number) => number; basis?: UsedBasis } | null,
 ): AnalysisResult {
   const missing: string[] = [];
   if (q.unconfirmed.length) missing.push("confirm the fields read from your photo");
@@ -148,8 +156,12 @@ export function analyzeQuote(
   const sum = q.sellingPrice !== null ? q.sellingPrice - rebates + feesTotal : null;
   const outTheDoor = q.outTheDoor ?? (sum as number);
   const outTheDoorSource = q.outTheDoor !== null ? "stated" : "sum";
+  // Task 057: a terms read lists no fee lines, so its out-the-door total minus the
+  // price is shown as one line and never flagged as a gap.
+  const lumpMode = q.readMode === "terms" && q.fees.length === 0 && q.outTheDoor !== null && q.sellingPrice !== null;
+  const feesLump = lumpMode ? round2((q.outTheDoor as number) - (q.sellingPrice as number)) : null;
   const totalGap =
-    q.outTheDoor !== null && sum !== null && Math.abs(q.outTheDoor - sum) > TOTAL_TOLERANCE
+    !lumpMode && q.outTheDoor !== null && sum !== null && Math.abs(q.outTheDoor - sum) > TOTAL_TOLERANCE
       ? round2(q.outTheDoor - sum)
       : null;
   const price = q.sellingPrice ?? Math.max(1, outTheDoor - feesTotal + rebates);
@@ -168,6 +180,7 @@ export function analyzeQuote(
       aprPercent: q.apr,
       termMonths: q.termMonths,
       retention5y,
+      resaleFactor: retention?.resaleFactor,
     });
     if (q.statedMonthly !== null && Math.abs(q.statedMonthly - asQuoted.monthly) > PAYMENT_TOLERANCE) {
       paymentGap = round2(q.statedMonthly - asQuoted.monthly);
@@ -185,6 +198,7 @@ export function analyzeQuote(
     aprPercent: terms.aprPercent,
     termMonths: terms.termMonths,
     retention5y,
+    resaleFactor: retention?.resaleFactor,
   });
 
   const financedFromLines = Math.max(0, outTheDoor - cashIn);
@@ -239,6 +253,8 @@ export function analyzeQuote(
       estimates,
       sameTerms,
       retentionSource,
+      feesLump,
+      resaleBasis: retention?.basis ?? "new",
       questions,
     },
   };
@@ -278,7 +294,7 @@ export function headsUp(
   q: Quote,
   pick: PickDeal,
   downRule: DownRule,
-  retention?: { retention5y: number } | null,
+  retention?: Parameters<typeof analyzeQuote>[2],
   /** The pick's state sales tax applied to this quote's price, used only when the quote lists none. */
   estTaxForQuote?: number | null,
 ): { ok: true; rows: HeadsUpRow[]; addedTax: number | null } | { ok: false; missing: string[] } {

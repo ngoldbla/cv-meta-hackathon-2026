@@ -97,6 +97,8 @@ class ModelFit:
     retention_5y: float | None
     new_price: float | None
     ages: dict[int, int]  # age in years -> sold units at that age
+    ret_by_age: dict[int, float] = field(default_factory=dict)  # task 057: sold ÷ new price, ages with >= 30 sold
+    slope_per_year: float | None = None  # task 057: the log-linear fit's slope
 
     @property
     def fitted_ages(self) -> list[int]:
@@ -121,6 +123,8 @@ class Pick:
     new_price: float
     ages: dict[int, int]
     rank: int | None = None  # None for an "extra" commodity pick
+    ret_by_age: dict[int, float] = field(default_factory=dict)  # task 057
+    slope_per_year: float | None = None  # task 057
 
 
 @dataclass
@@ -179,6 +183,8 @@ def rank_category(
             new_price=m.new_price,
             ages=dict(sorted(m.ages.items())),
             rank=rank,
+            ret_by_age=dict(sorted(m.ret_by_age.items())),
+            slope_per_year=m.slope_per_year,
         )
 
     by_retention = sorted(
@@ -263,6 +269,12 @@ def load_model_fits(
                     retention_5y=fit.get("retention_5y"),
                     new_price=entry.get("new_price"),
                     ages={int(a): v["count"] for a, v in entry["ages"].items()},
+                    ret_by_age={
+                        int(a): v["ret_new"]
+                        for a, v in entry["ages"].items()
+                        if v.get("ret_new") and v["count"] >= MIN_SOLD_PER_AGE
+                    },
+                    slope_per_year=fit.get("slope_per_year"),
                 )
             )
         out[category] = fits
@@ -280,6 +292,8 @@ def lineup_to_dict(lineup: Lineup) -> dict:
             "dep_per_month": round(p.dep_per_month, 2),
             "new_price": p.new_price,
             "ages_sold_n": {str(a): n for a, n in p.ages.items()},
+            "retention_by_age": {str(a): round(r, 4) for a, r in p.ret_by_age.items()},
+            "retention_slope_per_year": round(p.slope_per_year, 5) if p.slope_per_year is not None else None,
         }
 
     return {

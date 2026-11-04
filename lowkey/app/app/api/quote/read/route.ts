@@ -7,7 +7,7 @@ const MIMES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 /** Start reading a photo; returns an id to poll. The image is passed through, never kept. */
 export async function POST(req: Request) {
-  let body: { image_b64?: unknown; mime?: unknown };
+  let body: { image_b64?: unknown; mime?: unknown; mode?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -15,6 +15,8 @@ export async function POST(req: Request) {
   }
   const image = typeof body.image_b64 === "string" ? body.image_b64 : "";
   const mime = typeof body.mime === "string" ? body.mime : "image/jpeg";
+  // Task 057: "terms" reads only the money terms; anything else is the full read.
+  const mode = body.mode === "terms" ? "terms" : "full";
   if (!image || image.length > MAX_B64 || !MIMES.has(mime)) {
     return Response.json({ error: "unsupported image" }, { status: 413 });
   }
@@ -24,7 +26,7 @@ export async function POST(req: Request) {
   try {
     const res = await readerFetch("/read", {
       method: "POST",
-      body: JSON.stringify({ image_b64: image, mime }),
+      body: JSON.stringify({ image_b64: image, mime, mode }),
       timeoutMs: 20000,
     });
     if (!res) return Response.json({ error: "reader off" }, { status: 503 });
