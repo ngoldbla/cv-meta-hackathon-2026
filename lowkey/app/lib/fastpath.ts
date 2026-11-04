@@ -73,16 +73,22 @@ export function parseFastRequest(text: string): FastRequest | null {
  * `texts` are the user messages oldest-first. The latest ZIP and
  * the latest category win; APR and down-payment overrides are kept
  * the same way. The fast path runs only when the newest message
- * itself gives a ZIP or a category — a down-payment-only follow-up
- * ("What if I put $5k down?") still goes to the model — and only
- * once both a ZIP and a category are known from somewhere.
+ * itself gives a ZIP, a category, a down payment or a rate — and only
+ * once both a ZIP and a category are known from somewhere. Since task 050 a
+ * newest message that only changes the down payment or the rate also runs
+ * the fast path, so those follow-ups need no model.
  */
 export function parseConversationFastRequest(
   texts: string[],
 ): FastRequest | null {
   if (texts.length === 0) return null;
   const newest = texts[texts.length - 1] ?? "";
-  if (!parseZip(newest) && !parseCategory(newest)) return null;
+  // Task 050: a new down payment or rate re-prices the cards in code too, so
+  // "What if I put $5k down?" no longer needs a model.
+  const newestDown = parseDown(newest);
+  const changesTerms =
+    newestDown.fixed !== null || newestDown.percent !== null || parseUserApr(newest) !== null;
+  if (!parseZip(newest) && !parseCategory(newest) && !changesTerms) return null;
   let zip: string | null = null;
   let category: Category | null = null;
   let userApr: number | null = null;
