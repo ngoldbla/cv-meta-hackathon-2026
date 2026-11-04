@@ -43,6 +43,8 @@ export interface OwnershipInput {
   model?: string;
   /** Fitted 5-year retention after the 15% discount (0..1). */
   retention5y?: number;
+  /** Task 057: a used car's resale ÷ price after t months (before the trade-in step); absent for new cars. */
+  resaleFactor?: (tMonths: number) => number;
 }
 
 export interface CurvePoint {
@@ -146,10 +148,14 @@ export function ownershipMath(input: OwnershipInput): OwnershipResult {
   const taxAmount = Math.max(0, input.tax ?? 0);
   const loanAmount = Math.max(0, price + taxAmount - downPayment);
   const payment = monthlyPayment(loanAmount, aprPercent, termMonths);
+  const resaleOf = (month: number) =>
+    input.resaleFactor && month > 0
+      ? price * TRADE_IN_FACTOR * input.resaleFactor(month)
+      : resaleAt(price, retention5y, month);
 
   const pointAt = (month: number): WalkAwayPoint => {
     const balance = balanceAt(loanAmount, aprPercent, termMonths, month);
-    const resale = resaleAt(price, retention5y, month);
+    const resale = resaleOf(month);
     const equity = resale - balance;
     const cost = downPayment + payment * month - equity;
     const per = month > 0 ? round2(cost / month) : round2(cost);
@@ -167,7 +173,7 @@ export function ownershipMath(input: OwnershipInput): OwnershipResult {
 
   const curve: CurvePoint[] = [];
   for (let m = 0; m <= 60; m += 1) {
-    const resale = resaleAt(price, retention5y, m);
+    const resale = resaleOf(m);
     const balance = balanceAt(loanAmount, aprPercent, termMonths, m);
     curve.push({
       month: m,
@@ -187,7 +193,7 @@ export function ownershipMath(input: OwnershipInput): OwnershipResult {
   let positiveEquityMonth: number | null = null;
   for (let t = 0; t <= termMonths; t += 1) {
     const balance = balanceAt(loanAmount, aprPercent, termMonths, t);
-    const resale = resaleAt(price, retention5y, t);
+    const resale = resaleOf(t);
     if (resale >= balance) {
       positiveEquityMonth = t;
       break;

@@ -239,3 +239,30 @@ describe("a window sticker", () => {
     expect(r.analysis.questions).toContain("What is your selling price for this car, out the door?");
   });
 });
+
+describe("terms reads (task 057)", () => {
+  it("shows fees as one signed lump and never flags a total gap", () => {
+    const r = analyzeQuote(q({ source: "photo", readMode: "terms", sellingPrice: 28000, outTheDoor: 30500 }), TERMS);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.analysis.feesLump).toBe(2500);
+    expect(r.analysis.totalGap).toBeNull();
+  });
+  it("a rebate makes the lump negative", () => {
+    const r = analyzeQuote(q({ source: "photo", readMode: "terms", sellingPrice: 28000, outTheDoor: 27000 }), TERMS);
+    expect(r.ok && r.analysis.feesLump).toBe(-1000);
+  });
+  it("an itemized quote has no lump", () => {
+    const r = analyzeQuote(q({ sellingPrice: 28000, outTheDoor: 30500 }), TERMS);
+    expect(r.ok && r.analysis.feesLump).toBeNull();
+  });
+  it("a used car's resale curve changes the positive-equity month", () => {
+    const base = q({ sellingPrice: 25000, outTheDoor: 26500, down: 2500, apr: 7, termMonths: 60 });
+    const newer = analyzeQuote(base, TERMS, { retention5y: 0.55 });
+    const used = analyzeQuote(base, TERMS, { retention5y: 0.55, resaleFactor: () => 0.97, basis: "used-age-miles" });
+    expect(newer.ok && used.ok).toBe(true);
+    if (!newer.ok || !used.ok) return;
+    expect(used.analysis.resaleBasis).toBe("used-age-miles");
+    expect(used.analysis.sameTerms.positiveEquityMonth).not.toEqual(newer.analysis.sameTerms.positiveEquityMonth);
+  });
+});

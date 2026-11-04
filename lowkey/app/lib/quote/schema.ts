@@ -56,6 +56,8 @@ export const quoteSchema = z.object({
   fees: z.array(feeSchema).max(30),
   /** Fields read from a photo that the shopper has not yet confirmed. */
   unconfirmed: z.array(z.string()),
+  /** Task 057: "terms" when the photo read copied only the money terms (fees then show as one lump). */
+  readMode: z.enum(["full", "terms"]).optional(),
 });
 export type Quote = z.infer<typeof quoteSchema>;
 
