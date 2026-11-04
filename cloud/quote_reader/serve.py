@@ -22,17 +22,19 @@ vol = modal.Volume.from_name("lowkey-quote-models")  # read-only here
 image = (
     modal.Image.debian_slim(python_version="3.12")
     .pip_install("vllm==0.32.0", "pydantic>=2", "pillow", "huggingface_hub")
-    .env({"HF_HUB_OFFLINE": "1", "VLLM_LOGGING_LEVEL": "WARNING"})
+    .env({"HF_HUB_OFFLINE": "1", "VLLM_LOGGING_LEVEL": "WARNING", "VLLM_USE_FLASHINFER_SAMPLER": "0"})
     .add_local_file(__file__.replace("serve.py", "schema.py"), "/root/schema.py")
+    .add_local_file(__file__.replace("serve.py", "normalize.py"), "/root/normalize.py")
 )
 
 PROMPT = (
     "Read this car-buying document (a window sticker, a dealer's buyer's order, "
-    "a payment offer or a listing sheet). Fill in the JSON exactly as the page "
-    "states it. Copy numbers and the VIN character for character. If a value is "
-    "not printed on the page, use null; never infer, calculate or guess. Label "
-    "each fee: government (tax, title, registration), dealer (doc/dealer fee), "
-    "addon (anything optional or installed by the dealer), else unknown."
+    "a payment offer or a listing sheet). Copy every line of text into "
+    "`transcript`. Then list every printed label with its printed value in "
+    "`pairs`, copying both exactly (pair by meaning: on a tilted photo a value "
+    "may sit on a different line than its label). Tag fee and charge lines in "
+    "`fees`; the price, down payment, total, APR and term are not fees. "
+    "Never calculate or guess."
 )
 
 
@@ -66,14 +68,15 @@ class Reader:
         import sys
 
         sys.path.insert(0, "/root")
-        from schema import ReadQuote
+        from normalize import normalize
+        from schema import RawRead
         from vllm import SamplingParams
         from vllm.sampling_params import StructuredOutputsParams
 
         params = SamplingParams(
             temperature=0.0,
             max_tokens=1500,
-            structured_outputs=StructuredOutputsParams(json=ReadQuote.model_json_schema()),
+            structured_outputs=StructuredOutputsParams(json=RawRead.model_json_schema()),
         )
         messages = [
             {
@@ -86,7 +89,8 @@ class Reader:
         ]
         out = self.llm.chat(messages, params)[0].outputs[0].text
         # Valid by construction; validate anyway and never trust blindly.
-        return json.loads(ReadQuote.model_validate_json(out).model_dump_json())
+        raw = json.loads(RawRead.model_validate_json(out).model_dump_json())
+        return normalize(raw)
 
 
 @app.local_entrypoint()

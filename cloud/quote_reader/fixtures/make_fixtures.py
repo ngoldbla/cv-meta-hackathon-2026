@@ -82,12 +82,15 @@ def main(out):
     out.mkdir(parents=True, exist_ok=True)
     rng = random.Random(7)
     cars = [
-        ("1HG", "CV2F", 2026, "Brightwater", "Zenith", "Sport", 28450),
-        ("2T1", "BU4E", 2025, "Kestrel", "Aero", "LX", 24990),
-        ("5YJ", "XC3G", 2026, "Ridgeline Motors", "Tundra-X", "Limited", 51300),
+        ("1HG", "CV2FA", 2026, "Brightwater", "Zenith", "Sport", 28450),
+        ("2T1", "BU4EA", 2025, "Kestrel", "Aero", "LX", 24990),
+        ("5YJ", "XC3GA", 2026, "Ridgeline Motors", "Tundra-X", "Limited", 51300),
+        ("3FA", "PK9HB", 2025, "Marlowe", "Drift", "SE", 31200),
+        ("JTD", "LM5RC", 2026, "Sakura", "Terra", "XLE", 36850),
+        ("1GC", "TR7DE", 2025, "Ironwood", "Hauler", "LT", 44900),
     ]
     n = 0
-    for wmi, vds, yr, make, model, trim, price in cars:
+    for wmi, vds, yr, make, model, trim, price in cars[:6]:
         v = vin(rng, wmi, vds)
         fees = [
             ("Documentary fee", rng.choice([299, 599, 799]), "dealer"),
@@ -126,7 +129,7 @@ def main(out):
         }
         sheet(lines, "BUYER'S ORDER (SAMPLE)", name, out, truth, rng)
         n += 1
-    for wmi, vds, yr, make, model, trim, price in cars[:2]:
+    for wmi, vds, yr, make, model, trim, price in cars[2:6]:
         v = vin(rng, wmi, vds)
         mpg = rng.choice([28, 31, 36])
         name = f"window_sticker_{n}"
@@ -150,6 +153,38 @@ def main(out):
             "epa_combined_mpg": mpg,
         }
         sheet(lines, "MONRONEY LABEL (SAMPLE)", name, out, truth, rng)
+        n += 1
+    for wmi, vds, yr, make, model, trim, price in cars[:2]:
+        v = vin(rng, wmi, vds)
+        down, apr, term = rng.choice([1500, 2500]), rng.choice([6.9, 7.4]), rng.choice([60, 72])
+        fin = price + 640 - down
+        r = apr / 1200
+        pay = round(fin * r / (1 - (1 + r) ** -term), 2)
+        name = f"payment_offer_{n}"
+        lines = [
+            (f"{yr} {make} {model} {trim}", None, True),
+            (f"VIN {v}", None, False),
+            ("Cash price", money(price), False),
+            ("Dealer fees", money(640), False),
+            ("Cash down", money(down), False),
+            (f"APR {apr}%", None, False),
+            (f"{term} months", None, False),
+            ("YOUR PAYMENT", money(pay) + " / mo", True),
+        ]
+        truth = {
+            "doc_type": "payment_offer",
+            "vin": v,
+            "year": yr,
+            "make": make,
+            "model": model,
+            "trim": trim,
+            "selling_price": price,
+            "down": down,
+            "apr": apr,
+            "term_months": term,
+            "stated_monthly": pay,
+        }
+        sheet(lines, "PAYMENT OPTIONS (SAMPLE)", name, out, truth, rng)
         n += 1
     print(f"wrote {n} fixtures to {out}")
 
