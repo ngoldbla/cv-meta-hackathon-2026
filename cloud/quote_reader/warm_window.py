@@ -5,7 +5,9 @@
     python cloud/quote_reader/warm_window.py status
 
 While "on", one GPU container stays loaded, so a first read takes seconds,
-not a cold start; it bills for every hour it is on. "on" schedules its own
+not a cold start; it bills for every hour it is on. Reads go to that GPU
+(about 20 s for a real sheet) instead of the hosted model (about 60 s);
+the routing flag carries its own expiry. "on" schedules its own
 "off" with a user systemd timer on this machine, so a forgotten window
 can't keep billing. A redeploy also resets to scale-to-zero.
 """
@@ -13,12 +15,15 @@ can't keep billing. A redeploy also resets to scale-to-zero.
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 import modal
 
 APP, CLS = "lowkey-quote-reader", "Reader"
 UNIT = "lowkey-quote-warm-off"
+# serve.py reads "gpu_until" (epoch seconds) from this Dict to route reads.
+route = modal.Dict.from_name("lowkey-quote-route", create_if_missing=True)
 
 
 def reader():
@@ -52,8 +57,10 @@ def main(argv: list[str]) -> None:
         hours = float(argv[argv.index("--hours") + 1]) if "--hours" in argv else 3.0
         set_min(1)
         reader().warm.spawn()  # start loading now
-        print(f"warm window ON (min_containers=1); {schedule_off(hours)}")
+        route["gpu_until"] = time.time() + hours * 3600
+        print(f"warm window ON (min_containers=1, reads on the GPU); {schedule_off(hours)}")
     elif cmd == "off":
+        route.pop("gpu_until", None)
         set_min(0)
         subprocess.run(["systemctl", "--user", "stop", f"{UNIT}.timer"], capture_output=True)
         print("warm window OFF (scale to zero)")
@@ -64,6 +71,8 @@ def main(argv: list[str]) -> None:
             text=True,
         )
         print(r.stdout.strip() or "no auto-off timer scheduled")
+        left = route.get("gpu_until", 0) - time.time()
+        print(f"reads on the GPU for {left / 3600:.1f} h more" if left > 0 else "reads on the hosted model")
         print(
             "containers:",
             subprocess.run(["modal", "container", "list"], capture_output=True, text=True).stdout.count(APP),

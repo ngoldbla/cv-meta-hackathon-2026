@@ -44,7 +44,7 @@ export interface QuotePick {
 const MAX_QUOTES = 3;
 const DRAFT_KEY = "lowkey-quote-draft-v1";
 const POLL_MS = 2000;
-const READ_LIMIT_MS = 180_000;
+const READ_LIMIT_MS = 240_000; // a hosted read, then the backup GPU's cold start
 
 type ReadState = "idle" | "reading" | "failed" | "resting" | "off" | "unsupported";
 
@@ -361,7 +361,7 @@ export function QuoteCheck({
           </div>
           <Typography variant="paragraph-xs" className="text-muted-foreground" aria-live="polite">
             {readState === "reading"
-              ? `Reading… ${elapsed} s. The first read can take up to a minute and a half while the reader starts; after that, about 10 to 20 seconds. You can keep typing meanwhile.`
+              ? `Reading… ${elapsed} s. This usually takes 10 to 40 seconds. You can keep typing meanwhile.`
               : readState === "failed"
                 ? "Couldn't read that one. You can type it in."
                 : readState === "unsupported"

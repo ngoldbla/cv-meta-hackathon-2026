@@ -15,7 +15,7 @@ Low Key builds on the work and data of others. They are credited here, and in th
 
 ## Models
 - **Muse** (Meta Superintelligence Labs):
-  - **Muse Glimmer 30B** (Apache-2.0) reads photos of dealer sheets and window stickers for "Check a quote" ([`cloud/quote_reader/`](cloud/quote_reader/)), served with **vLLM** (Apache-2.0) on **Modal**. It transcribes and pairs labels with values; code decides every field. The same model, with its language-model head removed, is the experimental trunk in [`headless-glimmer/`](headless-glimmer/) (not used at runtime). See [`lowkey/docs/decision-model.md`](lowkey/docs/decision-model.md).
+  - **Muse Glimmer 30B** (Apache-2.0) reads photos of dealer sheets and window stickers for "Check a quote" ([`cloud/quote_reader/`](cloud/quote_reader/)), served by **Hugging Face Inference Providers** (DeepInfra), with **vLLM** (Apache-2.0) on **Modal** as the backup and demo path. It transcribes and pairs labels with values; code decides every field. The same model, with its language-model head removed, is the experimental trunk in [`headless-glimmer/`](headless-glimmer/) (not used at runtime). See [`lowkey/docs/decision-model.md`](lowkey/docs/decision-model.md).
   - **Muse Spark** wrote chat follow-ups during development; it is off in this build (`LOWKEY_CHAT_MODEL_ON`), and code answers rate and down-payment follow-ups.
   - **Muse Code** with **Muse Wonder** built the first phase of the app through the task mailbox in [`ops/`](ops/).
 - **Timestral** (Mistral AI): the time-series model that forecasts gas prices. The code is Apache-2.0; the weights are under a Modified MIT licence.

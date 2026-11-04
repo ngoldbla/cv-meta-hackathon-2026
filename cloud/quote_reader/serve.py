@@ -1,9 +1,13 @@
-"""Quote reader: Muse Glimmer-30B on a scale-to-zero Modal GPU (task 047).
+"""Quote reader: Muse Glimmer-30B (tasks 047, 052).
 
     modal deploy cloud/quote_reader/serve.py        # idle cost: zero
     modal run   cloud/quote_reader/serve.py --image path.jpg
 
-Weights are prestaged in the Volume by stage.py. The model only READS:
+Reads go first to Glimmer hosted on Hugging Face Inference Providers
+(always warm, billed per token to the HF account in the `huggingface`
+secret). If that fails, the same read runs on our own scale-to-zero
+Modal GPU, with weights prestaged in the Volume by stage.py. Both paths
+use the same prompt, schema and normalize.py. The model only READS:
 it returns schema-constrained JSON and nothing else. Numbers it reads
 are shown to the user for confirmation; all arithmetic stays in code.
 """
@@ -121,10 +125,103 @@ class Reader:
             return json.loads(RawRead.model_validate_json(gen.text).model_dump_json())
 
         raw = run(PROMPT)
-        if len(raw["transcript"]) < 3 or not raw["pairs"]:
+        if _thin(raw):
             print("read: thin result, retrying with the full transcript prompt")
             raw = run(FULL_PROMPT)
         return normalize(raw)
+
+
+def _thin(raw: dict) -> bool:
+    return len(raw["transcript"]) < 3 or not raw["pairs"]
+
+
+# --- Hosted path: Glimmer on Hugging Face Inference Providers ---------------
+HF_MODEL = "meta-models/Muse-Glimmer-30B"
+HF_PROVIDERS = ["deepinfra"]  # zero retention, structured output; 11-16 s per read
+HF_URL = "https://router.huggingface.co/v1/chat/completions"
+route = modal.Dict.from_name("lowkey-quote-route", create_if_missing=True)  # set by warm_window.py
+hosted_image = (
+    modal.Image.debian_slim(python_version="3.12")
+    .pip_install("requests", "pydantic>=2")
+    .add_local_file(__file__.replace("serve.py", "schema.py"), "/root/schema.py")
+    .add_local_file(__file__.replace("serve.py", "normalize.py"), "/root/normalize.py")
+)
+
+
+@app.function(
+    image=hosted_image,
+    secrets=[modal.Secret.from_name("huggingface")],
+    min_containers=0,
+    max_containers=4,
+    scaledown_window=2 * MINUTES,
+    timeout=10 * MINUTES,
+)
+def read_quote(image_b64: str, mime: str = "image/jpeg") -> dict:
+    """Read on the hosted model; fall back to our own GPU if every provider fails."""
+    import os
+    import sys
+    import time
+
+    import requests
+
+    sys.path.insert(0, "/root")
+    from normalize import normalize
+    from schema import RawRead
+
+    token = os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN")
+
+    # During a warm window (warm_window.py on) our loaded GPU is the faster path.
+    if route.get("gpu_until", 0) > time.time():
+        try:
+            return Reader().read.remote(image_b64, mime)
+        except Exception as e:  # noqa: BLE001  (fall through to the hosted model)
+            print(f"warm GPU read failed: {type(e).__name__}; trying the hosted model")
+
+    def run(provider: str, prompt: str) -> dict:
+        body = {
+            "model": f"{HF_MODEL}:{provider}",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{image_b64}"}},
+                        {"type": "text", "text": prompt},
+                    ],
+                }
+            ],
+            "response_format": {
+                "type": "json_schema",
+                "json_schema": {"name": "RawRead", "schema": RawRead.model_json_schema(), "strict": True},
+            },
+            "temperature": 0,
+            "max_tokens": 6000,
+        }
+        t = time.time()
+        r = requests.post(HF_URL, headers={"Authorization": f"Bearer {token}"}, json=body, timeout=90)
+        r.raise_for_status()
+        data = r.json()
+        choice = data["choices"][0]
+        usage = data.get("usage") or {}
+        # Timing, length and stop reason only; never the page's content.
+        print(
+            f"hosted read ({provider}): {time.time() - t:.1f}s, "
+            f"{usage.get('completion_tokens')} tokens, finish={choice.get('finish_reason')}"
+        )
+        return json.loads(RawRead.model_validate_json(choice["message"]["content"]).model_dump_json())
+
+    if token:
+        for provider in HF_PROVIDERS:
+            try:
+                raw = run(provider, PROMPT)
+                if _thin(raw):
+                    print("hosted read: thin result, retrying with the full transcript prompt")
+                    raw = run(provider, FULL_PROMPT)
+                return normalize(raw)
+            except Exception as e:  # noqa: BLE001  (try the next path)
+                status = getattr(getattr(e, "response", None), "status_code", None)
+                print(f"hosted read ({provider}) failed: {type(e).__name__} {status or ''}")
+    print("hosted read unavailable; falling back to the Modal GPU")
+    return Reader().read.remote(image_b64, mime)
 
 
 # --- The public seam: a small CPU web app in front of the GPU class ---------
@@ -170,8 +267,9 @@ def web():
 
     @api.post("/warm", status_code=202)
     async def warm(authorization: str | None = Header(None)):
+        # The hosted model is always warm, so this no longer wakes the GPU
+        # (it would cost GPU time for a path that is now only a fallback).
         check(authorization)
-        await Reader().warm.spawn.aio()
         return {"ok": True}
 
     @api.post("/read", status_code=202)
@@ -187,7 +285,7 @@ def web():
         if used >= DAILY_CAP:
             raise HTTPException(status_code=429, detail="daily cap")
         await counter.put.aio(day, used + 1)
-        call = await Reader().read.spawn.aio(body.image_b64, body.mime)
+        call = await read_quote.spawn.aio(body.image_b64, body.mime)
         return {"id": call.object_id}
 
     @api.get("/result/{call_id}")
@@ -208,10 +306,11 @@ def web():
 
 
 @app.local_entrypoint()
-def main(image: str):
+def main(image: str, gpu: bool = False):
     b64 = base64.b64encode(open(image, "rb").read()).decode()
     mime = "image/png" if image.lower().endswith(".png") else "image/jpeg"
-    print(json.dumps(Reader().read.remote(b64, mime), indent=2))
+    fn = Reader().read if gpu else read_quote
+    print(json.dumps(fn.remote(b64, mime), indent=2))
 
 
 @app.local_entrypoint()

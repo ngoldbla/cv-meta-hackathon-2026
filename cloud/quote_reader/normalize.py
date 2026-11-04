@@ -292,7 +292,9 @@ def normalize(raw: dict) -> dict:
             amount = parse_money(str(p.get("value", "")))
             if key in have or amount is None or _TAX_NOT_FEE.search(label):
                 continue
-            if _TAXLIKE.search(label) or (_FEELIKE.search(label) and not _NOT_FEES.search(label)):
+            # Add-ons rarely say "fee" ("Nitrogen tire fill"), so match them by name too.
+            feelike = _FEELIKE.search(label) or _ADDONS.search(label)
+            if _TAXLIKE.search(label) or (feelike and not _NOT_FEES.search(label)):
                 kind = (
                     "addon"
                     if _ADDONS.search(label)
