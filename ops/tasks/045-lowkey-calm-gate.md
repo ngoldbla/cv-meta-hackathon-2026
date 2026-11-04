@@ -1,10 +1,12 @@
 ---
 id: "045"
 title: "Low Key: a calm-tone and number-safety check on every model reply"
-status: open
+status: superseded
 created: 2026-11-03
 report: ops/reports/045-lowkey-calm-gate.md
 ---
+
+> **Superseded 2026-11-04: with the chat removed (task 049) no model writes prose, so calm holds by construction and there is no reply to check.**
 # Low Key: the calm gate
 
 **Run this after task 043 is done.** **Branch: `task/NNN-<slug>` cut from `main`, with a PR into `main`.** The same secrets and commit rules as task 023 apply. A merge into `main` deploys to https://lowkey.autos; follow `lowkey/docs/deploy.md`. Modal spend comes out of task 043's $80 total. Muse Spark $0.50. Keep this to about 3 hours.
