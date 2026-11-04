@@ -119,7 +119,8 @@ export default function WalkAwayView({
         </span>
       </div>
       )}
-      <Typography variant="h4" as="h2" className="text-[30px] leading-[1.15] text-balance">
+      {/* Task 055: a statement under the section's heading, not a heading of its own. */}
+      <Typography variant="h4" as="p" className="text-[30px] leading-[1.15] text-balance">
         {headline}
       </Typography>
       <Card>
@@ -206,7 +207,7 @@ export default function WalkAwayView({
           A minus means you&apos;d still owe something to sell.
         </Typography>
       </section>
-      <Typography variant="paragraph-xs" className="text-muted-foreground">
+      <Typography variant="paragraph-xs" className="max-w-[58ch] text-muted-foreground">
         {money(ownership.price)} with fees
         {ownership.taxAmount
           ? ` + ${money(ownership.taxAmount)} tax in the loan`

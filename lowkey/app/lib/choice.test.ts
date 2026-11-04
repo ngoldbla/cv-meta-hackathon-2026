@@ -265,3 +265,44 @@ describe("choosing the unit you're going for (task 054)", () => {
     expect(searchParamsSchema.safeParse({ zip: "30263", type: "sedan", car: civicSlug, unit: vin(1) }).success).toBe(true);
   });
 });
+
+describe("the chosen unit's distance on the results row (task 055)", () => {
+  type Row = { model: string; nearestMiles: number | null; labels: string[] };
+  const rowsOf = (out: Awaited<ReturnType<typeof runSearch>>) =>
+    (out.compare!.elements.compare!.props as { rows: Row[] }).rows;
+
+  it("shows, sorts and labels by the chosen far-away unit's distance, guard-checked", async () => {
+    const { sortFacts } = await import("./chooser");
+    // Make the Civic the nearest by default, so the choice visibly moves it.
+    vi.mocked(tools.executeLocalUnits).mockImplementation(async ({ model }) => {
+      const l = local(model!, priceOf(model!));
+      const miles = model === "Civic Sedan" ? 3.2 : 12.4;
+      return { ...l, units: l.units.map((u) => ({ ...u, distanceMiles: miles })) } as never;
+    });
+    const base = await runSearch(requestFromParams({ zip: "30263", type: "sedan" }));
+    const civicBase = rowsOf(base).find((r) => r.model === "Civic Sedan")!;
+    expect(civicBase.nearestMiles).toBe(3.2);
+    expect(civicBase.labels).toContain("Nearest");
+    expect(sortFacts(rowsOf(base) as never, "nearest")[0]!.model).toBe("Civic Sedan");
+
+    const far = await runSearch(requestFromParams({ zip: "30263", type: "sedan", car: civicSlug, unit: vin(7) }));
+    const civicFar = rowsOf(far).find((r) => r.model === "Civic Sedan")!;
+    expect(civicFar.nearestMiles).toBe(690);
+    expect(civicFar.labels).not.toContain("Nearest");
+    const byNearest = sortFacts(rowsOf(far) as never, "nearest") as unknown as Row[];
+    expect(byNearest.at(-1)!.model).toBe("Civic Sedan");
+    expect(checkCostCompareSpec(far.compare!, carsOf(far).map((c) => c.entry)).ok).toBe(true);
+
+    // A chosen local unit shows its own distance too.
+    const near = await runSearch(requestFromParams({ zip: "30263", type: "sedan", car: civicSlug, unit: vin(2) }));
+    expect(rowsOf(near).find((r) => r.model === "Civic Sedan")!.nearestMiles).toBe(3.2);
+  });
+
+  it("fails the guard when a row shows the nearest local distance for a far-away choice", async () => {
+    const far = await runSearch(requestFromParams({ zip: "30263", type: "sedan", car: civicSlug, unit: vin(7) }));
+    const spec = structuredClone(far.compare!);
+    const row = (spec.elements.compare!.props as { rows: Row[] }).rows.find((r) => r.model === "Civic Sedan")!;
+    row.nearestMiles = 12.4;
+    expect(checkCostCompareSpec(spec, carsOf(far).map((c) => c.entry)).ok).toBe(false);
+  });
+});

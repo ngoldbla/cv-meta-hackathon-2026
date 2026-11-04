@@ -157,7 +157,7 @@ export function PriceStripView(p: PriceStripProps) {
         ) : null}
       </dl>
 
-      {sentence ? <p className="text-pretty text-sm leading-relaxed">{sentence}</p> : null}
+      {sentence ? <p className="max-w-[70ch] text-sm leading-relaxed">{sentence}</p> : null}
       {!p.sameYear ? (
         <p className="text-sm leading-relaxed">
           {p.unitYear !== null

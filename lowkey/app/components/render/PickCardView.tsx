@@ -15,6 +15,7 @@ import { StatusDot } from "@/components/ui/status-dot";
 import { CarFigure } from "../hairline/CarFigure";
 import type { CarKind } from "@/lib/hairline/cars";
 import { CardModelContext } from "./listing-context";
+import { CardHeadingContext } from "./heading-context";
 import { WalkAwayContext } from "./walk-context";
 
 const KIND_BY_CATEGORY: Record<string, CarKind> = {
@@ -57,6 +58,7 @@ export function PickCardView({
   children?: ReactNode;
 }) {
   const { onWalkAway } = useContext(WalkAwayContext);
+  const heading = useContext(CardHeadingContext);
   const kind = KIND_BY_CATEGORY[category];
   return (
     <Card className="my-3">
@@ -86,8 +88,10 @@ export function PickCardView({
             </div>
           ) : null}
           <div className="min-w-0">
-            <CardTitle className="text-[19px]">{modelLabel}</CardTitle>
-            <CardDescription>{sentence}</CardDescription>
+            <CardTitle as={heading} className={heading === "h1" ? "text-2xl leading-tight" : "text-xl leading-tight"}>
+              {modelLabel}
+            </CardTitle>
+            <CardDescription className="text-pretty">{sentence}</CardDescription>
           </div>
         </div>
       </CardHeader>

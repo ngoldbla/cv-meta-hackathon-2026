@@ -84,7 +84,7 @@ function ListingBody({
 
   return (
     <main className="shell">
-      <AppBar title={car ? `${car.pick.make} ${car.pick.model}` : "Listing"} fallback={back} />
+      <AppBar title={car ? `${car.pick.make} ${car.pick.model}` : "Listing"} fallback={back} titleAs={car && unit ? "p" : "h1"} />
       {state.status === "loading" || (farVin && !unit && far.status !== "ready" && far.status !== "error" && !chosenFar && car) ? (
         <div className="flex flex-col gap-3 py-4" aria-busy="true">
           <Skeleton className="h-6 w-2/3" />
@@ -106,7 +106,7 @@ function ListingBody({
       ) : (
         <div className="flex flex-col gap-4 py-4">
           <div>
-            <h2 className="text-xl font-semibold tracking-[-0.01em]">{title}</h2>
+            <h1 className="text-2xl leading-tight font-semibold tracking-[-0.01em]">{title}</h1>
             <Typography variant="paragraph-sm" className="text-muted-foreground">
               {unit.dealer}
               {farVin && (unit.city || unit.state) ? `, ${[unit.city, unit.state].filter(Boolean).join(", ")}` : ""} ·{" "}

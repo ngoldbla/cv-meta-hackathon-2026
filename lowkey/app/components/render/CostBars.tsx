@@ -1,6 +1,6 @@
 "use client";
 
-import { BACK_FILL, SEGMENT_COLOR, SEGMENT_LABEL, fmtUsd } from "./format";
+import { BACK_EDGE, BACK_FILL, SEGMENT_COLOR, SEGMENT_LABEL, fmtUsd } from "./format";
 
 export interface CostSegment {
   part: "loan" | "gas" | "valueLost" | "interest" | "tax";
@@ -80,7 +80,7 @@ export function CostBarsView({
           {real.map((s) => (
             <span key={s.part} style={{ width: pct(s.usd), minWidth: s.usd > 0 ? 2 : undefined, background: SEGMENT_COLOR[s.part] }} className="block h-full" />
           ))}
-          <span style={{ width: pct(backWhenSold), minWidth: backWhenSold > 0 ? 2 : undefined, background: BACK_FILL }} className="block h-full" />
+          <span style={{ width: pct(backWhenSold), minWidth: backWhenSold > 0 ? 2 : undefined, background: BACK_FILL }} className={`block h-full rounded-r-[5px] ${BACK_EDGE}`} />
         </div>
         <div className="flex flex-wrap gap-x-2.5 gap-y-1 text-xs text-foreground/80">
           {real.map((s) => (
@@ -92,7 +92,7 @@ export function CostBarsView({
         </div>
       </div>
       <div className="flex items-center gap-2 rounded-lg bg-[var(--cost-back-bg)] px-2.5 py-2 text-[13px] text-[var(--cost-back-ink)]">
-        <span aria-hidden="true" className="inline-block h-[14px] w-[14px] shrink-0 rounded-[2px]" style={{ background: BACK_FILL }} />
+        <span aria-hidden="true" className={`inline-block h-[14px] w-[14px] shrink-0 rounded-[2px] ${BACK_EDGE}`} style={{ background: BACK_FILL }} />
         <span>
           <strong className="mono">{fmtUsd(backWhenSold)}/mo</strong> back when you sell at 5 years.
         </span>
