@@ -1,0 +1,203 @@
+"""Quote reader: Muse Glimmer-30B on a scale-to-zero Modal GPU (task 047).
+
+    modal deploy cloud/quote_reader/serve.py        # idle cost: zero
+    modal run   cloud/quote_reader/serve.py --image path.jpg
+
+Weights are prestaged in the Volume by stage.py. The model only READS:
+it returns schema-constrained JSON and nothing else. Numbers it reads
+are shown to the user for confirmation; all arithmetic stays in code.
+"""
+
+import base64
+import json
+
+import modal
+
+MODEL_DIR = "/models/meta-models__Muse-Glimmer-30B"
+GPU = "H100"  # bf16 ~60 GB; try "L40S" with a quantised build later
+MINUTES = 60
+
+app = modal.App("lowkey-quote-reader")
+vol = modal.Volume.from_name("lowkey-quote-models")  # read-only here
+# vLLM's torch.compile cache: the first container writes it, later ones skip compiling.
+cache = modal.Volume.from_name("lowkey-quote-vllm-cache", create_if_missing=True)
+image = (
+    modal.Image.debian_slim(python_version="3.12")
+    .pip_install("vllm==0.32.0", "pydantic>=2", "pillow", "huggingface_hub")
+    .env({"HF_HUB_OFFLINE": "1", "VLLM_LOGGING_LEVEL": "WARNING", "VLLM_USE_FLASHINFER_SAMPLER": "0"})
+    .add_local_file(__file__.replace("serve.py", "schema.py"), "/root/schema.py")
+    .add_local_file(__file__.replace("serve.py", "normalize.py"), "/root/normalize.py")
+)
+
+PROMPT = (
+    "Read this car-buying document (a window sticker, a dealer's buyer's order, "
+    "a payment offer or a listing sheet). Copy every line of text into "
+    "`transcript`. Then list every printed label with its printed value in "
+    "`pairs`, copying both exactly (pair by meaning: on a tilted photo a value "
+    "may sit on a different line than its label). Tag fee and charge lines in "
+    "`fees`; the price, down payment, total, APR and term are not fees. "
+    "Never calculate or guess."
+)
+
+
+@app.cls(
+    image=image,
+    gpu=GPU,
+    volumes={"/models": vol, "/root/.cache/vllm": cache},
+    enable_memory_snapshot=True,  # CPU snapshot of the imports (no GPU state)
+    min_containers=0,  # nothing runs, nothing costs, until summoned
+    max_containers=2,  # hard ceiling on spend
+    scaledown_window=2 * MINUTES,
+    timeout=10 * MINUTES,
+)
+class Reader:
+    @modal.enter(snap=True)
+    def imports(self):
+        # Heavy imports only; captured in the CPU memory snapshot.
+        import vllm  # noqa: F401
+
+    @modal.enter(snap=False)
+    def load(self):
+        from vllm import LLM
+
+        self.llm = LLM(
+            model=MODEL_DIR,
+            max_model_len=16384,
+            max_num_seqs=2,  # max_containers=2 and one read at a time per container
+            limit_mm_per_prompt={"image": 1},
+            gpu_memory_utilization=0.90,
+            # Capture CUDA graphs only for the batch sizes we actually run.
+            compilation_config={"cudagraph_capture_sizes": [1, 2, 4]},
+        )
+        cache.commit()
+
+    @modal.method()
+    def warm(self) -> str:
+        return "ready"
+
+    @modal.method()
+    def read(self, image_b64: str, mime: str = "image/jpeg") -> dict:
+        import sys
+
+        sys.path.insert(0, "/root")
+        from normalize import normalize
+        from schema import RawRead
+        from vllm import SamplingParams
+        from vllm.sampling_params import StructuredOutputsParams
+
+        params = SamplingParams(
+            temperature=0.0,
+            max_tokens=6000,  # a full window sticker transcript runs past 1,500 tokens
+            structured_outputs=StructuredOutputsParams(json=RawRead.model_json_schema()),
+        )
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{image_b64}"}},
+                    {"type": "text", "text": PROMPT},
+                ],
+            }
+        ]
+        gen = self.llm.chat(messages, params)[0].outputs[0]
+        out = gen.text
+        # Length and stop reason only; never the page's content.
+        print(f"read: {len(gen.token_ids)} tokens, finish={gen.finish_reason}")
+        # Valid by construction; validate anyway and never trust blindly.
+        raw = json.loads(RawRead.model_validate_json(out).model_dump_json())
+        return normalize(raw)
+
+
+# --- The public seam: a small CPU web app in front of the GPU class ---------
+# Only the Low Key server calls this (bearer token from the Modal secret
+# `lowkey-quote-auth`, mirrored in Vercel env). It never stores images,
+# logs nothing from them, and enforces a daily ceiling with a modal.Dict.
+web_image = modal.Image.debian_slim(python_version="3.12").pip_install("fastapi[standard]", "pydantic>=2")
+counter = modal.Dict.from_name("lowkey-quote-daily", create_if_missing=True)
+DAILY_CAP = 300
+MAX_IMAGE_BYTES = 6 * 1024 * 1024
+
+
+@app.function(
+    image=web_image,
+    secrets=[modal.Secret.from_name("lowkey-quote-auth")],
+    min_containers=0,
+    max_containers=4,
+    scaledown_window=2 * MINUTES,
+    timeout=3 * MINUTES,
+)
+@modal.concurrent(max_inputs=8)
+@modal.asgi_app()
+def web():
+    import datetime
+    import hmac
+    import os
+
+    from fastapi import FastAPI, Header, HTTPException
+    from fastapi.responses import JSONResponse
+    from pydantic import BaseModel
+
+    api = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+    token = os.environ["QUOTE_TOKEN"]
+
+    def check(authorization: str | None):
+        want = f"Bearer {token}"
+        if not authorization or not hmac.compare_digest(authorization, want):
+            raise HTTPException(status_code=401)
+
+    class ReadBody(BaseModel):
+        image_b64: str
+        mime: str = "image/jpeg"
+
+    @api.post("/warm", status_code=202)
+    async def warm(authorization: str | None = Header(None)):
+        check(authorization)
+        await Reader().warm.spawn.aio()
+        return {"ok": True}
+
+    @api.post("/read", status_code=202)
+    async def read(body: ReadBody, authorization: str | None = Header(None)):
+        """Start a read and return its id at once; poll /result/{id}."""
+        check(authorization)
+        if body.mime not in ("image/jpeg", "image/png", "image/webp"):
+            raise HTTPException(status_code=415)
+        if len(body.image_b64) * 3 // 4 > MAX_IMAGE_BYTES:
+            raise HTTPException(status_code=413)
+        day = datetime.date.today().isoformat()
+        used = await counter.get.aio(day, 0)
+        if used >= DAILY_CAP:
+            raise HTTPException(status_code=429, detail="daily cap")
+        await counter.put.aio(day, used + 1)
+        call = await Reader().read.spawn.aio(body.image_b64, body.mime)
+        return {"id": call.object_id}
+
+    @api.get("/result/{call_id}")
+    async def result(call_id: str, authorization: str | None = Header(None)):
+        check(authorization)
+        if not call_id.startswith("fc-") or len(call_id) > 64:
+            raise HTTPException(status_code=404)
+        call = modal.FunctionCall.from_id(call_id)
+        try:
+            data = await call.get.aio(timeout=0)
+        except TimeoutError:
+            return JSONResponse({"status": "pending"}, status_code=202)
+        except Exception:  # noqa: BLE001  (the read failed; the form stays usable)
+            return JSONResponse({"status": "failed"}, status_code=200)
+        return {"status": "done", "quote": data}
+
+    return api
+
+
+@app.local_entrypoint()
+def main(image: str):
+    b64 = base64.b64encode(open(image, "rb").read()).decode()
+    mime = "image/png" if image.lower().endswith(".png") else "image/jpeg"
+    print(json.dumps(Reader().read.remote(b64, mime), indent=2))
+
+
+@app.local_entrypoint()
+def profile_start():
+    import time
+
+    t = time.time()
+    print(Reader().warm.remote(), f"cold start {time.time() - t:.1f}s")

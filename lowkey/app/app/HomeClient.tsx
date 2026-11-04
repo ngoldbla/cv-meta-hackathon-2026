@@ -86,6 +86,7 @@ import {
   type SortableFacts,
 } from "@/lib/chooser";
 import type { DealInputs } from "@/lib/deal";
+import { QuoteCheck, type QuotePick } from "@/components/QuoteCheck";
 import {
   LAST_SEARCH_KEY,
   initialSearch,
@@ -556,6 +557,8 @@ export default function HomeClient({
 }) {
   const { messages, sendMessage, status, error } = useChat();
   const [aprText, setAprText] = useState<string | null>(null);
+  const [defaultApr, setDefaultApr] = useState<number | null>(null);
+  const [quoteOpen, setQuoteOpen] = useState<{ pickKey: string | null } | null>(null);
   const [walk, setWalk] = useState<WalkSelection | null>(null);
   // Chooser (task 040): page-owned sort, open sheet, and the sheet to
   // return to after "If I change my mind".
@@ -713,14 +716,44 @@ export default function HomeClient({
     let live = true;
     fetch("/api/apr")
       .then((r) => (r.ok ? r.json() : null))
-      .then((j: { label?: string } | null) => {
+      .then((j: { label?: string; aprPercent?: number } | null) => {
         if (live && j?.label) setAprText(j.label);
+        if (live && typeof j?.aprPercent === "number") setDefaultApr(j.aprPercent);
       })
       .catch(() => undefined);
     return () => {
       live = false;
     };
   }, []);
+
+  // Task 046: the latest turn's priced picks, for "Next to a Low Key pick".
+  const quotePicks: QuotePick[] = [];
+  for (let i = messages.length - 1; i >= 0 && quotePicks.length === 0; i -= 1) {
+    for (const part of (messages[i].parts ?? []) as Part[]) {
+      if (part.type !== "tool-ownership_math" || part.state !== "output-available") continue;
+      const o = part.output as OwnershipOutput & { make?: string | null };
+      if (!o.model) continue;
+      const label = [o.make, o.model].filter(Boolean).join(" ");
+      const key = modelKey(o.model, o.make);
+      if (quotePicks.some((p) => p.key === key)) continue;
+      quotePicks.push({
+        key,
+        label,
+        retention5y: o.dealInputs?.retention5y ?? null,
+        dealInputs: o.dealInputs ?? null,
+        deal: {
+          model: label,
+          price: o.price,
+          taxAmount: o.taxAmount ?? 0,
+          downPayment: o.downPayment,
+          aprPercent: o.aprPercent,
+          termMonths: o.termMonths,
+          monthlyPayment: o.monthlyPayment,
+          positiveEquityMonth: o.positiveEquityMonth ?? null,
+        },
+      });
+    }
+  }
 
   let footerMeta: { soldVehicles: number; providerAsOf: string } | null = null;
   let footerTax: string | null = null;
@@ -916,6 +949,15 @@ export default function HomeClient({
             lowkey<span className="brand-tld">.autos</span>
           </span>
         </div>
+        <div className="flex items-center gap-1">
+        <Button
+          type="button"
+          variant="ghost"
+          className="min-h-11 text-sm"
+          onClick={() => setQuoteOpen({ pickKey: null })}
+        >
+          Check a quote
+        </Button>
         <a
           href={REPO_URL}
           target="_blank"
@@ -926,7 +968,18 @@ export default function HomeClient({
         >
           <GitHubIcon />
         </a>
+        </div>
       </header>
+      {quoteOpen ? (
+        <QuoteCheck
+          wide={!isNarrow}
+          onClose={() => setQuoteOpen(null)}
+          picks={quotePicks}
+          initialPickKey={quoteOpen.pickKey}
+          aprPercent={quotePicks[0]?.deal.aprPercent ?? defaultApr ?? 8}
+          aprText={aprText ?? `${quotePicks[0]?.deal.aprPercent ?? defaultApr ?? 8}% APR`}
+        />
+      ) : null}
 
       <div className="messages">
         {walk && !isNarrow ? (

@@ -1,13 +1,13 @@
 ---
 id: "047"
 title: "Low Key: read a photo of a dealer sheet or window sticker into the Quote form — open-weights vision model on scale-to-zero Modal GPU"
-status: draft
+status: done
 created: 2026-11-04
 report: ops/reports/047-lowkey-quote-reader.md
 ---
 # Low Key: the quote reader
 
-> **Draft.** Dylan sets `status: open` after review. **Run this after task 046 is done.**
+> **Released by Dylan 2026-11-04 ("Let's proceed to execution"); done in PR #12.**
 
 **Branch: `task/047-quote-reader` cut from `main`, with a PR into `main`.** The same secrets and commit rules as task 023 apply. A merge into `main` deploys to https://lowkey.autos; follow `lowkey/docs/deploy.md`. **Spend caps:** provider **$0.10** (VIN calls only). **Meta Model API: none; the credits are gone, so no step may call it.** Modal **$25** in total for staging, probes and the first week live (report `modal` usage before and after each part). The reader runs on **Modal serverless GPU that costs nothing while idle** (see Infrastructure).
 
