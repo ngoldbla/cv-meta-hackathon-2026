@@ -1,5 +1,5 @@
 # Report 057: VIN-first quote check
-Status: in progress. The code is complete and every gate passes. Three checks need photo reads and wait for the reader's daily cap to reset (see Open).
+Status: done. Every check has run: the reader's daily cap was reset at Dylan's request, and the image-size, real-document and preview checks followed.
 Branch head at start: bd6ecce (main)
 
 ## Summary
@@ -7,7 +7,7 @@ Branch head at start: bd6ecce (main)
 - **The photo read copies only the terms:** price, MSRP, down, APR, term, monthly, out-the-door, mileage and VIN. Fees show as one signed line, "Taxes, fees and adjustments" (out-the-door − price). "Read everything, fees included" runs today's full read.
 - **Used cars are priced on their model's own curve.** It comes from sold prices at ages 1–5 and is placed at an effective age from the car's age and miles (w = 0.45, fit from sold data). New cars give exactly today's figures.
 - **Accuracy:** the terms read matches the full read on every field (12/12 on 12 invented fixtures).
-- **Speed:** the median is 5.1 s (full read: 6.0 s), plus about 0.5–1 s saved by polling every second instead of every two. The spec's 4 s target was not met: most of the time goes to the model taking in the image, not to the length of its answer. Dylan chose to ship the terms read anyway and to test a smaller image.
+- **Speed:** the median is 4.1–5.1 s across runs (full read: 6.0 s), plus about 0.5–1 s saved by polling every second instead of every two. The spec's 4 s target was not met: most of the time goes to the model taking in the image, not to the length of its answer. Dylan chose to ship the terms read anyway and to test a smaller image.
 
 ## Work done
 - **Design and plan** (9c4188c, 63d40bb): `lowkey/docs/specs/2026-11-04-vin-first-quote-design.md` and `lowkey/docs/plans/2026-11-04-vin-first-quote.md`. Section 4 was revised mid-design: the first draft's mileage factor was always 1, because the curve has no memory and the price already reflects the odometer. Dylan chose "age curve + effective age".
@@ -35,6 +35,11 @@ Branch head at start: bd6ecce (main)
 - **Schema, route and screen** (3b44034, 6f2757a, f8b8256): the terms mode, the mileage field, the car header, "The sheet says …", the lump line, the used-basis sentence, "Read everything", and 1 s polling.
   - The end-to-end run found that the read, landing after the VIN lookup, wiped the car field. Fixed in f8b8256.
 
+- **After the cap reset** (edde865), Dylan's real paperwork found three gaps the invented fixtures missed:
+  - **Cut-off output:** a buyer's worksheet with a payment grid ran past the new 600-token limit. The output was cut off and failed on both paths. The limit is now 1,500, and a cut-off or invalid terms result falls back to the full read instead of failing.
+  - **The thin-result rule was too strict:** a window sticker can print only its MSRP. "Thin" now means no money value at all, so the sticker went from 18 s (the full read) to about 5 s.
+  - **Wrong picks:** the read took a grid cell ("$500 – $525") as the monthly payment, and the sticker's base MSRP instead of its TOTAL. Code now treats ranges, several payments, or several loan lengths as a grid (no stated payment), and prefers the TOTAL line. The prompt now asks for the sticker's TOTAL; that was the second and last allowed prompt change. Tests were added for each.
+
 ## Checked
 - **Eval** (12 invented fixtures, hosted model):
 
@@ -43,7 +48,21 @@ Branch head at start: bd6ecce (main)
 | vin, selling_price, msrp, down, out_the_door, apr, term_months, stated_monthly | 12/12 each | 12/12 each |
 | Median / max, end to end | 5.1 s / 8.9 s | 6.0 s / 7.1 s |
 
-  Window stickers take the longest in both modes (6–7 s). Tables: `~/.cache/low-key/eval-057-*.txt`.
+  Window stickers take the longest in both modes (6–7 s). After the fixes in edde865, the terms run is still 12/12 on every field, with a median of 4.1 s (`eval-057-terms-final.txt`). Tables: `~/.cache/low-key/eval-057-*.txt`.
+- **Image size**, alternated one by one on the same 12 fixtures so load affects both sizes equally:
+
+| Longest side | Median / mean | Fields right |
+|---|---|---|
+| 1600 px (current) | 7.0 s / 7.4 s | 96/96 |
+| 1280 px | 9.3 s / 13.2 s | 95/96 |
+
+  A smaller image is no faster and loses a field, so 1600 px stays.
+- **Dylan's two real documents, terms mode, against the full read** (pass/fail only; the values stay in `~/.cache/low-key/real/`):
+  - the Toyota worksheet: every field the same (vin, price, down, APR, term, monthly, out-the-door);
+  - the Lexus sticker: vin and MSRP the same, with `price_basis` "msrp".
+- **Preview** (low-nkcuo0of2, Ready):
+  - `/api/vin` returns the CR-V with its age points, and `/zxing_reader.wasm` is served (946,860 bytes);
+  - one real terms read through the preview's `/api/quote/read` came back `mode: terms`, with the fixture's price, APR, term and a checked VIN.
 - **Local end to end** (headless Chrome, 390 px, light and dark):
   - **Setup:** the read and the VIN lookup are mocked, and a generated Code 39 VIN image goes through the photo picker.
   - **Order of requests:** the terms read was requested, and the VIN lookup fired *before* the read's result (the barcode path).
@@ -54,10 +73,6 @@ Branch head at start: bd6ecce (main)
 - **Provider spend:** about $0.05 in total (2 VIN calls and 6 facet calls). The rebuild made 0 calls.
 
 ## Open
-- **The reader's daily cap was hit (300/300 on 2026-11-04 UTC).** This session's evals used about 100 reads. The cap is shared with production, so photo reads on lowkey.autos rest until 00:00 UTC; typing still works. Dylan was told, and the counter was left alone.
-- **Waiting for the cap reset:**
-  - **The smaller-image experiment.** One run at 1280 px and 1024 px came back *slower* (7–8 s). That's probably provider load at the time, so it needs an interleaved rerun before any decision. 1024 px also lost one selling price (11/12).
-  - **Dylan's two real documents in terms mode,** pass/fail per field only.
-  - **One real terms read on the preview.**
-- **Where the 5.1 s goes.** It's mostly the model taking in the image. The hosted logs for terms reads weren't captured, so the per-step split is unmeasured.
-- **The PR is a draft** until the checks above have run.
+- **The reader's daily cap was hit on 2026-11-04 (300/300 UTC)** by this task's evals plus earlier work. Photo reads in production rested for a while. At Dylan's request the day's counter was reset to 0. Lesson: evals share the production cap, so budget them.
+- **Unmeasured:** the 4.1–7 s is mostly the hosted model taking in the image; the per-step split isn't measured.
+- **The model's reads vary a little between runs** (one Corolla run copied a single grid cell). The grid rules in code now cover the variant seen.

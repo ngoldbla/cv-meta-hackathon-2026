@@ -363,6 +363,8 @@ _TERM_PRIORITY = {
     "price": ["selling price", "sale price", "sales price", "cash price", "vehicle price", "your price", "price"],
     "out_the_door": ["out the door", "out-the-door", "otd", "total due", "total cash price", "total"],
     "monthly": ["monthly payment", "your payment", "payment", "per month"],
+    # On a sticker the TOTAL line is the full MSRP (options and destination included).
+    "msrp": ["total msrp", "total price", "total", "msrp", "manufacturers suggested retail price"],
     "down": ["cash down", "down payment", "down"],
 }
 _MONEY_KINDS = ("price", "msrp", "down", "apr", "out_the_door", "monthly")
@@ -392,9 +394,9 @@ def _clean_pairs(raw: dict) -> list[dict]:
 
 
 def terms_thin(raw: dict) -> bool:
-    """Fewer than two money values: run the full read instead."""
+    """No money value at all: run the full read instead (a sticker's lone MSRP is enough)."""
     pairs = _clean_pairs(raw)
-    return sum(1 for p in pairs if p["kind"] in _MONEY_KINDS and parse_money(p["value"]) is not None) < 2
+    return not any(p["kind"] in _MONEY_KINDS and parse_money(p["value"]) is not None for p in pairs)
 
 
 def normalize_terms(raw: dict) -> dict:
@@ -422,7 +424,10 @@ def normalize_terms(raw: dict) -> dict:
     out["msrp"] = money("msrp")
     out["down"] = money("down")
     out["out_the_door"] = money("out_the_door")
-    out["stated_monthly"] = money("monthly")
+    # A grid of estimates ("$500 - $525" per cell, or several payments) is not a stated payment.
+    monthly = [p["value"] for p in pairs if p["kind"] == "monthly" and parse_money(p["value"]) is not None]
+    is_grid = any(re.search(r"\d\s*[-–]\s*\$?\s*\d", v) for v in monthly) or len({parse_money(v) for v in monthly}) > 1
+    stated_monthly = None if is_grid else money("monthly")
     out["price_basis"] = (
         "selling" if out["selling_price"] is not None else ("msrp" if out["msrp"] is not None else None)
     )
@@ -441,6 +446,8 @@ def normalize_terms(raw: dict) -> dict:
         if m and 6 <= int(m.group(1)) <= 120:
             terms.add(int(m.group(1)))
     out["term_months"] = terms.pop() if len(terms) == 1 else None
+    # Several loan lengths are a payment grid: a lone copied cell is not their payment either.
+    out["stated_monthly"] = None if len(terms) > 1 else stated_monthly
 
     out["mileage"] = None
     for p in _ranked(pairs, "mileage"):
