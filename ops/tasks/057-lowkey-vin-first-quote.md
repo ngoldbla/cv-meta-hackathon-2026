@@ -1,7 +1,7 @@
 ---
 id: "057"
 title: "Low Key: VIN-first quote check"
-status: in-progress
+status: done
 created: 2026-11-04
 report: ops/reports/057-lowkey-vin-first-quote.md
 ---
