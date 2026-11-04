@@ -32,7 +32,7 @@ bash lowkey/pipeline/weekly.sh        # builds the table, uploads it to Blob, re
 Schedule it weekly (a systemd timer or cron). It spends provider credits; `lowkey/docs/deploy.md` has the details.
 
 ## 4. Optional: the photo reader
-"Check a quote" works as a typed form without this. Reads go to Muse Glimmer hosted on Hugging Face Inference Providers (always warm, billed per token to the account behind `HF_TOKEN`; a Pro account includes monthly credits). The Modal GPU is the backup and the demo path. To read photos:
+"Got the VIN?" works as a typed form without this (scanning a barcode and VIN lookups need no reader). Reads go to Muse Glimmer hosted on Hugging Face Inference Providers (always warm, billed per token to the account behind `HF_TOKEN`; a Pro account includes monthly credits). The Modal GPU is the backup and the demo path. To read photos:
 ```bash
 pip install modal && modal setup
 modal secret create huggingface HF_TOKEN=<your token>

@@ -1,7 +1,7 @@
 ---
 id: "059"
 title: "Low Key: Got the VIN?"
-status: in-progress
+status: done
 created: 2026-11-04
 report: ops/reports/059-lowkey-got-the-vin.md
 ---

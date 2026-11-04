@@ -1,6 +1,6 @@
 # Got the VIN?: design
 
-Date: 2026-11-04 · Status: approved in chat by Dylan, awaiting spec review · Task: 059
+Date: 2026-11-04 · Status: approved by Dylan, built · Task: 059
 
 ## Goal
 Make the VIN the way in. "Check a quote" confuses people, and the photo VIN path from task 057 is hidden inside a quote form. The entry becomes **"Got the VIN?"**. The shopper gets the VIN in one of three ways, the VIN fills in the car, and the shopper adds only the deal they were offered. The confirmed deal is then saved on the device as **"Your deal"**: a benchmark that results and car pages compare against, and that can be shared as a link.
@@ -63,7 +63,7 @@ storageAvailable(): boolean
 
 **Share button.** `navigator.share({ url })` where it exists, otherwise the clipboard, with "Link copied".
 
-**Opening a link.** `/quote` with `#d=` shows the deal read-only (car, terms, analysis) with **"Save as my deal"** and "Check my own" (an empty step 1). A bad link shows "This link didn't open; ask for a new one."
+**Opening a link.** `/quote` with `#d=` shows the deal as a copy the shopper can read or change (car, terms, analysis), under a banner with **"Save as my deal"** and **"Check my own"** (an empty step 1). The shopper's own draft is not overwritten while a shared deal is open. A bad link shows "This link didn't open; ask for a new one."
 
 ## 4. When things go wrong
 | Case | Behaviour |
