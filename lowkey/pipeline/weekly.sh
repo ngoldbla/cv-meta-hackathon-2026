@@ -2,7 +2,8 @@
 # Weekly Low Key table refresh (task 037, part 4).
 #
 # Rebuilds the private Blob table (lineups, MPG, gas forecasts and
-# the P19 vehicle sales-tax rules), uploads it, then reads it back
+# the P19 vehicle sales-tax rules). Gas forecasts come from the Modal
+# Timestral service (LOWKEY_GAS_URL in the env file), not a local model, uploads it, then reads it back
 # and validates it. Run from any checkout path (the reviewer runs it
 # from a separate detached worktree); every path below is resolved
 # from this script's location. Secrets come only from

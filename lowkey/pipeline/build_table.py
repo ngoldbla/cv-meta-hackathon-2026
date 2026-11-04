@@ -3,13 +3,14 @@
 Reuses the preflight work to build one JSON document for the live
 app: the ranked lineups per category (lineup.py on analyze.py fits),
 EPA combined MPG per ranked model (P17), the latest EIA weekly price
-plus a Timestral 52-week forecast per gas series (P15/P16), and the
+plus the gas forecasts (P15/P16) read from the Timestral service in
+cloud/gas_forecast, which runs on a Modal GPU on its own weekly schedule, and the
 ZIP -> gas-series rules (P15). The document is written outside git
 (default ~/.cache/low-key/table.json) and uploaded to private Blob
 storage by upload_table.mjs; raw provider data never enters git.
 
-Run with the Timestral throwaway venv (it has torch + timestral);
-all other imports are stdlib plus the preflight modules:
+Run with the pipeline venv (stdlib plus the preflight modules; the
+forecasts come over HTTP, so LOWKEY_GAS_URL/LOWKEY_GAS_TOKEN are needed):
 
   set -a; . ~/.config/low-key/env; set +a
   ~/.cache/low-key/venv-timestral/bin/python lowkey/pipeline/build_table.py
@@ -32,7 +33,7 @@ import json
 import sys
 import urllib.request
 import zipfile
-from datetime import UTC, date, datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 PREFLIGHT = Path(__file__).resolve().parent.parent / "preflight"
@@ -40,6 +41,7 @@ sys.path.insert(0, str(PREFLIGHT))
 
 import analyze  # noqa: E402
 import categories as categories_mod  # noqa: E402
+import gas_endpoint  # noqa: E402
 import lifespan as lifespan_mod  # noqa: E402
 import lineup as lineup_mod  # noqa: E402
 import make_map  # noqa: E402
@@ -360,16 +362,6 @@ def epa_variants(
     return out
 
 
-def display_name(area_name: str | None, duoarea: str) -> str:
-    """Card series label, e.g. CHICAGO -> 'Chicago regular'."""
-    raw = (area_name or duoarea).strip()
-    if raw.upper().startswith("PADD"):
-        return f"{raw.upper()} regular"
-    if raw.upper() in {"U.S.", "US", "NUS"}:
-        return "U.S. regular"
-    return f"{raw.title()} regular"
-
-
 def ensure_eia_series(refresh: bool, only: set[str] | None) -> dict[str, dict]:
     """Cached EIA records per duoarea (fresh pulls only on refresh)."""
     EIA_CACHE.mkdir(parents=True, exist_ok=True)
@@ -396,59 +388,6 @@ def ensure_eia_series(refresh: bool, only: set[str] | None) -> dict[str, dict]:
             continue
         records[duoarea] = record
     return records
-
-
-def forecast_all(records: dict[str, dict], skip: bool) -> dict[str, dict]:
-    """Latest price + Timestral 52-week quantiles per series."""
-    out: dict[str, dict] = {}
-    forecaster = None
-    if not skip:
-        import numpy as np
-        from timestral import TimestralForecaster
-
-        forecaster = TimestralForecaster.from_pretrained("mistralai/Timestral-28M")
-    for duoarea in sorted(records):
-        record = records[duoarea]
-        latest_date = record["periods"][-1]
-        entry: dict = {
-            "duoarea": duoarea,
-            "areaName": record.get("area_name"),
-            "displayName": display_name(record.get("area_name"), duoarea),
-            "seriesId": record.get("series"),
-            "latestPrice": float(record["values"][-1]),
-            "latestDate": latest_date,
-            "asOf": latest_date,
-            "forecast": None,
-        }
-        if forecaster is not None:
-            import numpy as np
-
-            values = np.asarray(record["values"], dtype=np.float64)
-            result = forecaster.forecast(values, prediction_length=52)
-            levels = [float(x) for x in result.quantile_levels]
-            quantiles = np.asarray(result.quantiles)[0, 0]
-
-            def series_at(level: float, _q=quantiles, _levels=levels) -> list[float]:
-                col = _q[:, _levels.index(level)]
-                return [round(float(v), 4) for v in col]
-
-            p10, p50, p90 = series_at(0.1), series_at(0.5), series_at(0.9)
-            entry["forecast"] = {
-                "horizonWeeks": 52,
-                "p10": p10,
-                "p50": p50,
-                "p90": p90,
-                "meanP10": round(sum(p10) / len(p10), 4),
-                "meanP50": round(sum(p50) / len(p50), 4),
-                "meanP90": round(sum(p90) / len(p90), 4),
-            }
-            print(
-                f"forecast {duoarea:6} latest ${entry['latestPrice']:.3f} "
-                f"({latest_date}) mean p50 ${entry['forecast']['meanP50']:.3f}",
-                flush=True,
-            )
-        out[duoarea] = entry
-    return out
 
 
 def _spec_model_name(provider_model: str) -> str:
@@ -778,7 +717,10 @@ def main() -> None:
         print("tax rules: unavailable; table will carry no tax section", flush=True)
 
     records = ensure_eia_series(args.refresh_eia, only)
-    gas_series = forecast_all(records, args.skip_forecast)
+    if args.skip_forecast:
+        gas_series, forecast_source = {}, {"model": "mistralai/Timestral-28M", "asOf": None, "horizonWeeks": 52}
+    else:
+        gas_series, forecast_source = gas_endpoint.gas_from_payload(gas_endpoint.fetch_gas(), set(records))
     eia_as_of = max((s["latestDate"] for s in gas_series.values()), default=None)
     built_at = datetime.now(tz=UTC).isoformat()
     table = {
@@ -810,11 +752,7 @@ def main() -> None:
                 "source": lifespan_cache["source"],
                 "asOf": lifespan_cache["asOf"],
             },
-            "forecast": {
-                "model": "mistralai/Timestral-28M",
-                "asOf": date.today().isoformat(),
-                "horizonWeeks": 52,
-            },
+            "forecast": forecast_source,
             "tax": {
                 "asOf": tax_section["asOf"],
                 "rows": tax_rows,
