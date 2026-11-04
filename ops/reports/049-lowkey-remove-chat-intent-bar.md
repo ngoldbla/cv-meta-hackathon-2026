@@ -18,6 +18,7 @@ Branch head at start: b73f947  ·  at finish: (pending)
   - `049-c-compare.html`: one comparison, opened in place.
 
   They share `049-kit.css/js`, `049-cars.js` (the Hairline SVGs as the app renders them) and `049-data.js`. The data file was generated from one live fast-path search (ZIP 30263, Sedan): the tool outputs and the guard-checked card specs. The sample quote is the invented fixture `buyers_order_3`, run through `lib/quote/compare.ts`. No figure was typed by hand. Screenshots are in `~/.cache/low-key/screens/049/`.
+- **Dylan's pick: B, a screen for each step.** Each screen has one job; Back and shared links work natively; the car page has room for the walk-away.
 
 ## Results
 (pending)

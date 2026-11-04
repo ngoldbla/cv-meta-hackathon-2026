@@ -19,7 +19,13 @@ All four come from code, through the number guard. The product's own truth: cars
 ## 3. Direction
 - **Visual authority: the established world, inherited, not reinvented.** The wordmark and key icon; the tokens in `app/globals.css` (paper ground `#f3f2ee`, ink, brass, the cost colours); IBM Plex Sans and Mono; Iconiq components; Hairline cars; the copy decisions from 038, in light and dark.
 - **Signature move (already the product's):** the cost bars. "You pay" against "What it really costs", where the gap is what comes back at resale. That is the moment every screen leads to.
-- **Structure:** open. Decided by picking one of the 049 mockup concepts (Part 2).
+- **Structure (Dylan picked concept B, 2026-11-04):** a screen for each step (`lowkey/docs/mockup/049-b-screens.html`).
+  - The routes are `/`, `/[type]?zip=`, `/[type]/[car]`, `/[type]/[car]/listing/[n]` and `/quote?car=`.
+  - The results are a dense list: one row per car, all on one cost scale.
+  - A car gets a whole page, with its walk-away and its listings.
+  - The settings are their own screen, opened from the summary line.
+  - The phone's Back button moves between screens.
+  - **Why B:** each screen has one job; Back and shared links work natively; the car page has room for the walk-away without stacking sheets.
 
 ## 4. Scope and boundaries
 - **In scope:** the whole flow without chat.
@@ -59,4 +65,4 @@ All four come from code, through the number guard. The product's own truth: cars
 - Next.js App Router on Vercel, using the existing components.
 - The new search route `GET /api/search` must return the same figures as today's fast path (task 049, Part 3).
 - The listings provider is never named in the app.
-- **Open:** the screen structure, from the 049 concepts. Dylan picks.
+- Structure decided: concept B.
