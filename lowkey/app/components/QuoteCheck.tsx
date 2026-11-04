@@ -433,7 +433,7 @@ export function QuoteCheck({
           onChange={(e) => void onPhoto(e.target.files?.[0])}
         />
         {step === "pending" ? <div className="min-h-40" aria-busy="true" /> : null}
-        {linkError && step === "vin" ? (
+        {linkError && step !== "pending" ? (
           <Typography variant="paragraph-sm" className="rounded-lg bg-muted px-3 py-2" role="status">
             This link didn&apos;t open; ask for a new one.
           </Typography>
@@ -973,6 +973,12 @@ export function QuoteCheck({
               </Typography>
             )}
 
+            <DealActions
+              quote={q}
+              retention={infoOf(active)?.retention ?? null}
+              canSave={q.sellingPrice !== null || q.outTheDoor !== null}
+            />
+            <SavedDeals deals={deals} activeId={activeDeal} onOpen={openSaved} />
             <Button
               type="button"
               variant="ghost"
@@ -989,12 +995,6 @@ export function QuoteCheck({
             >
               Start over
             </Button>
-            <DealActions
-              quote={q}
-              retention={infoOf(active)?.retention ?? null}
-              canSave={q.sellingPrice !== null || q.outTheDoor !== null}
-            />
-            <SavedDeals deals={deals} activeId={activeDeal} onOpen={openSaved} />
           </>
         ) : null}
       </div>
