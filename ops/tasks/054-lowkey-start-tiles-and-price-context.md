@@ -1,7 +1,7 @@
 ---
 id: "054"
 title: "Low Key: a leaner start screen, price in context, and choosing the car you're going for"
-status: open
+status: in_progress
 created: 2026-11-04
 report: ops/reports/054-lowkey-start-tiles-and-price-context.md
 ---
