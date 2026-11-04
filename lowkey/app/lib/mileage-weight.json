@@ -1,0 +1,12 @@
+{
+ "weight": 0.4507,
+ "accepted": true,
+ "cells": 174,
+ "median": 0.4507,
+ "iqr": [
+  0.3456,
+  0.5419
+ ],
+ "rule": "accept if >= 8 cells, median w in [0.1, 1.5], and the cells' IQR above 0; else w = 0 (age only)",
+ "asOf": "2026-11-04"
+}
