@@ -21,6 +21,7 @@ export default function QuoteClient() {
   const type = isSearchType(typeRaw) ? typeRaw : null;
   const view = parseView(params);
   const slug = params.get("car");
+  const openDealId = params.get("deal");
   const state = useSearch(type && view ? searchApiQuery(type, view) : null);
   const [fred, setFred] = useState<{ aprPercent: number; label: string } | null>(null);
 
@@ -52,7 +53,8 @@ export default function QuoteClient() {
       <AppBar title="Got the VIN?" fallback={fallback} />
       {waiting ? null : (
         <QuoteCheck
-          key={initialPickKey ?? "none"}
+          key={`${initialPickKey ?? "none"}|${openDealId ?? ""}`}
+          openDealId={openDealId}
           inline
           wide={false}
           onClose={() => router.push(fallback)}
