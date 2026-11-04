@@ -10,6 +10,7 @@ import json
 import os
 import sys
 import time
+import urllib.error
 import urllib.request
 
 URL = os.environ.get("LOWKEY_QUOTE_URL", "https://ngoldbla--lowkey-quote-reader-web.us-east.modal.run")
@@ -25,8 +26,16 @@ def call(method, path, body=None):
             "content-type": "application/json",
         },
     )
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return r.status, json.loads(r.read() or b"{}")
+    for attempt in range(4):  # this box is on WiFi: retry transient network errors
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                return r.status, json.loads(r.read() or b"{}")
+        except urllib.error.HTTPError:
+            raise
+        except (urllib.error.URLError, TimeoutError):
+            if attempt == 3:
+                raise
+            time.sleep(2 * (attempt + 1))
 
 
 def main(path):

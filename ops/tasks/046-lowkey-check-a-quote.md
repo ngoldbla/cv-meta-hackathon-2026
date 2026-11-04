@@ -1,13 +1,13 @@
 ---
 id: "046"
 title: "Low Key: Check a quote — one Quote schema, apples-to-apples compare, and a heads-up against our pick (no model)"
-status: draft
+status: done
 created: 2026-11-04
 report: ops/reports/046-lowkey-check-a-quote.md
 ---
 # Low Key: Check a quote
 
-> **Draft.** `status: draft` means Dylan has not released it; the inbox skill only picks `open`. Dylan sets it to `open` after review.
+> **Released by Dylan 2026-11-04 ("Let's proceed to execution"); done in PR #12.**
 
 **Branch: `task/046-check-a-quote` cut from `main`, with a PR into `main`.** The same secrets and commit rules as task 023 apply. A merge into `main` deploys to https://lowkey.autos; follow `lowkey/docs/deploy.md`. **No provider and no model spend** (the form is typed by hand; the reader is task 047).
 
