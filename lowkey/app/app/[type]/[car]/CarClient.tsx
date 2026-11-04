@@ -76,7 +76,7 @@ export default function CarClient({ type, slug }: { type: SearchType; slug: stri
 
   return (
     <main className="shell pb-24">
-      <AppBar title={title} fallback={back} />
+      <AppBar title={title} fallback={back} titleAs={car && spec ? "p" : "h1"} />
       {state.status === "loading" ? (
         <div className="flex flex-col gap-3 py-4" aria-busy="true">
           <Skeleton className="h-6 w-2/3" />
@@ -111,7 +111,7 @@ export default function CarClient({ type, slug }: { type: SearchType; slug: stri
           </p>
           <div className={updating ? "pt-3 opacity-60 transition-opacity" : "pt-3 transition-opacity"} aria-busy={updating}>
             {spec && isCatalogValid(spec) ? (
-              <RenderSpec spec={spec} onListing={openListing} onChoose={(_m, vin) => choose(vin)} resultsUrl={origin + back} />
+              <RenderSpec spec={spec} onListing={openListing} onChoose={(_m, vin) => choose(vin)} resultsUrl={origin + back} cardHeading="h1" />
             ) : (
               <TextFallback entry={car.entry} peers={data!.shown as never} category={data!.category} />
             )}

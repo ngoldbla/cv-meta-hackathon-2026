@@ -26,6 +26,10 @@ export const SEGMENT_LABEL: Record<string, string> = {
   tax: "Sales tax",
 };
 
-/** Hatched "back to you" fill (mockup greens through tokens). */
-export const BACK_FILL =
-  "repeating-linear-gradient(135deg, var(--cost-back-a) 0 6px, var(--cost-back-b) 6px 12px)";
+/**
+ * The "back to you" fill (task 055: was a hatched stripe pattern). A solid
+ * green tint with a dashed edge, so it reads apart from the cost segments
+ * by its edge as well as its colour, in light and dark.
+ */
+export const BACK_FILL = "var(--cost-back-b)";
+export const BACK_EDGE = "border border-dashed border-[var(--cost-back-ink)]";

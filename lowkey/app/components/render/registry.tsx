@@ -10,6 +10,7 @@ import { CostCompareView } from "./CostCompare";
 import { DealerLineView } from "./DealerLine";
 import { LifespanTrackView } from "./LifespanTrack";
 import { ListingDetailView } from "./ListingDetail";
+import { CardHeadingContext } from "./heading-context";
 import { ListingContext } from "./listing-context";
 import { PickCardView } from "./PickCardView";
 import { PriceStripView } from "./PriceStrip";
@@ -81,6 +82,7 @@ export function RenderSpec({
   onListing,
   onChoose,
   resultsUrl,
+  cardHeading = "h2",
 }: {
   spec: Spec;
   onWalkAway?: (modelKey: string) => void;
@@ -93,8 +95,11 @@ export function RenderSpec({
   /** Task 054: choose a unit by VIN, or clear the choice with null. */
   onChoose?: (modelKey: string, vin: string | null) => void;
   resultsUrl?: string;
+  /** Task 055: the card title's level ("h1" on a car's own screen). */
+  cardHeading?: "h1" | "h2";
 }): ReactNode {
   return (
+    <CardHeadingContext.Provider value={cardHeading}>
     <ListingContext.Provider value={{ onListing, onChoose, resultsUrl }}>
     <WalkAwayContext.Provider value={{ onWalkAway }}>
       <ChooserContext.Provider value={{ sort, onSort, onOpen }}>
@@ -104,5 +109,6 @@ export function RenderSpec({
       </ChooserContext.Provider>
     </WalkAwayContext.Provider>
     </ListingContext.Provider>
+    </CardHeadingContext.Provider>
   );
 }

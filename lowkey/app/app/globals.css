@@ -171,6 +171,10 @@
 }
 
 @layer base {
+  /* Task 055: no single word left alone on a paragraph's last line. */
+  p {
+    text-wrap: pretty;
+  }
   html,
   body {
     margin: 0;

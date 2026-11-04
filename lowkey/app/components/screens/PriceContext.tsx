@@ -97,7 +97,7 @@ export function FartherLeads({
           <p className="py-2 text-sm text-muted-foreground">Couldn&apos;t search farther away just now.</p>
         ) : data ? (
           <div className="flex flex-col gap-3 pt-1">
-            <p className="text-pretty text-sm leading-relaxed text-muted-foreground">
+            <p className="max-w-[70ch] text-sm leading-relaxed text-muted-foreground">
               {data.year ? `${data.year} ` : ""}
               {make} {model}
               {data.trim ? ` ${data.trim}` : ""} listed beyond {data.radius} miles for at least {fmtUsd(data.margin ?? 0)} less

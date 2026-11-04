@@ -82,7 +82,23 @@ export function SiteHeader({ quoteHref = "/quote" }: { quoteHref?: string }) {
  * Back goes back in history when there is a Low Key screen behind this one,
  * else to `fallback` (a shared link opened cold still has somewhere to go).
  */
-export function AppBar({ title, fallback, right }: { title: string; fallback: string; right?: ReactNode }) {
+/**
+ * The in-app bar. Its title is the screen's `<h1>` unless the screen has
+ * a heading of its own (task 055: the car and listing screens), when it
+ * is a plain label.
+ */
+export function AppBar({
+  title,
+  fallback,
+  right,
+  titleAs = "h1",
+}: {
+  title: string;
+  fallback: string;
+  right?: ReactNode;
+  titleAs?: "h1" | "p";
+}) {
+  const Title = titleAs;
   const router = useRouter();
   function back() {
     if (visited > 1) router.back();
@@ -95,7 +111,7 @@ export function AppBar({ title, fallback, right }: { title: string; fallback: st
           <path d="M15 5l-7 7 7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </Button>
-      <h1 className="min-w-0 flex-1 truncate text-base font-semibold">{title}</h1>
+      <Title className="min-w-0 flex-1 truncate text-base font-semibold">{title}</Title>
       {right}
     </header>
   );
