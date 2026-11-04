@@ -7,7 +7,7 @@ report: ops/reports/042-lowkey-minivan-hybrid-ev.md
 ---
 # Low Key: Minivan, Hybrid and Electric
 
-**Run this after task 041 is done.** **Branch: `low-key` only.** The same secrets and commit rules as task 023 apply. Every push to `low-key` deploys to https://low-key-murex.vercel.app; follow `lowkey/docs/deploy.md`. Provider cap **$1.50** (the sold-data fits for three new categories plus checks; report `/usage` before and after, at 1 request per 2 s); Muse Spark cap $0.10. EIA and fueleconomy.gov are free.
+**Run this after task 041 is done.** **Branch: `task/NNN-<slug>` cut from `main`, with a PR into `main`.** The same secrets and commit rules as task 023 apply. A merge into `main` deploys to https://lowkey.autos; follow `lowkey/docs/deploy.md`. Provider cap **$1.50** (the sold-data fits for three new categories plus checks; report `/usage` before and after, at 1 request per 2 s); Muse Spark cap $0.10. EIA and fueleconomy.gov are free.
 
 **Why (Dylan, 2026-11-03):** add three types: **Minivan**, **Hybrid** and **Electric** (all-electric only). "The alternative fuel choices mean we need to calculate fuel differently: electric energy cost by location instead."
 

@@ -2,7 +2,7 @@
 
 **A calm way to buy a car.** Pick a type and a ZIP. Low Key shows the new cars worth buying near you, what each one really costs a month over five years after resale, and the nearest one in stock. No ads, no sign-up, and no money from dealers.
 
-Live: https://low-key-murex.vercel.app · Author: Dylan Goldblatt · Code: MIT
+Live: https://lowkey.autos · Author: Dylan Goldblatt · Code: MIT
 
 Built for the Meta hackathon hosted by Cerebral Valley, Fall 2026.
 

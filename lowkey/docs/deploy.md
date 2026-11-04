@@ -2,7 +2,7 @@
 
 *Set up 2026-11-03.*
 
-- **Live URL:** https://low-key-murex.vercel.app
+- **Live URL:** https://lowkey.autos (also https://low-key-murex.vercel.app)
 - **Production branch: `main`** (it was `low-key` until 2026-11-03, when `low-key` was merged into `main` and retired). Every push or merged PR to `main` triggers a production deploy to that URL within a few minutes. There is no staging step: what lands on `main` is what judges and users see.
 - **Other branches** and open PRs get their own preview URLs. They never touch production.
 - **Build settings** (in Vercel, not the repo): Root Directory `lowkey/app`, framework preset Next.js, Node 22.x, install `npm ci`, build `npm run build`.

@@ -7,7 +7,7 @@ report: ops/reports/043-lowkey-laya-generative-ui.md
 ---
 # Low Key: generative UI with a decision model (Laya vs Glimmer)
 
-**Run this after task 042 is done.** **Branch: `low-key` only.** The same secrets and commit rules as task 023 apply. Every push to `low-key` deploys to https://low-key-murex.vercel.app; follow `lowkey/docs/deploy.md`. **Budget:** Modal **$80** in total for this task and task 045 (serving plus any training you choose to run there; scale to zero when idle unless part 5 says otherwise). Training can also run on dylan-pc's 16 GB GPU for free: check `nvidia-smi` and that no service holds the card first. Provider $0.10. Muse Spark $1.00 (baseline plus synthetic data). **Deadline:** the video is recorded tomorrow (2026-11-04), so keep this to about 6 hours of work. Cut scope, not rigour, if it runs long.
+**Run this after task 042 is done.** **Branch: `task/NNN-<slug>` cut from `main`, with a PR into `main`.** The same secrets and commit rules as task 023 apply. A merge into `main` deploys to https://lowkey.autos; follow `lowkey/docs/deploy.md`. **Budget:** Modal **$80** in total for this task and task 045 (serving plus any training you choose to run there; scale to zero when idle unless part 5 says otherwise). Training can also run on dylan-pc's 16 GB GPU for free: check `nvidia-smi` and that no service holds the card first. Provider $0.10. Muse Spark $1.00 (baseline plus synthetic data). **Deadline:** the video is recorded tomorrow (2026-11-04), so keep this to about 6 hours of work. Cut scope, not rigour, if it runs long.
 
 **Why (Dylan, 2026-11-03):**
 - Use Laya at runtime only if json-render in the chat can create generative UI elements with it. **Otherwise drop Laya** from the app and the credits.

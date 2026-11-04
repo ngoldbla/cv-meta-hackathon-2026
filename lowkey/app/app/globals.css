@@ -220,6 +220,11 @@
   letter-spacing: -0.01em;
 }
 
+.brand-tld {
+  color: var(--brass);
+  font-weight: 600;
+}
+
 .brand svg {
   color: var(--brass);
   flex: none;
