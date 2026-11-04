@@ -1,6 +1,7 @@
 """Probe: does a GPU memory snapshot cut the reader's cold start? (task 051)
 
-A separate app, so the live reader is never touched:
+Status 2026-11-04: not yet measured (the first deploy failed on an import;
+fixed). A separate app, so the live reader is never touched:
     modal deploy cloud/quote_reader/snap_probe.py
     python cloud/quote_reader/snap_probe.py      # times warm() on fresh containers
 
@@ -13,7 +14,11 @@ container. A restored container only wakes the engine.
 import time
 
 import modal
-from serve import MODEL_DIR, cache, vol  # same weights and compile cache
+
+# Defined here, not imported from serve.py: the probe's container only has this file.
+MODEL_DIR = "/models/meta-models__Muse-Glimmer-30B"
+vol = modal.Volume.from_name("lowkey-quote-models")
+cache = modal.Volume.from_name("lowkey-quote-vllm-cache")
 
 app = modal.App("lowkey-quote-reader-snap")
 image = (
