@@ -11,12 +11,15 @@ import { YearsToggle } from "@/components/screens/PriceContext";
 import { SourcesNote } from "@/components/screens/SourcesNote";
 import { TermsScreen } from "@/components/screens/TermsScreen";
 import { useSearch } from "@/components/screens/useSearch";
+import { YourDealRow } from "@/components/quote/YourDealRow";
+import { useDeals } from "@/components/quote/useDeals";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/b-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Typography } from "@/components/ui/typography";
+import { benchmark } from "@/lib/deals";
 import { isCatalogValid } from "@/lib/render/validate";
-import { carsOf, sourcesOf } from "@/lib/resultView";
+import { carsOf, quotePicksOf, sourcesOf } from "@/lib/resultView";
 import {
   carPath,
   listingPath,
@@ -73,6 +76,10 @@ export default function ResultsClient({ type }: { type: SearchType }) {
   const data = state.status === "ready" ? state.data : null;
   const cars = useMemo(() => (data ? carsOf(data) : []), [data]);
   const sources = useMemo(() => (data ? sourcesOf(data) : null), [data]);
+  // Task 059: the saved deal is the benchmark above the lineup.
+  const { deals } = useDeals();
+  const mine = benchmark(deals);
+  const picks = useMemo(() => (data ? quotePicksOf(data) : []), [data]);
   if (!view) return null;
 
   const v: View = view;
@@ -108,7 +115,7 @@ export default function ResultsClient({ type }: { type: SearchType }) {
         fallback="/"
         right={
           <Link href={quotePath({ type, view: v })} className="min-h-11 content-center whitespace-nowrap rounded-full px-2 text-sm font-medium text-foreground no-underline hover:bg-muted">
-            Check a quote
+            Got the VIN?
           </Link>
         }
       />
@@ -132,6 +139,14 @@ export default function ResultsClient({ type }: { type: SearchType }) {
       </div>
 
       <YearsToggle allYears={v.years === "all"} onToggle={(all) => router.replace(resultsPath(type, withYears(v, all)), { scroll: false })} />
+
+      {mine && data ? (
+        <YourDealRow
+          deal={mine}
+          picks={picks}
+          terms={{ downRule: data.downRule, aprPercent: data.aprPercent, termMonths: data.termMonths }}
+        />
+      ) : null}
 
       <section aria-label={resumeHeading({ type, zip: v.zip })} aria-busy={state.status === "loading"} className="mt-1">
         {state.status === "loading" ? (

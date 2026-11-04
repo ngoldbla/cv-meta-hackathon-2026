@@ -39,7 +39,7 @@ function GitHubIcon() {
   );
 }
 
-/** The start screen's header: the wordmark, About, Check a quote and the code. */
+/** The start screen's header: the wordmark, About, Got the VIN? and the code. */
 export function SiteHeader({ quoteHref = "/quote" }: { quoteHref?: string }) {
   return (
     <header className="topbar">
@@ -60,7 +60,7 @@ export function SiteHeader({ quoteHref = "/quote" }: { quoteHref?: string }) {
           href={quoteHref}
           className="min-h-11 content-center whitespace-nowrap rounded-full px-2 text-sm font-medium text-foreground no-underline transition-colors hover:bg-muted"
         >
-          Check a quote
+          Got the VIN?
         </Link>
         <a
           href={REPO_URL}

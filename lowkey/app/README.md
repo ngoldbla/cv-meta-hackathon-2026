@@ -1,6 +1,6 @@
 # Low Key app
 
-Next.js app for Low Key: an interactive web app with no chat (task 049). Screens: `/` (start), `/[type]` (results), `/[type]/[car]` (a car and its walk-away), `/[type]/[car]/listing/[n]` (a local unit), `/quote` (Check a quote). They read `GET /api/search`, which runs the code in `lib/searchRun.ts`. Rankings come from the private Blob depreciation table, local stock from the live listings search, payments from the cheapest local unit (or the labelled typical price), and fuel from EPA MPG with the EIA/Timestral forecast — all server-side (task 027).
+Next.js app for Low Key: an interactive web app with no chat (task 049). Screens: `/` (start), `/[type]` (results), `/[type]/[car]` (a car and its walk-away), `/[type]/[car]/listing/[n]` (a local unit), `/quote` (Got the VIN?: the VIN first, then the deal; saved deals and share links). They read `GET /api/search`, which runs the code in `lib/searchRun.ts`. Rankings come from the private Blob depreciation table, local stock from the live listings search, payments from the cheapest local unit (or the labelled typical price), and fuel from EPA MPG with the EIA/Timestral forecast — all server-side (task 027).
 
 ## Run locally
 
@@ -11,7 +11,7 @@ npm run build
 npm test
 ```
 
-Node 22. Copy `.env.example` names into your shell or Vercel; never commit values. The search needs the provider, EIA and Blob variables; Check a quote's photo reader needs `LOWKEY_QUOTE_URL` and `LOWKEY_QUOTE_TOKEN`.
+Node 22. Copy `.env.example` names into your shell or Vercel; never commit values. The search needs the provider, EIA and Blob variables; Got the VIN?'s photo reader needs `LOWKEY_QUOTE_URL` and `LOWKEY_QUOTE_TOKEN`.
 
 ## Vercel
 

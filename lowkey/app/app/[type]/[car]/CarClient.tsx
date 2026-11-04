@@ -10,11 +10,15 @@ import { AppBar } from "@/components/screens/Chrome";
 import { FartherLeads, PriceStripFor, YearsToggle } from "@/components/screens/PriceContext";
 import { useSearch } from "@/components/screens/useSearch";
 import WalkAwayView from "@/components/WalkAwayView";
+import { useDeals } from "@/components/quote/useDeals";
 import { Alert } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/b-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isCatalogValid } from "@/lib/render/validate";
-import { carsOf, type CarView } from "@/lib/resultView";
+import { benchmark } from "@/lib/deals";
+import { estTaxFor, resaleFor, vsDealLine } from "@/lib/quote/benchmark";
+import { headsUp } from "@/lib/quote/compare";
+import { carsOf, modelKey, quotePicksOf, type CarView } from "@/lib/resultView";
 import { pricedUnitOf, stripUnitOf } from "@/lib/render/specs";
 import { carPath, listingPath, parseView, quotePath, resultsPath, searchApiQuery, withChoice, withYears } from "@/lib/routes";
 import type { SearchType } from "@/lib/search";
@@ -50,6 +54,8 @@ export default function CarClient({ type, slug }: { type: SearchType; slug: stri
   // Task 054: choosing a unit re-prices in place; the old figures stay until the new ones arrive.
   const state = useSearch(view ? searchApiQuery(type, view) : null, { keep: true });
   const [origin, setOrigin] = useState("");
+  const { deals } = useDeals();
+  const mine = benchmark(deals);
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -59,6 +65,27 @@ export default function CarClient({ type, slug }: { type: SearchType; slug: stri
   const data = state.status === "ready" ? state.data : null;
   const car = useMemo(() => (data ? carsOf(data).find((c) => c.slug === slug) ?? null : null), [data, slug]);
   if (!view) return null;
+
+  // Task 059: this car against the saved deal, both on this car's terms.
+  const allPicks = data && mine ? quotePicksOf(data) : [];
+  const pickFor = car && mine ? allPicks.find((p) => p.key === modelKey(car.pick.model, car.pick.make)) ?? null : null;
+  const vsLine =
+    mine && data && pickFor
+      ? vsDealLine(
+          headsUp(
+            mine.quote,
+            pickFor.deal,
+            data.downRule,
+            resaleFor(
+              mine.quote,
+              mine.quote.car ? { year: mine.quote.car.year, miles: mine.quote.car.miles, retention: mine.retention } : null,
+              allPicks,
+              new Date().getFullYear(),
+            ),
+            estTaxFor(mine.quote, pickFor),
+          ),
+        )
+      : null;
 
   const back = resultsPath(type, view);
   const title = car ? `${car.pick.make} ${car.pick.model}` : "This car";
@@ -116,6 +143,14 @@ export default function CarClient({ type, slug }: { type: SearchType; slug: stri
               <TextFallback entry={car.entry} peers={data!.shown as never} category={data!.category} />
             )}
           </div>
+          {vsLine && mine ? (
+            <p className="mt-3 rounded-[10px] bg-muted px-3 py-2 text-sm">
+              {vsLine}.{" "}
+              <Link href={`/quote?deal=${encodeURIComponent(mine.id)}`} className="inline-flex min-h-11 items-center underline underline-offset-2">
+                See your deal
+              </Link>
+            </p>
+          ) : null}
           <section aria-label="Price in context" className="mt-6 flex flex-col gap-2">
             <PriceStripFor entry={car.entry} unit={pricedUnitOf(car.entry) ? stripUnitOf(pricedUnitOf(car.entry)!) : null} />
             <YearsToggle
@@ -154,7 +189,7 @@ export default function CarClient({ type, slug }: { type: SearchType; slug: stri
           <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background">
             <div className="mx-auto flex max-w-[720px] gap-2 px-4 py-3">
               <Link href={quotePath({ type, view, car: car.slug })} className={buttonVariants({ className: "min-h-11 flex-1" })}>
-                Compare my quote with this car
+                Compare a deal with this car
               </Link>
             </div>
           </div>

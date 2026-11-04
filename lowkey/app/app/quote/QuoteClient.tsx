@@ -10,7 +10,7 @@ import { carsOf, modelKey, quotePicksOf } from "@/lib/resultView";
 import { carPath, isSearchType, parseView, resultsPath, searchApiQuery } from "@/lib/routes";
 
 /**
- * Check a quote on its own screen (tasks 046, 049). Opened from a car or
+ * Got the VIN? on its own screen (tasks 046, 049). Opened from a car or
  * a listing, the search behind it supplies the picks (same terms), with
  * that car chosen; opened from the header, it compares on the defaults.
  */
@@ -21,6 +21,7 @@ export default function QuoteClient() {
   const type = isSearchType(typeRaw) ? typeRaw : null;
   const view = parseView(params);
   const slug = params.get("car");
+  const openDealId = params.get("deal");
   const state = useSearch(type && view ? searchApiQuery(type, view) : null);
   const [fred, setFred] = useState<{ aprPercent: number; label: string } | null>(null);
 
@@ -49,10 +50,11 @@ export default function QuoteClient() {
 
   return (
     <main className="shell">
-      <AppBar title="Check a quote" fallback={fallback} />
+      <AppBar title="Got the VIN?" fallback={fallback} />
       {waiting ? null : (
         <QuoteCheck
-          key={initialPickKey ?? "none"}
+          key={`${initialPickKey ?? "none"}|${openDealId ?? ""}`}
+          openDealId={openDealId}
           inline
           wide={false}
           onClose={() => router.push(fallback)}

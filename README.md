@@ -22,7 +22,7 @@ Every number comes from code, never from a language model. A number guard checks
 ## Repository
 | Path | What it is |
 |---|---|
-| [`lowkey/app/`](lowkey/app/) | The Next.js app (search route, tools, number guard, Check a quote, UI) |
+| [`lowkey/app/`](lowkey/app/) | The Next.js app (search route, tools, number guard, Got the VIN?, UI) |
 | [`cloud/quote_reader/`](cloud/quote_reader/) | The photo reader: Muse Glimmer via Hugging Face Inference Providers, with a scale-to-zero Modal GPU as backup, plus the code that decides each field |
 | [`lowkey/pipeline/`](lowkey/pipeline/) | Builds the weekly data table: rankings, MPG, gas forecasts, trims, lifespan, tax |
 | [`lowkey/preflight/`](lowkey/preflight/) | The checks run before building: data coverage, terms, ZIP-to-state |
