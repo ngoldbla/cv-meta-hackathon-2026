@@ -108,7 +108,7 @@ export default function ResultsClient({ type }: { type: SearchType }) {
         fallback="/"
         right={
           <Link href={quotePath({ type, view: v })} className="min-h-11 content-center whitespace-nowrap rounded-full px-2 text-sm font-medium text-foreground no-underline hover:bg-muted">
-            Check a quote
+            Got the VIN?
           </Link>
         }
       />

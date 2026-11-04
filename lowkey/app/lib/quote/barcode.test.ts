@@ -22,3 +22,11 @@ describe("a generated barcode", () => {
     expect(vinFromBarcodeText(read[0]?.text ?? "")).toBe(VIN);
   });
 });
+
+describe("decodeVinFrame", () => {
+  it("returns null and never throws on a blank or unreadable frame", async () => {
+    const { decodeVinFrame } = await import("./barcode");
+    const blank = { data: new Uint8ClampedArray(4 * 4 * 4), width: 4, height: 4, colorSpace: "srgb" } as ImageData;
+    expect(await decodeVinFrame(blank)).toBeNull();
+  });
+});

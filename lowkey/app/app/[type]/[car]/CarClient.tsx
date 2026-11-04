@@ -154,7 +154,7 @@ export default function CarClient({ type, slug }: { type: SearchType; slug: stri
           <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background">
             <div className="mx-auto flex max-w-[720px] gap-2 px-4 py-3">
               <Link href={quotePath({ type, view, car: car.slug })} className={buttonVariants({ className: "min-h-11 flex-1" })}>
-                Compare my quote with this car
+                Compare a deal with this car
               </Link>
             </div>
           </div>
