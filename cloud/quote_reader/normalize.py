@@ -36,6 +36,11 @@ _ADDONS = re.compile(
     r"gap\b|service contract|extended warranty|maintenance plan|key replacement",
     re.I,
 )
+# Labels a field must never take its value from ("Down payment" is not a payment).
+_EXCLUDE = {
+    "stated_monthly": re.compile(r"down|due at signing|total", re.I),
+    "selling_price": re.compile(r"msrp|base", re.I),
+}
 # fee lines that are really other fields
 _NOT_FEES = re.compile(r"price|down|out.?the.?door|total|apr|term|payment|msrp|trade|rebate", re.I)
 
@@ -87,7 +92,15 @@ def normalize(raw: dict) -> dict:
     for field, frags in _LABELS.items():
         out[field] = None
         for frag in frags:
-            hit = next((v for k, v in pairs if k == frag or (len(frag) > 4 and frag in k)), None)
+            ex = _EXCLUDE.get(field)
+            hit = next(
+                (
+                    v
+                    for k, v in pairs
+                    if (k == frag or (len(frag) > 4 and frag in k)) and not (ex and ex.search(k))
+                ),
+                None,
+            )
             if hit is not None:
                 out[field] = parse_money(hit)
                 if out[field] is not None:

@@ -79,3 +79,14 @@ def test_known_addons_override_a_dealer_tag():
     ]
     kinds = [f["kind"] for f in normalize(raw(fees=fees))["fees"]]
     assert kinds == ["addon", "addon", "dealer", "government"]
+
+
+def test_down_payment_is_never_the_monthly_payment():
+    pairs = [
+        {"label": "Down payment", "value": "$5,000.00"},
+        {"label": "Selling price", "value": "$36,850.00"},
+    ]
+    n = normalize(raw(pairs=pairs))
+    assert n["down"] == 5000.0 and n["stated_monthly"] is None
+    n2 = normalize(raw(pairs=[*pairs, {"label": "YOUR PAYMENT", "value": "$639.18 / mo"}]))
+    assert n2["stated_monthly"] == 639.18

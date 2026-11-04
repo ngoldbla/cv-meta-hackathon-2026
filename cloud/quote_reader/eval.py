@@ -1,8 +1,10 @@
-"""Score the quote reader on the invented fixtures (task 047).
+"""Score the deployed quote reader on the invented fixtures (task 047).
 
-    modal run cloud/quote_reader/eval.py --dir ~/.cache/low-key/quote-fixtures --kind photo
-Reads each fixture through the deployed-in-process Reader (one warm container),
-compares to the truth file field by field, and prints a scorecard plus timings.
+    set -a; . ~/.config/low-key/env; set +a
+    python cloud/quote_reader/eval.py [~/.cache/low-key/quote-fixtures] [photo|png]
+Reads each fixture through the deployed HTTP endpoint (the app's path),
+compares to the truth file field by field (a field the page doesn't print
+must come back null), and prints a scorecard plus timings.
 """
 
 import base64
@@ -12,7 +14,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from serve import Reader, app  # noqa: F401  (registers the app and class)
+from client import call  # noqa: E402
 
 KEYS = [
     "vin",
@@ -40,31 +42,40 @@ def close(a, b):
     return abs(float(a) - float(b)) < 0.005
 
 
-@app.local_entrypoint()
+def read(b64, mime):
+    _, started = call("POST", "/read", {"image_b64": b64, "mime": mime})
+    while True:
+        status, body = call("GET", f"/result/{started['id']}")
+        if status == 200:
+            if body.get("status") != "done":
+                raise RuntimeError("read failed")
+            return body["quote"]
+        time.sleep(1)
+
+
 def score(dir: str = "~/.cache/low-key/quote-fixtures", kind: str = "photo"):
     root = Path(dir).expanduser()
     suffix = ".photo.jpg" if kind == "photo" else ".png"
     names = sorted(p.name[: -len(suffix)] for p in root.glob(f"*{suffix}"))
-    reader = Reader()
     t0 = time.time()
-    reader.warm.remote()
-    print(f"cold start (first call): {time.time() - t0:.1f}s")
+    call("POST", "/warm")
     hit = {k: [0, 0] for k in KEYS + ["fees", "doc_type", "vehicle_text"]}
     for name in names:
         truth = json.loads((root / f"{name}.truth.json").read_text())
         b64 = base64.b64encode((root / f"{name}{suffix}").read_bytes()).decode()
         t = time.time()
-        got = reader.read.remote(b64, "image/jpeg" if kind == "photo" else "image/png")
+        got = read(b64, "image/jpeg" if kind == "photo" else "image/png")
         dt = time.time() - t
         (root / f"{name}.{kind}.out.json").write_text(json.dumps(got, indent=1))
         row = []
         for k in KEYS:
-            if k in truth:
-                ok = close(got.get(k), truth[k])
-                hit[k][0] += ok
-                hit[k][1] += 1
-                if not ok:
-                    row.append(f"{k}: got {got.get(k)!r} want {truth[k]!r}")
+            # A field the page doesn't print must come back null: false positives count.
+            want = truth.get(k)
+            ok = close(got.get(k), want)
+            hit[k][0] += ok
+            hit[k][1] += 1
+            if not ok:
+                row.append(f"{k}: got {got.get(k)!r} want {want!r}")
         if "make" in truth:
             want_v = f"{truth['make']} {truth['model']} {truth['trim']}".lower()
             ok = (got.get("vehicle_text") or "").lower() == want_v
@@ -87,3 +98,8 @@ def score(dir: str = "~/.cache/low-key/quote-fixtures", kind: str = "photo"):
     for k, (a, b) in hit.items():
         if b:
             print(f"  {k:16s} {a}/{b}  {100 * a / b:.0f}%")
+    print(f"total wall clock {time.time() - t0:.1f}s (includes any cold start)")
+
+
+if __name__ == "__main__":
+    score(*sys.argv[1:3])
