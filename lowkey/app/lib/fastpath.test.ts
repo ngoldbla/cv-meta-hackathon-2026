@@ -66,16 +66,15 @@ describe("parseFastRequest (task 026 part 5)", () => {
     ).toBe("30097");
   });
 
-  it("sends down-payment-only follow-ups to the model", () => {
-    expect(
-      parseConversationFastRequest([
-        "60614, SUV",
-        "What if I put $5k down?",
-      ]),
-    ).toBeNull();
-    expect(
-      parseConversationFastRequest(["60614, SUV", "hello"]),
-    ).toBeNull();
+  it("re-prices on a down-payment or rate follow-up, without a model (task 050)", () => {
+    const down = parseConversationFastRequest(["60614, SUV", "What if I put $5k down?"]);
+    expect(down).toMatchObject({ zip: "60614", category: "SUV", downFixed: 5000 });
+    const rate = parseConversationFastRequest(["60614, SUV", "my rate is 5.9%"]);
+    expect(rate).toMatchObject({ zip: "60614", category: "SUV", userApr: 5.9 });
+    // Still needs a ZIP and a type from somewhere.
+    expect(parseConversationFastRequest(["What if I put $5k down?"])).toBeNull();
+    // Anything else is not a fast request.
+    expect(parseConversationFastRequest(["60614, SUV", "hello"])).toBeNull();
   });
 
   it("carries APR and down-payment overrides, latest wins", () => {

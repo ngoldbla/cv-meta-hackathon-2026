@@ -224,6 +224,26 @@ async function fastPathResponse(req: FastRequest) {
   return createUIMessageStreamResponse({ stream });
 }
 
+const CALM_REPLY =
+  "Low Key works from the controls rather than chat. Pick a type of car and your ZIP to see the picks, " +
+  "add a down payment or your rate to your search (for example “$5k down” or “my rate is 5.9%”), " +
+  "or use “Check a quote” at the top to look over a dealer's numbers.";
+
+/** A fixed, calm text reply streamed in the chat's own format (task 050). */
+function calmReplyResponse() {
+  const stream = createUIMessageStream({
+    execute: async ({ writer }) => {
+      const id = `calm-${Date.now().toString(36)}`;
+      writer.write({ type: "start-step" });
+      writer.write({ type: "text-start", id });
+      writer.write({ type: "text-delta", id, delta: CALM_REPLY });
+      writer.write({ type: "text-end", id });
+      writer.write({ type: "finish-step" });
+    },
+  });
+  return createUIMessageStreamResponse({ stream });
+}
+
 export async function POST(req: Request) {
   const { messages }: { messages: UIMessage[] } = await req.json();
   // Fast path on any user turn that, with the conversation so far,
@@ -233,6 +253,12 @@ export async function POST(req: Request) {
     .map((m) => userText(m));
   const fastReq = parseConversationFastRequest(userTexts);
   if (fastReq) return fastPathResponse(fastReq);
+  // Task 050: with no model credits, a free-text question gets a calm, fixed
+  // reply that points to what works, never an error. The model follow-up
+  // returns only when LOWKEY_CHAT_MODEL_ON=1 and a key is set.
+  if (process.env.LOWKEY_CHAT_MODEL_ON !== "1" || !process.env.META_API_KEY) {
+    return calmReplyResponse();
+  }
   if (!process.env.META_API_KEY) {
     return Response.json(
       { error: "META_API_KEY is not set on the server." },
