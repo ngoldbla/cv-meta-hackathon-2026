@@ -127,7 +127,7 @@ export default function AboutPage() {
         <ul className="list-disc pl-5">
           <li>
             <P>
-              <strong>Timestral</strong> forecasts gas prices 52 weeks ahead, once a week.
+              <strong>Timestral</strong> forecasts gas prices 52 weeks ahead on a serverless GPU that scales to zero: weekly, and again whenever EIA posts new prices.
             </P>
           </li>
         </ul>

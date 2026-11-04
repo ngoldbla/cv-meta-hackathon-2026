@@ -1,7 +1,7 @@
 ---
 id: "058"
 title: "Low Key: Timestral on Modal"
-status: in progress
+status: done
 created: 2026-11-04
 report: ops/reports/058-lowkey-timestral-on-modal.md
 ---

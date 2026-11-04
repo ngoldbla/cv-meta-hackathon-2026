@@ -18,7 +18,7 @@ Low Key builds on the work and data of others. They are credited here, and in th
   - **Muse Glimmer 30B** (Apache-2.0) reads photos of dealer sheets and window stickers for "Check a quote" ([`cloud/quote_reader/`](cloud/quote_reader/)), served by **Hugging Face Inference Providers** (DeepInfra), with **vLLM** (Apache-2.0) on **Modal** as the backup and demo path. It transcribes and pairs labels with values; code decides every field. The same model, with its language-model head removed, is the experimental trunk in [`headless-glimmer/`](headless-glimmer/) (not used at runtime). See [`lowkey/docs/decision-model.md`](lowkey/docs/decision-model.md).
   - **Muse Spark** wrote chat follow-ups during development; the chat was removed in task 049, so no model runs in the search path.
   - **Muse Code** with **Muse Wonder** built the first phase of the app through the task mailbox in [`ops/`](ops/).
-- **Timestral** (Mistral AI): the time-series model that forecasts gas prices. The code is Apache-2.0; the weights are under a Modified MIT licence.
+- **Timestral** (Mistral AI): the time-series model that forecasts gas prices. The code is Apache-2.0; the weights are under a Modified MIT licence. It runs on a Modal GPU (`cloud/gas_forecast/`).
 
 ## Thanks
 Fireworks, Modal, Meta and Vercel, for their support in delivering this project.
