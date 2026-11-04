@@ -33,6 +33,8 @@ export const { registry } = defineRegistry(catalog, {
         payTotal={props.payTotal}
         realTotal={props.realTotal}
         backWhenSold={props.backWhenSold}
+        gasMpg={props.gasMpg ?? null}
+        gasMpgTypical={props.gasMpgTypical ?? false}
       />
     ),
     LifespanTrack: ({ props }) => (

@@ -22,12 +22,17 @@ export function CostBarsView({
   payTotal,
   realTotal,
   backWhenSold,
+  gasMpg = null,
+  gasMpgTypical = false,
 }: {
   pay: CostSegment[];
   real: CostSegment[];
   payTotal: number;
   realTotal: number;
   backWhenSold: number;
+  /** EPA combined MPG behind the gas segment (task 042, part 2b). */
+  gasMpg?: number | null;
+  gasMpgTypical?: boolean;
 }) {
   const bills = payTotal;
   const scale = bills > 0 ? bills : 1;
@@ -58,6 +63,13 @@ export function CostBarsView({
             </span>
           ))}
         </div>
+        {gasMpg !== null ? (
+          <p className="text-xs text-muted-foreground">
+            {gasMpgTypical
+              ? `Gas at a typical ${gasMpg} MPG for this model (EPA combined).`
+              : `Gas at ${gasMpg} MPG for this car (EPA combined).`}
+          </p>
+        ) : null}
       </div>
       <div className="flex flex-col gap-[5px]">
         <div className="flex items-baseline justify-between">

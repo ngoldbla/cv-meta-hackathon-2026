@@ -151,6 +151,10 @@ function checkCostBars(c: Checker, spec: Spec, id: string, entry: SpecEntry) {
     i += 1;
   }
   if (gasRaw !== null && segmentUsd(props, "pay", "gas") === undefined) c.fail(id, "missing-gas");
+  // Task 042: the MPG note copies the fuel estimate's MPG exactly.
+  if (props.gasMpg !== undefined) {
+    c.exact(id, `${base}.gasMpg`, props.gasMpg, entry.local?.fuel?.mpg ?? null);
+  }
   const taxRaw = (ownership.taxAmount ?? 0) / 60;
   let j = 0;
   for (const seg of (props.real as { part: string }[]) ?? []) {

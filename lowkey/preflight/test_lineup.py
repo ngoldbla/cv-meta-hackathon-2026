@@ -219,3 +219,50 @@ def test_pickup_lineup_is_unchanged_by_reserve() -> None:
         "Ranger",
     ]
     assert lineup.missing_brands == []
+
+
+def test_hybrid_lineup_reserves_a_toyota_and_a_honda() -> None:
+    # Task 042: the Toyota+Honda rule applies to Hybrid (both make
+    # many full hybrids); a Honda below three other makes still gets in.
+    models = [
+        fit("Maverick", "Ford", 0.75, 35000),
+        fit("Elantra Hybrid", "Hyundai", 0.74, 29000),
+        fit("Niro", "Kia", 0.73, 31000),
+        fit("Corolla Hybrid", "Toyota", 0.72, 29500),
+        fit("CR-V", "Honda", 0.68, 40800),
+    ]
+    lineup = rank_category("Hybrid", models)
+    makes = [p.make for p in lineup.picks]
+    assert "Toyota" in makes and "Honda" in makes
+    assert [p.model for p in lineup.picks] == [
+        "Maverick", "Elantra Hybrid", "Corolla Hybrid", "CR-V",
+    ]
+    assert lineup.missing_brands == []
+
+
+def test_minivan_lineup_has_no_reserve() -> None:
+    # Task 042: Minivan is unchanged by the Toyota+Honda rule.
+    models = [
+        fit("Carnival", "Kia", 0.66, 42700),
+        fit("Pacifica", "Chrysler", 0.65, 47000),
+        fit("Voyager", "Chrysler", 0.64, 41000),
+        fit("Grand Caravan", "Ford", 0.63, 40000),
+        fit("Odyssey", "Honda", 0.60, 45800),
+    ]
+    lineup = rank_category("Minivan", models)
+    assert "Honda" not in [p.make for p in lineup.picks]
+    assert lineup.missing_brands == []
+
+
+def test_new_category_short_of_four_shows_fewer_without_relaxing() -> None:
+    # Task 042: a category that cannot fill four shows fewer; a model
+    # under 30 sold units at a fitted age never fills the gap.
+    thin = {1: 29, 2: 29, 3: 100, 4: 100, 5: 29}
+    models = [
+        fit("Sienna", "Toyota", 0.70, 54000),
+        fit("Odyssey", "Honda", 0.65, 45800),
+        fit("Carnival", "Kia", 0.63, 42700),
+        fit("Thin Van", "Ford", 0.80, 40000, ages=thin),
+    ]
+    lineup = rank_category("Minivan", models)
+    assert [p.model for p in lineup.picks] == ["Sienna", "Odyssey", "Carnival"]

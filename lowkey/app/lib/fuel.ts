@@ -74,6 +74,10 @@ export function seriesForZip(
 
 export interface FuelEstimate {
   perMonth: number;
+  /** EPA combined MPG the estimate used (task 042, part 2b). */
+  mpg: number;
+  /** "engine"/"drivetrain": matched to the local unit; "typical": the model figure. */
+  mpgLevel: "engine" | "drivetrain" | "typical";
   low: number;
   high: number;
   seriesDisplay: string;
@@ -92,8 +96,10 @@ export function fuelForModel(args: {
   mpg: number | null | undefined;
   zip: string;
   table: FuelTable;
+  mpgLevel?: "engine" | "drivetrain" | "typical";
 }): FuelEstimate | null {
   const { mpg, zip, table } = args;
+  const mpgLevel = args.mpgLevel ?? "typical";
   if (!mpg || !(mpg > 0)) return null;
   const mapped = seriesForZip(zip, table);
   if (!mapped) return null;
@@ -105,9 +111,12 @@ export function fuelForModel(args: {
   const text =
     `Gas, est. ${usd0.format(Math.round(perMonth))}/mo ` +
     `(${usd0.format(Math.round(low))}–${usd0.format(Math.round(high))}) · ` +
+    `${mpgLevel === "typical" ? "typical MPG" : "EPA combined MPG"} ${mpg} · ` +
     `${series.displayName}, EIA, ${weekLabel(series.latestDate)}`;
   return {
     perMonth,
+    mpg,
+    mpgLevel,
     low,
     high,
     seriesDisplay: series.displayName,

@@ -39,6 +39,7 @@ PREFLIGHT = Path(__file__).resolve().parent.parent / "preflight"
 sys.path.insert(0, str(PREFLIGHT))
 
 import analyze  # noqa: E402
+import categories as categories_mod  # noqa: E402
 import lifespan as lifespan_mod  # noqa: E402
 import lineup as lineup_mod  # noqa: E402
 import make_map  # noqa: E402
@@ -89,6 +90,33 @@ EPA_OVERRIDES = {
     "Colorado": "49379",
     "Silverado 1500": "49378",
     "Sierra 1500": "49401",
+}
+# Task 042: (category, provider model) entries for the Minivan and
+# Hybrid lineups, where the provider model alone is ambiguous (the
+# Hybrid CR-V is not the gas CR-V).
+EPA_MODELS_BY_CATEGORY: dict[tuple[str, str], tuple[str, str, str]] = {
+    ("Hybrid", "Corolla Cross Hybrid"): ("Toyota", "Corolla Cross Hybrid", "Wheel Drive"),
+    ("Hybrid", "Corolla Hybrid"): ("Toyota", "Corolla Hybrid", "Front-Wheel"),
+    ("Hybrid", "Accord Sedan"): ("Honda", "Accord", "Front-Wheel"),
+    ("Hybrid", "Camry"): ("Toyota", "Camry", "Front-Wheel"),
+    ("Hybrid", "Sienna"): ("Toyota", "Sienna", "Front-Wheel"),
+    ("Hybrid", "Maverick"): ("Ford", "Maverick", "Front-Wheel"),
+    ("Hybrid", "Prius"): ("Toyota", "Prius", "Front-Wheel"),
+    ("Minivan", "Sienna"): ("Toyota", "Sienna", "Front-Wheel"),
+    ("Minivan", "Odyssey"): ("Honda", "Odyssey", "Front-Wheel"),
+    ("Minivan", "Carnival"): ("Kia", "Carnival", "Front-Wheel"),
+    ("Minivan", "Pacifica"): ("Chrysler", "Pacifica", "Front-Wheel"),
+    ("Minivan", "Voyager"): ("Chrysler", "Voyager", "Front-Wheel"),
+}
+# EPA drive text -> listing drivetrain codes (task 042, part 2b).
+EPA_DRIVE_CODES = {
+    "Front-Wheel Drive": ["FWD"],
+    "Rear-Wheel Drive": ["RWD"],
+    "All-Wheel Drive": ["AWD"],
+    "4-Wheel Drive": ["4WD"],
+    "Part-time 4-Wheel Drive": ["4WD"],
+    "4-Wheel or All-Wheel Drive": ["AWD", "4WD"],
+    "2-Wheel Drive": ["FWD", "RWD"],
 }
 
 
@@ -202,20 +230,59 @@ def load_epa_rows() -> tuple[list[dict], int, str]:
     return rows, year, as_of
 
 
-def lookup_mpg(rows: list[dict], year: int, model: str, make: str) -> dict | None:
-    """Base strict-gas EPA rating for one provider model, or None."""
-    spec = EPA_MODELS.get(model) or (make, model, "Wheel Drive")
-    epa_make, prefix, drive_hint = spec
-    cands = [
+def _is_strict_gas(r: dict) -> bool:
+    return (
+        r["fuelType"] in GAS_FUELS
+        and "Hybrid" not in (r.get("eng_dscr") or "")
+        and not (r.get("evMotor") or "").strip(" 0")
+    )
+
+
+def _is_full_hybrid(r: dict) -> bool:
+    return r.get("atvType") == "Hybrid" and r["fuelType"] in GAS_FUELS
+
+
+def _epa_spec(category: str, model: str, make: str) -> tuple[str, str, str]:
+    return (
+        EPA_MODELS_BY_CATEGORY.get((category, model))
+        or (EPA_MODELS.get(model) if category in categories_mod.GAS_CATEGORIES else None)
+        or (make, model, "Wheel Drive")
+    )
+
+
+def _powertrain_rows(rows: list[dict], category: str) -> list[dict]:
+    """EPA rows of the category's powertrain (task 042).
+
+    Gas categories: strict gas. Hybrid: full hybrids. Minivan: gas
+    or full hybrid, whichever the model is sold as (gas rows first;
+    hybrid rows only when the model has no gas row).
+    """
+    if category in categories_mod.GAS_CATEGORIES:
+        return [r for r in rows if _is_strict_gas(r)]
+    if category == "Hybrid":
+        return [r for r in rows if _is_full_hybrid(r)]
+    gas = [r for r in rows if _is_strict_gas(r)]
+    return gas or [r for r in rows if _is_full_hybrid(r)]
+
+
+def _model_rows(rows: list[dict], year: int, category: str, model: str, make: str) -> list[dict]:
+    epa_make, prefix, _ = _epa_spec(category, model, make)
+    base = [
         r
         for r in rows
         if int(r["year"]) == year
         and r["make"] == epa_make
         and r["model"].startswith(prefix)
-        and r["fuelType"] in GAS_FUELS
-        and "Hybrid" not in (r.get("eng_dscr") or "")
-        and not (r.get("evMotor") or "").strip(" 0")
     ]
+    return _powertrain_rows(base, category)
+
+
+def lookup_mpg(
+    rows: list[dict], year: int, model: str, make: str, category: str = "Sedan"
+) -> dict | None:
+    """Base EPA rating for one provider model in a category, or None."""
+    _, _, drive_hint = _epa_spec(category, model, make)
+    cands = _model_rows(rows, year, category, model, make)
     if drive_hint == "Manual":
         cands = [r for r in cands if r["trany"].startswith("Manual")]
 
@@ -243,6 +310,52 @@ def lookup_mpg(rows: list[dict], year: int, model: str, make: str) -> dict | Non
         "epaModel": best["model"],
         "drive": best["drive"],
     }
+
+
+def epa_variants(
+    rows: list[dict], year: int, model: str, make: str, category: str
+) -> list[dict]:
+    """Per-model EPA variants for the per-unit MPG match (task 042, 2b).
+
+    Model years year-1..year+1 (dealers stock two model years), the
+    category's powertrain; Minivan keeps gas and hybrid rows so the
+    unit's own powertrain decides. EPA combined MPG (comb08).
+    """
+    out: list[dict] = []
+    epa_make, prefix, _ = _epa_spec(category, model, make)
+    for y in (year - 1, year, year + 1):
+        base = [
+            r
+            for r in rows
+            if int(r["year"]) == y
+            and r["make"] == epa_make
+            and r["model"].startswith(prefix)
+        ]
+        if category == "Minivan":
+            cands = [r for r in base if _is_strict_gas(r) or _is_full_hybrid(r)]
+        else:
+            cands = _powertrain_rows(base, category)
+        for r in cands:
+            try:
+                mpg = float(r["comb08"])
+                displ = float(r["displ"]) if r["displ"] else None
+                cyl = int(r["cylinders"]) if r["cylinders"] else None
+            except ValueError:
+                continue
+            out.append(
+                {
+                    "epaId": r["id"],
+                    "year": y,
+                    "drive": EPA_DRIVE_CODES.get(r["drive"], []),
+                    "displ": displ,
+                    "cyl": cyl,
+                    "turbo": bool((r.get("tCharger") or "").strip()),
+                    "hybrid": _is_full_hybrid(r),
+                    "mpg": mpg,
+                }
+            )
+    out.sort(key=lambda v: (v["year"], v["epaId"]))
+    return out
 
 
 def display_name(area_name: str | None, duoarea: str) -> str:
@@ -360,7 +473,7 @@ def _facet_trim_rows(category: str, provider_model: str) -> list[dict]:
         {
             "facets": "trim",
             "inventory_type": "new",
-            "body_type": category,
+            **categories_mod.trim_filters(category),
             "model": provider_model,
             "year": str(trim_mod.CURRENT_YEAR),
             "metrics": "price.median,msrp.median",
@@ -444,6 +557,16 @@ def trim_for_pick(category: str, pick: dict) -> dict:
     try:
         try:
             trims, refs = _trims_from_specs(make, provider_model)
+            if category not in categories_mod.GAS_CATEGORIES:
+                # Task 042: the specs list every trim of the model (the
+                # gas Accord's LX and SE too); keep only the trims the
+                # category's own new stock carries, else use facets.
+                stocked = {
+                    str(r.get("value")) for r in _facet_trim_rows(category, provider_model)
+                }
+                trims = [t for t in trims if t.trim in stocked]
+                if not trims:
+                    raise ValueError(f"no {category} trims in specs for {provider_model}")
             source: str | None = "specs"
         except Exception as exc:
             print(f"trim specs fallback {provider_model}: {type(exc).__name__}", flush=True)
@@ -489,7 +612,7 @@ def trim_for_pick(category: str, pick: dict) -> dict:
                             "facets": "trim",
                             "inventory_status": "sold",
                             "inventory_type": "used",
-                            "body_type": category,
+                            **categories_mod.trim_filters(category),
                             "model": provider_model,
                             "year": str(sold_year),
                             "sold_within_days": "90",
@@ -587,23 +710,25 @@ def main() -> None:
     lineups, total_sold = build_lineups()
 
     rows, epa_year, epa_as_of = load_epa_rows()
+    # Keyed by provider model for the gas categories (unchanged) and
+    # by "<category>:<model>" for Minivan and Hybrid (task 042), where
+    # the same provider model ("CR-V") is a different powertrain.
     mpg: dict[str, dict | None] = {}
-    for entry in lineups.values():
+    for category, entry in lineups.items():
         picks = [*entry["picks"], *([entry["commodity"]] if entry["commodity"] else [])]
         for pick in picks:
-            if pick["providerModel"] in mpg:
-                pick["mpg"] = mpg[pick["providerModel"]]["mpg"] if mpg[pick["providerModel"]] else None  # type: ignore[index]
-                continue
-            found = lookup_mpg(rows, epa_year, pick["providerModel"], pick["make"])
-            mpg[pick["providerModel"]] = (
-                {**found, "asOf": str(epa_year)} if found else None
-            )
-            pick["mpg"] = found["mpg"] if found else None
-            print(
-                f"mpg {pick['providerModel']}: "
-                f"{found['mpg'] if found else 'NO RATING'}",
-                flush=True,
-            )
+            model = pick["providerModel"]
+            key = model if category in categories_mod.GAS_CATEGORIES else f"{category}:{model}"
+            if key not in mpg:
+                found = lookup_mpg(rows, epa_year, model, pick["make"], category)
+                mpg[key] = {**found, "asOf": str(epa_year)} if found else None
+                print(
+                    f"mpg {category} {model}: {found['mpg'] if found else 'NO RATING'}",
+                    flush=True,
+                )
+            pick["mpg"] = mpg[key]["mpg"] if mpg[key] else None  # type: ignore[index]
+            # Task 042, part 2b: the variants a local unit is matched to.
+            pick["epaVariants"] = epa_variants(rows, epa_year, model, pick["make"], category)
 
     # Task 029, parts 1-2: one-step-up trims (specs, facets fallback,
     # retention guard) and lifespans (outside-git cache) per pick.
@@ -616,7 +741,15 @@ def main() -> None:
             if key not in trim_cache:
                 trim_cache[key] = trim_for_pick(category, pick)
             pick.update(trim_cache[key])
-            life = lifespan_cache["models"].get(pick["providerModel"])
+            # Task 042: the study rates hybrids as their own rows (e.g.
+            # Civic Hybrid), so a Hybrid pick never borrows the gas
+            # model's figure; it needs a "Hybrid:<model>" entry.
+            life_key = (
+                pick["providerModel"]
+                if category != "Hybrid"
+                else f"Hybrid:{pick['providerModel']}"
+            )
+            life = lifespan_cache["models"].get(life_key)
             if life:
                 pick["lifespanYears"] = life["years"]
                 pick["lifespanMiles"] = lifespan_mod.miles_from_years(life["years"])

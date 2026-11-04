@@ -82,7 +82,7 @@ export interface SpecLocal {
   model?: string | null;
   error?: string | null;
   fellBackToBase?: boolean;
-  fuel?: { perMonth: number } | null;
+  fuel?: { perMonth: number; mpg?: number; mpgLevel?: string } | null;
   units: SpecUnit[];
   /** Cheapest local price (task 038 price position). */
   bestPrice?: number | null;
@@ -221,12 +221,17 @@ function costBarsProps(entry: SpecEntry) {
   ];
   if (costs.gas !== null) real.push({ part: "gas", usd: costs.gas });
   if (costs.tax > 0) real.push({ part: "tax", usd: costs.tax });
+  const fuel = entry.local?.fuel;
   return {
     pay,
     real,
     payTotal: costs.bills,
     realTotal: costs.real,
     backWhenSold: costs.back,
+    // Task 042, part 2b: the MPG behind the gas segment, when known.
+    ...(fuel && typeof fuel.mpg === "number"
+      ? { gasMpg: fuel.mpg, gasMpgTypical: fuel.mpgLevel === "typical" }
+      : {}),
   };
 }
 

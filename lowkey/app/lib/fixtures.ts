@@ -58,7 +58,7 @@ const PICKUP: RankFixture = {
   commodity: { rank: null, make: "Ford", model: "Maverick", price: 35509, retention5y: 0.554, depPerMonth: 264, flag: "extra" },
 };
 
-export const RANK_FIXTURES: Record<Category, RankFixture> = {
+export const RANK_FIXTURES: Record<"Sedan" | "SUV" | "Pickup", RankFixture> = {
   Sedan: SEDAN,
   SUV,
   Pickup: PICKUP,

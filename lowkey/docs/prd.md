@@ -44,10 +44,11 @@ The pitch in one sentence: *"If you change your mind after a year, leaving costs
 - **Resale is what a buyer would pay you, not a dealer's asking price.** Sold-listing prices are dealer retail prices. Low Key takes a trade-in discount off them (calibrated in preflight P13) so the walk-away cost is not flattering.
 - Rent is not the whole cost of a car. Fuel, insurance and repairs are extra. The app says so in one line.
 
-## Categories (gas only, no hybrids, no plug-ins)
-- Sedan
-- SUV
-- Pickup
+## Categories
+- **Sedan, SUV, Pickup:** gas only (the strict filter: no hybrids, no plug-ins).
+- **Minivan** (task 042): the minivan body, gas or full hybrid, whichever the model is sold as.
+- **Hybrid** (task 042): full hybrids (HEV) across any body; not mild hybrids (MHEV) or plug-in hybrids (PHEV). The Toyota+Honda rule applies.
+- **Out of scope:** plug-in hybrids (PHEV), and **Electric** (BEV): scoped in task 042, then dropped by Dylan on 2026-11-03 after the P20 lineups ("Skip electric altogether").
 
 **Note:** some expected winners may not qualify. I believe Toyota's newest Camry is hybrid-only; preflight P5 checks this. If it's true, it is not in the sedan list. The data decides.
 
@@ -56,7 +57,8 @@ The pitch in one sentence: *"If you change your mind after a year, leaving costs
 2. **Lineup rules (Dylan, 2026-11-03):**
    - **Four ranked picks per category** (Dylan, 2026-11-03; was two): #1–#4 by 5-year resale.
    - **More than one brand in every lineup:** no make may hold more than 2 of the 4 slots. When a third model of the same make would qualify, it is skipped for the next-best model of another make.
-   - **A Toyota and a Honda in every sedan and SUV lineup** (task 029, part 0): one slot is reserved for the best-retaining qualifying Toyota and one for the best-retaining qualifying Honda; the remaining slots fill by 5-year resale under the rules above (including the 2-per-make cap, which the reserved picks count toward), and the four are then ordered by resale. If no Toyota or no Honda qualifies, the shortfall is recorded and the lineup fills normally. Pickups are unchanged.
+   - **A Toyota and a Honda in every sedan, SUV and hybrid lineup** (task 029, part 0; hybrid added in task 042): one slot is reserved for the best-retaining qualifying Toyota and one for the best-retaining qualifying Honda; the remaining slots fill by 5-year resale under the rules above (including the 2-per-make cap, which the reserved picks count toward), and the four are then ordered by resale. If no Toyota or no Honda qualifies, the shortfall is recorded and the lineup fills normally. Pickups and minivans are unchanged.
+   - **Fewer than four:** a category that can't fill four shows fewer and says so; the 30-unit floor is never relaxed to fill it (task 042).
    - **The commodity pick** (lowest dollars a month) is extra. If it is already among the four, that card gets a "cheapest to own" badge. Otherwise it appears as a fifth, smaller card. It may be any make.
    - **Defaults until Dylan changes them:**
      - Pickups exclude heavy-duty trucks (¾-ton and 1-ton: F-250/350, 2500/3500HD); they have no EPA MPG rating and are not a "need keys now" purchase.
@@ -116,7 +118,7 @@ Toyota and Honda will take most #1 and #2 slots. The rankings come from the data
 
 ## Additions (Dylan, 2026-11-03)
 - **The message:** "Get a car without regret." Low Key helps you buy for value and quality: the signal, not the noise.
-- **Body type by button:** three large buttons (Sedan, SUV, Pickup), not typing.
+- **Body type by button:** large buttons (Sedan, SUV, Pickup; Minivan and Hybrid added in task 042, a 3 + 2 grid), not typing.
 - **No photos.** The vehicles are isometric line drawings (Hairline), one per body type.
 - **The trim is one step above base** (for example Corolla SE, not LE), because a small step up raises satisfaction. There's a guard: drop back to base if the step-up keeps its value clearly worse, or isn't in stock.
 - **Card face, in order:**

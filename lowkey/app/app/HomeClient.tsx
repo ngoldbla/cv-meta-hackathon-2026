@@ -51,6 +51,7 @@ import { RevealText } from "@/components/ui/reveal-text";
 import { StreamingText } from "@/components/ui/streaming-text";
 import { ThinkingIndicator } from "@/components/ui/thinking-indicator";
 import { Typography } from "@/components/ui/typography";
+import { comparingLabel } from "@/lib/categories";
 import {
   areaAfterSearch,
   areaPlaceLabel,
@@ -294,12 +295,6 @@ function footerDate(iso: string): string {
   return `${FOOTER_MONTHS[Number(m[2]) - 1] ?? m[2]} ${Number(m[3])}, ${m[1]}`;
 }
 
-const CATEGORY_PLURAL: Record<string, string> = {
-  SUV: "SUVs",
-  Sedan: "sedans",
-  Pickup: "pickups",
-};
-
 interface TurnStep {
   id: string;
   label: string;
@@ -321,11 +316,10 @@ function turnSteps(parts: Part[]): TurnStep[] {
     const output = rank.find((p) => p.state === "output-available")
       ?.output as RankOutput | undefined;
     const category = output?.category ?? input?.category;
-    const plural = category ? (CATEGORY_PLURAL[category] ?? category) : null;
     groups.push({
       id: "rank",
-      label: plural
-        ? `Comparing gas ${plural} by 5-year resale`
+      label: category
+        ? comparingLabel(category)
         : "Comparing cars by 5-year resale",
       parts: rank,
     });
@@ -1420,22 +1414,25 @@ export default function HomeClient({
                 if (!picked || busy) return;
                 handleBodyPick(picked);
               }}
-              className="mt-3 w-full"
+              // Task 042: five types in a 3 + 2 grid that fits 390 px.
+              className="mt-3 grid w-full grid-cols-3 gap-2"
             >
                 {(
                   [
                     ["Sedan", "sedan"],
                     ["SUV", "suv"],
                     ["Pickup", "pickup"],
+                    ["Minivan", "minivan"],
+                    ["Hybrid", "hybrid"],
                   ] as const
                 ).map(([label, kind]) => (
                   <ToggleGroupItem
                     key={kind}
                     value={label}
-                    className="h-auto min-h-11 flex-1 px-1 py-2"
+                    className="h-auto min-h-11 w-full rounded-md px-1 py-2"
                   >
                     <span className="flex flex-col items-center gap-1">
-                      <CarFigure kind={kind} className="w-[104px]" />
+                      <CarFigure kind={kind} className="w-[96px] max-w-full" />
                       <span>{label}</span>
                     </span>
                   </ToggleGroupItem>
@@ -1604,6 +1601,13 @@ export default function HomeClient({
                     Gas: {display}, as of {footerDate(latest)}.
                   </p>
                 ))}
+                {gasSources.size > 0 ? (
+                  <p>
+                    MPG: EPA combined (55% city, 45% highway), matched to
+                    the local car where the listing allows; otherwise the
+                    model&apos;s typical figure, labelled.
+                  </p>
+                ) : null}
               </div>
             </PopoverContent>
           </Popover>

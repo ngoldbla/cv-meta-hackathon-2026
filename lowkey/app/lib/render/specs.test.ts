@@ -14,7 +14,7 @@ import {
 } from "./specs";
 
 /** Tool-output fixtures: rank fixtures + real ownership maths. */
-function entriesFor(category: Category, opts?: { fuel?: number | null }): SpecEntry[] {
+function entriesFor(category: keyof typeof RANK_FIXTURES, opts?: { fuel?: number | null }): SpecEntry[] {
   const fixture = RANK_FIXTURES[category];
   const picks = [...fixture.picks];
   if (!picks.some((p) => p.model === fixture.commodity.model)) {
@@ -72,7 +72,7 @@ function entriesFor(category: Category, opts?: { fuel?: number | null }): SpecEn
   });
 }
 
-const CATEGORIES: Category[] = ["Sedan", "SUV", "Pickup"];
+const CATEGORIES: (keyof typeof RANK_FIXTURES)[] = ["Sedan", "SUV", "Pickup"];
 
 type CompareRow = {
   label: string;
@@ -390,5 +390,18 @@ describe("spec builders + number guard (task 034)", () => {
     expect(check.ok).toBe(false);
     expect(check.failures.map((f) => f.check)).toContain("unchecked-number");
     expect(collectSpecNumbers(spec).size).toBeGreaterThan(0);
+  });
+});
+
+describe("gas MPG note (task 042, part 2b)", () => {
+  it("copies the fuel estimate's MPG and passes the guard; a wrong MPG fails", () => {
+    const entry = entriesFor("SUV", { fuel: 120 })[0];
+    entry.local = { ...entry.local!, fuel: { perMonth: 120, mpg: 37, mpgLevel: "typical" } };
+    const spec = buildTurnSpecs([entry], "Hybrid").cards.get(entry.pick.model)!;
+    const bars = Object.values(spec.elements).find((e) => e.type === "CostBars")!;
+    expect(bars.props).toMatchObject({ gasMpg: 37, gasMpgTypical: true });
+    expect(checkPickCardSpec(spec, entry).ok).toBe(true);
+    (bars.props as Record<string, unknown>).gasMpg = 40;
+    expect(checkPickCardSpec(spec, entry).ok).toBe(false);
   });
 });

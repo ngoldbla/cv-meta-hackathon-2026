@@ -8,6 +8,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from "@/components/ui/b-togglegroup";
+import { categoryNoun } from "@/lib/categories";
 import { SORT_KEYS, SORT_LABEL, isSortKey, sortFacts } from "@/lib/chooser";
 
 import { ChooserContext } from "./chooser-context";
@@ -30,9 +31,6 @@ export interface CostCompareRow {
   listingTotal: number | null;
 }
 
-function categoryNoun(category: string): string {
-  return category === "SUV" ? "SUV" : category.toLowerCase();
-}
 
 /** One short fact line per row: bills, distance, lifespan. */
 function factLine(r: CostCompareRow): string {

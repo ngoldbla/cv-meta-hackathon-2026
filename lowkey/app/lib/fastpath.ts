@@ -28,6 +28,10 @@ export function parseZip(text: string): string | null {
 }
 
 export function parseCategory(text: string): Category | null {
+  // Task 042: the powertrain word wins over a body word ("a hybrid
+  // SUV" is a Hybrid request); "van" means a minivan.
+  if (/\bhybrids?\b/i.test(text)) return "Hybrid";
+  if (/\b(?:mini-?vans?|vans?)\b/i.test(text)) return "Minivan";
   if (/\bsuvs?\b/i.test(text)) return "SUV";
   if (/\bsedans?\b/i.test(text)) return "Sedan";
   if (/\bpickups?\b/i.test(text) || /\btrucks?\b/i.test(text)) return "Pickup";

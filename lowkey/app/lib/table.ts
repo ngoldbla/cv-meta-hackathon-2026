@@ -1,5 +1,7 @@
 import { get } from "@vercel/blob";
 
+import type { Category } from "./categories";
+import type { EpaVariant } from "./mpgmatch";
 import type { TaxSection } from "./tax";
 
 /**
@@ -12,7 +14,7 @@ import type { TaxSection } from "./tax";
  * returns the whole table.
  */
 
-export type Category = "Sedan" | "SUV" | "Pickup";
+export type { Category };
 
 export const TABLE_PATHNAME = "lowkey/table.json";
 const CACHE_TTL_MS = 60 * 60 * 1000;
@@ -32,6 +34,8 @@ export interface TablePick {
     fittedAges: number[];
   };
   mpg: number | null;
+  /** Task 042, part 2b: EPA variants a local unit is matched to. */
+  epaVariants?: EpaVariant[];
   /** Task 029 trim/lifespan fields (null on tables built before 029). */
   baseTrim?: string | null;
   stepUpTrim?: string | null;
@@ -84,7 +88,8 @@ export interface LowkeyTable {
   version: number;
   builtAt: string;
   tradeInFactor: number;
-  lineups: Record<Category, TableLineup>;
+  /** Minivan and Hybrid are absent on tables built before task 042. */
+  lineups: Partial<Record<Category, TableLineup>> & Record<"Sedan" | "SUV" | "Pickup", TableLineup>;
   mpg: Record<
     string,
     { mpg: number; epaId: string; epaModel: string; drive: string } | null
@@ -166,6 +171,7 @@ export function toRankPick(pick: TablePick, flag?: "badge" | "extra") {
     depPerMonth: pick.depPerMonth,
     sampleSizes: pick.sampleSizes,
     mpg: pick.mpg,
+    epaVariants: pick.epaVariants ?? [],
     baseTrim: pick.baseTrim ?? null,
     stepUpTrim: pick.stepUpTrim ?? null,
     recommendedTrim: pick.recommendedTrim ?? null,
@@ -190,6 +196,7 @@ export type RankPick = ReturnType<typeof toRankPick>;
 /** One category's lineup plus footer metadata. Nothing else leaks. */
 export function lineupFromTable(table: LowkeyTable, category: Category) {
   const lineup = table.lineups[category];
+  if (!lineup) throw new Error(`no ${category} lineup in the table yet`);
   const picks = lineup.picks.map((p) => ({
     ...toRankPick(p),
     // Task 031: the table's discount factor, so the card can show
@@ -224,15 +231,23 @@ export function lineupFromTable(table: LowkeyTable, category: Category) {
  * Resolve a caller-supplied model string ("Honda CR-V", "CR-V") to a
  * table pick, longest provider-model match first (so "Silverado 1500"
  * beats the bare Ram "1500"), mirroring the old fixture resolver.
+ * Task 042: the same model can sit in two lineups (the gas CR-V in
+ * SUV, the hybrid CR-V in Hybrid), so a given category is searched
+ * first.
  */
 export function resolveTablePick(
   table: LowkeyTable,
   model: string,
+  category?: string | null,
 ): { pick: TablePick; category: Category } | undefined {
   const wanted = model.trim().toLowerCase();
   const all: { pick: TablePick; category: Category }[] = [];
-  for (const category of Object.keys(table.lineups) as Category[]) {
+  const order = (Object.keys(table.lineups) as Category[]).sort(
+    (a, b) => Number(b === category) - Number(a === category),
+  );
+  for (const category of order) {
     const lineup = table.lineups[category];
+    if (!lineup) continue;
     for (const pick of lineup.picks) all.push({ pick, category });
     if (lineup.commodity) {
       if (!lineup.picks.some((p) => p.model === lineup.commodity!.model)) {
@@ -240,6 +255,7 @@ export function resolveTablePick(
       }
     }
   }
+  // Stable sort: within one length the preferred category stays first.
   const sorted = [...all].sort(
     (a, b) => b.pick.model.length - a.pick.model.length,
   );
