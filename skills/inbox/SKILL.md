@@ -6,7 +6,7 @@ description: Pick up the next task from the ops mailbox (ops/tasks/), do it unde
 
 The protocol is in `ops/README.md`. Read it, together with `AGENTS.md`, before the first task of a session.
 
-1. **Sync.** Run `git checkout low-key && git pull --ff-only`, then cut the task branch: `git checkout -b task/NNN-<slug>`. If the pull fails, stop and report why. Do not reset, rebase or force anything.
+1. **Sync.** Run `git checkout main && git pull --ff-only`, then cut the task branch: `git checkout -b task/NNN-<slug>`. If the pull fails, stop and report why. Do not reset, rebase or force anything.
 2. **Pick.** Choose a task from `ops/tasks/`:
    - if Dylan named one, take that;
    - otherwise take the lowest-numbered task whose `status` is `open`;
@@ -16,7 +16,7 @@ The protocol is in `ops/README.md`. Read it, together with `AGENTS.md`, before t
    - **After each part,** update the report and commit it with that part's work, then push. This keeps progress visible.
    - **If a step fails, is ambiguous, or conflicts with `AGENTS.md`,** stop and record it under *Blocked / questions*.
    - **Never stand in for a result.** Do not fill a gap with an estimate, a mock or a rerun under different settings without saying so.
-5. **Finish.** Set `status: done`, or `blocked` if you stopped early. Complete the report, commit (`Finish task NNN` or `Block task NNN`), push, and open a PR into `low-key` (`gh pr create --base low-key`). Never push to `low-key` itself.
+5. **Finish.** Set `status: done`, or `blocked` if you stopped early. Complete the report, commit (`Finish task NNN` or `Block task NNN`), push, and open a PR into `main` (`gh pr create --base main`). Never push to `main` itself.
 6. **Tell Dylan in one line:** the task id, its final status, the report path and the PR link.
 
 ## Report template

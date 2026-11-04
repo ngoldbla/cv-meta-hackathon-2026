@@ -918,13 +918,15 @@ export default function HomeClient({
       <header className="topbar">
         <div className="brand">
           <KeyIcon />
-          <span>Low Key</span>
+          <span>
+            lowkey<span className="brand-tld">.autos</span>
+          </span>
         </div>
         <a
           href={REPO_URL}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Low Key's code and credits on GitHub (opens in a new tab)"
+          aria-label="lowkey.autos code and credits on GitHub (opens in a new tab)"
           title="Code and credits on GitHub"
           className="grid size-11 place-items-center rounded-full text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
         >

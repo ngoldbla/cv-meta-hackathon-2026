@@ -7,7 +7,7 @@ report: ops/reports/044-lowkey-about-and-credits.md
 ---
 # Low Key: About and credits
 
-**Run this after task 045 is done.** **Branch: `low-key` only.** The same secrets and commit rules as task 023 apply. Every push to `low-key` deploys to https://low-key-murex.vercel.app; follow `lowkey/docs/deploy.md`. No provider or model spend.
+**Run this after task 045 is done.** **Branch: `task/NNN-<slug>` cut from `main`, with a PR into `main`.** The same secrets and commit rules as task 023 apply. A merge into `main` deploys to https://lowkey.autos; follow `lowkey/docs/deploy.md`. No provider or model spend.
 
 **Why (Dylan, 2026-11-03):** package the hackathon entry. Low Key is a way to buy a car the calm way, which is why it's called "Low Key": don't get over-invested in the decision, and be confident you made a good one anyway.
 

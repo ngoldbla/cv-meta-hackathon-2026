@@ -7,7 +7,7 @@ report: ops/reports/045-lowkey-calm-gate.md
 ---
 # Low Key: the calm gate
 
-**Run this after task 043 is done.** **Branch: `low-key` only.** The same secrets and commit rules as task 023 apply. Every push to `low-key` deploys to https://low-key-murex.vercel.app; follow `lowkey/docs/deploy.md`. Modal spend comes out of task 043's $80 total. Muse Spark $0.50. Keep this to about 3 hours.
+**Run this after task 043 is done.** **Branch: `task/NNN-<slug>` cut from `main`, with a PR into `main`.** The same secrets and commit rules as task 023 apply. A merge into `main` deploys to https://lowkey.autos; follow `lowkey/docs/deploy.md`. Modal spend comes out of task 043's $80 total. Muse Spark $0.50. Keep this to about 3 hours.
 
 **Why (Dylan, 2026-11-03):** Low Key should sound super calm at all times. A decapitated model can't write, but it can judge: it scores each Muse Spark reply before the user sees it.
 
