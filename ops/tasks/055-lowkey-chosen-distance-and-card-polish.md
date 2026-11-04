@@ -1,7 +1,7 @@
 ---
 id: "055"
 title: "Low Key: the chosen unit's distance on the results row, and the car card's detect findings"
-status: open
+status: in_progress
 created: 2026-11-04
 report: ops/reports/055-lowkey-chosen-distance-and-card-polish.md
 ---
