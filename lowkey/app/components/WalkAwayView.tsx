@@ -212,7 +212,7 @@ export default function WalkAwayView({
           ? ` + ${money(ownership.taxAmount)} tax in the loan`
           : ""}
         {" "}· {downPct}% down · {ownership.termMonths} mo · {aprText}. Resale: recent sales −15% (tax doesn&apos;t come back).
-        {ownership.taxNotice ? ` ${ownership.taxNotice}` : ""} Excl. insurance, fuel, repairs. Say “my rate is 5.9%” to change the rate.
+        {ownership.taxNotice ? ` ${ownership.taxNotice}` : ""} Excl. insurance, fuel, repairs. Change the rate, down payment or term under “Change” on the lineup.
       </Typography>
     </section>
   );

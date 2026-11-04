@@ -181,6 +181,17 @@
   }
 }
 
+/* Browser surfaces in the palette (impeccable craft floor). */
+::selection {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+input,
+textarea {
+  caret-color: var(--brass);
+}
+
 /* Visible keyboard focus everywhere, including components that set
    outline-none for pointer use (un-layered, so it always wins). */
 :focus-visible {
@@ -218,6 +229,20 @@
   font-weight: 700;
   font-size: 20px;
   letter-spacing: -0.01em;
+}
+
+.appbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 56px;
+  margin: 0 -8px;
+  padding: 0 8px 0 0;
+  border-bottom: 1px solid var(--line);
+  background: var(--background);
 }
 
 .brand-tld {

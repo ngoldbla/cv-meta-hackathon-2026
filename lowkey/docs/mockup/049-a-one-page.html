@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>049 A · One page, sheets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="049-kit.css">
+</head>
+<body class="board">
+<div class="board-head">
+  <h1>A · One page, with sheets</h1>
+  <p>Everything happens on the home page. Tapping a type fills the lineup in below the tiles, which shrink to a row of chips. A car, a listing, the settings and Check a quote each open as a bottom sheet over the lineup, and Back closes the top sheet. It stays closest to today's app and is the least work to build.</p>
+  <p class="src">The numbers come from the live fast path (ZIP 30263, Sedan, 2026-11-04) and the app's quote code. The sample quote is an invented fixture.</p>
+</div>
+<div class="row-label">Light</div><div id="light"></div>
+<div class="row-label">Dark</div><div id="dark"></div>
+<script src="049-data.js"></script>
+<script src="049-cars.js"></script>
+<script src="049-kit.js"></script>
+<script>
+const { D, $, ICON, split, car, byReal, header, tiles, areaLine, cardFace, costBars, walkChart, slider, walkSay, walkTable, units, dealSheet, settingsLine, settingsPanel, quoteStart, quoteResult } = K;
+const civic = car(D.commodity);
+const sorts = '<div class="seg" style="margin:4px 0 12px"><div class="on">Real cost</div><div>Monthly</div><div>Nearest</div><div>Lasts longest</div></div>';
+const chips = `<div style="display:flex;gap:6px;margin:12px 0 2px;overflow:hidden">${["Sedan","SUV","Pickup","Minivan","Hybrid"].map((t) => `<span class="chip${t === "Sedan" ? " on" : ""}">${t}</span>`).join("")}</div>`;
+const results = () => `<div class="scroll">${header()}${chips}
+  <h2 class="screen-title">Your sedans near ${D.zip}</h2>
+  ${settingsLine()}${sorts}
+  <div style="display:flex;flex-direction:column;gap:10px">${byReal().map((c) => `<div class="surface pad">${cardFace(c)}</div>`).join("")}</div></div>`;
+const sheet = (top, inner) => `<div class="scrim"></div><div class="sheet" style="top:${top}px">${inner}</div>`;
+const n = split(civic).name;
+
+K.board([
+  { cap: "1 · Start", sub: "area and five types; one tap", html: () => `<div class="scroll">${header()}
+      <h2 class="screen-title" style="font-size:30px;margin-top:22px">Get a car without regret.</h2>
+      <p style="margin:6px 0 10px">The new cars near you that hold their value best, what each really costs a month, and what it would cost to change your mind.</p>
+      ${areaLine()}<div style="height:6px"></div>${tiles()}
+      <div class="sep" style="margin-top:18px"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;min-height:44px"><span style="font-weight:600">How Low Key works</span>${ICON.chevD}</div>
+      <div class="sep"></div><div class="small muted">No ads · No sign-up · Not paid by dealers</div></div>` },
+  { cap: "2 · Results", sub: "same page, tiles become chips", html: results },
+  { cap: "3 · Settings", sub: "sheet; cards re-price behind it", html: () => results() + sheet(388, `<div class="grab"></div><div class="sheet-head"><h3>Your terms</h3><span class="x">${ICON.x}</span></div>${settingsPanel()}`) },
+  { cap: "4 · A car", sub: "sheet with the walk-away", html: () => results() + sheet(56, `<div class="grab"></div>
+      <div class="sheet-head"><span></span><span class="x">${ICON.x}</span></div>
+      ${cardFace(civic)}
+      <div class="small" style="margin:10px 0">${civic.sentence}</div>
+      <div class="back-note">${$(civic.cost.backWhenSold)} a month of what you pay comes back when you sell at 5 years.</div>
+      <h3 style="margin:16px 0 4px">If you change your mind</h3>
+      ${walkChart(civic, 24)}${slider(24)}${walkSay(civic, 24)}
+      <div style="position:absolute;left:16px;right:16px;bottom:16px;display:flex;gap:8px"><span class="btn" style="flex:1">3 nearby</span><span class="btn primary" style="flex:1.4">Compare my quote</span></div>`) },
+  { cap: "5 · A listing", sub: "second sheet on top", html: () => results() + sheet(56, `<div class="grab"></div><div class="sheet-head"><span></span><span class="x">${ICON.x}</span></div>`) + sheet(150, `<div class="grab"></div>
+      <div class="sheet-head"><h3>${civic.face.title}</h3><span class="x">${ICON.x}</span></div>
+      <div class="small muted">${civic.face.dealer} · ${K.mi(civic.face.miles)} · lowest of ${civic.listingTotal} listed within ${civic.radius} mi</div>
+      <div class="surface pad" style="margin-top:12px">${dealSheet(civic)}</div>
+      <div class="label">Others nearby</div>${units({ ...civic, face: civic.more[0], more: civic.more.slice(1) })}
+      <div style="display:flex;gap:8px;margin-top:12px"><span class="btn" style="flex:1">See the listing</span><span class="btn primary" style="flex:1">Check their quote</span></div>`) },
+  { cap: "6 · Check a quote", sub: "sheet, pick pre-filled", html: () => results() + sheet(56, `<div class="grab"></div><div class="sheet-head"><h3>Check a quote</h3><span class="x">${ICON.x}</span></div>${quoteResult(D.commodity)}`) },
+]);
+</script>
+</body>
+</html>

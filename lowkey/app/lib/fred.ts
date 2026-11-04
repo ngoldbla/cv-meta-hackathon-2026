@@ -67,27 +67,6 @@ export function aprLabel(info: FredApr): string {
   return `${formatAprPercent(info.aprPercent)}% APR: the national average for 60-month new-car loans (Federal Reserve, ${monthYearLabel(info.dateIso)})`;
 }
 
-/**
- * User-stated rate override, e.g. "My rate is 5.9%" or "5.9% APR".
- * Returns null when the text states no rate.
- */
-export function parseUserApr(text: string): number | null {
-  const patterns = [
-    /my rate is\s*(\d+(?:\.\d+)?)\s*%/i,
-    /rate is\s*(\d+(?:\.\d+)?)\s*%/i,
-    /(\d+(?:\.\d+)?)\s*%\s*APR/i,
-    /APR\s*(?:is\s*)?(\d+(?:\.\d+)?)\s*%/i,
-  ];
-  for (const re of patterns) {
-    const m = re.exec(text);
-    if (m) {
-      const v = Number(m[1]);
-      if (Number.isFinite(v) && v >= 0 && v < 40) return v;
-    }
-  }
-  return null;
-}
-
 export const FALLBACK_APR: FredApr = {
   aprPercent: FALLBACK_APR_PERCENT,
   dateIso: null,

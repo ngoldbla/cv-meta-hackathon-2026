@@ -7,7 +7,6 @@ import {
   restoreAction,
   resultsLink,
   resumeHeading,
-  searchMessage,
   searchQuery,
   serializeLastSearch,
   typeFromCategory,
@@ -45,8 +44,6 @@ describe("search URL (task 041, part 3)", () => {
     expect(resultsLink("https://low-key-murex.vercel.app/", s)).toBe(
       "https://low-key-murex.vercel.app/?zip=60614&type=suv",
     );
-    expect(searchMessage(s)).toBe("60614, SUV");
-    expect(searchMessage({ zip: "30097", type: "pickup" })).toBe("30097, Pickup");
     expect(resumeHeading(s)).toBe("Your SUVs near 60614");
     expect(resumeHeading({ zip: "10001", type: "sedan" })).toBe("Your sedans near 10001");
   });

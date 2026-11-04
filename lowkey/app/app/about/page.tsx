@@ -61,7 +61,7 @@ export default function AboutPage() {
           good one.
         </P>
         <P>
-          Pick a type of car and your ZIP. Low Key shows the new cars that hold their value best near you, what each
+          Pick a type of car and your ZIP, and set your own down payment, term and rate if you like. Low Key shows the new cars that hold their value best near you, what each
           really costs a month (the loan, fuel and sales tax), what it would cost to change your mind, and the lowest
           listed prices nearby. Bring a dealer&apos;s quote or a window sticker, and it checks the numbers and puts them
           next to its picks on the same terms. No account, no ads, and no money from dealers.
@@ -109,7 +109,8 @@ export default function AboutPage() {
           </li>
           <li>
             <P>
-              The cards, the charts and every figure are built by code, never by a language model. A number guard
+              There is no chat. You choose a type of car and your terms with ordinary controls, and code does the
+              rest: the cards, the charts and every figure are built by code, never by a language model. A number guard
               checks each figure on a card against the data that produced it. Cards and charts render with{" "}
               <strong>json-render</strong> from a fixed component catalog; the interface uses <strong>Iconiq UI</strong>.
             </P>

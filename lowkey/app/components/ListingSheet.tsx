@@ -17,7 +17,7 @@ import {
  * The listing sheet (task 041, part 1): one local unit in an Iconiq
  * drawer, from the bottom on phones and the right on wide screens,
  * before the shopper ever leaves for the dealer's site. Closing
- * returns to where they were (the car's sheet, or the chat).
+ * returns to where they were (the screen it was opened from).
  */
 export function ListingSheet({
   title,
@@ -25,13 +25,24 @@ export function ListingSheet({
   wide,
   onClose,
   children,
+  inline = false,
 }: {
   title: string;
   subtitle: string;
   wide: boolean;
   onClose: () => void;
   children: ReactNode;
+  /** Task 049: render on a screen of its own (it has an app bar), not in a drawer. */
+  inline?: boolean;
 }) {
+  if (inline) {
+    return (
+      <section aria-label={title} className="flex flex-col gap-4 py-4">
+        <p className="text-sm text-muted-foreground">{subtitle}</p>
+        {children}
+      </section>
+    );
+  }
   return (
     <Drawer
       open

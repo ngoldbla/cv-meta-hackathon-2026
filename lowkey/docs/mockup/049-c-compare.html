@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>049 C · Compare, open in place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="049-kit.css">
+</head>
+<body class="board">
+<div class="board-head">
+  <h1>C · One comparison, opened in place</h1>
+  <p>The results are a single comparison: every car's real cost on one scale, cheapest first. Tapping a car opens it in place, with its walk-away and its best listing, and closes any other that was open. The settings open inline under their summary line. Only Check a quote leaves the page. This concept is the densest: the whole decision is on one scroll.</p>
+  <p class="src">The numbers come from the live fast path (ZIP 30263, Sedan, 2026-11-04) and the app's quote code. The sample quote is an invented fixture.</p>
+</div>
+<div class="row-label">Light</div><div id="light"></div>
+<div class="row-label">Dark</div><div id="dark"></div>
+<script src="049-data.js"></script>
+<script src="049-cars.js"></script>
+<script src="049-kit.js"></script>
+<script>
+const { D, $, ICON, split, car, byReal, header, appbar, tiles, areaLine, costBars, walkChart, slider, walkSay, walkTable, units, dealSheet, settingsLine, settingsPanel, quoteStart, quoteResult } = K;
+const civic = car(D.commodity);
+const typeSeg = `<div class="seg" style="margin:12px 0 4px">${["Sedan","SUV","Pickup","Minivan","Hybrid"].map((t) => `<div class="${t === "Sedan" ? "on" : ""}">${t}</div>`).join("")}</div>`;
+const sortChips = `<div style="display:flex;gap:6px;margin:2px 0 6px">${["Real cost","Monthly","Nearest","Lasts longest"].map((t, i) => `<span class="chip${i === 0 ? " on" : ""}">${t}</span>`).join("")}</div>`;
+const head = (open) => `${header()}${typeSeg}
+  <div class="xs muted" style="display:flex;gap:6px;align-items:center;min-height:32px">${ICON.pin} Near ${D.place} ${D.zip} · <span class="link">Change</span></div>
+  ${settingsLine()}${open === "settings" ? `<div class="surface pad" style="margin-bottom:10px">${settingsPanel()}</div>` : ""}
+  <h2 class="screen-title" style="margin-top:6px">What each really costs a month</h2>
+  <div class="small muted" style="margin-bottom:8px">Over 5 years, after you sell. Tap a car to open it.</div>${sortChips}`;
+const line = (c, isOpen) => {
+  const { name, trim } = split(c);
+  const tags = c.labels.map((l) => `<span class="tag${l === "Cheapest to own" ? " brass" : ""}">${l}</span>`).join("");
+  return `<div class="cmp-row${isOpen ? " open" : ""}"><div class="top"><span class="nm">${name}</span><span class="small muted">${trim}</span><span class="vv num">${$(c.cost.realTotal)}</span>${isOpen ? ICON.chevD.replace("M6 9l6 6 6-6", "M6 15l6-6 6 6") : ICON.chevD}</div>
+    ${tags && isOpen ? `<div class="labels" style="margin:4px 0 6px">${tags}</div>` : '<div style="height:6px"></div>'}
+    ${costBars(c, { thin: true, legend: isOpen })}`;
+};
+const list = (openModel, inner = "") => `<div>${byReal().map((c) => line(c, c.model === openModel) + (c.model === openModel ? inner : "") + "</div>").join("")}</div>`;
+const n = split(civic).name;
+const opened = (sel) => `
+  <div class="small" style="margin:10px 0 6px">${civic.sentence}</div>
+  <div class="small muted">${K.mi(civic.face.miles)} away · lasts about ${K.years(civic)} yrs · ${K.stockLine(civic)}</div>
+  <h3 style="margin:14px 0 4px">If you change your mind</h3>${walkChart(civic, sel)}${slider(sel)}${walkSay(civic, sel)}`;
+
+K.board([
+  { cap: "1 · Start", sub: "area and five types; one tap", html: () => `<div class="scroll">${header()}
+      <h2 class="screen-title" style="font-size:30px;margin-top:22px">Get a car without regret.</h2>
+      <p style="margin:6px 0 10px">The new cars near you that hold their value best, what each really costs a month, and what it would cost to change your mind.</p>
+      ${areaLine()}<div style="height:6px"></div>${tiles()}
+      <p class="small muted" style="margin-top:18px">No ads, no sign-up, not paid by dealers. <span class="link">How Low Key works</span></p></div>` },
+  { cap: "2 · Results", sub: "the comparison is the page", html: () => `<div class="scroll">${head()}${list(null)}</div>` },
+  { cap: "3 · Settings", sub: "inline, under its summary", html: () => `<div class="scroll">${head("settings")}${list(null)}</div>` },
+  { cap: "4 · A car", sub: "opened in place", html: () => `<div class="scroll" style="top:-262px">${head()}${list(civic.model, opened(24))}</div>` },
+  { cap: "5 · A listing", sub: "inside the open car", html: () => `<div class="scroll" style="top:-262px">${head()}${list(civic.model, `
+      <div class="small muted" style="margin:10px 0 4px">${K.mi(civic.face.miles)} away · lasts about ${K.years(civic)} yrs</div>
+      <h3 style="margin:10px 0 4px">Near you</h3>
+      <div class="surface pad"><div style="font-weight:600">${civic.face.title}</div><div class="small muted" style="margin-bottom:6px">${civic.face.dealer} · ${K.mi(civic.face.miles)} · lowest of ${civic.listingTotal} listed</div>${dealSheet(civic)}
+      <div style="display:flex;gap:8px;margin-top:10px"><span class="btn" style="flex:1">See the listing</span><span class="btn primary" style="flex:1">Compare my quote</span></div></div>
+      ${units({ ...civic, face: civic.more[0], more: civic.more.slice(1) })}`)}</div>` },
+  { cap: "6 · Check a quote", sub: "its own page, pick chosen", html: () => `<div class="scroll">${appbar("Check a quote")}
+      <div class="label">Compare with</div><div class="field">${n} · ${$(civic.cost.realTotal)}/mo<span class="unit">${ICON.chevD}</span></div><div style="height:12px"></div>${quoteResult(D.commodity)}</div>` },
+]);
+</script>
+</body>
+</html>

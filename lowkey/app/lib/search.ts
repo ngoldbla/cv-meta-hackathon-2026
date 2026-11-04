@@ -1,8 +1,8 @@
 /**
  * Resumable results (task 041, part 3). The page URL reflects the
  * search (`?zip=60614&type=suv`, plus `&sort=` when it is not the
- * default), so a shared or reopened link reruns the same fast-path
- * search. The last search is also remembered in localStorage. Only
+ * default). Since task 049 those links open `/suv?zip=60614` (lib/routes.ts),
+ * which reruns the search. The last search is also remembered in localStorage. Only
  * the ZIP, the type and the sort are kept; results are always re-run,
  * never restored from storage.
  */
@@ -57,11 +57,6 @@ export function typeFromCategory(category: string | null | undefined): SearchTyp
 /** "suv" -> "SUV", the type button's label. */
 export function typeLabel(type: SearchType): string {
   return TYPE_LABEL[type];
-}
-
-/** The chat message that runs this search on the fast path. */
-export function searchMessage(s: SavedSearch): string {
-  return `${s.zip}, ${TYPE_LABEL[s.type]}`;
 }
 
 /** "Your SUVs near 60614". */

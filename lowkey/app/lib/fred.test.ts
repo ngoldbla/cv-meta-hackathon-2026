@@ -6,7 +6,6 @@ import {
   getDefaultApr,
   monthYearLabel,
   parseFredCsv,
-  parseUserApr,
 } from "./fred";
 
 const SAMPLE_CSV = [
@@ -95,13 +94,6 @@ describe("getDefaultApr fallback", () => {
       text: async () => "DATE,RIFLPBCIANM60NM\n2026-08-01,\n",
     }));
     expect(r.assumed).toBe(true);
-  });
-
-  it("parses a user-stated rate override", () => {
-    expect(parseUserApr("My rate is 5.9%")).toBe(5.9);
-    expect(parseUserApr("my rate is 5.9%")).toBe(5.9);
-    expect(parseUserApr("60614, SUV")).toBeNull();
-    expect(parseUserApr("What if I put 10% down?")).toBeNull();
   });
 
   it("returns the parsed FRED value on success", async () => {

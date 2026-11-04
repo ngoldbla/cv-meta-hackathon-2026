@@ -1,7 +1,7 @@
 ---
 id: "049"
 title: "Low Key: an interactive web app with no chat — mockups first, then screens shaped with impeccable"
-status: open
+status: done
 created: 2026-11-04
 revised: 2026-11-04
 report: ops/reports/049-lowkey-remove-chat-intent-bar.md
