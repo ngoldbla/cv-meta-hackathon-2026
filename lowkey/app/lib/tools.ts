@@ -1,7 +1,4 @@
-import { tool } from "ai";
-import { z } from "zod";
-
-import { CATEGORIES, isCategory } from "./categories";
+import { isCategory } from "./categories";
 import { fuelForModel } from "./fuel";
 import { matchUnitMpg } from "./mpgmatch";
 import { aprLabel, getDefaultApr } from "./fred";
@@ -17,11 +14,11 @@ import {
 } from "./table";
 
 /**
- * Live tools (task 027). rank_category reads the private Blob table
+ * The search's executors (tasks 027, 049). rank_category reads the private Blob table
  * (one category per call), local_units searches the listings provider
  * over REST, and ownership_math prices the cheapest local unit (or
- * the table's typical price, labelled). Plain executors are exported
- * for the fast path in app/api/chat/route.ts.
+ * the table's typical price, labelled). Called only by code
+ * (lib/searchRun.ts); no model calls them since task 049.
  */
 
 export async function executeRankCategory(category: Category) {
@@ -207,59 +204,3 @@ export async function executeOwnership(args: {
     aprLabel: aprInfo ? aprLabel(aprInfo) : null,
   };
 }
-
-export const rankCategoryTool = tool({
-  description:
-    "Return the ranked picks (at most 4) and the commodity pick for a category from the live depreciation table. Call this whenever the user names a sedan, SUV, pickup, minivan or hybrid type to consider.",
-  inputSchema: z.object({
-    category: z.enum(CATEGORIES),
-  }),
-  execute: async ({ category }: { category: Category }) =>
-    executeRankCategory(category),
-});
-
-export const ownershipMathTool = tool({
-  description:
-    "Return the monthly payment (sales tax for the ZIP's state financed into the loan), the 61-point equity curve (resale, balance, equity), walk-away costs at 6, 12, 24, 36 and 60 months, and positiveEquityMonth (the first month the car is worth more than the loan). Pass model (the exact model string from rank_category), category (the rank_category category) and zip so the server prices the cheapest local unit, or the typical price when there is no local unit. Omit apr to use the Federal Reserve average; pass apr only when the user states their own rate. Deterministic; never estimate these numbers in text.",
-  inputSchema: z.object({
-    price: z.number().positive().optional(),
-    down: z.number().nonnegative().optional(),
-    apr: z.number().nonnegative().optional(),
-    term: z.number().int().positive().optional(),
-    model: z.string().optional(),
-    zip: z.string().optional(),
-    category: z.enum(CATEGORIES).optional(),
-  }),
-  execute: async (args: {
-    price?: number;
-    down?: number;
-    apr?: number;
-    term?: number;
-    model?: string;
-    zip?: string;
-    category?: string;
-  }) => executeOwnership(args),
-});
-
-export const localUnitsTool = tool({
-  description:
-    "Return up to 3 new in-stock local units near a ZIP code for a ranked model (cheapest first, radius 50 widening to 150), with the fuel estimate for that ZIP. Set model to the exact model string from rank_category (for example \"CR-V\", not \"Honda CR-V\") and category to the rank_category category.",
-  inputSchema: z.object({
-    zip: z.string(),
-    model: z.string().optional(),
-    category: z.string().optional(),
-    radius: z.number().int().positive().optional(),
-  }),
-  execute: async (args: {
-    zip: string;
-    model?: string;
-    category?: string;
-    radius?: number;
-  }) => executeLocalUnits(args),
-});
-
-export const lowkeyTools = {
-  rank_category: rankCategoryTool,
-  ownership_math: ownershipMathTool,
-  local_units: localUnitsTool,
-};

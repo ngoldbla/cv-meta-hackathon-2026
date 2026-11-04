@@ -116,7 +116,10 @@ export function QuoteCheck({
   downRule = { kind: "share", share: 0.1 },
   termMonths = 60,
   initialPickKey,
+  inline = false,
 }: {
+  /** Task 049: on its own screen (/quote) rather than in a drawer. */
+  inline?: boolean;
   wide: boolean;
   onClose: () => void;
   picks: QuotePick[];
@@ -272,6 +275,7 @@ export function QuoteCheck({
       subtitle="Type it in, or add a photo or PDF of the dealer's sheet or the window sticker."
       wide={wide}
       onClose={onClose}
+      inline={inline}
     >
       <div className="flex flex-col gap-5 pb-6">
         {quotes.length > 1 || quotes[0].sellingPrice !== null || quotes[0].outTheDoor !== null ? (

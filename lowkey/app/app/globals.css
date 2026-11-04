@@ -220,6 +220,20 @@
   letter-spacing: -0.01em;
 }
 
+.appbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 56px;
+  margin: 0 -8px;
+  padding: 0 8px 0 0;
+  border-bottom: 1px solid var(--line);
+  background: var(--background);
+}
+
 .brand-tld {
   color: var(--brass);
   font-weight: 600;

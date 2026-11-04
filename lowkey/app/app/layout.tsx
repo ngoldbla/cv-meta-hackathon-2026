@@ -11,6 +11,8 @@ import "@fontsource/ibm-plex-mono/600.css";
 
 import { Analytics } from "@vercel/analytics/next";
 
+import { Providers } from "@/components/screens/Providers";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -26,7 +28,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <body>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
-        {children}
+        <Providers>{children}</Providers>
         <Analytics />
       </body>
     </html>
