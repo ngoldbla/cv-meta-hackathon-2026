@@ -1,5 +1,6 @@
 /**
- * Three Hairline car figures (sedan, SUV, pickup) in the package's
+ * Five Hairline car figures (sedan, SUV, pickup; task 042 added the
+ * minivan and the hybrid, a sedan with a leaf on its rear deck) in the package's
  * figure format (`FigureMount`), drawn with hairline-create and checked
  * with its validate/look tools. Concept (strongest rest pose wins):
  * Roller — the car rolls a little toward the pointer, wheels turning
@@ -45,7 +46,7 @@ import {
 } from "./core/stage";
 import { inject } from "./core/styles";
 
-export type CarKind = "sedan" | "suv" | "pickup";
+export type CarKind = "sedan" | "suv" | "pickup" | "minivan" | "hybrid";
 
 interface CarSpec {
   label: string;
@@ -54,6 +55,8 @@ interface CarSpec {
   cabTop: [number, number, number, number, number];
   cabZ: [number, number];
   bed: boolean;
+  /** Task 042: the hybrid's leaf on the rear deck. */
+  leaf?: boolean;
   wheelR: number;
   wheelX: [number, number];
   topZ: number;
@@ -93,6 +96,29 @@ const SPECS: Record<CarKind, CarSpec> = {
     wheelX: [30, 92],
     topZ: 54,
   },
+  minivan: {
+    label: "minivan",
+    bodyZ: [12, 30],
+    cabFoot: [12, 4, 98, 50, 9],
+    cabTop: [16, 7, 80, 47, 8],
+    cabZ: [30, 58],
+    bed: false,
+    wheelR: 12.5,
+    wheelX: [28, 94],
+    topZ: 60,
+  },
+  hybrid: {
+    label: "hybrid",
+    bodyZ: [12, 32],
+    cabFoot: [36, 7, 84, 47, 8],
+    cabTop: [42, 11, 74, 43, 7],
+    cabZ: [32, 47],
+    bed: false,
+    leaf: true,
+    wheelR: 12.5,
+    wheelX: [30, 90],
+    topZ: 52,
+  },
 };
 
 function tapered(
@@ -131,6 +157,8 @@ function makeCarMount(spec: CarSpec): FigureMount {
     const nearW = WX.map(() => mk("path", { class: "sil" }, g));
     const spokes = WX.map(() => mk("path", { class: "nf" }, g));
     const hubs = WX.map(() => mk("circle", { r: 3, class: "dot m" }, g));
+    const leafSil = spec.leaf ? mk("path", { class: "sil" }, g) : null;
+    const leafRib = spec.leaf ? mk("path", { class: "nf" }, g) : null;
 
     const [bodyRing, bodyInner] = rings(2, 2, 118, 52, 10, 1.4);
     const [bedRing, bedInner] = rings(4, 4, 56, 50, 6, 1);
@@ -154,6 +182,22 @@ function makeCarMount(spec: CarSpec): FigureMount {
       };
     }
 
+    // Task 042: a leaf standing on the rear deck, leaning back: a lens
+    // of two arcs and a midrib in the car's centre plane.
+    function leaf(Q: Projector) {
+      const L = 24;
+      const W = 8;
+      const tilt = (2 * Math.PI) / 3;
+      const at = (u: number, v: number) =>
+        Q(24 + u * Math.cos(tilt) - v * Math.sin(tilt), 27, 33 + u * Math.sin(tilt) + v * Math.cos(tilt));
+      const pts: [number, number][] = [];
+      for (let k = 0; k <= 12; k += 1) pts.push(at((L * k) / 12, W * Math.sin((Math.PI * k) / 12)));
+      for (let k = 11; k >= 1; k -= 1) {
+        pts.push(at((L * k) / 12, -0.75 * W * Math.sin((Math.PI * k) / 12)));
+      }
+      return { d: poly(pts), rib: seg(at(0, 0), at(L * 0.85, 0)) };
+    }
+
     function draw(roll: number, ang: number) {
       if (drawn === roll) return;
       drawn = roll;
@@ -169,6 +213,11 @@ function makeCarMount(spec: CarSpec): FigureMount {
       put(body, prism(Q, front, bodyRing, bodyInner, spec.bodyZ[0], spec.bodyZ[1]));
       if (bed) put(bed, prism(Q, front, bedRing, bedInner, 32, 39));
       put(cab, tapered(Q, front, cabFoot, cabTop, spec.cabZ[0], spec.cabZ[1]));
+      if (leafSil && leafRib) {
+        const lf = leaf(Q);
+        leafSil.setAttribute("d", lf.d);
+        leafRib.setAttribute("d", lf.rib);
+      }
       nearW[1]?.classList.toggle("hi", !hover);
       body.sil.classList.toggle("hi", hover);
     }
@@ -233,6 +282,8 @@ export const CAR_LABELS: Record<CarKind, string> = {
   sedan: "Isometric line drawing of a sedan that rolls a little toward the pointer.",
   suv: "Isometric line drawing of an SUV that rolls a little toward the pointer.",
   pickup: "Isometric line drawing of a pickup that rolls a little toward the pointer.",
+  minivan: "Isometric line drawing of a minivan that rolls a little toward the pointer.",
+  hybrid: "Isometric line drawing of a hybrid car, a sedan with a leaf, that rolls a little toward the pointer.",
 };
 
 /** Mount a car figure on `el` (package `Figure` contract; never plays). */

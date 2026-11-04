@@ -1,11 +1,13 @@
 ---
 id: "042"
 title: "Low Key: three more types — Minivan, Hybrid, Electric — with electricity cost by location"
-status: open
+status: done
 created: 2026-11-03
 report: ops/reports/042-lowkey-minivan-hybrid-ev.md
 ---
 # Low Key: Minivan, Hybrid and Electric
+
+> **Update (Dylan, 2026-11-03, after the P20 lineups):** "Skip electric altogether." Electric, the EIA electricity price and the kWh match are out; Minivan, Hybrid and the per-unit MPG match (2b) stand. The Minivan and Hybrid lineups were approved before wiring.
 
 **Run this after task 041 is done.** **Branch: `task/NNN-<slug>` cut from `main`, with a PR into `main`.** The same secrets and commit rules as task 023 apply. A merge into `main` deploys to https://lowkey.autos; follow `lowkey/docs/deploy.md`. Provider cap **$1.50** (the sold-data fits for three new categories plus checks; report `/usage` before and after, at 1 request per 2 s); Muse Spark cap $0.10. EIA and fueleconomy.gov are free.
 

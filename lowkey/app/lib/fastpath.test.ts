@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   downForPrice,
   parseConversationFastRequest,
+  parseCategory,
   parseFastRequest,
 } from "./fastpath";
 
@@ -104,5 +105,28 @@ describe("parseFastRequest (task 026 part 5)", () => {
     expect(d.downFixed).toBe(5000);
     expect(downForPrice(d, 34899)).toBe(5000);
     expect(downForPrice(parseFastRequest("60614, SUV")!, 34899)).toBeCloseTo(3489.9, 2);
+  });
+});
+
+describe("parseCategory, task 042 words", () => {
+  it("reads minivan, van, hybrid and keeps the old words", () => {
+    expect(parseCategory("a minivan please")).toBe("Minivan");
+    expect(parseCategory("Mini-van")).toBe("Minivan");
+    expect(parseCategory("we need a van")).toBe("Minivan");
+    expect(parseCategory("Hybrid")).toBe("Hybrid");
+    expect(parseCategory("hybrids near 30097")).toBe("Hybrid");
+    expect(parseCategory("SUVs")).toBe("SUV");
+    expect(parseCategory("a truck")).toBe("Pickup");
+  });
+
+  it("lets the powertrain word win over a body word", () => {
+    expect(parseCategory("a hybrid SUV")).toBe("Hybrid");
+    expect(parseCategory("hybrid minivan")).toBe("Hybrid");
+  });
+
+  it("does not read electric or plug-in words as a type", () => {
+    expect(parseCategory("electric")).toBeNull();
+    expect(parseCategory("an EV")).toBeNull();
+    expect(parseFastRequest("60614, Hybrid")?.category).toBe("Hybrid");
   });
 });

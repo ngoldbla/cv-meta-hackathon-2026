@@ -66,9 +66,11 @@ export const catalog = defineCatalog(schema, {
         payTotal: z.number(),
         realTotal: z.number(),
         backWhenSold: z.number(),
+        gasMpg: z.number().nullable().optional(),
+        gasMpgTypical: z.boolean().optional(),
       }),
       description:
-        "Two bars on one scale (the bills total): 'You pay each month' (loan + gas) and 'What it really costs you' (value lost + interest + gas + sales tax); the remainder of the second bar is the hatched 'back to you' segment, backWhenSold = bills - real cost.",
+        "Two bars on one scale (the bills total): 'You pay each month' (loan + gas) and 'What it really costs you' (value lost + interest + gas + sales tax); the remainder of the second bar is the hatched 'back to you' segment, backWhenSold = bills - real cost. gasMpg is the EPA combined MPG the gas estimate used (task 042), gasMpgTypical true when it is the model's typical figure rather than the local unit's match.",
     },
     LifespanTrack: {
       props: z.object({

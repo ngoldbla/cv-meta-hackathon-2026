@@ -37,7 +37,7 @@ The wrapper loads `~/.config/low-key/env` (never printed), runs
 `build_table.py --refresh-provider --refresh-eia --refresh-tax`
 (provider facets, EIA series and the P19 sales-tax rules), uploads
 with `upload_table.mjs`, then reads the blob back with
-`check_table.mjs` (version and size, 3 categories, gas series count,
+`check_table.mjs` (version and size, 5 categories, gas series count,
 51 tax rows, every EIA `asOf` no older than 8 days). It appends one
 summary line to `~/.cache/low-key/weekly.log` (dates, sizes and
 provider usage before/after; no secrets) and exits non-zero on any

@@ -80,8 +80,25 @@ describe("mapListingsResponse (task 027 part 3)", () => {
       trim: "LX",
       url: "https://example.com/fixture/crv-1",
       vin: null,
+      drivetrain: null,
+      engine: null,
+      cylinders: null,
+      powertrain: null,
     });
     expect(units[0].price).toBeLessThan(units[1].price);
+  });
+
+  it("keeps the per-unit MPG fields when the listing has them (task 042)", () => {
+    const { units } = mapListingsResponse(
+      body([row({ drivetrain: "AWD", engine: "2.0L I4", cylinders: 4, powertrain_type: "HEV" })]),
+      "60614",
+    );
+    expect(units[0]).toMatchObject({
+      drivetrain: "AWD",
+      engine: "2.0L I4",
+      cylinders: 4,
+      powertrain: "HEV",
+    });
   });
 
   it("falls back to selected_price when price_with_fees is missing", () => {
@@ -356,5 +373,19 @@ describe("trim filtering and the no-stock fallback (task 029, part 1)", () => {
     expect(out.fellBackToBase).toBe(false);
     expect(out.result.error).toBe("Couldn't load local stock right now");
     expect(calls).toBeGreaterThan(0);
+  });
+});
+
+describe("listingsUrl category filters (task 042)", () => {
+  it("searches full hybrids for Hybrid and gas-or-hybrid minivans for Minivan", () => {
+    const hybrid = new URL(listingsUrl("https://provider.example", "CR-V", "60614", 50, null, "Hybrid"));
+    expect(hybrid.searchParams.get("powertrain_type")).toBe("HEV");
+    expect(hybrid.searchParams.get("fuel_type")).toBeNull();
+    const van = new URL(listingsUrl("https://provider.example", "Sienna", "60614", 50, null, "Minivan"));
+    expect(van.searchParams.get("body_type")).toBe("Minivan");
+    expect(van.searchParams.get("exclude_powertrain_type")).toBe("PHEV,BEV,FCEV,MHEV");
+    const gas = new URL(listingsUrl("https://provider.example", "CR-V", "60614", 50));
+    expect(gas.searchParams.get("fuel_type")).toBe("Gas only");
+    expect(gas.searchParams.get("fields")).toContain("drivetrain");
   });
 });

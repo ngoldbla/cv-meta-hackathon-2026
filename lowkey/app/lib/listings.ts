@@ -1,6 +1,6 @@
 /**
  * Live local listings (task 027, part 3). Server-side REST search:
- * new, in stock, strict gas-only, cheapest first, limit 3, radius 50
+ * new, in stock, the category filter (strict gas-only for Sedan, SUV and Pickup; task 042), cheapest first, limit 3, radius 50
  * widening to 150 when fewer than 3 are found. Results are cached
  * per model/ZIP/radius for 6 hours by the Next.js fetch cache, with
  * an 8-second timeout. Any failure returns the "couldn't load" card
@@ -9,6 +9,8 @@
  * Task 031: the search keeps all model years of new units (no year
  * filter); the card shows each unit's year and notes leftover years.
  */
+
+import { listingFilters, type Category } from "./categories";
 
 export interface LocalUnit {
   price: number;
@@ -20,6 +22,11 @@ export interface LocalUnit {
   url: string;
   /** The listing's VIN (task 041; shown under licence section 3), or null. */
   vin: string | null;
+  /** Task 042, part 2b: what the per-unit MPG match reads (or null). */
+  drivetrain?: string | null;
+  engine?: string | null;
+  cylinders?: number | null;
+  powertrain?: string | null;
 }
 
 export interface LocalUnitsResult {
@@ -64,6 +71,7 @@ export function listingsUrl(
   zip: string,
   radius: number,
   trim?: string | null,
+  category: Category = "Sedan",
 ): string {
   const params = new URLSearchParams({
     inventory_type: "new",
@@ -74,8 +82,10 @@ export function listingsUrl(
     sort: "price",
     price_basis: "selected",
     limit: "3",
-    fuel_type: "Gas only",
-    exclude_powertrain_type: "MHEV,HEV",
+    ...listingFilters(category),
+    // Task 042, part 2b: the fields the per-unit MPG match needs,
+    // projected in the same call.
+    fields: "default,drivetrain,engine,cylinders,powertrain_type",
   });
   if (trim) params.set("trim", trim);
   return `${baseUrl.replace(/\/$/, "")}/listings?${params.toString()}`;
@@ -123,6 +133,10 @@ export function mapListingsResponse(
       trim: typeof r.trim === "string" && r.trim ? r.trim : null,
       url,
       vin: vinOf(r.vin),
+      drivetrain: typeof r.drivetrain === "string" ? r.drivetrain : null,
+      engine: typeof r.engine === "string" ? r.engine : null,
+      cylinders: num(r.cylinders),
+      powertrain: typeof r.powertrain_type === "string" ? r.powertrain_type : null,
     });
   }
   units.sort((a, b) => a.price - b.price);
@@ -153,6 +167,7 @@ export async function fetchLocalUnits(args: {
   zip: string;
   providerModel: string;
   trim?: string | null;
+  category?: Category;
   fetcher?: ListingsFetcher;
   baseUrl?: string;
   apiKey?: string;
@@ -171,7 +186,7 @@ export async function fetchLocalUnits(args: {
 
   const retryDelays = args.retryDelaysMs ?? [700, 1400];
   async function search(radius: number) {
-    const url = listingsUrl(baseUrl!, providerModel, zip, radius, trim);
+    const url = listingsUrl(baseUrl!, providerModel, zip, radius, trim, args.category);
     for (let attempt = 0; ; attempt += 1) {
       const res = await fetcher(url, {
         headers: {
@@ -270,6 +285,7 @@ export async function fetchUnitsWithTrimFallback(args: {
   providerModel: string;
   recommendedTrim?: string | null;
   baseTrim?: string | null;
+  category?: Category;
   fetcher?: ListingsFetcher;
   baseUrl?: string;
   apiKey?: string;
@@ -280,6 +296,7 @@ export async function fetchUnitsWithTrimFallback(args: {
   const shared = {
     zip: args.zip,
     providerModel: args.providerModel,
+    category: args.category,
     fetcher: args.fetcher,
     baseUrl: args.baseUrl,
     apiKey: args.apiKey,

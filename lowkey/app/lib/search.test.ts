@@ -54,7 +54,9 @@ describe("search URL (task 041, part 3)", () => {
   it("maps rank categories to URL types", () => {
     expect(typeFromCategory("SUV")).toBe("suv");
     expect(typeFromCategory("Pickup")).toBe("pickup");
-    expect(typeFromCategory("Minivan")).toBeNull();
+    expect(typeFromCategory("Minivan")).toBe("minivan");
+    expect(typeFromCategory("Hybrid")).toBe("hybrid");
+    expect(typeFromCategory("Electric")).toBeNull();
     expect(typeFromCategory(undefined)).toBeNull();
   });
 });

@@ -1,7 +1,9 @@
 import { tool } from "ai";
 import { z } from "zod";
 
+import { CATEGORIES, isCategory } from "./categories";
 import { fuelForModel } from "./fuel";
+import { matchUnitMpg } from "./mpgmatch";
 import { aprLabel, getDefaultApr } from "./fred";
 import { fetchUnitsWithTrimFallback } from "./listings";
 import type { DealInputs, DownRule } from "./deal";
@@ -40,25 +42,33 @@ export async function executeLocalUnits(args: {
   } catch {
     table = null;
   }
-  const resolved = table && model ? resolveTablePick(table, model) : undefined;
+  const resolved = table && model ? resolveTablePick(table, model, category) : undefined;
   const providerModel = resolved?.pick.providerModel ?? (model ?? "");
+  const searchCategory = resolved?.category ?? (isCategory(category) ? category : undefined);
   const search = await fetchUnitsWithTrimFallback({
     zip,
     providerModel,
     recommendedTrim: resolved?.pick.recommendedTrim ?? null,
     baseTrim: resolved?.pick.baseTrim ?? null,
+    category: searchCategory,
   });
   const result = search.result;
+  // Task 042, part 2b: the fuel estimate uses the cheapest local
+  // unit's own EPA match (the unit the payment prices), else the
+  // model's figure labelled "typical MPG".
+  const match = resolved
+    ? matchUnitMpg(result.units[0] ?? {}, resolved.pick.epaVariants, resolved.pick.mpg)
+    : null;
   const fuel =
-    table && resolved
-      ? fuelForModel({ mpg: resolved.pick.mpg, zip, table })
+    table && match
+      ? fuelForModel({ mpg: match.mpg, mpgLevel: match.level, zip, table })
       : null;
   return {
     zip,
     model: resolved?.pick.model ?? (model ?? null),
     providerModel: providerModel || null,
     make: resolved?.pick.make ?? null,
-    category: category ?? null,
+    category: resolved?.category ?? category ?? null,
     recommendedTrim: resolved?.pick.recommendedTrim ?? null,
     baseTrim: resolved?.pick.baseTrim ?? null,
     trimUsed: search.trimUsed,
@@ -82,6 +92,8 @@ export async function executeOwnership(args: {
   term?: number;
   model?: string;
   zip?: string;
+  /** The lineup the model is from (task 042: "CR-V" is in SUV and Hybrid). */
+  category?: string;
   retention5y?: number;
   /** Set by the fast path when `price` is already the resolved price. */
   priceSource?: "local" | "typical" | "given";
@@ -99,7 +111,7 @@ export async function executeOwnership(args: {
   } catch {
     table = null;
   }
-  const resolved = table && model ? resolveTablePick(table, model) : undefined;
+  const resolved = table && model ? resolveTablePick(table, model, args.category) : undefined;
   const retention5y =
     args.retention5y ?? resolved?.pick.retentionAfterDiscount;
 
@@ -114,6 +126,7 @@ export async function executeOwnership(args: {
       providerModel: resolved.pick.providerModel,
       recommendedTrim: resolved.pick.recommendedTrim ?? null,
       baseTrim: resolved.pick.baseTrim ?? null,
+      category: resolved.category,
     });
     const local = search.result;
     trimUsed = search.trimUsed;
@@ -197,9 +210,9 @@ export async function executeOwnership(args: {
 
 export const rankCategoryTool = tool({
   description:
-    "Return the ranked picks (at most 4) and the commodity pick for a category from the live depreciation table. Call this whenever the user names a sedan, SUV or pickup type to consider.",
+    "Return the ranked picks (at most 4) and the commodity pick for a category from the live depreciation table. Call this whenever the user names a sedan, SUV, pickup, minivan or hybrid type to consider.",
   inputSchema: z.object({
-    category: z.enum(["Sedan", "SUV", "Pickup"]),
+    category: z.enum(CATEGORIES),
   }),
   execute: async ({ category }: { category: Category }) =>
     executeRankCategory(category),
@@ -207,7 +220,7 @@ export const rankCategoryTool = tool({
 
 export const ownershipMathTool = tool({
   description:
-    "Return the monthly payment (sales tax for the ZIP's state financed into the loan), the 61-point equity curve (resale, balance, equity), walk-away costs at 6, 12, 24, 36 and 60 months, and positiveEquityMonth (the first month the car is worth more than the loan). Pass model (the exact model string from rank_category) and zip so the server prices the cheapest local unit, or the typical price when there is no local unit. Omit apr to use the Federal Reserve average; pass apr only when the user states their own rate. Deterministic; never estimate these numbers in text.",
+    "Return the monthly payment (sales tax for the ZIP's state financed into the loan), the 61-point equity curve (resale, balance, equity), walk-away costs at 6, 12, 24, 36 and 60 months, and positiveEquityMonth (the first month the car is worth more than the loan). Pass model (the exact model string from rank_category), category (the rank_category category) and zip so the server prices the cheapest local unit, or the typical price when there is no local unit. Omit apr to use the Federal Reserve average; pass apr only when the user states their own rate. Deterministic; never estimate these numbers in text.",
   inputSchema: z.object({
     price: z.number().positive().optional(),
     down: z.number().nonnegative().optional(),
@@ -215,6 +228,7 @@ export const ownershipMathTool = tool({
     term: z.number().int().positive().optional(),
     model: z.string().optional(),
     zip: z.string().optional(),
+    category: z.enum(CATEGORIES).optional(),
   }),
   execute: async (args: {
     price?: number;
@@ -223,12 +237,13 @@ export const ownershipMathTool = tool({
     term?: number;
     model?: string;
     zip?: string;
+    category?: string;
   }) => executeOwnership(args),
 });
 
 export const localUnitsTool = tool({
   description:
-    "Return up to 3 new in-stock local units near a ZIP code for a ranked model (cheapest first, radius 50 widening to 150), with the fuel estimate for that ZIP. Set model to the exact model string from rank_category (for example \"CR-V\", not \"Honda CR-V\").",
+    "Return up to 3 new in-stock local units near a ZIP code for a ranked model (cheapest first, radius 50 widening to 150), with the fuel estimate for that ZIP. Set model to the exact model string from rank_category (for example \"CR-V\", not \"Honda CR-V\") and category to the rank_category category.",
   inputSchema: z.object({
     zip: z.string(),
     model: z.string().optional(),

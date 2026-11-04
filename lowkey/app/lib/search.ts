@@ -9,7 +9,7 @@
 
 import { DEFAULT_SORT, isSortKey, type SortKey } from "./chooser";
 
-export type SearchType = "sedan" | "suv" | "pickup";
+export type SearchType = "sedan" | "suv" | "pickup" | "minivan" | "hybrid";
 
 export interface SavedSearch {
   zip: string;
@@ -20,18 +20,28 @@ const TYPE_LABEL: Record<SearchType, string> = {
   sedan: "Sedan",
   suv: "SUV",
   pickup: "Pickup",
+  minivan: "Minivan",
+  hybrid: "Hybrid",
 };
 
 const TYPE_PLURAL: Record<SearchType, string> = {
   sedan: "sedans",
   suv: "SUVs",
   pickup: "pickups",
+  minivan: "minivans",
+  hybrid: "hybrids",
 };
 
 export const LAST_SEARCH_KEY = "lowkey-last-search";
 
 function isType(value: unknown): value is SearchType {
-  return value === "sedan" || value === "suv" || value === "pickup";
+  return (
+    value === "sedan" ||
+    value === "suv" ||
+    value === "pickup" ||
+    value === "minivan" ||
+    value === "hybrid"
+  );
 }
 
 function isZip(value: unknown): value is string {

@@ -21,6 +21,8 @@ const KIND_BY_CATEGORY: Record<string, CarKind> = {
   Sedan: "sedan",
   SUV: "suv",
   Pickup: "pickup",
+  Minivan: "minivan",
+  Hybrid: "hybrid",
 };
 
 /**

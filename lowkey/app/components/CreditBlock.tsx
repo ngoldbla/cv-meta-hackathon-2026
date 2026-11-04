@@ -20,7 +20,7 @@ export const CREDIT_POINTS: { lead: string; text: string }[] = [
   },
   {
     lead: "Less risk.",
-    text: "Every car here is among the best at holding its value in its class, and every price includes the loan, gas or electricity, and tax.",
+    text: "Every car here is among the best at holding its value in its class, and every price includes the loan, gas and tax.",
   },
   {
     lead: "Shop anonymously.",
