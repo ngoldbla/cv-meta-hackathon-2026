@@ -59,12 +59,14 @@ PROMPT = (
 # Task 057: the small read. Only these kinds; the car comes from the VIN lookup.
 TERMS_PROMPT = (
     "List only these values if they are printed: the vehicle's selling price (also "
-    "printed as sale price, cash price or vehicle price), MSRP, down payment, "
+    "printed as sale price, cash price or vehicle price), MSRP (on a window sticker, "
+    "the TOTAL line), down payment, "
     "APR, term, monthly payment, out-the-door total, odometer mileage, VIN. "
     "Copy each label and value exactly, and tag each with its kind. Skip everything else. "
     "Never calculate or guess."
 )
-TERMS_MAX_TOKENS = 600
+# A payment grid repeats down/term/monthly pairs, so leave room (600 cut one real sheet off).
+TERMS_MAX_TOKENS = 1500
 
 
 @app.cls(
@@ -136,10 +138,13 @@ class Reader:
             return json.loads(model_cls.model_validate_json(gen.text).model_dump_json())
 
         if mode == "terms":
-            raw = run(TERMS_PROMPT, TermsRead, TERMS_MAX_TOKENS)
-            if not terms_thin(raw):
-                return normalize_terms(raw)
-            print("read: thin terms result, running the full read")
+            try:
+                raw = run(TERMS_PROMPT, TermsRead, TERMS_MAX_TOKENS)
+                if not terms_thin(raw):
+                    return normalize_terms(raw)
+                print("read: thin terms result, running the full read")
+            except ValueError as e:  # cut off or invalid: the full read never fails the same way
+                print(f"read: terms result unusable ({type(e).__name__}), running the full read")
         raw = run(PROMPT)
         if _thin(raw):
             print("read: thin result, retrying with the full transcript prompt")
@@ -233,10 +238,13 @@ def read_quote(image_b64: str, mime: str = "image/jpeg", mode: str = "full") -> 
         for provider in HF_PROVIDERS:
             try:
                 if mode == "terms":
-                    raw = run(provider, TERMS_PROMPT, TermsRead, TERMS_MAX_TOKENS)
-                    if not terms_thin(raw):
-                        return normalize_terms(raw)
-                    print("hosted read: thin terms result, running the full read")
+                    try:
+                        raw = run(provider, TERMS_PROMPT, TermsRead, TERMS_MAX_TOKENS)
+                        if not terms_thin(raw):
+                            return normalize_terms(raw)
+                        print("hosted read: thin terms result, running the full read")
+                    except ValueError as e:  # cut off or invalid JSON (pydantic raises a ValueError subclass)
+                        print(f"hosted read: terms result unusable ({type(e).__name__}), running the full read")
                 raw = run(provider, PROMPT)
                 if _thin(raw):
                     print("hosted read: thin result, retrying with the full transcript prompt")

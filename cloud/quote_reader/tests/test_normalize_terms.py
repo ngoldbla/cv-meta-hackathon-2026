@@ -76,9 +76,11 @@ def test_mileage_digits_only():
     assert normalize_terms(raw(("mileage", "Miles", "n/a")))["mileage"] is None
 
 
-def test_thin_when_fewer_than_two_money_values():
-    assert terms_thin(raw(("price", "Price", "$28,450")))
+def test_thin_only_when_no_money_value():
+    # A window sticker can print only its MSRP: with the VIN, that is a complete terms read.
+    assert not terms_thin(raw(("msrp", "Total MSRP", "$27,315"), ("vin", "VIN", GOOD_VIN)))
     assert not terms_thin(raw(("price", "Price", "$28,450"), ("apr", "APR", "6.9%")))
+    assert terms_thin(raw(("vin", "VIN", GOOD_VIN)))
     assert terms_thin({"pairs": []})
 
 
@@ -89,3 +91,33 @@ def test_sticker_base_price_is_not_a_selling_price():
     ))
     assert out["selling_price"] is None
     assert out["msrp"] == 51300.0 and out["price_basis"] == "msrp"
+
+
+def test_payment_grid_is_not_a_stated_payment():
+    # A dealer's estimate grid ("$500 - $525" per cell) has no single monthly payment.
+    out = normalize_terms(raw(
+        ("monthly", "Est. $/Monthly", "$500 - $525"),
+        ("monthly", "Est. $/Monthly", "$434 - $459"),
+        ("price", "Selling Price", "$28,450"),
+    ))
+    assert out["stated_monthly"] is None
+    assert normalize_terms(raw(("monthly", "Payment", "$500 - $525")))["stated_monthly"] is None
+    two = normalize_terms(raw(("monthly", "Payment", "$512"), ("monthly", "Payment", "$480")))
+    assert two["stated_monthly"] is None
+
+
+def test_sticker_total_beats_the_base_msrp():
+    out = normalize_terms(raw(
+        ("msrp", "Manufacturer's suggested retail price", "$31,750.00"),
+        ("msrp", "Total", "$37,763.00"),
+    ))
+    assert out["msrp"] == 37763.0
+
+
+def test_one_grid_cell_is_not_a_payment_when_terms_form_a_grid():
+    out = normalize_terms(raw(
+        ("term", "60 Months", "60 Months"),
+        ("term", "72 Months", "72 Months"),
+        ("monthly", "Est. $/Monthly", "$500"),
+    ))
+    assert out["term_months"] is None and out["stated_monthly"] is None
