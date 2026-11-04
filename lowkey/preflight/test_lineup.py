@@ -266,3 +266,22 @@ def test_new_category_short_of_four_shows_fewer_without_relaxing() -> None:
     ]
     lineup = rank_category("Minivan", models)
     assert [p.model for p in lineup.picks] == ["Sienna", "Odyssey", "Carnival"]
+
+
+def test_age_points_reach_the_table_dict() -> None:
+    """Task 057: the sold-price ratio by age (>= 30 sold) and the fit's slope travel to the table."""
+    import lineup
+    analysis = {"models": {c: {} for c in lineup.CATEGORIES}}
+    analysis["models"]["Sedan"]["Corolla"] = {
+        "new_price": 24000.0,
+        "fit": {"retention_5y": 0.62, "slope_per_year": -0.09},
+        "ages": {
+            "1": {"count": 120, "ret_new": 0.86},
+            "2": {"count": 90, "ret_new": 0.79},
+            "3": {"count": 12, "ret_new": 0.70},
+        },
+    }
+    fits = lineup.load_model_fits(analysis, {"Sedan": {"Corolla": "Toyota"}})
+    m = next(f for f in fits["Sedan"] if f.model == "Corolla")
+    assert m.ret_by_age == {1: 0.86, 2: 0.79}  # age 3 has fewer than 30 sales
+    assert m.slope_per_year == -0.09

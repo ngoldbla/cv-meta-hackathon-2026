@@ -203,6 +203,8 @@ def _pick_out(raw: dict) -> dict:
         "retentionAfterDiscount": raw["retention_5y_after_discount"],
         "depPerMonth": raw["dep_per_month"],
         "typicalNewPrice": raw["new_price"],
+        "retentionByAge": raw.get("retention_by_age") or None,
+        "retentionSlopePerYear": raw.get("retention_slope_per_year"),
         "sampleSizes": {
             "byAge": by_age,
             "total": sum(by_age.values()),
