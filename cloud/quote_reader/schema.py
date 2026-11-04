@@ -75,3 +75,18 @@ class RawRead(BaseModel):
         default_factory=list,
         description="Only fee and charge lines. NOT the vehicle price, down payment, total, APR or term.",
     )
+
+
+class TermPair(BaseModel):
+    kind: Literal["price", "msrp", "down", "apr", "term", "monthly", "out_the_door", "mileage", "vin"]
+    label: str = Field(description="The label printed on the page, copied exactly")
+    value: str = Field(description="The value printed for that label, copied exactly")
+
+
+class TermsRead(BaseModel):
+    """Task 057: the small read. Only the money terms, the mileage and the VIN."""
+
+    pairs: list[TermPair] = Field(
+        min_length=1,
+        description="Only the listed kinds, each as printed. Skip everything else.",
+    )
