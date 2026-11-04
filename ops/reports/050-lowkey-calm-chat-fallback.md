@@ -12,5 +12,8 @@ Production returned `{"type":"error","errorText":"An error occurred."}` for any 
 ## Results
 `npm ci && npm run build`, 226 app tests, `pytest -q`, name_guard and secret_guard pass. Production check after merge: see the PR.
 
+## Warm window for demos and judging
+`cloud/quote_reader/warm_window.py on --hours N` keeps one H100 loaded (`update_autoscaler(min_containers=1)`) and schedules its own `off` with a user systemd timer; `off` returns to scale-to-zero and cancels the timer. Tested 2026-11-04: a read while the container was still loading took 89 s; a warm read took 9.7 s. Turn it on 2–3 minutes before it's needed. It bills for every hour it is on. Run it with the Python that has `modal` (`~/.local/share/uv/tools/modal/bin/python`).
+
 ## Deviations
 The reply's examples ("$5k down", "my rate is 5.9%") are fixed copy, the same examples the footer already shows; no model writes any number.
