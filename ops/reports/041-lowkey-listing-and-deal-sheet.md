@@ -128,4 +128,8 @@ My Low Key results: http://localhost:3100/?zip=60614&type=suv
    - Low Key's source audits moved to `lowkey/docs/claims.yaml`.
    - README, AGENTS, CREDITS, the ops README, the inbox skill, pyproject, the hook installer and CI were rewritten for the new layout.
    - `main` itself changes only when `low-key` is merged into it.
-4. **Saving progress:** an open design question for Dylan (options are in the PR).
+4. **Saving progress:** Dylan chose the resume card.
+   - A remembered search no longer re-runs by itself. The opening shows "Pick up where you left off · Your SUVs near 60614 · Prices and stock are checked again when you tap", with **Show them again** and **Start fresh** (which forgets it).
+   - A shared or reopened link (`?zip=&type=`) still runs at once.
+   - Checked locally at 390 px, dark: after a search and a bare reload, the card showed and nothing ran; one tap re-ran the search in 0.3 s and restored `?zip=60614&type=suv`. No console errors.
+   - A "Keep this car" shortlist is a possible later task.

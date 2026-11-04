@@ -111,3 +111,13 @@ export function initialSearch(
   const last = parseLastSearch(stored);
   return last ? { search: last, sort: null, from: "stored" } : null;
 }
+
+/**
+ * What to do with the search found on open: a link runs at once (it
+ * was shared or reopened to see results); a remembered search is
+ * offered on the resume card and runs only when tapped, so a return
+ * visit spends no provider calls until the shopper asks.
+ */
+export function restoreAction(init: { from: "url" | "stored" }): "run" | "offer" {
+  return init.from === "url" ? "run" : "offer";
+}

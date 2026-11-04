@@ -88,6 +88,7 @@ import type { DealInputs } from "@/lib/deal";
 import {
   LAST_SEARCH_KEY,
   initialSearch,
+  restoreAction,
   resultsLink,
   resumeHeading,
   searchMessage,
@@ -420,6 +421,14 @@ function persistLastSearch(s: SavedSearch) {
   }
 }
 
+function forgetLastSearch() {
+  try {
+    window.localStorage.removeItem(LAST_SEARCH_KEY);
+  } catch {
+    // Best-effort only.
+  }
+}
+
 function loadLastSearch(): string | null {
   try {
     return window.localStorage.getItem(LAST_SEARCH_KEY);
@@ -566,6 +575,8 @@ export default function HomeClient({
   // search restored from a link or the last visit.
   const [current, setCurrent] = useState<SavedSearch | null>(null);
   const [resumed, setResumed] = useState<SavedSearch | null>(null);
+  // The remembered search, offered on the resume card until tapped.
+  const [resumeOffer, setResumeOffer] = useState<SavedSearch | null>(null);
   const [origin, setOrigin] = useState("");
   const restoredRef = useRef(false);
   const [bodyPick, setBodyPick] = useState<string[]>([]);
@@ -613,9 +624,23 @@ export default function HomeClient({
     persistSort(key);
   }
 
-  // Task 041: a search in the URL (a shared or reopened link) or the
-  // remembered last search re-runs on open. Numbers are never
-  // restored from storage; the fast path runs again.
+  /** Run a saved search fresh, under "Your SUVs near 60614". */
+  function runSaved(search: SavedSearch) {
+    setResumeOffer(null);
+    setResumed(search);
+    setCurrent(search);
+    setArea((a) =>
+      a && a.zip === search.zip ? a : { zip: search.zip, city: null, state: null },
+    );
+    setZipOpen(false);
+    setBodyPick([typeLabel(search.type)]);
+    void sendMessage({ text: searchMessage(search) });
+  }
+
+  // Task 041: a search in the URL (a shared or reopened link) runs on
+  // open. The remembered last search waits for one tap on the resume
+  // card, so a return visit spends nothing until asked. Numbers are
+  // never restored from storage; the fast path always runs again.
   useEffect(() => {
     setOrigin(window.location.origin);
     if (restoredRef.current) return;
@@ -623,16 +648,15 @@ export default function HomeClient({
     const init = initialSearch(window.location.search, loadLastSearch());
     if (!init) return;
     if (init.sort) chooseSort(init.sort);
-    setResumed(init.search);
-    setCurrent(init.search);
-    setArea((a) =>
-      a && a.zip === init.search.zip ? a : { zip: init.search.zip, city: null, state: null },
-    );
-    setZipOpen(false);
-    setBodyPick([typeLabel(init.search.type)]);
-    void sendMessage({ text: searchMessage(init.search) });
+    if (restoreAction(init) === "run") runSaved(init.search);
+    else setResumeOffer(init.search);
     // Runs once on open; sendMessage is stable for the session.
   }, []);
+
+  function forgetSaved() {
+    forgetLastSearch();
+    setResumeOffer(null);
+  }
 
   // When a turn finishes, the URL and the remembered search follow it.
   useEffect(() => {
@@ -768,6 +792,7 @@ export default function HomeClient({
     setListing(null);
     setListingReturn(null);
     setResumed(null);
+    setResumeOffer(null);
     void sendMessage({ text });
   }
 
@@ -957,6 +982,42 @@ export default function HomeClient({
                   We help you buy for value and quality: the signal, not the noise.
                 </Typography>
               </div>
+            ) : null}
+            {messages.length === 0 && resumeOffer ? (
+              <section
+                aria-label="Pick up where you left off"
+                className="mt-3 flex flex-col gap-3 rounded-xl border border-border bg-card p-5"
+              >
+                <div className="flex flex-col gap-1">
+                  <Typography variant="paragraph-sm" className="text-muted-foreground">
+                    Pick up where you left off
+                  </Typography>
+                  <Typography variant="paragraph-md" className="font-medium">
+                    {resumeHeading(resumeOffer)}
+                  </Typography>
+                  <Typography variant="paragraph-sm" className="text-muted-foreground">
+                    Prices and stock are checked again when you tap.
+                  </Typography>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => runSaved(resumeOffer)}
+                    className="min-h-11"
+                  >
+                    Show them again
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={forgetSaved}
+                    className="min-h-11 text-muted-foreground"
+                  >
+                    Start fresh
+                  </Button>
+                </div>
+              </section>
             ) : null}
 
             <MessageGroup>

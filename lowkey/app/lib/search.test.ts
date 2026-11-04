@@ -4,6 +4,7 @@ import {
   initialSearch,
   parseLastSearch,
   parseSearchQuery,
+  restoreAction,
   resultsLink,
   resumeHeading,
   searchMessage,
@@ -84,5 +85,13 @@ describe("stored last search (task 041, part 3)", () => {
       from: "url",
     });
     expect(initialSearch("", null)).toBeNull();
+  });
+});
+
+describe("restore action (resume card)", () => {
+  it("runs a link at once and offers a remembered search", () => {
+    const stored = serializeLastSearch({ zip: "60614", type: "suv" });
+    expect(restoreAction(initialSearch("?zip=30097&type=pickup", stored)!)).toBe("run");
+    expect(restoreAction(initialSearch("", stored)!)).toBe("offer");
   });
 });
