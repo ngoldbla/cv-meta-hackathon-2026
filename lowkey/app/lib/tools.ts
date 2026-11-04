@@ -1,5 +1,6 @@
 import { isCategory } from "./categories";
 import { fuelForModel } from "./fuel";
+import { requestRefreshIfStale, withLiveGas } from "./gasForecast";
 import { matchUnitMpg } from "./mpgmatch";
 import { aprLabel, getDefaultApr } from "./fred";
 import { fetchFarUnits, fetchUnitsForYear, fetchUnitsWithTrimFallback, type LocalUnit } from "./listings";
@@ -64,10 +65,12 @@ export async function executeLocalUnits(args: {
   const match = resolved
     ? matchUnitMpg(result.units[0] ?? {}, resolved.pick.epaVariants, resolved.pick.mpg)
     : null;
+  // Task 058: live Timestral forecasts over the table's; a stale series asks for a refresh.
   const fuel =
     table && match
-      ? fuelForModel({ mpg: match.mpg, mpgLevel: match.level, zip, table })
+      ? fuelForModel({ mpg: match.mpg, mpgLevel: match.level, zip, table: await withLiveGas(table) })
       : null;
+  requestRefreshIfStale(fuel?.latestDate);
   return {
     zip,
     model: resolved?.pick.model ?? (model ?? null),
@@ -107,7 +110,10 @@ export async function fuelForUnit(args: { zip: string; model: string; category?:
   const resolved = resolveTablePick(table, args.model, args.category);
   if (!resolved) return null;
   const match = matchUnitMpg(args.unit, resolved.pick.epaVariants, resolved.pick.mpg);
-  return match ? fuelForModel({ mpg: match.mpg, mpgLevel: match.level, zip: args.zip, table }) : null;
+  if (!match) return null;
+  const fuel = fuelForModel({ mpg: match.mpg, mpgLevel: match.level, zip: args.zip, table: await withLiveGas(table) });
+  requestRefreshIfStale(fuel?.latestDate);
+  return fuel;
 }
 
 /**

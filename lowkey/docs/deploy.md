@@ -45,11 +45,37 @@ failure. The manual equivalent is:
 
 ```bash
 set -a; . ~/.config/low-key/env; set +a
-~/.cache/low-key/venv-timestral/bin/python lowkey/pipeline/build_table.py --refresh-provider --refresh-eia --refresh-tax
+python lowkey/pipeline/build_table.py --refresh-provider --refresh-eia --refresh-tax
 node lowkey/pipeline/upload_table.mjs ~/.cache/low-key/table.json
 node lowkey/pipeline/check_table.mjs
 ```
 
+`build_table.py` takes the gas forecasts from the Gas forecast service
+(`LOWKEY_GAS_URL`, `LOWKEY_GAS_TOKEN`), so the pipeline needs no Timestral
+environment or GPU.
+
 The app reads the blob server-side only and caches it in memory for
 one hour, so a fresh upload appears within an hour (sooner on a cold
 start). No route returns the whole table.
+
+## Gas forecast service (task 058)
+
+Timestral runs on a Modal GPU that scales to zero (`cloud/gas_forecast/`).
+It forecasts weekly (Tuesday 05:00 America/New_York, after EIA posts
+Monday's prices) and on demand when the app sees a forecast older than the
+latest EIA week.
+
+```bash
+pip install modal && modal setup
+modal run cloud/gas_forecast/stage.py                  # weights into a Volume, CPU only
+modal secret create lowkey-gas EIA_API_KEY=<key> GAS_TOKEN=<a long random value>
+modal deploy cloud/gas_forecast/serve.py               # GPU only while forecasting
+```
+
+Put the printed web URL in `LOWKEY_GAS_URL` and the same token in
+`LOWKEY_GAS_TOKEN`, on Vercel (preview and production) and in
+`~/.config/low-key/env`. Without them the app uses the table's forecasts.
+
+Limits: at most 10 GPU runs per UTC day, and a refresh request is
+debounced for 6 hours after the last check. A run takes a few seconds and
+costs well under a cent.
