@@ -71,12 +71,19 @@ class TermsRead(BaseModel):
 **Spend:** one live test call before the build (task cap $0.25 for checks). The response is saved with its VIN replaced as a test fixture. The report gives the per-call cost.
 
 ## 4. Used-car depreciation
-- **Basis:** the purchase price. The curve in `ownership.ts` is exponential and has no memory, so age is already priced in and the model's 5-year retention applies forward unchanged. Retention is matched from the VIN lookup's make and model. A model missing from the table uses `DEFAULT_RETENTION_5Y`, labelled on screen.
-- **Mileage factor:** resale(t) × m(t), with `m(t) = clamp(1 − β · (milesAt(t) − 12000 · ageYearsAt(t)) / 1000, 0.75, 1.05)`. Future miles follow the existing 1,000 mi/month assumption.
-- **β:** fit once offline from the provider's sold data (price against miles within model and year band) for the five categories, capped at $1, and stored in the table with its fit statistics.
-  - If the fit is unreliable (too few sales, or a slope that isn't clearly below zero), mileage isn't used. The used card then says "This estimate doesn't account for mileage." β is never a guessed constant.
-  - The fit's threshold is recorded in the report before the fit is run.
-- **New cars:** 0 years and 0 miles reproduce today's `ownershipMath` output exactly (a test).
+**Revised 2026-11-04 (Dylan chose "age curve + effective age").** The first draft multiplied the constant-rate curve by a mileage factor. Since the price already reflects the odometer, and future miles are assumed at the typical 12k a year, that factor was always 1: mileage could not change anything. A used car needs a curve whose loss slows with age.
+
+- **The age curve, per model:** `analyze.py` already computes each model's sold-price ratio to the new price at ages 1–5 (`ages[a].ret_new`). `build_table.py` stores those points with count ≥ 30 as `retentionByAge` on each pick. This is a table rebuild from cache with 0 provider calls; older tables without the field still load.
+- **The curve between and beyond the points:** V(0) = 1, then linear interpolation of log V between stored ages. Past the last stored age, the curve continues with the model's fitted yearly slope (`slope_per_year`, stored as `retentionSlopePerYear`).
+- **Effective age:** `aEff = max(0, age + w · (odometer − 12000 · age) / 12000)`, where age = the current year − the build year (from the VIN lookup). A car with more miles than typical sits further along its curve.
+- **Forward resale:** resale(t) = price × 0.85 × V(aEff + t/12) / V(aEff), with miles added at the existing 1,000 a month. A used car from the dealer still loses the 15% trade-in step on day one, as new cars do today.
+- **The weight w, fit once:** `lowkey/pipeline/mileage_weight.py` runs about 6 provider facet calls, capped at $1. That's `facets=model`, sold, used, `sold_within_days=90`, `metrics=price.median`, for ages 2, 3 and 4, each split into miles below and above typical.
+  - Each (model, age) cell with ≥ 10 sales in both halves gives `w = (log(P_low / P_high) / |slope at that age|) / ((M_high − M_low) / 12000)`, using each half's band midpoint miles.
+  - **Acceptance (fixed before the fit runs):** at least 8 cells, a median w in [0.1, 1.5], and the cells' interquartile range above 0. Then w = the median.
+  - **Otherwise** w = 0 (age only), and the used card says "This estimate uses the car's age, not its mileage." w is never a guessed constant.
+  - The result goes to `lowkey/app/lib/mileage-weight.json`: the aggregate weight, cell count, IQR and date, with no listing rows.
+- **A model missing from the table, or without `retentionByAge`:** the used curve falls back to the constant-rate curve with `DEFAULT_RETENTION_5Y` (or the model's own 5-year figure), labelled on screen.
+- **New cars:** a car with age 0 and fewer than 1,000 miles uses today's `ownershipMath` path unchanged. A test proves the output is identical.
 - **Numbers on screen:** every figure passes the number guard (`lib/render/guard.ts`); the guard is not weakened.
 
 ## 5. Confirm screen and comparison
@@ -90,7 +97,7 @@ class TermsRead(BaseModel):
 - **pytest:** `normalize_terms()`, covering label priority, sticker-only price, split VIN, grid-implied APR, thin-result detection and mileage parsing.
 - **vitest:**
   - `lib/vin.ts` with a mocked fetch: every row of the failure table, cache-key shape, and the cap;
-  - the depreciation math: identical when new, monotonic in miles, clamped, and the "no β" path;
+  - the used curve: identical to today when new; interpolation and extrapolation; more miles never raise resale; the w = 0 path; the fallback with no `retentionByAge`;
   - barcode decode on a generated Code 39 image of an invented VIN.
 - **The eval gate in section 2**, with speed and accuracy reported side by side.
 - **End to end:** headless Chrome on a local `next start` with the reader and VIN lookup mocked, at 390 px in light and dark. Then a preview check with one real read and one real VIN lookup.
