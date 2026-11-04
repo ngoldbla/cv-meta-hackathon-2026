@@ -18,6 +18,8 @@ export interface LocalUnit {
   year: number | null;
   trim: string | null;
   url: string;
+  /** The listing's VIN (task 041; shown under licence section 3), or null. */
+  vin: string | null;
 }
 
 export interface LocalUnitsResult {
@@ -85,6 +87,13 @@ function num(value: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+/** A well-formed 17-character VIN (no I, O or Q), or null. */
+export function vinOf(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const v = value.trim().toUpperCase();
+  return /^[A-HJ-NPR-Z0-9]{17}$/.test(v) ? v : null;
+}
+
 /** Map a provider response to card units (cheapest first, at most 3). */
 export function mapListingsResponse(
   body: unknown,
@@ -113,6 +122,7 @@ export function mapListingsResponse(
       year: num(r.year),
       trim: typeof r.trim === "string" && r.trim ? r.trim : null,
       url,
+      vin: vinOf(r.vin),
     });
   }
   units.sort((a, b) => a.price - b.price);

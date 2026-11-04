@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 
 import {
   Collapsible,
@@ -8,6 +8,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/b-collapsible";
 import { fmtUsd } from "./format";
+import { CardModelContext, ListingContext } from "./listing-context";
 
 export interface DealerUnitView {
   title: string;
@@ -19,6 +20,11 @@ export interface DealerUnitView {
 }
 
 function UnitLine({ unit }: { unit: DealerUnitView }) {
+  // Task 041: "See the car" opens the in-app listing sheet first; the
+  // dealer's site is the sheet's last action. Without a handler (or a
+  // card to belong to) it stays a plain new-tab link.
+  const { onListing } = useContext(ListingContext);
+  const modelKey = useContext(CardModelContext);
   return (
     <li className="text-[13px] leading-relaxed">
       <span className="mono font-semibold">{unit.miles} mi</span>
@@ -29,14 +35,25 @@ function UnitLine({ unit }: { unit: DealerUnitView }) {
       {" · "}
       {unit.dealer}
       {" · "}
-      <a
-        href={unit.url}
-        target="_blank"
-        rel="noreferrer"
-        className="inline-block py-[13px] -my-[13px]"
-      >
-        See the car
-      </a>
+      {onListing && modelKey ? (
+        <button
+          type="button"
+          onClick={() => onListing(modelKey, unit.url)}
+          aria-label={`See the ${unit.title} at ${unit.dealer}`}
+          className="inline-block -my-[13px] py-[13px] text-brass underline"
+        >
+          See the car
+        </button>
+      ) : (
+        <a
+          href={unit.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block py-[13px] -my-[13px]"
+        >
+          See the car
+        </a>
+      )}
       {unit.note ? (
         <span className="mt-1 block text-foreground/80">{unit.note}</span>
       ) : null}

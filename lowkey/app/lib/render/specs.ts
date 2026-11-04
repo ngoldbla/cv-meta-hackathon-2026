@@ -6,6 +6,7 @@ import {
   unitTitle,
 } from "../costs";
 import { bestAtLabels, type BestAt, type ChooserFacts } from "../chooser";
+import { unitDeal, type DealInputs } from "../deal";
 import { cardSentence } from "../summary";
 
 /**
@@ -62,6 +63,8 @@ export interface SpecOwnership {
   evenMonth?: number | null;
   underwaterMonth?: number | null;
   curve: { month: number; resale: number; balance: number; equity?: number }[];
+  /** Assumptions for pricing another local unit (task 041). */
+  dealInputs?: DealInputs;
 }
 
 export interface SpecUnit {
@@ -72,6 +75,7 @@ export interface SpecUnit {
   trim?: string | null;
   price: number;
   url: string;
+  vin?: string | null;
 }
 
 export interface SpecLocal {
@@ -441,4 +445,53 @@ export function buildTurnSpecs(
     );
   }
   return { compare: buildCostCompareSpec(entries, category), cards };
+}
+
+/**
+ * The listing sheet (task 041, part 1): one local unit with its own
+ * estimated out-the-door price, monthly bills and positive-equity
+ * month, priced at the turn's assumptions. Null when the unit is not
+ * in the entry's tool results or the ownership output predates the
+ * deal inputs. Dollars are whole dollars, as everywhere in specs.
+ */
+export function buildListingSpec(entry: SpecEntry, url: string): Spec | null {
+  const { pick, ownership, local } = entry;
+  const unit = (local?.units ?? []).find((u) => u.url === url);
+  const inputs = ownership?.dealInputs;
+  if (!unit || !ownership || !inputs) return null;
+  const gas = gasPerMonth(entry);
+  const deal = unitDeal(inputs, unit.price, gas);
+  const title = [unit.year ?? null, pick.make, local?.model ?? pick.model, unit.trim ?? null]
+    .filter((p) => p !== null && p !== "")
+    .join(" ");
+  return {
+    root: "listing",
+    elements: {
+      listing: {
+        type: "ListingDetail",
+        props: {
+          modelKey: pick.model,
+          title,
+          vin: unit.vin ?? null,
+          dealer: unit.dealer,
+          miles: unit.distanceMiles,
+          daysOnLot: unit.daysOnLot ?? null,
+          price: unit.price,
+          tax: deal.tax === null ? null : usd(deal.tax),
+          outTheDoor: deal.outTheDoor === null ? null : usd(deal.outTheDoor),
+          taxNotice: ownership.taxNotice ?? null,
+          down: usd(deal.down),
+          downShare: inputs.downRule.kind === "share" ? inputs.downRule.share : null,
+          aprPercent: inputs.aprPercent,
+          termMonths: inputs.termMonths,
+          loan: usd(deal.loan),
+          gas: gas === null ? null : usd(gas),
+          bills: usd(deal.bills),
+          positiveEquityMonth: deal.positiveEquityMonth,
+          url: unit.url,
+        },
+        children: [],
+      },
+    },
+  };
 }
