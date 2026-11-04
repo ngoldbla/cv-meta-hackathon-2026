@@ -28,6 +28,14 @@ _LABELS = {
     "rebates": ["rebate", "rebates", "incentive"],
     "trade_in": ["trade-in", "trade in", "trade allowance"],
 }
+# Optional dealer products: a label matching these is always an add-on,
+# whatever the model tagged it (task 046: add-ons are shown on their own line).
+_ADDONS = re.compile(
+    r"nitrogen|etch|protect|coating|sealant|tint|wheel lock|pinstrip|theft|lojack|"
+    r"appearance|market adjust|additional dealer markup|adm\b|dealer add|accessor|"
+    r"gap\b|service contract|extended warranty|maintenance plan|key replacement",
+    re.I,
+)
 # fee lines that are really other fields
 _NOT_FEES = re.compile(r"price|down|out.?the.?door|total|apr|term|payment|msrp|trade|rebate", re.I)
 
@@ -96,7 +104,11 @@ def normalize(raw: dict) -> dict:
     out["epa_combined_mpg"] = int(m.group(1)) if m else None
 
     out["fees"] = [
-        {"label": f["label"], "amount": f.get("amount"), "kind": f.get("kind", "unknown")}
+        {
+            "label": f["label"],
+            "amount": f.get("amount"),
+            "kind": "addon" if _ADDONS.search(f.get("label", "")) else f.get("kind", "unknown"),
+        }
         for f in raw.get("fees", [])
         if not _NOT_FEES.search(f.get("label", ""))
     ]

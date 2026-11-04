@@ -17,9 +17,6 @@ from serve import Reader, app  # noqa: F401  (registers the app and class)
 KEYS = [
     "vin",
     "year",
-    "make",
-    "model",
-    "trim",
     "selling_price",
     "msrp",
     "down",

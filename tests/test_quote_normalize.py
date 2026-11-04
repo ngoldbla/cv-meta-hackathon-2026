@@ -68,3 +68,14 @@ def test_parse_money():
     assert parse_money("$1,234.50") == 1234.5
     assert parse_money("$639.18 / mo") == 639.18
     assert parse_money("n/a") is None
+
+
+def test_known_addons_override_a_dealer_tag():
+    fees = [
+        {"label": "Nitrogen tire fill", "amount": 199, "kind": "dealer"},
+        {"label": "Paint and fabric protection", "amount": 995, "kind": "dealer"},
+        {"label": "Documentary fee", "amount": 799, "kind": "dealer"},
+        {"label": "Title and registration", "amount": 185, "kind": "government"},
+    ]
+    kinds = [f["kind"] for f in normalize(raw(fees=fees))["fees"]]
+    assert kinds == ["addon", "addon", "dealer", "government"]
