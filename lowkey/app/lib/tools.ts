@@ -2,7 +2,8 @@ import { isCategory } from "./categories";
 import { fuelForModel } from "./fuel";
 import { matchUnitMpg } from "./mpgmatch";
 import { aprLabel, getDefaultApr } from "./fred";
-import { fetchUnitsWithTrimFallback } from "./listings";
+import { fetchFarUnits, fetchUnitsForYear, fetchUnitsWithTrimFallback, type LocalUnit } from "./listings";
+import { farLeads, farMargin, fetchMarketStats, type PriceContext } from "./priceStats";
 import type { DealInputs, DownRule } from "./deal";
 import { ownershipMath } from "./ownership";
 import { resolveTax, taxNoticeText } from "./tax";
@@ -31,6 +32,8 @@ export async function executeLocalUnits(args: {
   model?: string;
   category?: string;
   radius?: number;
+  /** Task 054: every new model year instead of the newest one. */
+  allYears?: boolean;
 }) {
   const { zip, model, category } = args;
   let table = null;
@@ -42,12 +45,17 @@ export async function executeLocalUnits(args: {
   const resolved = table && model ? resolveTablePick(table, model, category) : undefined;
   const providerModel = resolved?.pick.providerModel ?? (model ?? "");
   const searchCategory = resolved?.category ?? (isCategory(category) ? category : undefined);
-  const search = await fetchUnitsWithTrimFallback({
+  // Task 054: one model year by default, the pick's newest (its newest
+  // EPA variant); "include older model years" searches every new year.
+  const variantYears = (resolved?.pick.epaVariants ?? []).map((v) => v.year);
+  const newestYear = args.allYears || variantYears.length === 0 ? null : Math.max(...variantYears);
+  const search = await fetchUnitsForYear({
     zip,
     providerModel,
     recommendedTrim: resolved?.pick.recommendedTrim ?? null,
     baseTrim: resolved?.pick.baseTrim ?? null,
     category: searchCategory,
+    newestYear,
   });
   const result = search.result;
   // Task 042, part 2b: the fuel estimate uses the cheapest local
@@ -70,6 +78,9 @@ export async function executeLocalUnits(args: {
     baseTrim: resolved?.pick.baseTrim ?? null,
     trimUsed: search.trimUsed,
     fellBackToBase: search.fellBackToBase,
+    yearUsed: search.yearUsed,
+    fellBackToOlderYear: search.fellBackToOlderYear,
+    allYears: Boolean(args.allYears),
     units: result.units,
     unitsFound: result.unitsFound,
     totalFound: result.totalFound,
@@ -79,6 +90,116 @@ export async function executeLocalUnits(args: {
     widened: result.widened,
     error: result.error ?? null,
     fuel,
+  };
+}
+
+/**
+ * Task 054: the fuel estimate for a unit the shopper chose, from that
+ * unit's own EPA match (the same rule the cheapest unit gets).
+ */
+export async function fuelForUnit(args: { zip: string; model: string; category?: string; unit: LocalUnit }) {
+  let table = null;
+  try {
+    table = await getTable();
+  } catch {
+    return null;
+  }
+  const resolved = resolveTablePick(table, args.model, args.category);
+  if (!resolved) return null;
+  const match = matchUnitMpg(args.unit, resolved.pick.epaVariants, resolved.pick.mpg);
+  return match ? fuelForModel({ mpg: match.mpg, mpgLevel: match.level, zip: args.zip, table }) : null;
+}
+
+/**
+ * Task 054, part 2: the price context for the unit a card is priced
+ * on. Two stats calls at most (local, national), each cached 6 hours.
+ * Without a year or a model there is nothing to match, so no call.
+ */
+export async function executePriceContext(args: {
+  zip: string;
+  providerModel: string | null;
+  make: string | null;
+  model: string;
+  trim: string | null;
+  category: string | null;
+  radius: number;
+  unit: LocalUnit;
+}): Promise<{ context: PriceContext | null; calls: number }> {
+  const { unit } = args;
+  if (!args.providerModel || unit.year === null || !isCategory(args.category)) return { context: null, calls: 0 };
+  const q = { providerModel: args.providerModel, trim: args.trim, year: unit.year, category: args.category };
+  const local = await fetchMarketStats({ ...q, zip: args.zip, radius: args.radius });
+  const national = await fetchMarketStats(q);
+  return {
+    calls: 2,
+    context: {
+      make: args.make,
+      model: args.model,
+      trim: args.trim,
+      year: unit.year,
+      radius: args.radius,
+      local,
+      national,
+      unit: { vin: unit.vin, listedPrice: unit.listedPrice ?? null, msrp: unit.msrp ?? null },
+    },
+  };
+}
+
+export interface FartherResult {
+  /** The cheapest local price the leads are measured against. */
+  bestLocal: number | null;
+  margin: number | null;
+  radius: number;
+  year: number | null;
+  trim: string | null;
+  leads: (LocalUnit & { saves: number })[];
+  /** How many units the national search returned (before the margin rule). */
+  searched: number;
+  error: string | null;
+  calls: number;
+}
+
+/**
+ * Task 054, part 2: far-away leads for one car. The local search is the
+ * card's own (cached); the national search is the one on-demand call.
+ * Only units with a VIN can be chosen, so only those are offered.
+ */
+export async function executeFarther(args: {
+  zip: string;
+  model: string;
+  category?: string;
+  allYears?: boolean;
+}): Promise<FartherResult> {
+  const local = await executeLocalUnits({ zip: args.zip, model: args.model, category: args.category, allYears: args.allYears });
+  const face = local.units[0] ?? null;
+  const base = {
+    bestLocal: local.bestPrice,
+    margin: local.bestPrice !== null ? farMargin(local.bestPrice) : null,
+    radius: local.radiusUsed,
+    year: face?.year ?? null,
+    trim: local.trimUsed,
+    leads: [],
+    searched: 0,
+    calls: 0,
+  };
+  if (!face || local.bestPrice === null || face.year === null || !local.providerModel || !isCategory(local.category)) {
+    return { ...base, error: local.error ?? "No local price to compare with" };
+  }
+  const far = await fetchFarUnits({
+    zip: args.zip,
+    providerModel: local.providerModel,
+    trim: local.trimUsed,
+    year: face.year,
+    category: local.category,
+  });
+  if (!far) return { ...base, calls: 1, error: "Couldn't search farther away just now" };
+  const withVin = far.units.filter((u) => u.vin !== null);
+  return {
+    ...base,
+    calls: 1,
+    searched: far.units.length,
+    leads: farLeads(withVin, local.bestPrice, local.radiusUsed, local.units.map((u) => u.vin)),
+    error: null,
   };
 }
 
@@ -93,13 +214,16 @@ export async function executeOwnership(args: {
   category?: string;
   retention5y?: number;
   /** Set by the fast path when `price` is already the resolved price. */
-  priceSource?: "local" | "typical" | "given";
+  priceSource?: "local" | "typical" | "given" | "chosen";
   /**
    * How `down` was set (task 041), so the listing sheet can price
    * another unit the same way. Default: a stated dollar `down` is a
    * fixed amount; no `down` is 10% of the price.
    */
   downRule?: DownRule;
+  /** Task 054: with priceSource "chosen", the card's local search facts. */
+  trimUsed?: string | null;
+  fellBackToBase?: boolean;
 }) {
   const { down, apr, term, model, zip } = args;
   let table = null;
@@ -113,11 +237,16 @@ export async function executeOwnership(args: {
     args.retention5y ?? resolved?.pick.retentionAfterDiscount;
 
   let price = args.price;
-  let priceSource: "local" | "typical" | "given" = args.priceSource ?? "given";
+  let priceSource: "local" | "typical" | "given" | "chosen" = args.priceSource ?? "given";
   let typicalPrice: number | null = resolved?.pick.typicalNewPrice ?? null;
   let trimUsed: string | null = resolved?.pick.recommendedTrim ?? null;
   let fellBackToBase = false;
-  if (zip && resolved) {
+  // Task 054: the search (runSearch) passes the price it resolved, with
+  // the local search's facts; no second search. Other callers search.
+  if (args.priceSource !== undefined && args.trimUsed !== undefined) {
+    trimUsed = args.trimUsed ?? trimUsed;
+    fellBackToBase = args.fellBackToBase ?? false;
+  } else if (zip && resolved) {
     const search = await fetchUnitsWithTrimFallback({
       zip,
       providerModel: resolved.pick.providerModel,

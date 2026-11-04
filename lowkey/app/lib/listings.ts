@@ -27,6 +27,11 @@ export interface LocalUnit {
   engine?: string | null;
   cylinders?: number | null;
   powertrain?: string | null;
+  /** Task 054: the advertised price (the price-context basis), the unit's own MSRP, and where the dealer is. */
+  listedPrice?: number | null;
+  msrp?: number | null;
+  city?: string | null;
+  state?: string | null;
 }
 
 export interface LocalUnitsResult {
@@ -72,6 +77,8 @@ export function listingsUrl(
   radius: number,
   trim?: string | null,
   category: Category = "Sedan",
+  /** Task 054: one model year, or null for every new model year. */
+  year: number | null = null,
 ): string {
   const params = new URLSearchParams({
     inventory_type: "new",
@@ -85,9 +92,11 @@ export function listingsUrl(
     ...listingFilters(category),
     // Task 042, part 2b: the fields the per-unit MPG match needs,
     // projected in the same call.
-    fields: "default,drivetrain,engine,cylinders,powertrain_type",
+    // Task 054: msrp, city and state for the price context.
+    fields: "default,drivetrain,engine,cylinders,powertrain_type,msrp,city,state",
   });
   if (trim) params.set("trim", trim);
+  if (year !== null) params.set("year", String(year));
   return `${baseUrl.replace(/\/$/, "")}/listings?${params.toString()}`;
 }
 
@@ -108,6 +117,7 @@ export function vinOf(value: unknown): string | null {
 export function mapListingsResponse(
   body: unknown,
   _zip?: string,
+  max = 3,
 ): { units: LocalUnit[]; total: number } {
   const root = (body ?? {}) as {
     data?: unknown;
@@ -137,11 +147,15 @@ export function mapListingsResponse(
       engine: typeof r.engine === "string" ? r.engine : null,
       cylinders: num(r.cylinders),
       powertrain: typeof r.powertrain_type === "string" ? r.powertrain_type : null,
+      listedPrice: num(r.price),
+      msrp: num(r.msrp),
+      city: typeof r.city === "string" && r.city ? r.city : null,
+      state: typeof r.state === "string" && r.state ? r.state : null,
     });
   }
   units.sort((a, b) => a.price - b.price);
   const total = num(root.pagination?.total) ?? units.length;
-  return { units: units.slice(0, 3), total };
+  return { units: units.slice(0, max), total };
 }
 
 function failure(
@@ -168,6 +182,8 @@ export async function fetchLocalUnits(args: {
   providerModel: string;
   trim?: string | null;
   category?: Category;
+  /** Task 054: one model year, or null/absent for every new model year. */
+  year?: number | null;
   fetcher?: ListingsFetcher;
   baseUrl?: string;
   apiKey?: string;
@@ -186,7 +202,7 @@ export async function fetchLocalUnits(args: {
 
   const retryDelays = args.retryDelaysMs ?? [700, 1400];
   async function search(radius: number) {
-    const url = listingsUrl(baseUrl!, providerModel, zip, radius, trim, args.category);
+    const url = listingsUrl(baseUrl!, providerModel, zip, radius, trim, args.category, args.year ?? null);
     for (let attempt = 0; ; attempt += 1) {
       const res = await fetcher(url, {
         headers: {
@@ -286,6 +302,7 @@ export async function fetchUnitsWithTrimFallback(args: {
   recommendedTrim?: string | null;
   baseTrim?: string | null;
   category?: Category;
+  year?: number | null;
   fetcher?: ListingsFetcher;
   baseUrl?: string;
   apiKey?: string;
@@ -297,6 +314,7 @@ export async function fetchUnitsWithTrimFallback(args: {
     zip: args.zip,
     providerModel: args.providerModel,
     category: args.category,
+    year: args.year ?? null,
     fetcher: args.fetcher,
     baseUrl: args.baseUrl,
     apiKey: args.apiKey,
@@ -315,4 +333,91 @@ export async function fetchUnitsWithTrimFallback(args: {
   }
   const fallback = await fetchLocalUnits({ ...shared, trim: base });
   return { result: fallback, trimUsed: base, fellBackToBase: true };
+}
+
+/**
+ * The national search for far-away leads (task 054, part 2): the same
+ * model, trim and year with no radius, cheapest first. The ZIP is the
+ * distance origin only. One call, made on demand, cached for 6 hours.
+ */
+export const FAR_LIMIT = 20;
+
+export function farListingsUrl(
+  baseUrl: string,
+  providerModel: string,
+  zip: string,
+  trim: string | null,
+  year: number,
+  category: Category = "Sedan",
+): string {
+  const params = new URLSearchParams({
+    inventory_type: "new",
+    availability_status: "stock",
+    model: providerModel,
+    year: String(year),
+    postal_code: zip,
+    sort: "price",
+    price_basis: "selected",
+    limit: String(FAR_LIMIT),
+    ...listingFilters(category),
+    fields: "default,drivetrain,engine,cylinders,powertrain_type,msrp,city,state",
+  });
+  if (trim) params.set("trim", trim);
+  return `${baseUrl.replace(/\/$/, "")}/listings?${params.toString()}`;
+}
+
+export async function fetchFarUnits(args: {
+  zip: string;
+  providerModel: string;
+  trim: string | null;
+  year: number;
+  category?: Category;
+  fetcher?: ListingsFetcher;
+  baseUrl?: string;
+  apiKey?: string;
+}): Promise<{ units: LocalUnit[]; total: number } | null> {
+  const baseUrl = args.baseUrl ?? process.env.LOWKEY_PROVIDER_BASE_URL;
+  const apiKey = args.apiKey ?? process.env.LOWKEY_PROVIDER_KEY;
+  if (!baseUrl || !apiKey || !args.providerModel || !/^\d{5}$/.test(args.zip)) return null;
+  const fetcher: ListingsFetcher = args.fetcher ?? (fetch as unknown as ListingsFetcher);
+  try {
+    const res = await fetcher(farListingsUrl(baseUrl, args.providerModel, args.zip, args.trim, args.year, args.category), {
+      headers: { Authorization: `Bearer ${apiKey}`, Accept: "application/json" },
+      next: { revalidate: REVALIDATE_SECONDS },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return null;
+    return mapListingsResponse(await res.json(), args.zip, FAR_LIMIT);
+  } catch {
+    return null;
+  }
+}
+
+export interface YearSearchOutcome extends TrimSearchOutcome {
+  /** The model year searched, or null for every new model year. */
+  yearUsed: number | null;
+  /** True when the newest year had no stock and the year before was searched. */
+  fellBackToOlderYear: boolean;
+}
+
+/**
+ * Task 054: one model year at a time. The newest model year is searched
+ * first (with the trim fallback inside); only a clean zero within 150
+ * miles falls back to the year before. `newestYear` null searches every
+ * new model year (the shopper's "include older model years").
+ */
+export async function fetchUnitsForYear(
+  args: Parameters<typeof fetchUnitsWithTrimFallback>[0] & { newestYear: number | null },
+): Promise<YearSearchOutcome> {
+  const { newestYear, ...rest } = args;
+  if (newestYear === null) {
+    const all = await fetchUnitsWithTrimFallback({ ...rest, year: null });
+    return { ...all, yearUsed: null, fellBackToOlderYear: false };
+  }
+  const first = await fetchUnitsWithTrimFallback({ ...rest, year: newestYear });
+  if (first.result.error || first.result.totalFound > 0 || first.result.unitsFound > 0) {
+    return { ...first, yearUsed: newestYear, fellBackToOlderYear: false };
+  }
+  const older = await fetchUnitsWithTrimFallback({ ...rest, year: newestYear - 1 });
+  return { ...older, yearUsed: newestYear - 1, fellBackToOlderYear: true };
 }

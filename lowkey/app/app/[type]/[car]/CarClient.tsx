@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { RenderSpec } from "@/components/render/registry";
 import { TextFallback } from "@/components/render/TextFallback";
 import { AppBar } from "@/components/screens/Chrome";
+import { FartherLeads, PriceStripFor, YearsToggle } from "@/components/screens/PriceContext";
 import { useSearch } from "@/components/screens/useSearch";
 import WalkAwayView from "@/components/WalkAwayView";
 import { Alert } from "@/components/ui/alert";
@@ -14,7 +15,8 @@ import { buttonVariants } from "@/components/ui/b-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isCatalogValid } from "@/lib/render/validate";
 import { carsOf, type CarView } from "@/lib/resultView";
-import { listingPath, parseView, quotePath, resultsPath, searchApiQuery } from "@/lib/routes";
+import { pricedUnitOf, stripUnitOf } from "@/lib/render/specs";
+import { carPath, listingPath, parseView, quotePath, resultsPath, searchApiQuery, withChoice, withYears } from "@/lib/routes";
 import type { SearchType } from "@/lib/search";
 
 /** The walk-away view's inputs from one priced car (the same mapping the chat page used before task 049). */
@@ -44,8 +46,9 @@ function walkInputs(car: CarView) {
 export default function CarClient({ type, slug }: { type: SearchType; slug: string }) {
   const router = useRouter();
   const params = useSearchParams();
-  const view = parseView(params);
-  const state = useSearch(view ? searchApiQuery(type, view) : null);
+  const view = parseView(params, slug);
+  // Task 054: choosing a unit re-prices in place; the old figures stay until the new ones arrive.
+  const state = useSearch(view ? searchApiQuery(type, view) : null, { keep: true });
   const [origin, setOrigin] = useState("");
 
   useEffect(() => {
@@ -63,7 +66,13 @@ export default function CarClient({ type, slug }: { type: SearchType; slug: stri
   const openListing = (_model: string, url: string) => {
     const n = (car?.entry.local?.units ?? []).findIndex((u) => u.url === url);
     if (car && n >= 0) router.push(listingPath(type, car.slug, n + 1, view));
+    else if (car?.entry.chosen?.unit.url === url && car.entry.chosen.vin) router.push(listingPath(type, car.slug, car.entry.chosen.vin, view));
   };
+  // Task 054, part 3: the choice lives in the URL, so Back undoes it.
+  const choose = (vin: string | null) =>
+    router.push(carPath(type, slug, withChoice(view, vin ? { car: slug, unit: vin } : null)), { scroll: false });
+  const chosenVin = view.choice?.car === slug ? view.choice.unit : null;
+  const updating = state.status === "ready" && Boolean(state.updating);
 
   return (
     <main className="shell pb-24">
@@ -89,13 +98,45 @@ export default function CarClient({ type, slug }: { type: SearchType; slug: stri
         </div>
       ) : (
         <>
-          <div className="pt-3">
+          {data!.choiceMissing && chosenVin ? (
+            <div className="mt-3 flex flex-col gap-1 rounded-[10px] bg-muted px-3 py-2 text-sm">
+              <span>The car you chose isn&apos;t listed any more, so this is priced on the cheapest one nearby.</span>
+              <button type="button" onClick={() => choose(null)} className="inline-flex min-h-11 items-center self-start underline underline-offset-2">
+                Clear the choice
+              </button>
+            </div>
+          ) : null}
+          <p role="status" className="sr-only">
+            {updating ? "Updating the figures for this car." : ""}
+          </p>
+          <div className={updating ? "pt-3 opacity-60 transition-opacity" : "pt-3 transition-opacity"} aria-busy={updating}>
             {spec && isCatalogValid(spec) ? (
-              <RenderSpec spec={spec} onListing={openListing} resultsUrl={origin + back} />
+              <RenderSpec spec={spec} onListing={openListing} onChoose={(_m, vin) => choose(vin)} resultsUrl={origin + back} />
             ) : (
               <TextFallback entry={car.entry} peers={data!.shown as never} category={data!.category} />
             )}
           </div>
+          <section aria-label="Price in context" className="mt-6 flex flex-col gap-2">
+            <PriceStripFor entry={car.entry} unit={pricedUnitOf(car.entry) ? stripUnitOf(pricedUnitOf(car.entry)!) : null} />
+            <YearsToggle
+              allYears={view.years === "all"}
+              year={(car.entry.local as { yearUsed?: number | null } | undefined)?.yearUsed ?? null}
+              fellBack={Boolean((car.entry.local as { fellBackToOlderYear?: boolean } | undefined)?.fellBackToOlderYear)}
+              onToggle={(all) => router.push(carPath(type, slug, withYears(view, all)), { scroll: false })}
+            />
+            <FartherLeads
+              type={type}
+              slug={slug}
+              zip={view.zip}
+              model={car.entry.local?.model ?? car.pick.model}
+              make={car.pick.make}
+              chosenVin={chosenVin}
+              startOpen={data!.choice?.source === "far"}
+              allYears={view.years === "all"}
+              onOpen={(vin) => router.push(listingPath(type, slug, vin, view))}
+              onChoose={choose}
+            />
+          </section>
           {car.ownership ? (
             <section id="walk-away" aria-labelledby="walk-away-title" className="mt-6 scroll-mt-16">
               <h2 id="walk-away-title" className="text-lg font-semibold">

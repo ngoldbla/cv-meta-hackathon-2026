@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   fetchLocalUnits,
+  fetchUnitsForYear,
   fetchUnitsWithTrimFallback,
   listingsUrl,
   mapListingsResponse,
@@ -84,6 +85,11 @@ describe("mapListingsResponse (task 027 part 3)", () => {
       engine: null,
       cylinders: null,
       powertrain: null,
+      // Task 054: the price-context fields.
+      listedPrice: 35000,
+      msrp: null,
+      city: null,
+      state: null,
     });
     expect(units[0].price).toBeLessThan(units[1].price);
   });
@@ -387,5 +393,53 @@ describe("listingsUrl category filters (task 042)", () => {
     const gas = new URL(listingsUrl("https://provider.example", "CR-V", "60614", 50));
     expect(gas.searchParams.get("fuel_type")).toBe("Gas only");
     expect(gas.searchParams.get("fields")).toContain("drivetrain");
+  });
+});
+
+describe("one model year at a time (task 054)", () => {
+  const shared = { zip: "30263", providerModel: "Corolla", recommendedTrim: "SE", baseTrim: "LE", baseUrl: "https://p.test/v1", apiKey: "k" };
+
+  function byYear(stock: Record<string, number>): { fetcher: ListingsFetcher; urls: URL[] } {
+    const urls: URL[] = [];
+    const fetcher: ListingsFetcher = async (raw) => {
+      const u = new URL(raw);
+      urls.push(u);
+      const n = stock[`${u.searchParams.get("year") ?? "all"}`] ?? 0;
+      const rows = Array.from({ length: Math.min(n, 3) }, (_, i) => row({ year: Number(u.searchParams.get("year") ?? 2026), price_with_fees: 27_000 + i, vdp_url: `https://example.com/u/${i}` }));
+      return { ok: true, status: 200, json: async () => body(rows, n) };
+    };
+    return { fetcher, urls };
+  }
+
+  it("searches the newest model year only, at the same trim", async () => {
+    const { fetcher, urls } = byYear({ "2027": 12 });
+    const out = await fetchUnitsForYear({ ...shared, fetcher, newestYear: 2027 });
+    expect(out.yearUsed).toBe(2027);
+    expect(out.fellBackToOlderYear).toBe(false);
+    expect(out.result.totalFound).toBe(12);
+    expect(urls.every((u) => u.searchParams.get("year") === "2027")).toBe(true);
+  });
+
+  it("falls back to the year before only on a clean zero within 150 miles", async () => {
+    const { fetcher, urls } = byYear({ "2026": 9 });
+    const out = await fetchUnitsForYear({ ...shared, fetcher, newestYear: 2027 });
+    expect(out.yearUsed).toBe(2026);
+    expect(out.fellBackToOlderYear).toBe(true);
+    expect(out.result.totalFound).toBe(9);
+    // 2027 was searched at 50 and 150 miles for both trims before falling back.
+    expect(urls.filter((u) => u.searchParams.get("year") === "2027").map((u) => u.searchParams.get("radius"))).toEqual(["50", "150", "50", "150"]);
+  });
+
+  it("searches every new model year when the shopper includes older ones", async () => {
+    const { fetcher, urls } = byYear({ all: 30 });
+    const out = await fetchUnitsForYear({ ...shared, fetcher, newestYear: null });
+    expect(out.yearUsed).toBeNull();
+    expect(out.result.totalFound).toBe(30);
+    expect(urls.every((u) => !u.searchParams.has("year"))).toBe(true);
+  });
+
+  it("puts the year in the listings URL only when one is given", () => {
+    expect(new URL(listingsUrl("https://p.test/v1", "Corolla", "30263", 50, "SE", "Sedan", 2027)).searchParams.get("year")).toBe("2027");
+    expect(new URL(listingsUrl("https://p.test/v1", "Corolla", "30263", 50, "SE", "Sedan")).searchParams.has("year")).toBe(false);
   });
 });

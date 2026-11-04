@@ -7,7 +7,7 @@
 
 import type { QuotePick } from "@/components/QuoteCheck";
 import type { SearchResult } from "./searchRun";
-import { pickSlug, type SpecEntry, type SpecOwnership } from "./render/specs";
+import { pickSlug, type SpecEntry, type SpecOwnership, type SpecUnit } from "./render/specs";
 
 type Pick0 = SearchResult["shown"][number];
 type Own0 = SearchResult["ownerships"][number];
@@ -68,6 +68,12 @@ export function carsOf(r: SearchResult): CarView[] {
         pick: pick as unknown as SpecEntry["pick"],
         ownership: toSpecOwnership(ownership),
         local: r.locals[i] as unknown as SpecEntry["local"],
+        // Task 054: the same context and choice the server's specs used.
+        context: r.contexts?.[i] ?? null,
+        chosen:
+          r.choice && r.choice.model === p.model
+            ? { vin: r.choice.vin, source: r.choice.source, unit: r.choice.unit as unknown as SpecUnit }
+            : null,
       },
     };
   });

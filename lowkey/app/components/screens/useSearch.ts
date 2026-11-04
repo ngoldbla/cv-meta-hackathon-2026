@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { SearchResult } from "@/lib/searchRun";
 
@@ -29,19 +29,36 @@ function load(url: string): Promise<SearchResult> {
   return p;
 }
 
-export function useSearch(url: string | null): SearchState {
+/**
+ * With `keep` (task 054: choosing a unit re-prices one car), the last
+ * result stays on screen, marked `updating`, until the new one arrives.
+ */
+export function useSearch(url: string | null, opts: { keep?: boolean } = {}): SearchState & { updating?: boolean } {
   const [state, setState] = useState<SearchState>({ status: "loading" });
+  const [updating, setUpdating] = useState(false);
+  const keep = Boolean(opts.keep);
+  const last = useRef<SearchState>(state);
+  last.current = state;
   useEffect(() => {
     if (!url) return;
     let live = true;
-    setState({ status: "loading" });
+    if (keep && last.current.status === "ready") setUpdating(true);
+    else setState({ status: "loading" });
     load(url).then(
-      (data) => live && setState({ status: "ready", data }),
-      (e: Error) => live && setState({ status: "error", message: e.message }),
+      (data) => {
+        if (!live) return;
+        setUpdating(false);
+        setState({ status: "ready", data });
+      },
+      (e: Error) => {
+        if (!live) return;
+        setUpdating(false);
+        setState({ status: "error", message: e.message });
+      },
     );
     return () => {
       live = false;
     };
-  }, [url]);
-  return state;
+  }, [url, keep]);
+  return state.status === "ready" ? { ...state, updating } : state;
 }

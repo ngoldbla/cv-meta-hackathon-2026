@@ -36,6 +36,9 @@ const badgeColors = {
   fuchsia: "#d946ef",
   pink: "#ec4899",
   rose: "#f43f5e",
+  // Low Key (task 054): the brass token, so the "Cheapest to own" label
+  // meets 4.5:1 in light and dark (amber measured 2.8:1).
+  brass: "var(--brass)",
 } as const;
 
 const badgeSemanticColors = {

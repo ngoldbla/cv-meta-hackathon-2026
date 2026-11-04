@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/b-togglegroup";
 import { categoryNoun } from "@/lib/categories";
 import { SORT_KEYS, SORT_LABEL, isSortKey, sortFacts } from "@/lib/chooser";
+import { rowPriceLine } from "@/lib/priceStats";
 
 import { ChooserContext } from "./chooser-context";
 import { SEGMENT_COLOR, fmtUsd } from "./format";
@@ -29,6 +30,9 @@ export interface CostCompareRow {
   lifespanYears: number | null;
   price: number | null;
   listingTotal: number | null;
+  /** Task 054: the priced unit against the local median, and whether the shopper chose it. */
+  vsLocalMedian?: number | null;
+  chosen?: boolean;
 }
 
 
@@ -68,7 +72,7 @@ export function CostCompareView({
   const max = Math.max(...rows.map((r) => r.total), 1);
   const pct = (n: number) => `${(n / max) * 100}%`;
   const rowAria = (r: CostCompareRow) =>
-    `${r.label}${r.labels.length ? `, ${r.labels.join(", ").toLowerCase()}` : ""}: ${r.total} dollars a month real cost: ${r.valueLost} value lost, ${r.interest} interest, ${r.gas} gas, ${r.tax} sales tax; you pay ${r.bills} dollars a month${r.nearestMiles !== null ? `; nearest ${Math.round(r.nearestMiles)} miles` : ""}${r.price !== null && r.listingTotal !== null ? `; lowest listed ${r.price} dollars of ${r.listingTotal} listed` : ""}${onOpen ? ". Opens the full card." : ""}`;
+    `${r.label}${r.labels.length ? `, ${r.labels.join(", ").toLowerCase()}` : ""}: ${r.total} dollars a month real cost: ${r.valueLost} value lost, ${r.interest} interest, ${r.gas} gas, ${r.tax} sales tax; you pay ${r.bills} dollars a month${r.nearestMiles !== null ? `; nearest ${Math.round(r.nearestMiles)} miles` : ""}${r.chosen ? "; priced on the car you're going for" : r.price !== null && r.listingTotal !== null ? `; lowest listed ${r.price} dollars of ${r.listingTotal} listed` : ""}${rowPriceLine(r.vsLocalMedian ?? null) ? `; ${rowPriceLine(r.vsLocalMedian ?? null)}` : ""}${onOpen ? ". Opens the full card." : ""}`;
   return (
     <section
       aria-label={`What each ${categoryNoun(category)} really costs a month, sorted by ${SORT_LABEL[sort].toLowerCase()}`}
@@ -139,7 +143,7 @@ export function CostCompareView({
                   {r.labels.map((l) => (
                     <Badge
                       key={l}
-                      color={l === "Cheapest to own" ? "amber" : "gray"}
+                      color={l === "Cheapest to own" ? "brass" : "gray"}
                       size="sm"
                       animate={false}
                       shimmer={false}
@@ -156,10 +160,15 @@ export function CostCompareView({
                 <span style={{ width: pct(r.tax), minWidth: r.tax > 0 ? 2 : undefined, background: SEGMENT_COLOR.tax }} className="block h-full" />
               </span>
               <span className="text-xs text-muted-foreground">{factLine(r)}</span>
-              {r.price !== null && r.listingTotal !== null ? (
+              {r.chosen ? (
+                <span className="text-xs font-medium">Priced on the car you&apos;re going for</span>
+              ) : r.price !== null && r.listingTotal !== null ? (
                 <span className="text-xs text-muted-foreground">
                   {fmtUsd(r.price)} · lowest of {r.listingTotal} listed
                 </span>
+              ) : null}
+              {rowPriceLine(r.vsLocalMedian ?? null) ? (
+                <span className="text-xs text-muted-foreground">{rowPriceLine(r.vsLocalMedian ?? null)}</span>
               ) : null}
             </button>
           </motion.li>

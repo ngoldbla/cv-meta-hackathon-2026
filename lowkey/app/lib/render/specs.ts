@@ -7,6 +7,7 @@ import {
 } from "../costs";
 import { bestAtLabels, type BestAt, type ChooserFacts } from "../chooser";
 import { unitDeal, type DealInputs } from "../deal";
+import { priceFacts, type PriceContext } from "../priceStats";
 import { cardSentence } from "../summary";
 
 /**
@@ -76,6 +77,11 @@ export interface SpecUnit {
   price: number;
   url: string;
   vin?: string | null;
+  /** Task 054: the advertised price, the unit's own MSRP, the dealer's place. */
+  listedPrice?: number | null;
+  msrp?: number | null;
+  city?: string | null;
+  state?: string | null;
 }
 
 export interface SpecLocal {
@@ -120,6 +126,10 @@ export interface SpecEntry {
   pick: SpecPick;
   ownership?: SpecOwnership;
   local?: SpecLocal;
+  /** Task 054: the market around the unit the card is priced on. */
+  context?: PriceContext | null;
+  /** Task 054: the unit the shopper chose, which the ownership prices. */
+  chosen?: { vin: string; source: "local" | "far"; unit: SpecUnit } | null;
 }
 
 /** Whole dollars, the one documented rounding for spec amounts. */
@@ -336,6 +346,7 @@ export function buildPickCardSpec(
   const modelForUnits = local?.model ?? pick.model;
   const facePlan = dealerUnitsFace(units, pick.currentYear);
   const stats = listingStats(local);
+  const chosenVin = entry.chosen?.vin ?? null;
   const toUnit = (u: SpecUnit, note: string | null) => ({
     title: unitTitle(u.year, modelForUnits, u.trim),
     miles: u.distanceMiles,
@@ -343,6 +354,8 @@ export function buildPickCardSpec(
     dealer: u.dealer,
     url: u.url,
     note,
+    vin: u.vin ?? null,
+    chosen: chosenVin !== null && u.vin === chosenVin,
   });
   elements[dealerId] = {
     type: "DealerLine",
@@ -382,6 +395,10 @@ export function buildPickCardSpec(
       category,
       modelKey: pick.model,
       hasWalkAway: Boolean(ownership),
+      // Task 054: the card says when it is priced on the shopper's own pick.
+      chosenNote: entry.chosen
+        ? `Priced on the car you're going for, at ${entry.chosen.unit.dealer}${entry.chosen.source === "far" ? ` in ${[entry.chosen.unit.city, entry.chosen.unit.state].filter(Boolean).join(", ")}` : ""}.`
+        : null,
     },
     children,
   };
@@ -418,6 +435,10 @@ export function buildCostCompareSpec(entries: SpecEntry[], category: string): Sp
         lifespanYears: entry.pick.lifespanYears ?? null,
         price: stats ? stats.price : null,
         listingTotal: stats ? stats.total : null,
+        // Task 054: the priced unit against the local median, and whether
+        // the shopper chose that unit.
+        vsLocalMedian: entry.context ? priceFacts(entry.context).vsLocalMedian : null,
+        chosen: Boolean(entry.chosen),
       };
     })
     .filter((r): r is NonNullable<typeof r> => r !== null);
@@ -459,9 +480,12 @@ export function buildTurnSpecs(
  * in the entry's tool results or the ownership output predates the
  * deal inputs. Dollars are whole dollars, as everywhere in specs.
  */
-export function buildListingSpec(entry: SpecEntry, url: string): Spec | null {
+export function buildListingSpec(entry: SpecEntry, url: string, extra: readonly SpecUnit[] = []): Spec | null {
   const { pick, ownership, local } = entry;
-  const unit = (local?.units ?? []).find((u) => u.url === url);
+  // Task 054: far-away units (the chosen one, or a lead) price the same way.
+  const unit = [...(local?.units ?? []), ...(entry.chosen ? [entry.chosen.unit] : []), ...extra].find(
+    (u) => u.url === url,
+  );
   const inputs = ownership?.dealInputs;
   if (!unit || !ownership || !inputs) return null;
   const gas = gasPerMonth(entry);
@@ -494,6 +518,75 @@ export function buildListingSpec(entry: SpecEntry, url: string): Spec | null {
           bills: usd(deal.bills),
           positiveEquityMonth: deal.positiveEquityMonth,
           url: unit.url,
+        },
+        children: [],
+      },
+    },
+  };
+}
+
+/** The unit a price strip marks: the card's priced unit, or a listing's. */
+export interface StripUnit {
+  vin: string | null;
+  year: number | null;
+  listedPrice: number | null;
+  msrp: number | null;
+}
+
+/** The unit the card is priced on: the chosen one, else the cheapest local one. */
+export function pricedUnitOf(entry: SpecEntry): SpecUnit | null {
+  return entry.chosen?.unit ?? entry.local?.units?.[0] ?? null;
+}
+
+export function stripUnitOf(u: SpecUnit): StripUnit {
+  return { vin: u.vin ?? null, year: u.year ?? null, listedPrice: u.listedPrice ?? null, msrp: u.msrp ?? null };
+}
+
+/**
+ * The price strip (task 054, part 2): the local range (p5 to p95 with
+ * the p25–p75 band), the local and national medians, the MSRP and the
+ * marked unit. Figures copy the provider stats and the listing exactly;
+ * the differences are computed by priceFacts. A unit of another model
+ * year than the stats gets no comparison (the strip says why). Null
+ * without a context.
+ */
+export function buildPriceStripSpec(entry: SpecEntry, unit: StripUnit): Spec | null {
+  const ctx = entry.context;
+  if (!ctx) return null;
+  const sameYear = unit.year !== null && unit.year === ctx.year;
+  const facts = priceFacts({ ...ctx, unit: { vin: unit.vin, listedPrice: sameYear ? unit.listedPrice : null, msrp: unit.msrp } });
+  const title = [ctx.year, ctx.model, ctx.trim].filter((p) => p !== null && p !== "").join(" ");
+  const local = ctx.local;
+  return {
+    root: "strip",
+    elements: {
+      strip: {
+        type: "PriceStrip",
+        props: {
+          modelKey: entry.pick.model,
+          title,
+          year: ctx.year,
+          unitYear: unit.year,
+          sameYear,
+          radius: ctx.radius,
+          localLoaded: local !== null,
+          nationalLoaded: ctx.national !== null,
+          localCount: local ? local.count : null,
+          low: local ? local.p5 : null,
+          p25: local ? local.p25 : null,
+          localMedian: local ? local.median : null,
+          p75: local ? local.p75 : null,
+          high: local ? local.p95 : null,
+          nationalMedian: ctx.national ? ctx.national.median : null,
+          nationalCount: ctx.national ? ctx.national.count : null,
+          msrp: facts.msrp,
+          msrpOwn: facts.msrpOwn,
+          listed: facts.listed,
+          vsLocalMedian: facts.vsLocalMedian,
+          vsNationalMedian: facts.vsNationalMedian,
+          vsMsrp: facts.vsMsrp,
+          positionSide: facts.position ? facts.position.side : null,
+          positionShare: facts.position ? facts.position.share : null,
         },
         children: [],
       },

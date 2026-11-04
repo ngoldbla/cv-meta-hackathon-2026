@@ -2,10 +2,13 @@ import type { Spec } from "@json-render/core";
 
 import { dealerUnitsFace, effectiveMonthlyCost } from "../costs";
 import { unitDeal } from "../deal";
+import { farMargin, positionOf } from "../priceStats";
 import {
   interestPerMonth,
   listingStats,
   nearestMilesOf,
+  type SpecUnit,
+  type StripUnit,
   turnLabels,
   valueLostPerMonth,
   type SpecEntry,
@@ -297,6 +300,16 @@ function checkDealer(c: Checker, spec: Spec, id: string, entry: SpecEntry) {
     c.exact(id, `${path}.miles`, actual.miles, expected.distanceMiles);
     c.exact(id, `${path}.price`, actual.price, expected.price);
   };
+  // Task 054: a unit is marked chosen only when its VIN is the choice.
+  const chosenVin = entry.chosen?.vin ?? null;
+  const checkChosen = (actual: { chosen?: unknown; vin?: unknown } | null | undefined, expected: { vin?: string | null } | null) => {
+    if (!actual || !expected) return;
+    if (actual.vin !== undefined && (actual.vin ?? null) !== (expected.vin ?? null)) c.fail(id, "unit-vin");
+    const want = chosenVin !== null && expected.vin === chosenVin;
+    if (Boolean(actual.chosen) !== want) c.fail(id, "chosen-unit");
+  };
+  checkChosen(props.face as { chosen?: unknown } | null, plan.face);
+  ((props.more as { chosen?: unknown }[]) ?? []).forEach((u, idx) => checkChosen(u, plan.more[idx]?.unit ?? null));
   checkUnit(
     (props.face as { miles?: unknown; price?: unknown } | null) ?? null,
     plan.face ? { distanceMiles: plan.face.distanceMiles, price: plan.face.price } : null,
@@ -360,6 +373,8 @@ export function checkCostCompareSpec(spec: Spec, entries: SpecEntry[]): GuardRes
     labels: string[];
     price: number | null;
     listingTotal: number | null;
+    vsLocalMedian?: number | null;
+    chosen?: boolean;
   }[]) ?? [];
   const labels = turnLabels(entries);
   const byLabel = new Map(entries.map((e) => [`${e.pick.make} ${e.pick.model}`, e]));
@@ -389,6 +404,18 @@ export function checkCostCompareSpec(spec: Spec, entries: SpecEntry[]): GuardRes
     const stats = listingStats(entry.local);
     c.exact(spec.root, `${base}.rows.${idx}.price`, row.price, stats ? stats.price : null);
     c.exact(spec.root, `${base}.rows.${idx}.listingTotal`, row.listingTotal, stats ? stats.total : null);
+    // Task 054: the priced unit's listed price less the local median,
+    // recomputed from the raw context; and the chosen flag.
+    const ctx = entry.context ?? null;
+    const listedRaw = ctx?.unit.listedPrice ?? null;
+    const medianRaw = ctx?.local?.median ?? null;
+    c.exact(
+      spec.root,
+      `${base}.rows.${idx}.vsLocalMedian`,
+      row.vsLocalMedian,
+      listedRaw !== null && medianRaw !== null ? listedRaw - medianRaw : null,
+    );
+    if (Boolean(row.chosen) !== Boolean(entry.chosen)) c.fail(spec.root, "chosen-row");
     // Task 040: the sort figures copy or round the tool figures, and
     // the best-at labels are recomputed from them.
     c.dollar(spec.root, `${base}.rows.${idx}.bills`, row.bills, entry.ownership.monthlyPayment + gasRaw);
@@ -413,7 +440,7 @@ export function checkCostCompareSpec(spec: Spec, entries: SpecEntry[]): GuardRes
  * listing exactly, and the deal figures recompute from the ownership
  * output's assumptions (whole dollars, within $1).
  */
-export function checkListingSpec(spec: Spec, entry: SpecEntry): GuardResult {
+export function checkListingSpec(spec: Spec, entry: SpecEntry, extra: readonly SpecUnit[] = []): GuardResult {
   const c = new Checker(spec);
   const props = propsOf(spec, spec.root);
   const id = spec.root;
@@ -421,7 +448,10 @@ export function checkListingSpec(spec: Spec, entry: SpecEntry): GuardResult {
     c.fail(id, "root-type");
     return c.finish();
   }
-  const unit = (entry.local?.units ?? []).find((u) => u.url === props.url);
+  // Task 054: a far-away unit (the chosen one, or a lead) is found the same way.
+  const unit = [...(entry.local?.units ?? []), ...(entry.chosen ? [entry.chosen.unit] : []), ...extra].find(
+    (u) => u.url === props.url,
+  );
   const inputs = entry.ownership?.dealInputs;
   if (!unit || !inputs || props.modelKey !== entry.pick.model) {
     c.fail(id, "unknown-unit");
@@ -455,4 +485,69 @@ export function checkListingSpec(spec: Spec, entry: SpecEntry): GuardResult {
   c.exact(id, `${base}.termMonths`, props.termMonths, inputs.termMonths);
   c.exact(id, `${base}.positiveEquityMonth`, props.positiveEquityMonth, deal.positiveEquityMonth);
   return c.finish();
+}
+
+/**
+ * Check one price-strip spec (task 054) against its entry's context and
+ * the unit it marks: every stat copies the provider figure exactly, the
+ * differences are recomputed here from the raw figures, and a unit of
+ * another model year gets no comparison.
+ */
+export function checkPriceStripSpec(spec: Spec, entry: SpecEntry, unit: StripUnit): GuardResult {
+  const c = new Checker(spec);
+  const props = propsOf(spec, spec.root);
+  const id = spec.root;
+  const ctx = entry.context;
+  if (!props || spec.elements[id]?.type !== "PriceStrip" || !ctx || props.modelKey !== entry.pick.model) {
+    c.fail(id, "root-type");
+    return c.finish();
+  }
+  const base = `elements.${id}.props`;
+  const local = ctx.local;
+  const national = ctx.national;
+  const sameYear = unit.year !== null && unit.year === ctx.year;
+  if (props.sameYear !== sameYear) c.fail(id, "same-year");
+  if (props.localLoaded !== (local !== null)) c.fail(id, "local-loaded");
+  if (props.nationalLoaded !== (national !== null)) c.fail(id, "national-loaded");
+  c.exact(id, `${base}.year`, props.year, ctx.year);
+  c.exact(id, `${base}.unitYear`, props.unitYear, unit.year);
+  c.exact(id, `${base}.radius`, props.radius, ctx.radius);
+  c.exact(id, `${base}.localCount`, props.localCount, local ? local.count : null);
+  c.exact(id, `${base}.low`, props.low, local ? local.p5 : null);
+  c.exact(id, `${base}.p25`, props.p25, local ? local.p25 : null);
+  c.exact(id, `${base}.localMedian`, props.localMedian, local ? local.median : null);
+  c.exact(id, `${base}.p75`, props.p75, local ? local.p75 : null);
+  c.exact(id, `${base}.high`, props.high, local ? local.p95 : null);
+  c.exact(id, `${base}.nationalMedian`, props.nationalMedian, national ? national.median : null);
+  c.exact(id, `${base}.nationalCount`, props.nationalCount, national ? national.count : null);
+  const msrp = unit.msrp ?? national?.msrpMedian ?? local?.msrpMedian ?? null;
+  c.exact(id, `${base}.msrp`, props.msrp, msrp);
+  if (props.msrpOwn !== (unit.msrp !== null)) c.fail(id, "msrp-own");
+  const listed = sameYear ? unit.listedPrice : null;
+  c.exact(id, `${base}.listed`, props.listed, listed);
+  const diff = (a: number | null, b: number | null | undefined) => (a !== null && b !== null && b !== undefined ? a - b : null);
+  c.exact(id, `${base}.vsLocalMedian`, props.vsLocalMedian, diff(listed, local?.median));
+  c.exact(id, `${base}.vsNationalMedian`, props.vsNationalMedian, diff(listed, national?.median));
+  c.exact(id, `${base}.vsMsrp`, props.vsMsrp, diff(listed, msrp));
+  const pos = listed !== null && local ? positionOf(listed, local) : null;
+  if ((props.positionSide ?? null) !== (pos ? pos.side : null)) c.fail(id, "position-side");
+  c.exact(id, `${base}.positionShare`, props.positionShare, pos ? pos.share : null);
+  return c.finish();
+}
+
+/**
+ * Far-away leads (task 054) as the page receives them: each lead is
+ * checked against the margin rule and its "less than nearby" figure is
+ * recomputed from the two prices. A lead that fails is dropped.
+ */
+export function checkFarLeads<T extends { price: number; distanceMiles: number; saves: number }>(
+  leads: readonly T[],
+  bestLocal: number | null,
+  radius: number,
+  margin: number | null,
+): T[] {
+  if (bestLocal === null || margin === null || margin !== farMargin(bestLocal)) return [];
+  return leads.filter(
+    (l) => l.saves === bestLocal - l.price && l.saves >= margin && l.distanceMiles > radius,
+  );
 }

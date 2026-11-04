@@ -30,6 +30,9 @@ const dealerUnitSchema = z.object({
   dealer: z.string(),
   url: z.string(),
   note: z.string().nullable(),
+  /** Task 054: the unit the shopper is going for. */
+  chosen: z.boolean().optional(),
+  vin: z.string().nullable().optional(),
 });
 
 export const catalog = defineCatalog(schema, {
@@ -53,6 +56,8 @@ export const catalog = defineCatalog(schema, {
             lifespanYears: z.number().nullable(),
             price: z.number().nullable(),
             listingTotal: z.number().nullable(),
+            vsLocalMedian: z.number().nullable().optional(),
+            chosen: z.boolean().optional(),
           }),
         ),
       }),
@@ -112,10 +117,41 @@ export const catalog = defineCatalog(schema, {
         category: z.string(),
         modelKey: z.string(),
         hasWalkAway: z.boolean(),
+        chosenNote: z.string().nullable().optional(),
       }),
       slots: ["default"],
       description:
         "Container for one car: best-at labels (no rank), in-stock dot, Hairline figure, model and trim, code-written sentence, trim-step line, then its children in mockup order (CostBars, LifespanTrack, EquityMini, DealerLine), then 'If I change my mind'.",
+    },
+    PriceStrip: {
+      props: z.object({
+        modelKey: z.string(),
+        title: z.string(),
+        year: z.number().nullable(),
+        unitYear: z.number().nullable(),
+        sameYear: z.boolean(),
+        radius: z.number(),
+        localLoaded: z.boolean(),
+        nationalLoaded: z.boolean(),
+        localCount: z.number().nullable(),
+        low: z.number().nullable(),
+        p25: z.number().nullable(),
+        localMedian: z.number().nullable(),
+        p75: z.number().nullable(),
+        high: z.number().nullable(),
+        nationalMedian: z.number().nullable(),
+        nationalCount: z.number().nullable(),
+        msrp: z.number().nullable(),
+        msrpOwn: z.boolean(),
+        listed: z.number().nullable(),
+        vsLocalMedian: z.number().nullable(),
+        vsNationalMedian: z.number().nullable(),
+        vsMsrp: z.number().nullable(),
+        positionSide: z.enum(["lower", "higher", "at"]).nullable(),
+        positionShare: z.number().nullable(),
+      }),
+      description:
+        "Price in context (task 054): listed prices of this model, trim and year. A track from the local p5 to p95 with the p25-p75 band, ticks for the local median, the national median and the MSRP, and the marked unit; then one plain sentence written in code from these props.",
     },
     ListingDetail: {
       props: z.object({

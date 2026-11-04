@@ -12,6 +12,7 @@ import { LifespanTrackView } from "./LifespanTrack";
 import { ListingDetailView } from "./ListingDetail";
 import { ListingContext } from "./listing-context";
 import { PickCardView } from "./PickCardView";
+import { PriceStripView } from "./PriceStrip";
 import { EquityMiniView } from "./EquityMini";
 import { ChooserContext } from "./chooser-context";
 import { WalkAwayContext } from "./walk-context";
@@ -62,6 +63,7 @@ export const { registry } = defineRegistry(catalog, {
       />
     ),
     ListingDetail: ({ props }) => <ListingDetailView {...props} />,
+    PriceStrip: ({ props }) => <PriceStripView {...props} />,
     PickCard: ({ props, children }) => (
       <PickCardView {...props}>{children}</PickCardView>
     ),
@@ -77,6 +79,7 @@ export function RenderSpec({
   onSort,
   onOpen,
   onListing,
+  onChoose,
   resultsUrl,
 }: {
   spec: Spec;
@@ -87,10 +90,12 @@ export function RenderSpec({
   onOpen?: (modelKey: string) => void;
   /** Listing sheet (task 041): open a unit, and the results link. */
   onListing?: (modelKey: string, url: string) => void;
+  /** Task 054: choose a unit by VIN, or clear the choice with null. */
+  onChoose?: (modelKey: string, vin: string | null) => void;
   resultsUrl?: string;
 }): ReactNode {
   return (
-    <ListingContext.Provider value={{ onListing, resultsUrl }}>
+    <ListingContext.Provider value={{ onListing, onChoose, resultsUrl }}>
     <WalkAwayContext.Provider value={{ onWalkAway }}>
       <ChooserContext.Provider value={{ sort, onSort, onOpen }}>
         <JSONUIProvider registry={registry}>
