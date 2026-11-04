@@ -58,12 +58,18 @@ class Pair(BaseModel):
 class RawRead(BaseModel):
     """What the model is forced to emit. normalize.py turns it into a quote."""
 
-    transcript: list[str] = Field(description="Every line of text on the page, top to bottom, copied exactly")
+    transcript: list[str] = Field(
+        min_length=1,
+        description="Top to bottom, copied exactly: every line with a number, price, fee, tax, rate, "
+        "term, payment, VIN, the vehicle's year and name, or the dealer. Skip lists of standard "
+        "features or equipment and legal fine print.",
+    )
     doc_type: Literal["window_sticker", "buyers_order", "payment_offer", "listing_sheet", "other"]
     pairs: list[Pair] = Field(
+        min_length=1,
         description="Every printed label with its printed value (price, fees, down payment, "
         "total, payment...). Pair by meaning, not by position: on a tilted photo a value "
-        "can sit on a different line than its label."
+        "can sit on a different line than its label.",
     )
     fees: list[Fee] = Field(
         default_factory=list,

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/b-button";
 import { Input } from "@/components/ui/input";
 import { Typography } from "@/components/ui/typography";
 import { downFor, type DealInputs, type DownRule } from "@/lib/deal";
+import { fileToJpegBase64, UnreadableFileError } from "@/lib/quote/image";
 import { taxAmountFor } from "@/lib/tax";
 import { analyzeQuote, headsUp, type PickDeal, type SameTerms } from "@/lib/quote/compare";
 import {
@@ -45,7 +46,7 @@ const DRAFT_KEY = "lowkey-quote-draft-v1";
 const POLL_MS = 2000;
 const READ_LIMIT_MS = 180_000;
 
-type ReadState = "idle" | "reading" | "failed" | "resting" | "off";
+type ReadState = "idle" | "reading" | "failed" | "resting" | "off" | "unsupported";
 
 const FIELD_LABELS: Record<MoneyField, string> = {
   sellingPrice: "Vehicle price",
@@ -85,29 +86,6 @@ function signed(n: number, unit = ""): string {
 
 function quoteName(q: Quote, i: number): string {
   return q.dealerName?.trim() || `Quote ${i + 1}`;
-}
-
-/** Resize to at most 1600 px on the long side and re-encode as JPEG. */
-async function photoToBase64(file: File): Promise<string> {
-  const url = URL.createObjectURL(file);
-  try {
-    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const el = new Image();
-      el.onload = () => resolve(el);
-      el.onerror = () => reject(new Error("unreadable"));
-      el.src = url;
-    });
-    const scale = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.round(img.naturalWidth * scale);
-    canvas.height = Math.round(img.naturalHeight * scale);
-    const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("no canvas");
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL("image/jpeg", 0.85).split(",")[1] ?? "";
-  } finally {
-    URL.revokeObjectURL(url);
-  }
 }
 
 function loadDraft(): Quote[] | null {
@@ -152,7 +130,10 @@ export function QuoteCheck({
   const [active, setActive] = useState(0);
   const [readState, setReadState] = useState<ReadState>("idle");
   const [pickKey, setPickKey] = useState<string | null>(initialPickKey ?? picks[0]?.key ?? null);
+  const cameraRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const [elapsed, setElapsed] = useState(0);
+  const [dragging, setDragging] = useState(false);
   const cancelled = useRef(false);
 
   // Start the reader loading while the shopper finds a photo.
@@ -204,8 +185,16 @@ export function QuoteCheck({
   const onPhoto = async (file: File | undefined) => {
     if (!file) return;
     setReadState("reading");
+    setElapsed(0);
+    const started = Date.now();
+    const tick = setInterval(() => setElapsed(Math.round((Date.now() - started) / 1000)), 1000);
     try {
-      const image_b64 = await photoToBase64(file);
+      let image_b64: string;
+      try {
+        image_b64 = await fileToJpegBase64(file);
+      } catch (e) {
+        return setReadState(e instanceof UnreadableFileError ? "unsupported" : "failed");
+      }
       const start = await fetch("/api/quote/read", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -232,7 +221,9 @@ export function QuoteCheck({
     } catch {
       setReadState("failed");
     } finally {
+      clearInterval(tick);
       if (fileRef.current) fileRef.current.value = "";
+      if (cameraRef.current) cameraRef.current.value = "";
     }
   };
 
@@ -278,7 +269,7 @@ export function QuoteCheck({
   return (
     <ListingSheet
       title="Check a quote"
-      subtitle="Type it in, or photograph the dealer's sheet or the window sticker."
+      subtitle="Type it in, or add a photo or PDF of the dealer's sheet or the window sticker."
       wide={wide}
       onClose={onClose}
     >
@@ -314,35 +305,72 @@ export function QuoteCheck({
           </div>
         ) : null}
 
-        <section className="flex flex-col gap-2">
+        <section
+          className={`flex flex-col gap-2 rounded-lg ${dragging ? "outline-2 outline-dashed outline-foreground/40" : ""}`}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragging(true);
+          }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragging(false);
+            if (readState !== "reading" && readState !== "off") void onPhoto(e.dataTransfer.files?.[0]);
+          }}
+        >
+          {/* Camera: a new photo. */}
           <input
-            ref={fileRef}
+            ref={cameraRef}
             type="file"
             accept="image/*"
             capture="environment"
             className="sr-only"
-            aria-label="Photograph a sheet or sticker"
+            tabIndex={-1}
+            aria-label="Take a photo of a sheet or sticker"
             onChange={(e) => void onPhoto(e.target.files?.[0])}
           />
-          <Button
-            type="button"
-            variant="outline"
-            className="min-h-11"
-            disabled={readState === "reading" || readState === "off"}
-            onClick={() => fileRef.current?.click()}
-          >
-            {readState === "reading" ? "Reading your photo…" : "Photograph a sheet or sticker"}
-          </Button>
+          {/* Library, Files, or a PDF saved from email: no capture attribute, so phones offer every source. */}
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*,.heic,.heif,application/pdf,.pdf"
+            className="sr-only"
+            tabIndex={-1}
+            aria-label="Choose a photo, screenshot or PDF"
+            onChange={(e) => void onPhoto(e.target.files?.[0])}
+          />
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-11"
+              disabled={readState === "reading" || readState === "off"}
+              onClick={() => fileRef.current?.click()}
+            >
+              Choose a photo or PDF
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-11"
+              disabled={readState === "reading" || readState === "off"}
+              onClick={() => cameraRef.current?.click()}
+            >
+              Take a photo
+            </Button>
+          </div>
           <Typography variant="paragraph-xs" className="text-muted-foreground" aria-live="polite">
             {readState === "reading"
-              ? "This can take up to a minute the first time. You can keep typing meanwhile."
+              ? `Reading… ${elapsed} s. The first read can take up to a minute and a half while the reader starts; after that, about 10 to 20 seconds. You can keep typing meanwhile.`
               : readState === "failed"
                 ? "Couldn't read that one. You can type it in."
-                : readState === "resting"
-                  ? "Photo reading is resting for now. You can type it in."
-                  : readState === "off"
-                    ? "Photo reading isn't available right now. You can type it in."
-                    : "Your photo is read once and discarded; nothing is stored. A draft stays on this device."}
+                : readState === "unsupported"
+                  ? "That file couldn't be opened here. Try a screenshot of it, a JPEG, or a PDF."
+                  : readState === "resting"
+                    ? "Photo reading is resting for now. You can type it in."
+                    : readState === "off"
+                      ? "Photo reading isn't available right now. You can type it in."
+                      : "A photo from your library, a screenshot, or a PDF from email all work; for a PDF, the first page is read. Nothing is stored. A draft stays on this device."}
           </Typography>
         </section>
 
