@@ -1,7 +1,7 @@
 ---
 id: "041"
 title: "Low Key: listing sheet before the dealer site, a shareable deal sheet, and resumable results"
-status: open
+status: done
 created: 2026-11-03
 report: ops/reports/041-lowkey-listing-and-deal-sheet.md
 ---
