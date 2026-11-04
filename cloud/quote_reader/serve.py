@@ -194,6 +194,10 @@ def read_quote(image_b64: str, mime: str = "image/jpeg") -> dict:
                 "json_schema": {"name": "RawRead", "schema": RawRead.model_json_schema(), "strict": True},
             },
             "temperature": 0,
+            # Copying a page needs no hidden reasoning: with it on, the provider's
+            # default wrote about 2,000 thinking tokens per read (about 14 s);
+            # off, about 700 tokens and 4 s, with the same reads.
+            "chat_template_kwargs": {"enable_thinking": False},
             "max_tokens": 6000,
         }
         t = time.time()

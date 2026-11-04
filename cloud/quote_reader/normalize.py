@@ -17,6 +17,8 @@ _TRANS = dict(
 )
 _WEIGHTS = [8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2]
 _VIN = re.compile(r"(?<![A-Z0-9])[A-HJ-NPR-Z0-9]{17}(?![A-Z0-9])")
+# A VIN printed in groups: 17 VIN characters with single spaces or hyphens between groups.
+_VIN_SPACED = re.compile(r"(?<![A-Z0-9])[A-HJ-NPR-Z0-9]{2,}(?:[ -][A-HJ-NPR-Z0-9]{2,})+(?![A-Z0-9])")
 
 # canonical field -> label fragments, most specific first; matched on the whole label
 _LABELS = {
@@ -50,6 +52,10 @@ _EXCLUDE = {
 # fee lines that are really other fields (tax lines are kept: "Total Taxes" is a fee)
 _NOT_FEES = re.compile(
     r"price|down|out.?the.?door|total(?!\s*tax)|apr|term|payment|msrp|trade|rebate|saving|financed", re.I
+)
+# Fees the dealer charges on every sale: never an optional add-on, whatever the model tagged.
+_DEALER_FEE = re.compile(
+    r"\bdoc(?:umentary|ument)?\b|dealer (?:service|handling|processing)|processing fee|conveyance", re.I
 )
 _TAXLIKE = re.compile(r"\btax(es)?\b|title|registration|license|tag\b", re.I)
 _FEELIKE = re.compile(r"\bfee\b|\bfees\b|\bcharge\b", re.I)
@@ -146,12 +152,40 @@ def _label_key(label: str) -> str:
     return re.sub(r"[^a-z0-9 -]", "", label.lower()).strip()
 
 
+_MONTHS_TOKEN = re.compile(r"\b(\d{2,3})\s*(?:months|mos?)\b\.?", re.I)
+_MONEY = r"\$\s*[\d,]+(?:\.\d{2})?"
+_RANGE = rf"{_MONEY}\s*[-–]\s*\$?\s*[\d,]+(?:\.\d{{2}})?"
+_GRID_ROW = re.compile(rf"^\s*({_MONEY})((?:\s+{_RANGE})+)\s*$")
+
+
+def _grid_cells(lines: list[str]) -> list[str]:
+    """Split a grid copied row by row into one cell per line.
+
+    "Purchase 60 Months 72 Months" becomes "60 Months", "72 Months";
+    "$2,000 $500 - $525 $434 - $459" becomes "$2,000", "$500 - $525", "$434 - $459".
+    """
+    out: list[str] = []
+    for line in lines:
+        months = _MONTHS_TOKEN.findall(line)
+        row = _GRID_ROW.match(line)
+        if len(months) >= 2:
+            out.extend(f"{m} Months" for m in months)
+        elif row:
+            out.append(row.group(1))
+            out.extend(re.findall(_RANGE, row.group(2)))
+        else:
+            out.append(line)
+    return out
+
+
 def _payment_grid(lines: list[str]) -> tuple[list[int], list[dict]]:
     """A dealer's payment grid ("$ Down" rows x "60 Months" columns of ranges).
 
     Returns the term columns and one option per cell: {down, term_months,
-    low, high}. Reads the transcript in order, as the model copied it.
+    low, high}. Reads the transcript in order, as the model copied it, one
+    cell per line or one grid row per line.
     """
+    lines = _grid_cells(lines)
     terms: list[int] = []
     for line in lines:
         m = re.match(r"^\s*(\d{2,3})\s*(?:months|mos?)\.?\s*$", line, re.I)
@@ -190,6 +224,16 @@ def normalize(raw: dict) -> dict:
     # VIN: regex over the transcript; prefer a candidate whose check digit holds.
     cands = _VIN.findall(text.upper())
     good = [c for c in cands if vin_check_ok(c)]
+    if not good:
+        # Stickers and photos often split a VIN ("JTD LM5RC1TB212233"). A joined
+        # run counts only if its check digit holds, so words can't merge into one.
+        for run in _VIN_SPACED.findall(text.upper()):
+            groups = re.split(r"[ -]", run)
+            for i in range(len(groups)):
+                for j in range(i + 2, len(groups) + 1):
+                    joined = "".join(groups[i:j])
+                    if len(joined) == 17 and vin_check_ok(joined) and joined not in good:
+                        good.append(joined)
     vin = (good or cands or [None])[0]
     out["vin"] = vin
     out["vin_check_ok"] = bool(good)
@@ -279,7 +323,11 @@ def normalize(raw: dict) -> dict:
                 "amount": f.get("amount"),
                 "kind": "addon"
                 if _ADDONS.search(f.get("label", ""))
-                else ("government" if _TAXLIKE.search(f.get("label", "")) else f.get("kind", "unknown")),
+                else (
+                    "government"
+                    if _TAXLIKE.search(f.get("label", ""))
+                    else ("dealer" if _DEALER_FEE.search(f.get("label", "")) else f.get("kind", "unknown"))
+                ),
             }
             for f in raw.get("fees", [])
             if not _NOT_FEES.search(f.get("label", "")) and not _TAX_NOT_FEE.search(f.get("label", ""))
