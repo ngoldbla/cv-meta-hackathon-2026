@@ -45,7 +45,7 @@ cpu_image = (
     experimental_options={"enable_gpu_snapshot": True},
     min_containers=0,
     max_containers=1,
-    scaledown_window=60,
+    scaledown_window=10,  # a refresh is a single call, so idle time is pure cost
     timeout=600,
 )
 class Forecaster:
