@@ -1,5 +1,6 @@
 "use client";
 
+import { LocateFixed } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { Alert } from "@/components/ui/alert";
@@ -204,10 +205,18 @@ export function AreaControl({
           ) : null}
         </div>
       ) : area ? (
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
-          <span>
+        // One line at any width: the place truncates, the two actions never wrap.
+        <div className="flex items-center gap-x-2 whitespace-nowrap text-sm">
+          <span className="min-w-0 truncate" title={`Near ${areaPlaceLabel(area)}${area.approximate ? " (approximate)" : ""}`}>
             Near <strong>{areaPlaceLabel(area)}</strong>
-            {area.approximate ? " (approximate)" : ""}
+            {area.approximate ? (
+              <>
+                {" "}
+                <abbr title="approximate" className="no-underline">
+                  (approx.)
+                </abbr>
+              </>
+            ) : null}
           </span>
           <span aria-hidden="true">·</span>
           <Button
@@ -225,16 +234,17 @@ export function AreaControl({
           >
             Change
           </Button>
-          <span aria-hidden="true">·</span>
           <Button
             type="button"
-            variant="link"
-            linkUnderline="static"
+            variant="ghost"
+            size="icon-lg"
             disabled={busy}
             onClick={useLocation}
-            className="min-h-11 underline underline-offset-2"
+            aria-label="Use my location"
+            title="Use my location"
+            className="size-11 shrink-0 text-foreground/70 hover:text-foreground"
           >
-            {busy ? locating : "Use my location"}
+            {busy ? <Spinner size="sm" /> : <LocateFixed className="size-5" aria-hidden="true" />}
           </Button>
         </div>
       ) : null}

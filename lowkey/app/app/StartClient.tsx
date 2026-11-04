@@ -81,11 +81,8 @@ export default function StartClient({ initialArea }: { initialArea: SearchArea |
   return (
     <main className="shell">
       <SiteHeader />
-      <section className="mt-6 flex flex-col gap-2">
-        <h1 className="text-[30px] leading-[1.15] font-semibold tracking-[-0.02em] text-balance">Get a car without regret.</h1>
-        <Typography variant="paragraph-md" className="text-muted-foreground">
-          We help you buy for value and quality: the signal, not the noise.
-        </Typography>
+      <section className="mt-6">
+        <h1 className="text-[30px] leading-[1.15] font-semibold tracking-[-0.02em] text-balance">Buy a car without regret.</h1>
       </section>
 
       {resume ? (
@@ -148,12 +145,6 @@ export default function StartClient({ initialArea }: { initialArea: SearchArea |
           </button>
         ))}
       </nav>
-
-      <footer className="mt-auto flex items-center gap-3 py-4 text-xs">
-        <Link href="/about" className="inline-flex min-h-11 items-center underline underline-offset-2">
-          About
-        </Link>
-      </footer>
     </main>
   );
 }
