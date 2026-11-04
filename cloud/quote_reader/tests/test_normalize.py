@@ -179,3 +179,22 @@ def test_mpg_comes_from_the_labelled_pair_not_the_small_print():
 def test_make_from_vin_only_with_a_valid_vin():
     assert normalize(raw(transcript=[f"VIN {GOOD_VIN}"]))["make_from_vin"] == "Honda"
     assert normalize(raw(transcript=["VIN 1HGCV2FA0SB601815"]))["make_from_vin"] is None
+
+
+def test_paired_addons_are_backfilled_even_without_the_word_fee():
+    # The hosted model sometimes pairs add-ons but leaves them out of `fees`.
+    pairs = [
+        {"label": "Selling price", "value": "$28,450.00"},
+        {"label": "Nitrogen tire fill", "value": "$199.00"},
+        {"label": "Paint and fabric protection", "value": "$995.00"},
+        {"label": "Trade allowance", "value": "$4,000.00"},
+    ]
+    fees = normalize(raw(pairs=pairs, fees=[{"label": "Documentary fee", "amount": 799, "kind": "dealer"}]))[
+        "fees"
+    ]
+    got = {(f["label"], f["amount"], f["kind"]) for f in fees}
+    assert got == {
+        ("Documentary fee", 799, "dealer"),
+        ("Nitrogen tire fill", 199, "addon"),
+        ("Paint and fabric protection", 995, "addon"),
+    }

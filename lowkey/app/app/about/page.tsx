@@ -101,7 +101,8 @@ export default function AboutPage() {
           <li>
             <P>
               <strong>Muse Glimmer</strong> (30B, open weights) reads a photo of a dealer&apos;s sheet or a window
-              sticker. It runs on a serverless GPU that starts only when someone uses it. It copies the page and pairs
+              sticker. It runs on Hugging Face Inference Providers (served by DeepInfra, which keeps no copy of the
+              request), with our own serverless GPU as a backup. It copies the page and pairs
               each label with its value; plain code then finds the VIN, checks it, and picks out every number, and you
               confirm each one before anything is compared.
             </P>
@@ -175,7 +176,8 @@ export default function AboutPage() {
           <li>
             <P>
               <A href="https://vercel.com">Vercel</A> (hosting, storage, and an approximate starting area).{" "}
-              <A href="https://modal.com">Modal</A> (the serverless GPU for photo reading).
+              <A href="https://huggingface.co/docs/inference-providers">Hugging Face Inference Providers</A> (photo
+              reading). <A href="https://modal.com">Modal</A> (the reader&apos;s server and its backup GPU).
             </P>
           </li>
         </ul>
@@ -199,7 +201,7 @@ export default function AboutPage() {
       </Section>
 
       <Section title="Thanks">
-        <P>Fireworks, Modal, Meta and Vercel, for their support in delivering this project.</P>
+        <P>Fireworks, Hugging Face, Modal, Meta and Vercel, for their support in delivering this project.</P>
       </Section>
 
       <Section title="Author">

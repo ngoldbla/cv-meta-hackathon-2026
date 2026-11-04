@@ -28,8 +28,8 @@ bash lowkey/pipeline/weekly.sh        # builds the table, uploads it to Blob, re
 ```
 Schedule it weekly (a systemd timer or cron). It spends provider credits; `lowkey/docs/deploy.md` has the details.
 
-## 3. Optional: the photo reader on Modal
-"Check a quote" works as a typed form without this. To read photos:
+## 3. Optional: the photo reader
+"Check a quote" works as a typed form without this. Reads go to Muse Glimmer hosted on Hugging Face Inference Providers (always warm, billed per token to the account behind `HF_TOKEN`; a Pro account includes monthly credits). The Modal GPU is the backup and the demo path. To read photos:
 ```bash
 pip install modal && modal setup
 modal secret create huggingface HF_TOKEN=<your token>
@@ -37,7 +37,7 @@ modal secret create lowkey-quote-auth QUOTE_TOKEN=<a long random value>
 modal run cloud/quote_reader/stage.py --repo meta-models/Muse-Glimmer-30B   # CPU-only, ~60 GB into a Volume
 modal deploy cloud/quote_reader/serve.py                                     # GPU only when used
 ```
-Put the printed web URL in `LOWKEY_QUOTE_URL` and the same token in `LOWKEY_QUOTE_TOKEN`. It costs nothing while idle; a cold start takes about a minute and a half. For a demo, `python cloud/quote_reader/warm_window.py on --hours 2` keeps one GPU warm and turns itself off.
+Put the printed web URL in `LOWKEY_QUOTE_URL` and the same token in `LOWKEY_QUOTE_TOKEN`. A hosted read takes about 10–35 s and has no cold start; nothing costs anything while idle. Staging the weights is needed only for the backup GPU, whose cold start is about a minute and a half. For a demo, `python cloud/quote_reader/warm_window.py on --hours 2` keeps one GPU warm, routes reads to it (about 20 s for a real sheet), and turns itself off.
 
 ## 4. Change the preferences
 - **Luxury cars:** the lineups come from the category rules in `lowkey/preflight/categories.py`, used by `lowkey/pipeline/build_table.py`: add a price band and a make list for a new category, keep the resale-history floor (at least 30 sold units at each fitted age), and add the category to `lowkey/app/lib/categories.ts`.

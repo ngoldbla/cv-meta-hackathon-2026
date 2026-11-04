@@ -5,6 +5,8 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 modal deploy serve.py
+# A deploy resets min_containers to 0, so end any warm window (and its GPU routing).
+~/.local/share/uv/tools/modal/bin/python warm_window.py off
 modal container list --json \
   | python3 -c "import sys,json;[print(x.get('Container ID','')) for x in json.load(sys.stdin) if 'lowkey-quote-reader' in json.dumps(x) and '-snap' not in json.dumps(x)]" \
   | while read -r c; do [ -n "$c" ] && modal container stop --yes "$c" >/dev/null && echo "retired $c"; done
