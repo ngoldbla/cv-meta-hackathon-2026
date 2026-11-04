@@ -294,7 +294,7 @@ export function headsUp(
   q: Quote,
   pick: PickDeal,
   downRule: DownRule,
-  retention?: { retention5y: number } | null,
+  retention?: Parameters<typeof analyzeQuote>[2],
   /** The pick's state sales tax applied to this quote's price, used only when the quote lists none. */
   estTaxForQuote?: number | null,
 ): { ok: true; rows: HeadsUpRow[]; addedTax: number | null } | { ok: false; missing: string[] } {
