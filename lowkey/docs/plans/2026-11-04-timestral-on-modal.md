@@ -28,7 +28,7 @@
 | File | Responsibility |
 | --- | --- |
 | `ops/tasks/058-lowkey-timestral-on-modal.md` | Task file (status, links) |
-| `cloud/gas_forecast/core.py` | Pure logic: entries from forecasts, display names, latest EIA week, refresh decisions. No modal/torch imports. |
+| `cloud/gas_forecast/core.py` | Pure logic: entries from forecasts, display names, refresh decisions. No modal/torch imports. |
 | `cloud/gas_forecast/eia.py` | EIA API v2 fetch of the weekly EPMR series (stdlib only) |
 | `cloud/gas_forecast/stage.py` | One-off CPU stage of the weights into the Volume `lowkey-gas-models` |
 | `cloud/gas_forecast/serve.py` | Modal app: `Forecaster`, `refresh`, the cron, `web` |
@@ -54,7 +54,6 @@
 - Produces:
   - `display_name(area_name: str | None, duoarea: str) -> str`
   - `entry_for(record: dict, levels: list[float], quantiles) -> dict`, where `quantiles` is array-like `(52, Q)` and the result is a GasSeriesEntry dict
-  - `latest_eia_week(now: datetime) -> str` (ISO date)
   - `pre_check(checked_at: float | None, day_count: int, now: float, force: bool) -> str | None`, returning `"debounced"`, `"capped"` or `None`
   - `needs_forecast(newest: str | None, current_as_of: str | None) -> bool`
   - `DAILY_GPU_CAP = 10`, `DEBOUNCE_S = 6 * 3600`, `HORIZON = 52`
@@ -83,7 +82,6 @@ Timestral should run as a serverless GPU endpoint, prestaged on Modal Volumes, u
 
 ```python
 import sys
-from datetime import UTC, datetime
 from pathlib import Path
 
 import numpy as np
@@ -95,7 +93,6 @@ from core import (  # noqa: E402
     DEBOUNCE_S,
     display_name,
     entry_for,
-    latest_eia_week,
     needs_forecast,
     pre_check,
 )
@@ -133,18 +130,6 @@ def test_entry_for_picks_levels_by_value_not_position():
     assert (f["meanP10"], f["meanP50"], f["meanP90"]) == (2.0, 3.0, 4.0)
 
 
-def ny(y, m, d, hh, mm=0):
-    # America/New_York in November 2026 is UTC-5.
-    return datetime(y, m, d, hh + 5, mm, tzinfo=UTC)
-
-
-def test_latest_eia_week():
-    assert latest_eia_week(ny(2026, 11, 2, 17, 59)) == "2026-10-26"  # Monday, before release
-    assert latest_eia_week(ny(2026, 11, 2, 18, 0)) == "2026-11-02"  # Monday, after
-    assert latest_eia_week(ny(2026, 11, 4, 9)) == "2026-11-02"  # Wednesday
-    assert latest_eia_week(ny(2026, 11, 8, 23)) == "2026-11-02"  # Sunday night
-
-
 def test_pre_check():
     now = 1_000_000.0
     assert pre_check(None, 0, now, force=False) is None
@@ -173,14 +158,9 @@ imports, so it is tested locally and shipped into every Modal image."""
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
-
 HORIZON = 52
 DAILY_GPU_CAP = 10
 DEBOUNCE_S = 6 * 3600
-NY = ZoneInfo("America/New_York")
-RELEASE_HOUR = 18  # EIA posts Monday's prices on Monday afternoon (ET)
 
 
 def display_name(area_name: str | None, duoarea: str) -> str:
@@ -222,15 +202,6 @@ def entry_for(record: dict, levels: list[float], quantiles) -> dict:
     }
 
 
-def latest_eia_week(now: datetime) -> str:
-    """The most recent Monday whose 18:00 America/New_York has passed."""
-    local = now.astimezone(NY)
-    monday = (local - timedelta(days=local.weekday())).date()
-    if local.weekday() == 0 and local.hour < RELEASE_HOUR:
-        monday -= timedelta(days=7)
-    return monday.isoformat()
-
-
 def pre_check(checked_at: float | None, day_count: int, now: float, force: bool) -> str | None:
     """Why a refresh should not start, or None when it may."""
     if not force and checked_at is not None and now - checked_at < DEBOUNCE_S:
@@ -252,7 +223,7 @@ Note: `display_name(None, "R40")` must return `"R40 regular"`, which is why the 
 - [ ] **Step 5: Run the tests to verify they pass**
 
 Run: `.venv/bin/python -m pytest -q cloud/gas_forecast/tests/test_core.py`
-Expected: 6 passed
+Expected: 5 passed
 
 - [ ] **Step 6: Commit**
 
@@ -385,7 +356,7 @@ def newest_period(records: dict[str, dict]) -> str | None:
 - [ ] **Step 4: Run the tests to verify they pass**
 
 Run: `.venv/bin/python -m pytest -q cloud/gas_forecast/tests/`
-Expected: 9 passed
+Expected: 8 passed
 
 - [ ] **Step 5: Commit**
 
@@ -405,7 +376,7 @@ Assisted-by: agent" -- cloud/gas_forecast/eia.py cloud/gas_forecast/tests/test_e
 - Create: `cloud/gas_forecast/stage.py`, `cloud/gas_forecast/serve.py`, `cloud/gas_forecast/parity.py`
 
 **Interfaces:**
-- Consumes: `core.entry_for`, `core.pre_check`, `core.needs_forecast`, `core.latest_eia_week`, `core.DAILY_GPU_CAP`; `eia.fetch_all`, `eia.newest_period`
+- Consumes: `core.entry_for`, `core.pre_check`, `core.needs_forecast`, `core.HORIZON`; `eia.fetch_all`, `eia.newest_period`
 - Produces (HTTP, bearer `GAS_TOKEN`):
   - `GET /gas` → 200 `{builtAt, eiaAsOf, model, horizonWeeks, series: {duoarea: GasSeriesEntry}}`, or 404 when nothing is stored yet
   - `POST /refresh` → 202 `{status: "started" | "debounced"}`, or 429 `{detail: "capped"}`
@@ -1148,7 +1119,7 @@ Expected: `29 {'model': 'mistralai/Timestral-28M', 'asOf': '2026-11-0x', 'horizo
 - [ ] **Step 8: Run the Python suite and commit**
 
 Run: `.venv/bin/python -m pytest -q`
-Expected: all pass (98 before this task, plus 12)
+Expected: all pass (98 before this task, plus 11)
 
 ```bash
 git add lowkey/pipeline/gas_endpoint.py lowkey/pipeline/test_gas_endpoint.py
