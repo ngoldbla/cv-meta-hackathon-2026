@@ -29,12 +29,25 @@ image = (
     .add_local_file(__file__.replace("serve.py", "normalize.py"), "/root/normalize.py")
 )
 
-PROMPT = (
+# Fallback when the short read comes back thin: copy everything (slower, never empty).
+FULL_PROMPT = (
     "Read this car-buying document (a window sticker, a dealer's buyer's order, "
     "a payment offer or a listing sheet). Copy every line of text into "
     "`transcript`. Then list every printed label with its printed value in "
     "`pairs`, copying both exactly (pair by meaning: on a tilted photo a value "
     "may sit on a different line than its label). Tag fee and charge lines in "
+    "`fees`; the price, down payment, total, APR and term are not fees. "
+    "Never calculate or guess."
+)
+
+PROMPT = (
+    "Read this car-buying document (a window sticker, a dealer's buyer's order, "
+    "a payment offer or a listing sheet). In `transcript`, copy top to bottom every "
+    "line that has a number, price, fee, tax, rate, term, payment, the VIN, the "
+    "vehicle's year and name, or the dealer; skip lists of standard features or "
+    "equipment and legal fine print. Then list every printed label with its printed "
+    "value in `pairs`, copying both exactly (pair by meaning: on a tilted photo a "
+    "value may sit on a different line than its label). Tag fee and charge lines in "
     "`fees`; the price, down payment, total, APR and term are not fees. "
     "Never calculate or guess."
 )
@@ -90,21 +103,27 @@ class Reader:
             max_tokens=6000,  # a full window sticker transcript runs past 1,500 tokens
             structured_outputs=StructuredOutputsParams(json=RawRead.model_json_schema()),
         )
-        messages = [
-            {
-                "role": "user",
-                "content": [
-                    {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{image_b64}"}},
-                    {"type": "text", "text": PROMPT},
-                ],
-            }
-        ]
-        gen = self.llm.chat(messages, params)[0].outputs[0]
-        out = gen.text
-        # Length and stop reason only; never the page's content.
-        print(f"read: {len(gen.token_ids)} tokens, finish={gen.finish_reason}")
-        # Valid by construction; validate anyway and never trust blindly.
-        raw = json.loads(RawRead.model_validate_json(out).model_dump_json())
+
+        def run(prompt: str) -> dict:
+            messages = [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{image_b64}"}},
+                        {"type": "text", "text": prompt},
+                    ],
+                }
+            ]
+            gen = self.llm.chat(messages, params)[0].outputs[0]
+            # Length and stop reason only; never the page's content.
+            print(f"read: {len(gen.token_ids)} tokens, finish={gen.finish_reason}")
+            # Valid by construction; validate anyway and never trust blindly.
+            return json.loads(RawRead.model_validate_json(gen.text).model_dump_json())
+
+        raw = run(PROMPT)
+        if len(raw["transcript"]) < 3 or not raw["pairs"]:
+            print("read: thin result, retrying with the full transcript prompt")
+            raw = run(FULL_PROMPT)
         return normalize(raw)
 
 
