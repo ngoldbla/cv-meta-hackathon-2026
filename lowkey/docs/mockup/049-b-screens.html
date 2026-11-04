@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>049 B · Screens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="049-kit.css">
+</head>
+<body class="board">
+<div class="board-head">
+  <h1>B · A screen for each step</h1>
+  <p>Separate routes: <span class="mono">/</span>, <span class="mono">/sedan?zip=30263</span>, <span class="mono">/sedan/civic</span>, <span class="mono">/sedan/civic/listing</span>, <span class="mono">/quote?car=civic</span>. The results are a dense list of one row per car on one cost scale. A car gets a whole page, with its walk-away and its listings. The phone's Back button moves between screens, and every screen has a link of its own.</p>
+  <p class="src">The numbers come from the live fast path (ZIP 30263, Sedan, 2026-11-04) and the app's quote code. The sample quote is an invented fixture.</p>
+</div>
+<div class="row-label">Light</div><div id="light"></div>
+<div class="row-label">Dark</div><div id="dark"></div>
+<script src="049-data.js"></script>
+<script src="049-cars.js"></script>
+<script src="049-kit.js"></script>
+<script>
+const { D, $, ICON, split, car, byReal, header, appbar, tiles, areaLine, cardFace, costBars, walkChart, slider, walkSay, walkTable, units, dealSheet, settingsLine, settingsPanel, quoteResult } = K;
+const civic = car(D.commodity);
+const tabs = `<div style="display:flex;gap:18px;border-bottom:1px solid var(--border);margin:0 -16px;padding:0 16px">${["Real cost","Monthly","Nearest","Lasts longest"].map((t, i) => `<div style="min-height:44px;display:flex;align-items:center;font-size:14px;${i === 0 ? "font-weight:600;box-shadow:inset 0 -2px 0 var(--foreground)" : "color:var(--muted-foreground)"}">${t}</div>`).join("")}</div>`;
+const row = (c) => {
+  const { name, trim } = split(c);
+  const tags = c.labels.map((l) => `<span class="tag${l === "Cheapest to own" ? " brass" : ""}">${l}</span>`).join("");
+  return `<div class="cmp-row"><div class="top"><span class="nm">${name}</span><span class="muted small">${trim}</span><span class="vv num">${$(c.cost.realTotal)}<span class="small muted" style="font-weight:400">/mo</span></span>${ICON.chevR}</div>
+    ${tags ? `<div class="labels" style="margin:4px 0 6px">${tags}</div>` : '<div style="height:6px"></div>'}
+    ${costBars(c, { thin: true })}
+    <div class="xs muted" style="margin-top:6px">${K.mi(c.face.miles)} · lasts about ${K.years(c)} yrs · positive equity by month ${c.pe} · ${$(c.face.price)}</div></div>`;
+};
+const n = split(civic).name;
+
+K.board([
+  { cap: "1 · Start", sub: "/", html: () => `<div class="scroll">${header()}
+      <h2 class="screen-title" style="font-size:30px;margin-top:22px">Get a car without regret.</h2>
+      <p style="margin:6px 0 10px">The new cars near you that hold their value best, what each really costs a month, and what it would cost to change your mind.</p>
+      ${areaLine()}<div style="height:6px"></div>${tiles()}
+      <p class="small muted" style="margin-top:18px">No ads, no sign-up, not paid by dealers. <span class="link">How Low Key works</span></p></div>` },
+  { cap: "2 · Results", sub: "/sedan?zip=30263", html: () => `<div class="scroll">${appbar("Sedans near " + D.zip, '<span class="nav small link" style="min-height:44px;display:flex;align-items:center;padding-right:8px">Check a quote</span>')}
+      ${settingsLine()}${tabs}
+      <div>${byReal().map(row).join("")}</div>
+      <div class="legend" style="margin-top:10px"><span><i style="background:var(--cost-loan)"></i>Loan</span><span><i style="background:var(--cost-gas)"></i>Gas</span><span><i style="background:var(--cost-lost)"></i>Value lost</span><span><i style="background:var(--cost-interest)"></i>Interest</span><span><i style="background:var(--cost-tax)"></i>Sales tax</span><span><i style="background:var(--cost-back-a)"></i>Back when you sell</span></div></div>` },
+  { cap: "3 · Settings", sub: "/sedan?zip=30263&terms", html: () => `<div class="scroll">${appbar("Your terms", '<span class="btn quiet" style="border:0">Done</span>')}${settingsPanel()}
+      <div class="sep" style="margin-top:18px"></div><div class="small muted">Every car re-prices on these terms. They stay in the link, so a shared link shows the same numbers.</div></div>` },
+  { cap: "4 · A car", sub: "/sedan/civic", html: () => `<div class="scroll">${appbar("Sedans")}
+      <div style="display:flex;gap:12px;align-items:center;margin-top:10px"><span class="car" style="width:96px;aspect-ratio:5/4">${window.LK_CARS.sedan}</span><div class="small muted">${civic.sentence}</div></div>
+      <div style="margin-top:8px">${cardFace(civic)}</div>
+      <div class="back-note" style="margin-top:10px">${$(civic.cost.backWhenSold)} a month of what you pay comes back when you sell at 5 years.</div>
+      <h3 style="margin:16px 0 4px">If you change your mind</h3>
+      ${walkChart(civic, 24)}${slider(24)}${walkSay(civic, 24)}
+      <div style="height:10px"></div>${walkTable(civic, 24)}
+      <div style="position:absolute;left:0;right:0;bottom:0;padding:12px 16px 18px;background:var(--background);border-top:1px solid var(--border);display:flex;gap:8px"><span class="btn" style="flex:1">3 near you</span><span class="btn primary" style="flex:1.4">Compare my quote</span></div></div>` },
+  { cap: "5 · A listing", sub: "/sedan/civic/listing/1", html: () => `<div class="scroll">${appbar(n)}
+      <h2 class="screen-title">${civic.face.title}</h2>
+      <div class="small muted">${civic.face.dealer} · ${K.mi(civic.face.miles)} · lowest of ${civic.listingTotal} listed within ${civic.radius} mi</div>
+      <div class="surface pad" style="margin-top:12px">${dealSheet(civic)}</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px"><span class="btn primary block">See it on the dealer's site</span><span class="btn block">Check this dealer's quote</span></div>
+      <div class="label" style="margin-top:18px">Others near you</div>${units({ ...civic, face: civic.more[0], more: civic.more.slice(1) })}</div>` },
+  { cap: "6 · Check a quote", sub: "/quote?car=civic", html: () => `<div class="scroll">${appbar("Check a quote")}<div style="height:12px"></div>${quoteResult(D.commodity)}</div>` },
+]);
+</script>
+</body>
+</html>
