@@ -14,15 +14,28 @@ import re
 import subprocess
 import sys
 
+PROVIDER = "57c63d512fec5524bea0059b9c8a51256d02886bdb3fab649621e7142283fc81"  # Low Key listings provider
 DENY = {
     "c857d09db23e6822e3600bc06ad8d58f92ed62bc8efd81c753f77048662cb97d",
     "c70eca6b0f88f44d81a41311647e50fda1ac454ec04ffd442b0eb4743a993131",
+    PROVIDER,
+}
+# The listings provider may be credited in these files only (Dylan,
+# 2026-11-03): never in the app, its copy, branch names or commits.
+PROVIDER_ALLOWED_PATHS = {
+    "CREDITS.md",
+    "README.md",
+    "lowkey/docs/roll-your-own.md",
+    "lowkey/app/.env.example",
 }
 TOKEN = re.compile(r"[a-z0-9]+")
 
 
-def _hit(text: str) -> bool:
-    return any(hashlib.sha256(t.encode()).hexdigest() in DENY for t in TOKEN.findall(text.lower()))
+def _hit(text: str, allow: frozenset[str] = frozenset()) -> bool:
+    return any(
+        (d := hashlib.sha256(t.encode()).hexdigest()) in DENY and d not in allow
+        for t in TOKEN.findall(text.lower())
+    )
 
 
 def _git(*args: str) -> str:
@@ -39,8 +52,9 @@ def scan(strict_unsigned: bool = False) -> list[str]:
             text = open(path, encoding="utf-8").read()
         except (UnicodeDecodeError, FileNotFoundError, IsADirectoryError):
             continue
+        allow = frozenset({PROVIDER}) if path in PROVIDER_ALLOWED_PATHS else frozenset()
         for i, line in enumerate(text.splitlines(), 1):
-            if _hit(line):
+            if _hit(line, allow):
                 problems.append(f"{path}:{i}: <redacted>")
     for ref in _git("for-each-ref", "--format=%(refname)").splitlines():
         if _hit(ref):

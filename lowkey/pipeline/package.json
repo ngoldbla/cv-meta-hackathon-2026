@@ -1,0 +1,12 @@
+{
+  "name": "lowkey-pipeline",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@vercel/blob": "2.8.2"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

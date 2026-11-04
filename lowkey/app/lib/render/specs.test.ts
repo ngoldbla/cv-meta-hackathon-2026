@@ -1,0 +1,394 @@
+import { describe, expect, it } from "vitest";
+
+import { RANK_FIXTURES, sampleUnitsFor, type Category } from "../fixtures";
+import { ownershipMath } from "../ownership";
+import { checkCostCompareSpec, checkPickCardSpec, collectSpecNumbers } from "./guard";
+import { isCatalogValid } from "./validate";
+import {
+  buildCostCompareSpec,
+  buildPickCardSpec,
+  buildTurnSpecs,
+  costBreakdown,
+  type SpecEntry,
+  positiveMonthOf,
+} from "./specs";
+
+/** Tool-output fixtures: rank fixtures + real ownership maths. */
+function entriesFor(category: Category, opts?: { fuel?: number | null }): SpecEntry[] {
+  const fixture = RANK_FIXTURES[category];
+  const picks = [...fixture.picks];
+  if (!picks.some((p) => p.model === fixture.commodity.model)) {
+    picks.push({ ...fixture.commodity });
+  }
+  return picks.map((pick, i) => {
+    // Task 037 fixture: Illinois-style 8.98% tax financed in the loan.
+    const own = ownershipMath({
+      price: pick.price,
+      tax: pick.price * 0.0898,
+      down: pick.price * 0.1,
+      apr: 8,
+      term: 60,
+      retention5y: pick.retention5y,
+    });
+    return {
+      pick: {
+        ...pick,
+        // CR-V rated (mockup), Venue unrated, others rated.
+        lifespanYears: pick.model === "Venue" ? null : 10 + i,
+        lifespanMiles: pick.model === "Venue" ? null : (10 + i) * 12000,
+        lifespanSource: pick.model === "Venue" ? null : "iSeeCars 2026",
+        lifespanAsOf: pick.model === "Venue" ? null : "2026",
+        recommendedTrim: "LX",
+        baseTrim: "LX",
+        currentYear: 2026,
+      },
+      ownership: {
+        price: own.price,
+        taxAmount: own.taxAmount,
+        taxStatus: "included" as const,
+        taxNotice:
+          "Includes about 9.0% Illinois sales tax (state + average local, est.).",
+        downPayment: own.downPayment,
+        loanAmount: own.loanAmount,
+        monthlyPayment: own.monthlyPayment,
+        aprPercent: own.aprPercent,
+        termMonths: own.termMonths,
+        evenMonth: own.evenMonth,
+        curve: own.curve,
+      },
+      local: {
+        model: pick.model,
+        fuel: opts?.fuel === null ? null : { perMonth: opts?.fuel ?? 150 },
+        bestPrice: pick.price,
+        totalFound: 9,
+        radiusUsed: 50,
+        units: sampleUnitsFor(pick.model, pick.price).map((u) => ({
+          ...u,
+          year: 2026,
+          trim: "LX",
+        })),
+      },
+    };
+  });
+}
+
+const CATEGORIES: Category[] = ["Sedan", "SUV", "Pickup"];
+
+type CompareRow = {
+  label: string;
+  model: string;
+  total: number;
+  bills: number;
+  labels: string[];
+  nearestMiles: number | null;
+  lifespanYears: number | null;
+};
+
+function compareRows(spec: ReturnType<typeof buildCostCompareSpec>): CompareRow[] {
+  return (spec!.elements[spec!.root]!.props as { rows: CompareRow[] }).rows;
+}
+
+describe("spec builders + number guard (task 034)", () => {
+  for (const category of CATEGORIES) {
+    it(`builds guarded specs for ${category}`, () => {
+      const entries = entriesFor(category);
+      const { compare, cards } = buildTurnSpecs(entries, category);
+      expect(compare).not.toBeNull();
+      expect(isCatalogValid(compare!)).toBe(true);
+      const compareCheck = checkCostCompareSpec(compare!, entries);
+      expect(compareCheck.failures).toEqual([]);
+      expect(compareCheck.ok).toBe(true);
+      for (const entry of entries) {
+        const spec = cards.get(entry.pick.model)!;
+        expect(spec.elements[spec.root]?.type).toBe("PickCard");
+        expect(isCatalogValid(spec)).toBe(true);
+        const check = checkPickCardSpec(spec, entry);
+        expect(check.failures).toEqual([]);
+        expect(check.ok).toBe(true);
+      }
+    });
+
+    it(`orders the ${category} chooser by real cost, with no highlight or rank`, () => {
+      const entries = entriesFor(category);
+      const compare = buildCostCompareSpec(entries, category)!;
+      const rows = compareRows(compare);
+      const totals = rows.map((r) => r.total);
+      expect(totals).toEqual([...totals].sort((a, b) => a - b));
+      for (const r of rows) {
+        expect(r).not.toHaveProperty("highlighted");
+        expect(r).not.toHaveProperty("rank");
+      }
+    });
+  }
+
+  it("cards carry an EquityMini with the positive-equity month (task 039)", () => {
+    for (const category of CATEGORIES) {
+      for (const entry of entriesFor(category)) {
+        const spec = buildTurnSpecs(entriesFor(category), category).cards.get(entry.pick.model)!;
+        const els = Object.values(spec.elements);
+        expect(els.some((el) => el.type === "UnderwaterMini")).toBe(false);
+        const eq = els.find((el) => el.type === "EquityMini");
+        expect(eq).toBeDefined();
+        const props = eq!.props as { positiveEquityMonth: number | null; curve: { equity: number; resale: number; balance: number }[] };
+        expect(props.positiveEquityMonth).toBe(positiveMonthOf(entry.ownership!));
+        for (const pt of props.curve) expect(pt.equity).toBeCloseTo(pt.resale - pt.balance, 1);
+      }
+    }
+  });
+
+  it("the guard rejects a tampered positive-equity month (task 039)", () => {
+    const entries = entriesFor("SUV");
+    const entry = entries[0]!;
+    const spec = buildTurnSpecs(entries, "SUV").cards.get(entry.pick.model)!;
+    const id = Object.keys(spec.elements).find((k) => spec.elements[k]!.type === "EquityMini")!;
+    const props = spec.elements[id]!.props as { positiveEquityMonth: number | null };
+    props.positiveEquityMonth = (props.positiveEquityMonth ?? 0) + 3;
+    expect(checkPickCardSpec(spec, entry).ok).toBe(false);
+  });
+
+  it("labels the cheapest rows 'Cheapest to own', ties shared (task 040)", () => {
+    const base = entriesFor("SUV")[0]!;
+    const tied: SpecEntry[] = [
+      { ...base, pick: { ...base.pick, make: "Alpha", model: "One", rank: 1 } },
+      { ...base, pick: { ...base.pick, make: "Beta", model: "Two", rank: 2 } },
+      {
+        ...base,
+        pick: { ...base.pick, make: "Gamma", model: "Three", rank: 3 },
+        local: {
+          model: base.pick.model,
+          fuel: { perMonth: (base.local?.fuel?.perMonth ?? 150) + 200 },
+          units: base.local?.units ?? [],
+        },
+      },
+    ];
+    const spec = buildCostCompareSpec(tied, "SUV")!;
+    const byLabel = new Map(compareRows(spec).map((r) => [r.label, r]));
+    expect(byLabel.get("Alpha One")!.labels).toContain("Cheapest to own");
+    expect(byLabel.get("Beta Two")!.labels).toContain("Cheapest to own");
+    expect(byLabel.get("Gamma Three")!.labels).not.toContain("Cheapest to own");
+    expect(checkCostCompareSpec(spec, tied).ok).toBe(true);
+  });
+
+  it("the guard rejects tampered labels and sort figures (task 040)", () => {
+    const entries = entriesFor("SUV");
+    for (const tamper of [
+      (r: CompareRow) => { r.labels = [...r.labels, "Nearest"]; },
+      (r: CompareRow) => { r.bills += 5; },
+      (r: CompareRow) => { r.nearestMiles = (r.nearestMiles ?? 0) + 1; },
+      (r: CompareRow) => { r.lifespanYears = 99; },
+    ]) {
+      const spec = buildCostCompareSpec(entries, "SUV")!;
+      tamper(compareRows(spec)[0]!);
+      expect(checkCostCompareSpec(spec, entries).ok).toBe(false);
+    }
+  });
+
+  it("cards carry their best-at labels and no rank (task 040)", () => {
+    for (const category of CATEGORIES) {
+      const entries = entriesFor(category);
+      const { compare, cards } = buildTurnSpecs(entries, category);
+      const rowLabels = new Map(compareRows(compare).map((r) => [r.model, r.labels]));
+      for (const entry of entries) {
+        const spec = cards.get(entry.pick.model)!;
+        const props = spec.elements[spec.root]!.props as Record<string, unknown>;
+        expect(props).not.toHaveProperty("rank");
+        expect(props).not.toHaveProperty("badgeLabel");
+        expect(props.labels).toEqual(rowLabels.get(entry.pick.model));
+      }
+    }
+  });
+
+  it("no spec carries a rank number or ordinal wording (task 040)", () => {
+    for (const category of CATEGORIES) {
+      const entries = entriesFor(category);
+      const { compare, cards } = buildTurnSpecs(entries, category);
+      for (const spec of [compare!, ...cards.values()]) {
+        const text = JSON.stringify(spec);
+        expect(text).not.toMatch(/Pick #|#\d|top pick|number one|Start with/i);
+      }
+    }
+  });
+
+  it("checks the CR-V 'back to you' figure against resale at 60", () => {
+    const entries = entriesFor("SUV");
+    const crv = entries.find((e) => e.pick.model === "CR-V")!;
+    const costs = costBreakdown(crv)!;
+    const at60 = crv.ownership!.curve.find((p) => p.month === 60)!;
+    const viaResale = (at60.resale - crv.ownership!.downPayment) / 60;
+    // Task 034 hand check: bills - real cost vs (resale - down) / 60.
+    expect(Math.abs(costs.back - viaResale)).toBeLessThanOrEqual(1);
+    expect(costs.back).toBe(costs.bills - costs.real);
+  });
+
+  it("renders an unrated lifespan as null years with no miles", () => {
+    const entries = entriesFor("SUV");
+    const venue = entries.find((e) => e.pick.model === "Venue")!;
+    const spec = buildPickCardSpec(venue, entries.map((e) => e.pick), "SUV");
+    const life = Object.values(spec.elements).find((e) => e.type === "LifespanTrack")!;
+    expect((life.props as { years: unknown }).years).toBeNull();
+    expect((life.props as { miles: unknown }).miles).toBeNull();
+    expect(checkPickCardSpec(spec, venue).ok).toBe(true);
+  });
+
+  it("omits gas segments when there is no fuel estimate", () => {
+    const entries = entriesFor("Sedan", { fuel: null });
+    const entry = entries[0]!;
+    const spec = buildPickCardSpec(entry, entries.map((e) => e.pick), "Sedan");
+    const bars = Object.values(spec.elements).find((e) => e.type === "CostBars")!;
+    const props = bars.props as { pay: { part: string }[]; real: { part: string }[] };
+    expect(props.pay.map((s) => s.part)).toEqual(["loan"]);
+    expect(props.real.map((s) => s.part)).toEqual(["valueLost", "interest", "tax"]);
+    expect(checkPickCardSpec(spec, entry).ok).toBe(true);
+  });
+
+  it("shows the sales-tax segment; card carries no tax line (tasks 037/038)", () => {
+    const entries = entriesFor("SUV");
+    const crv = entries.find((e) => e.pick.model === "CR-V")!;
+    const costs = costBreakdown(crv)!;
+    expect(costs.tax).toBe(Math.round(crv.ownership!.taxAmount! / 60));
+    expect(costs.real).toBeGreaterThan(costs.valueLost + costs.interest);
+    const spec = buildPickCardSpec(crv, entries.map((e) => e.pick), "SUV");
+    const bars = Object.values(spec.elements).find((e) => e.type === "CostBars")!;
+    const props = bars.props as { real: { part: string; usd: number }[] };
+    expect(props.real.map((s) => s.part)).toContain("tax");
+    // Tax wording lives once in the footer/popover, not per card.
+    expect(spec.elements[spec.root]!.props).not.toHaveProperty("taxLine");
+    expect(checkPickCardSpec(spec, crv).ok).toBe(true);
+    const compare = buildCostCompareSpec(entries, "SUV")!;
+    const rows = (
+      compare.elements[compare.root]!.props as {
+        rows: { tax: number; total: number }[];
+      }
+    ).rows;
+    expect(rows.every((r) => r.tax > 0)).toBe(true);
+    expect(checkCostCompareSpec(compare, entries).ok).toBe(true);
+  });
+
+  it("carries the price position from listing totals (task 038)", () => {
+    const entries = entriesFor("SUV");
+    const crv = entries.find((e) => e.pick.model === "CR-V")!;
+    const spec = buildPickCardSpec(crv, entries.map((e) => e.pick), "SUV");
+    const dealer = Object.values(spec.elements).find(
+      (e) => e.type === "DealerLine",
+    )!;
+    const dp = dealer.props as {
+      listingTotal: number | null;
+      listingRadius: number | null;
+      listingMax: number | null;
+    };
+    // 9 listed, only 3 returned: position known, full range not.
+    expect(dp.listingTotal).toBe(9);
+    expect(dp.listingRadius).toBe(50);
+    expect(dp.listingMax).toBeNull();
+    expect(checkPickCardSpec(spec, crv).ok).toBe(true);
+    const compare = buildCostCompareSpec(entries, "SUV")!;
+    const rows = (
+      compare.elements[compare.root]!.props as {
+        rows: { label: string; price: number | null; listingTotal: number | null }[];
+      }
+    ).rows;
+    const crvRow = rows.find((r) => r.label.includes("CR-V"))!;
+    expect(crvRow.price).toBe(crv.pick.price);
+    expect(crvRow.listingTotal).toBe(9);
+    expect(checkCostCompareSpec(compare, entries).ok).toBe(true);
+
+    // Every listing returned: the dearest price is known for free.
+    const all: SpecEntry = {
+      ...crv,
+      local: { ...crv.local!, totalFound: 3 },
+    };
+    const allSpec = buildPickCardSpec(all, [all.pick], "SUV");
+    const allDealer = Object.values(allSpec.elements).find(
+      (e) => e.type === "DealerLine",
+    )!;
+    expect(
+      (allDealer.props as { listingMax: number | null }).listingMax,
+    ).toBe(crv.pick.price + 700);
+    expect(checkPickCardSpec(allSpec, all).ok).toBe(true);
+
+    // Tampered position fails the guard.
+    const bad = buildPickCardSpec(crv, entries.map((e) => e.pick), "SUV");
+    const badDealer = Object.values(bad.elements).find(
+      (e) => e.type === "DealerLine",
+    )!;
+    (badDealer.props as { listingTotal: number }).listingTotal = 99;
+    expect(checkPickCardSpec(bad, crv).ok).toBe(false);
+  });
+
+  it("shows no tax segment in a no-tax state", () => {
+    const base = entriesFor("SUV")[0]!;
+    // Genuinely untaxed ownership, so the guard's back-to-you check
+    // still ties to resale (a taxed loan with taxAmount 0 must fail).
+    const untaxed = ownershipMath({
+      price: base.pick.price,
+      down: base.pick.price * 0.1,
+      apr: 8,
+      term: 60,
+      retention5y: base.pick.retention5y,
+    });
+    const untaxedOwnership = {
+      price: untaxed.price,
+      taxAmount: 0,
+      downPayment: untaxed.downPayment,
+      loanAmount: untaxed.loanAmount,
+      monthlyPayment: untaxed.monthlyPayment,
+      aprPercent: untaxed.aprPercent,
+      termMonths: untaxed.termMonths,
+      evenMonth: untaxed.evenMonth,
+      curve: untaxed.curve,
+    };
+    const noTax: SpecEntry = {
+      ...base,
+      ownership: {
+        ...untaxedOwnership,
+        taxStatus: "none" as const,
+        taxNotice: "No state sales tax on cars in Montana.",
+      },
+    };
+    const spec = buildPickCardSpec(noTax, [noTax.pick], "SUV");
+    const bars = Object.values(spec.elements).find((e) => e.type === "CostBars")!;
+    const props = bars.props as { real: { part: string }[] };
+    expect(props.real.map((s) => s.part)).not.toContain("tax");
+    expect(spec.elements[spec.root]!.props).not.toHaveProperty("taxLine");
+    expect(checkPickCardSpec(spec, noTax).ok).toBe(true);
+
+    const unknown: SpecEntry = {
+      ...base,
+      ownership: {
+        ...untaxedOwnership,
+        taxStatus: "unknown" as const,
+        taxNotice: "Tax not included: unknown state",
+      },
+    };
+    const unknownSpec = buildPickCardSpec(unknown, [unknown.pick], "SUV");
+    expect(unknownSpec.elements[unknownSpec.root]!.props).not.toHaveProperty(
+      "taxLine",
+    );
+    expect(checkPickCardSpec(unknownSpec, unknown).ok).toBe(true);
+  });
+
+  it("fails the guard when a spec number is tampered with", () => {
+    const entries = entriesFor("SUV");
+    const entry = entries[0]!;
+    const spec = buildPickCardSpec(entry, entries.map((e) => e.pick), "SUV");
+    const bars = Object.values(spec.elements).find((e) => e.type === "CostBars")!;
+    (bars.props as { backWhenSold: number }).backWhenSold += 25;
+    const check = checkPickCardSpec(spec, entry);
+    expect(check.ok).toBe(false);
+    expect(check.failures.map((f) => f.check)).toContain("back-identity");
+    // Failures never carry a value (safe to log without data).
+    expect(JSON.stringify(check.failures)).not.toMatch(/\d{2,}/);
+  });
+
+  it("fails the guard on a number the guard does not know", () => {
+    const entries = entriesFor("SUV");
+    const entry = entries[0]!;
+    const spec = buildPickCardSpec(entry, entries.map((e) => e.pick), "SUV");
+    const bars = Object.values(spec.elements).find((e) => e.type === "CostBars")!;
+    (bars.props as Record<string, unknown>).extraCharge = 42;
+    const check = checkPickCardSpec(spec, entry);
+    expect(check.ok).toBe(false);
+    expect(check.failures.map((f) => f.check)).toContain("unchecked-number");
+    expect(collectSpecNumbers(spec).size).toBeGreaterThan(0);
+  });
+});
