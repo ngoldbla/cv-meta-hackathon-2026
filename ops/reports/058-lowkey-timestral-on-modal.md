@@ -9,7 +9,7 @@ Branch: task/058-timestral-on-modal (cut from main)
 - **The app reads live forecasts** (`lib/gasForecast.ts`, wired into the tools) and falls back to the table's forecasts when `LOWKEY_GAS_URL` is not set.
 
 ## Work done
-- **Pure core and EIA fetch** (bf33840, 667cdb6): the forecast maths, the "latest EIA week" rule (the most recent Monday whose 18:00 America/New_York has passed) and the weekly gasoline fetch.
+- **Pure core and EIA fetch** (bf33840, 667cdb6): the forecast maths and the weekly gasoline fetch. The "latest EIA week" rule (the most recent Monday whose 18:00 America/New_York has passed) lives only in the app, in `lowkey/app/lib/gasForecast.ts` (2834e26), after ruling 7627c27.
 - **Modal app** (73196f2, 274fd96): stage, serve and parity scripts. Deployed at https://ngoldbla--lowkey-gas-web.us-east.modal.run (GET /gas and POST /refresh, both token-gated).
 - **App wiring** (2834e26): live gas forecasts and stale-refresh requests.
 - **Table build** (c5d3a7f): `build_table.py` reads the service.

@@ -9,8 +9,9 @@ ZIP -> gas-series rules (P15). The document is written outside git
 (default ~/.cache/low-key/table.json) and uploaded to private Blob
 storage by upload_table.mjs; raw provider data never enters git.
 
-Run with the pipeline venv (stdlib plus the preflight modules; the
-forecasts come over HTTP, so LOWKEY_GAS_URL/LOWKEY_GAS_TOKEN are needed):
+Run with the pipeline venv (stdlib plus the preflight modules; no torch
+needed). The gas forecasts come from the gas service over HTTP, so
+LOWKEY_GAS_URL/LOWKEY_GAS_TOKEN are needed:
 
   set -a; . ~/.config/low-key/env; set +a
   ~/.cache/low-key/venv-timestral/bin/python lowkey/pipeline/build_table.py

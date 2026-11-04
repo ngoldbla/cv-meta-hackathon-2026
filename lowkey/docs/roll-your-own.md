@@ -14,22 +14,22 @@ Low Key is open source so you can shop with your own preferences: a luxury list,
 | `EIA_API_KEY` | Free at https://www.eia.gov/opendata/ |
 | `BLOB_READ_WRITE_TOKEN` | Created with the Vercel Blob store |
 | `LOWKEY_QUOTE_URL`, `LOWKEY_QUOTE_TOKEN` | Optional: your Modal deployment of the photo reader (step 4) |
-| `LOWKEY_GAS_URL`, `LOWKEY_GAS_TOKEN` | Optional: your Modal deployment of the gas forecast service (step 3) |
+| `LOWKEY_GAS_URL`, `LOWKEY_GAS_TOKEN` | Required for the weekly table: your Modal deployment of the gas forecast service (step 2) |
 
 FRED, the Census geocoder and fueleconomy.gov need no key.
 
-## 2. Build the weekly data table
+## 2. Deploy the gas forecast service
+Required for the weekly table. Forecasts gas prices on a serverless Modal GPU that scales to zero, weekly and on demand. Follow "Gas forecast service" in `lowkey/docs/deploy.md`, then set `LOWKEY_GAS_URL` and `LOWKEY_GAS_TOKEN`.
+
+## 3. Build the weekly data table
 The app reads one table (`lowkey/table.json` in Blob) with the picks per type, resale curves, MPG, gas forecasts, trims, lifespan and sales tax.
 
-The pipeline reads the gas forecasts from the gas forecast service (step 3), so `LOWKEY_GAS_URL` and `LOWKEY_GAS_TOKEN` must be set when it runs. A local Timestral environment (`~/.cache/low-key/venv-timestral`) is optional now; `lowkey/pipeline/weekly.sh` uses it as its Python if present, and `lowkey/docs/deploy.md` has the manual steps.
+The pipeline reads the gas forecasts from the gas forecast service (step 2), so `LOWKEY_GAS_URL` and `LOWKEY_GAS_TOKEN` must be set when it runs; without them `build_table.py` fails. `lowkey/pipeline/weekly.sh` requires a Python 3.12 venv at `~/.cache/low-key/venv-timestral` (it no longer needs torch or Timestral, so any plain venv at that path works) and stops with `missing-timestral-venv` without it. `lowkey/docs/deploy.md` has the manual steps.
 ```bash
 set -a; . ~/.config/low-key/env; set +a
 bash lowkey/pipeline/weekly.sh        # builds the table, uploads it to Blob, reads it back and checks it
 ```
 Schedule it weekly (a systemd timer or cron). It spends provider credits; `lowkey/docs/deploy.md` has the details.
-
-## 3. Optional: the gas forecast service
-Forecasts gas prices on a serverless Modal GPU that scales to zero, weekly and on demand. Follow "Gas forecast service" in `lowkey/docs/deploy.md`, then set `LOWKEY_GAS_URL` and `LOWKEY_GAS_TOKEN`.
 
 ## 4. Optional: the photo reader
 "Check a quote" works as a typed form without this. Reads go to Muse Glimmer hosted on Hugging Face Inference Providers (always warm, billed per token to the account behind `HF_TOKEN`; a Pro account includes monthly credits). The Modal GPU is the backup and the demo path. To read photos:
