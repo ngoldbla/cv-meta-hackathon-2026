@@ -1,0 +1,155 @@
+{
+ "data": {
+  "vin": "1HGCV2FA9SB601815",
+  "status": "active",
+  "successor_vin": null,
+  "latest_listing": {
+   "price": 37313,
+   "price_with_fees": 37313,
+   "miles": 10,
+   "inventory_type": "new",
+   "title_status": "unknown",
+   "certification": null,
+   "previous_use": "unknown",
+   "pricing": {
+    "displayed_provider_current_price_usd": 37313,
+    "seller_total_before_taxes_and_registration_usd": 37313,
+    "seller_total_before_manufacturer_incentives_usd": 37313,
+    "dealer_adjusted_vehicle_price_usd": null,
+    "totals": {
+     "vehicle_usd": 36900,
+     "fees_usd": 413,
+     "add_ons_usd": 0,
+     "incentives_usd": 0,
+     "government_usd": null
+    },
+    "reconciles": true,
+    "fee_disclosure": "itemized",
+    "estimated_dealer_fees": null,
+    "line_items": [
+     {
+      "amount_usd": 38580,
+      "applicability": "all_buyers",
+      "direction": "anchor",
+      "raw_label": "TSRP",
+      "role": "pricing_anchor",
+      "row_key": "dprice:0",
+      "row_order": 0,
+      "subtype": "retail",
+      "included_in": [],
+      "excluded_from": [
+       "displayed_provider_current_price"
+      ],
+      "placement": null,
+      "category": "msrp",
+      "eligibility": null,
+      "stable_key": "pricing_anchor:msrp:f19e3e62"
+     },
+     {
+      "amount_usd": 230,
+      "applicability": "all_buyers",
+      "direction": "subtract",
+      "raw_label": "Discount",
+      "role": "dealer_discount",
+      "row_key": "dprice:1",
+      "row_order": 1,
+      "subtype": null,
+      "included_in": [],
+      "excluded_from": [],
+      "placement": null,
+      "category": null,
+      "eligibility": "everyone",
+      "stable_key": "dealer_discount:_:127e5c5e"
+     },
+     {
+      "amount_usd": 378,
+      "applicability": "all_buyers",
+      "direction": "add",
+      "raw_label": "Doc Fee",
+      "role": "seller_fee",
+      "row_key": "dprice:2",
+      "row_order": 2,
+      "subtype": "doc",
+      "included_in": [],
+      "excluded_from": [],
+      "placement": "inside_displayed",
+      "category": "doc",
+      "eligibility": null,
+      "stable_key": "seller_fee:doc:7ab3223d"
+     },
+     {
+      "amount_usd": 35,
+      "applicability": "all_buyers",
+      "direction": "add",
+      "raw_label": "EVR Fee",
+      "role": "seller_fee",
+      "row_key": "dprice:3",
+      "row_order": 3,
+      "subtype": "dealer_fee_generic",
+      "included_in": [],
+      "excluded_from": [],
+      "placement": "inside_displayed",
+      "category": "electronic_filing",
+      "eligibility": null,
+      "stable_key": "seller_fee:electronic_filing:adc1cf60"
+     },
+     {
+      "amount_usd": 37313,
+      "applicability": "all_buyers",
+      "direction": "set",
+      "raw_label": "Sale Price",
+      "role": "displayed_price",
+      "row_key": "dprice:4",
+      "row_order": 4,
+      "subtype": null,
+      "included_in": [
+       "displayed_provider_current_price",
+       "seller_total_before_taxes_and_registration",
+       "seller_total_before_manufacturer_incentives"
+      ],
+      "excluded_from": [],
+      "placement": null,
+      "category": null,
+      "eligibility": null,
+      "stable_key": "displayed_price:_:9b2e0d5b"
+     }
+    ]
+   },
+   "inventory_date": "2026-08-22",
+   "sold_date": null,
+   "last_checked_at": "2026-11-04 12:46:26.967000",
+   "dealer": {
+    "name": "Example Motors"
+   }
+  },
+  "build": {
+   "year": 2026,
+   "make": "Honda",
+   "model": "CR-V",
+   "trim": "Sport Hybrid",
+   "version": "Sport Hybrid AWD",
+   "body_type": "SUV",
+   "drivetrain": "AWD",
+   "fuel_type": "Hybrid",
+   "powertrain_type": "HEV",
+   "transmission": "CVT",
+   "engine": "2.0L I4",
+   "cylinders": 4,
+   "doors": 4,
+   "seating_capacity": 5,
+   "exterior_color": "Crystal Black Pearl",
+   "interior_color": "Black Cloth",
+   "base_exterior_color": "Black",
+   "base_interior_color": "Black",
+   "spec_source": "openspec",
+   "spec_ref": "us/honda/cr_v/2026/sport_hybrid/awd",
+   "assembly_location": "East Liberty, Ohio, United States",
+   "window_sticker_verified": false,
+   "original_market": null,
+   "paint_program": null,
+   "base_msrp": 37130,
+   "combined_msrp": 38580
+  }
+ },
+ "meta": {}
+}
