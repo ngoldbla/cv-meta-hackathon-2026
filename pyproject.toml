@@ -3,37 +3,27 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cages"
-version = "0.1.0"
-description = "CAGES: Calibrated, Adversarially Generated Evacuation Simulation dataset and worst-case-ready subway and bus dispatch for emergency evacuations."
-readme = "docs/cages.md"
+name = "low-key"
+version = "0.2.0"
+description = "Low Key: a calm way to buy a car. Python side: the data pipeline and preflight checks behind the app (lowkey/), plus the headless Muse Glimmer decision trunk (headless-glimmer/)."
+readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "Dylan Goldblatt" }]
 requires-python = ">=3.10"
-dependencies = ["numpy>=1.24", "scipy>=1.10", "pyyaml>=6"]
+dependencies = ["numpy>=1.24"]
 
 [project.optional-dependencies]
-gym = ["gymnasium>=1.0"]
 model = ["torch>=2.2", "safetensors", "huggingface_hub"]
-hf = ["transformers>=4.45"]
-mcp = ["mcp>=1.2"]
-jupedsim = ["jupedsim"]
-dev = ["pytest>=8", "ruff>=0.5", "hypothesis>=6", "gymnasium>=1.0"]
-ems = ["pandas==2.3.3", "pyarrow==21.0.0"]
-
-[project.scripts]
-cages = "cages.cli:main"
+hf = ["transformers>=4.45", "peft"]
+dev = ["pytest>=8", "ruff>=0.5"]
 
 [tool.setuptools.packages.find]
-where = [".", "judges/cages", "judges/ems"]
-include = ["cages*", "ems*", "loopkit*"]
-
-[tool.setuptools.package-data]
-"cages.data" = ["mta_7line.json"]  # MTA calibration aggregates
+where = ["headless-glimmer"]
+include = ["headless_glimmer*"]
 
 [tool.ruff]
 line-length = 110
-src = [".", "judges/cages", "judges/ems"]
+src = [".", "headless-glimmer"]
 target-version = "py310"
 
 [tool.ruff.lint]
@@ -41,5 +31,6 @@ select = ["E", "F", "W", "I", "B", "UP"]
 ignore = ["E501", "B905"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "judges/cages/tests", "judges/ems/tests"]
+testpaths = ["lowkey/pipeline", "lowkey/preflight", "headless-glimmer/tests"]
+pythonpath = ["headless-glimmer"]
 addopts = "--import-mode=importlib"

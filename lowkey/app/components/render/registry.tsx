@@ -9,6 +9,8 @@ import { CostBarsView } from "./CostBars";
 import { CostCompareView } from "./CostCompare";
 import { DealerLineView } from "./DealerLine";
 import { LifespanTrackView } from "./LifespanTrack";
+import { ListingDetailView } from "./ListingDetail";
+import { ListingContext } from "./listing-context";
 import { PickCardView } from "./PickCardView";
 import { EquityMiniView } from "./EquityMini";
 import { ChooserContext } from "./chooser-context";
@@ -57,6 +59,7 @@ export const { registry } = defineRegistry(catalog, {
         listingMax={props.listingMax}
       />
     ),
+    ListingDetail: ({ props }) => <ListingDetailView {...props} />,
     PickCard: ({ props, children }) => (
       <PickCardView {...props}>{children}</PickCardView>
     ),
@@ -71,6 +74,8 @@ export function RenderSpec({
   sort = DEFAULT_SORT,
   onSort,
   onOpen,
+  onListing,
+  resultsUrl,
 }: {
   spec: Spec;
   onWalkAway?: (modelKey: string) => void;
@@ -78,8 +83,12 @@ export function RenderSpec({
   sort?: SortKey;
   onSort?: (key: SortKey) => void;
   onOpen?: (modelKey: string) => void;
+  /** Listing sheet (task 041): open a unit, and the results link. */
+  onListing?: (modelKey: string, url: string) => void;
+  resultsUrl?: string;
 }): ReactNode {
   return (
+    <ListingContext.Provider value={{ onListing, resultsUrl }}>
     <WalkAwayContext.Provider value={{ onWalkAway }}>
       <ChooserContext.Provider value={{ sort, onSort, onOpen }}>
         <JSONUIProvider registry={registry}>
@@ -87,5 +96,6 @@ export function RenderSpec({
         </JSONUIProvider>
       </ChooserContext.Provider>
     </WalkAwayContext.Provider>
+    </ListingContext.Provider>
   );
 }

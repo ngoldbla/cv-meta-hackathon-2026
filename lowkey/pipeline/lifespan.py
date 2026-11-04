@@ -6,7 +6,7 @@ model from the Longest-Lasting odometer model (almost 400 million
 used cars; new-car prices from 8.7 million cars sold July-December
 2025). It covers 10 of the 12 ranked models; models it does not
 publish show no lifespan at all rather than a guess. The audit trail
-is in research/claims.yaml (lowkey029-iseecars-*).
+is in lowkey/docs/claims.yaml (lowkey029-iseecars-*).
 
 The per-model year figures live outside git in
 ~/.cache/low-key/lifespan.json and are merged into the private

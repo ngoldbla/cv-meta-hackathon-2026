@@ -1,34 +1,41 @@
-# Emergency-logistics autoresearch
+# Low Key
 
-An open research program. An agent-driven loop co-designs worst-case scenarios and response policies against a frozen, calibrated simulator. The test is whether the policies it finds beat the strongest classical planners on the worst outcomes of a hard emergency-logistics problem, and which parts of the loop cause the gain.
+**A calm way to buy a car.** Pick a type and a ZIP. Low Key shows the new cars worth buying near you, what each one really costs a month over five years after resale, and the nearest one in stock. No ads, no sign-up, and no money from dealers.
 
-Author: Dylan Goldblatt. Code: MIT. Data: CC BY 4.0.
+Live: https://low-key-murex.vercel.app · Author: Dylan Goldblatt · Code: MIT
 
-*Safety scope: simulation research only. Nothing here certifies an evacuation, a dispatch policy or a relief plan.*
+Built for the Meta hackathon hosted by Cerebral Valley, Fall 2026.
 
-## How the loop works
-- **Frozen judge.** A calibrated simulator, its evaluator and its real-world anchors. Their hashes are in the ledger, and no loop may edit them.
-- **Blue loop.** Feynman's autoresearch ([`skills/autoresearch/`](skills/autoresearch/SKILL.md)) over response policies: learned and hybrid models first, readable code as a baseline. One change per iteration, keep or revert, every iteration logged and committed.
-- **Red loop.** The same loop over the scenario generator. It looks for scenarios where the policy falls furthest short of what was achievable (regret), inside calibrated bounds.
-- **Counterfactual reports.** Every decision is replayed under every option, so each run shows which decisions cost the most.
-- **One-shot holdout.** Claims are pre-registered in the hash-chained ledger and tested once, on sealed holdout pools.
+## What it does
+- **Ranks by resale.** The picks in each type are the models that keep the most of their price after five years, from real sold-vehicle data.
+- **Shows the real cost.** Each car's monthly cost splits into value lost, interest, gas and sales tax, next to what you actually pay each month.
+- **Lets you choose the order.** Sort by real cost, monthly payment, distance or lifespan. There are no rank numbers.
+- **Finds the car.** The cheapest new unit nearby, its estimated out-the-door price, and a short deal sheet to take to the dealer.
+- **Plans for a change of mind.** "If I change my mind" shows what selling early would cost, month by month.
 
-Design: [`docs/superpowers/specs/2026-10-29-emergency-logistics-loop-design.md`](docs/superpowers/specs/2026-10-29-emergency-logistics-loop-design.md)
+Every number comes from code, never from the language model. A number guard checks each figure on screen against the tool result that produced it.
 
-## Status
-| Milestone | State |
+## Repository
+| Path | What it is |
 |---|---|
-| M1 problem survey | in progress (`research/problem-selection/`) |
-| M2 loop wiring and dry run on CAGES | in progress |
-| M3–M6 | planned after the problem is chosen |
+| [`lowkey/app/`](lowkey/app/) | The Next.js app (chat route, tools, number guard, UI) |
+| [`lowkey/pipeline/`](lowkey/pipeline/) | Builds the weekly data table: rankings, MPG, gas forecasts, trims, lifespan, tax |
+| [`lowkey/preflight/`](lowkey/preflight/) | The checks run before building: data coverage, terms, ZIP-to-state |
+| [`lowkey/docs/`](lowkey/docs/) | PRD, deploy notes, preflight results, roadmap |
+| [`headless-glimmer/`](headless-glimmer/) | Muse Glimmer with its language-model head removed, used as a decision trunk |
+| [`ops/`](ops/) | The task mailbox the app was built through: tasks in, reports out |
 
-## Judges
-| Judge | Problem | Where | State |
-|---|---|---|---|
-| CAGES v0 | Subway and bus evacuation of a stadium on the NYC 7 line | `judges/cages/` | frozen evaluator v2.0, ledger entries 1–10, tag `cages-v0`. See [`docs/cages.md`](docs/cages.md). |
+## Checks
+```bash
+cd lowkey/app && npm ci && npm test && npm run build
+.venv/bin/python -m pytest -q          # pipeline, preflight and headless Glimmer tests
+python scripts/name_guard.py && python scripts/secret_guard.py --all
+```
 
-## Running the loop
-- Rules for any agent: [`AGENTS.md`](AGENTS.md).
-- Muse Code runbook: [`docs/runbook-loop.md`](docs/runbook-loop.md).
-- Task mailbox: [`ops/README.md`](ops/README.md).
-- CAGES quick start: [`docs/cages.md`](docs/cages.md#quick-start).
+Keys are never committed; they live in Vercel's secret store, or in `~/.config/low-key/env` on a build machine.
+
+## Credits and data
+See [`CREDITS.md`](CREDITS.md). Listings and sold-vehicle data come from [Visor](https://visor.vin), used under its API licence.
+
+## History
+This repository began as an emergency-logistics research program (subway evacuation, then EMS surge dispatch). That work is kept at tag `ems-archive-2026-11-02` and branch `archive/ems-surge-2026-11`.

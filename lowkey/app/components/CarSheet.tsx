@@ -75,7 +75,7 @@ export function CarSheet({
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 text-left">
               <DrawerTitle className="text-left">{car.title}</DrawerTitle>
-              <DrawerDescription className="mx-0 text-left">
+              <DrawerDescription className="!mx-0 !text-left">
                 {wide
                   ? "Use the arrows for the other cars."
                   : "Swipe or use the arrows for the other cars."}

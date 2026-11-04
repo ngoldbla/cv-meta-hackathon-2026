@@ -4,6 +4,7 @@ import { z } from "zod";
 import { fuelForModel } from "./fuel";
 import { aprLabel, getDefaultApr } from "./fred";
 import { fetchUnitsWithTrimFallback } from "./listings";
+import type { DealInputs, DownRule } from "./deal";
 import { ownershipMath } from "./ownership";
 import { resolveTax, taxNoticeText } from "./tax";
 import {
@@ -84,6 +85,12 @@ export async function executeOwnership(args: {
   retention5y?: number;
   /** Set by the fast path when `price` is already the resolved price. */
   priceSource?: "local" | "typical" | "given";
+  /**
+   * How `down` was set (task 041), so the listing sheet can price
+   * another unit the same way. Default: a stated dollar `down` is a
+   * fixed amount; no `down` is 10% of the price.
+   */
+  downRule?: DownRule;
 }) {
   const { down, apr, term, model, zip } = args;
   let table = null;
@@ -150,8 +157,23 @@ export async function executeOwnership(args: {
     model: resolved?.pick.model ?? model,
     retention5y,
   });
+  // Task 041: the assumptions a second local unit is priced with.
+  const dealInputs: DealInputs = {
+    downRule:
+      args.downRule ??
+      (down !== undefined
+        ? { kind: "amount", usd: down }
+        : { kind: "share", share: 0.1 }),
+    aprPercent: result.aprPercent,
+    termMonths: result.termMonths,
+    retention5y: result.retention5y,
+    taxStatus: taxRes.status,
+    taxRule: taxRes.rule,
+    mpg: resolved?.pick.mpg ?? null,
+  };
   return {
     ...result,
+    dealInputs,
     taxStatus: taxRes.status,
     taxState: taxRes.state,
     taxStateName: taxRes.rule?.name ?? null,

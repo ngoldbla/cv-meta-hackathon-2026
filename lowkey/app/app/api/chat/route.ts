@@ -150,6 +150,10 @@ async function fastPathResponse(req: FastRequest) {
         });
         const out = await executeOwnership({
           ...ownInput,
+          downRule:
+            req.downFixed !== null
+              ? { kind: "amount", usd: req.downFixed }
+              : { kind: "share", share: (req.downPercent ?? 10) / 100 },
           retention5y: pick.retention5y,
           priceSource: local.bestPrice !== null && local.bestPrice !== undefined ? "local" : "typical",
           apr:

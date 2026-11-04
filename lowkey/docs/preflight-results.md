@@ -118,7 +118,7 @@ Recomputed from the task-022 fits (new-price basis) with the PRD lineup rules as
 
 ## 2026-11-03 (task 029, runner): P18 lifespan
 
-- **P18 Lifespan: PASS with gaps shown as gaps.** Candidates checked against their sources before any number was built on (full audit: `research/claims.yaml`, ids `lowkey029-iseecars-*`, fetched 2026-11-03):
+- **P18 Lifespan: PASS with gaps shown as gaps.** Candidates checked against their sources before any number was built on (full audit: `lowkey/docs/claims.yaml`, ids `lowkey029-iseecars-*`, fetched 2026-11-03):
   - *iSeeCars Longest-Lasting Cars* (current study September 15, 2026; over 395 million vehicles; average odometer by age fed to a proprietary survival model): gives a predicted chance of reaching 250,000 miles per model (overall average 5.4%; the 4.8% in task 029 is the superseded 2025 average). Recency and method are stated, but a survival probability at one threshold is not an expected life, so it cannot price "lasts about N years" without a further assumption. Not chosen as the metric source.
   - *iSeeCars car-lifespan (potential lifespan)* (over 2 million cars, at least 10 of the past 20 model years): gives the 99th-percentile odometer reading for 20 models only (230,000–297,000 miles). It is a top-1% reading, not a mean life, and covers almost none of the lineup. Not chosen.
   - *Provider used-listing proxy* (share at high mileage by age from sold facets): the sold facets carry only `miles.median` per model and age, so a high-mileage share would need new per-threshold listing counts on dealer-retail sales with no survival method behind them. Weakest method; not chosen.

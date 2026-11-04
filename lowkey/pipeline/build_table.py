@@ -58,7 +58,7 @@ GAS_FUELS = {"Regular", "Premium", "Midgrade"}
 
 # Provider model value -> (EPA make, EPA model prefix, drivetrain hint).
 # Mirrors preflight/p17_mpg.py, extended for the four-pick lineups
-# (Colorado, Silverado 1500, Maverick). Heavy-duty trucks have no EPA
+# (Colorado, Silverado 1500, Sierra 1500, Maverick). Heavy-duty trucks have no EPA
 # rating and never rank, so they need no entry.
 EPA_MODELS: dict[str, tuple[str, str, str]] = {
     "Accord Sedan": ("Honda", "Accord", "Front-Wheel"),
@@ -76,16 +76,19 @@ EPA_MODELS: dict[str, tuple[str, str, str]] = {
     "1500": ("Ram", "1500", "Wheel Drive"),
     "Colorado": ("Chevrolet", "Colorado", "Wheel Drive"),
     "Silverado 1500": ("Chevrolet", "Silverado", "Wheel Drive"),
+    "Sierra 1500": ("GMC", "Sierra", "Wheel Drive"),
     "Maverick": ("Ford", "Maverick", "Wheel Drive"),
 }
 # Volume-powertrain EPA ids (see p17_mpg.py): Tacoma automatic,
 # Ram 1500 base 3.0L strict-gas configuration; Colorado base 4WD and
-# Silverado base 2.7L 4WD (the generic sort would pick ZR2 / V8 trims).
+# Silverado and Sierra base 2.7L 4WD (the generic sort would pick
+# ZR2 / AT4X / V8 trims or the "Mud Terrain Tires" variant).
 EPA_OVERRIDES = {
     "Tacoma": "50091",
     "1500": "49420",
     "Colorado": "49379",
     "Silverado 1500": "49378",
+    "Sierra 1500": "49401",
 }
 
 

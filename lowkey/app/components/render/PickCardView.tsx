@@ -14,6 +14,7 @@ import {
 import { StatusDot } from "@/components/ui/status-dot";
 import { CarFigure } from "../hairline/CarFigure";
 import type { CarKind } from "@/lib/hairline/cars";
+import { CardModelContext } from "./listing-context";
 import { WalkAwayContext } from "./walk-context";
 
 const KIND_BY_CATEGORY: Record<string, CarKind> = {
@@ -89,7 +90,9 @@ export function PickCardView({
         {trimLine ? (
           <p className="mb-3 text-sm leading-relaxed text-foreground/80">{trimLine}</p>
         ) : null}
-        <div className="flex flex-col gap-3">{children}</div>
+        <CardModelContext.Provider value={modelKey}>
+          <div className="flex flex-col gap-3">{children}</div>
+        </CardModelContext.Provider>
         {hasWalkAway && onWalkAway ? (
           <Button
             type="button"

@@ -13,10 +13,12 @@ artifacts/
 *.safetensors
 *.pt
 !datasets/**/*.json
-judges/ems/data/cache/
 
 # secrets: never commit
 .env
 .env.*
 *.env
 !.env.example
+
+# Leftover local data from the archived research program (never tracked)
+judges/

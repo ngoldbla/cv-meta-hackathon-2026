@@ -5,6 +5,7 @@ import {
   fetchUnitsWithTrimFallback,
   listingsUrl,
   mapListingsResponse,
+  vinOf,
   type ListingsFetcher,
 } from "./listings";
 
@@ -41,6 +42,24 @@ function okJson(payload: unknown): ListingsFetcher {
   });
 }
 
+describe("vinOf (task 041)", () => {
+  it("keeps a well-formed VIN and drops anything else", () => {
+    expect(vinOf("2hkrs4h7xth000001")).toBe("2HKRS4H7XTH000001");
+    expect(vinOf("2HKRS4H7XTH00000")).toBeNull();
+    expect(vinOf("2HKRS4H7XTH0000O1")).toBeNull();
+    expect(vinOf(12345)).toBeNull();
+    expect(vinOf(null)).toBeNull();
+  });
+
+  it("maps the listing's VIN onto the unit", () => {
+    const { units } = mapListingsResponse(
+      body([row({ vin: "2HKRS4H7XTH000001" })]),
+      "60614",
+    );
+    expect(units[0]?.vin).toBe("2HKRS4H7XTH000001");
+  });
+});
+
 describe("mapListingsResponse (task 027 part 3)", () => {
   it("maps only the fields the card needs, cheapest first", () => {
     const { units, total } = mapListingsResponse(
@@ -60,6 +79,7 @@ describe("mapListingsResponse (task 027 part 3)", () => {
       year: 2026,
       trim: "LX",
       url: "https://example.com/fixture/crv-1",
+      vin: null,
     });
     expect(units[0].price).toBeLessThan(units[1].price);
   });

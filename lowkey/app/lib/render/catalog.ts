@@ -115,6 +115,31 @@ export const catalog = defineCatalog(schema, {
       description:
         "Container for one car: best-at labels (no rank), in-stock dot, Hairline figure, model and trim, code-written sentence, trim-step line, then its children in mockup order (CostBars, LifespanTrack, EquityMini, DealerLine), then 'If I change my mind'.",
     },
+    ListingDetail: {
+      props: z.object({
+        modelKey: z.string(),
+        title: z.string(),
+        vin: z.string().nullable(),
+        dealer: z.string(),
+        miles: z.number(),
+        daysOnLot: z.number().nullable(),
+        price: z.number(),
+        tax: z.number().nullable(),
+        outTheDoor: z.number().nullable(),
+        taxNotice: z.string().nullable(),
+        down: z.number(),
+        downShare: z.number().nullable(),
+        aprPercent: z.number(),
+        termMonths: z.number(),
+        loan: z.number(),
+        gas: z.number().nullable(),
+        bills: z.number(),
+        positiveEquityMonth: z.number().nullable(),
+        url: z.string(),
+      }),
+      description:
+        "The listing sheet (task 041): one local unit before the dealer's site. Year, make, model and trim; price with fees; days on the lot; dealer name and distance; the estimated out-the-door price (price with fees + estimated sales tax); this unit's monthly bills (loan + gas) and positive-equity month at the turn's assumptions. 'Take this to the dealer' writes a short deal sheet to copy or share; 'Open dealer's listing' is the last action, in a new tab.",
+    },
   },
   actions: {},
 });

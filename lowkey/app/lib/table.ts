@@ -127,6 +127,15 @@ export async function getTable(): Promise<LowkeyTable> {
   if (cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
     return cached.data;
   }
+  // Local checks only: a freshly built table can be tried before it is
+  // uploaded. Ignored on Vercel, which always reads the Blob table.
+  const localFile = process.env.LOWKEY_TABLE_FILE;
+  if (localFile && !process.env.VERCEL) {
+    const { readFile } = await import("node:fs/promises");
+    const data = parseTable(await readFile(localFile, "utf8"));
+    cached = { data, fetchedAt: Date.now() };
+    return data;
+  }
   const token = process.env.BLOB_READ_WRITE_TOKEN;
   const result = await get(TABLE_PATHNAME, {
     access: "private",

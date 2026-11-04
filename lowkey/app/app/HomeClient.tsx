@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { CarFigure } from "@/components/hairline/CarFigure";
 import { CarSheet, type SheetCar } from "@/components/CarSheet";
 import { CreditBlock, CREDIT_POINTS } from "@/components/CreditBlock";
+import { ListingSheet } from "@/components/ListingSheet";
 import { RenderSpec } from "@/components/render/registry";
 import { TextFallback } from "@/components/render/TextFallback";
 import WalkAwayView from "@/components/WalkAwayView";
@@ -62,10 +63,15 @@ import {
   type SearchArea,
 } from "@/lib/geo";
 import { STILL_LOOKING_AFTER_MS } from "@/lib/geo";
-import { checkCostCompareSpec, checkPickCardSpec } from "@/lib/render/guard";
+import {
+  checkCostCompareSpec,
+  checkListingSpec,
+  checkPickCardSpec,
+} from "@/lib/render/guard";
 import { isCatalogValid } from "@/lib/render/validate";
 import {
   buildCostCompareSpec,
+  buildListingSpec,
   buildPickCardSpec,
   turnLabels,
   type SpecEntry,
@@ -78,6 +84,20 @@ import {
   type SortKey,
   type SortableFacts,
 } from "@/lib/chooser";
+import type { DealInputs } from "@/lib/deal";
+import {
+  LAST_SEARCH_KEY,
+  initialSearch,
+  restoreAction,
+  resultsLink,
+  resumeHeading,
+  searchMessage,
+  searchQuery,
+  serializeLastSearch,
+  typeFromCategory,
+  typeLabel,
+  type SavedSearch,
+} from "@/lib/search";
 import type { Spec } from "@json-render/core";
 import type { CurveLike } from "@/components/WorthChart";
 
@@ -144,6 +164,8 @@ interface OwnershipOutput {
     perMonth: number;
   }[];
   aprLabel?: string | null;
+  /** Task 041: assumptions for pricing another local unit. */
+  dealInputs?: DealInputs;
 }
 
 interface LocalOutput {
@@ -176,6 +198,7 @@ interface LocalOutput {
     trim?: string | null;
     price: number;
     url: string;
+    vin?: string | null;
   }[];
 }
 
@@ -206,6 +229,7 @@ function toSpecOwnership(o: OwnershipOutput | undefined): SpecOwnership | undefi
     evenMonth: o.evenMonth ?? o.underwaterMonth ?? null,
     underwaterMonth: o.underwaterMonth ?? null,
     curve: o.curve ?? [],
+    dealInputs: o.dealInputs,
   };
 }
 
@@ -237,6 +261,17 @@ function KeyIcon() {
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <circle cx="8" cy="14" r="4.5" stroke="currentColor" strokeWidth="2" />
       <path d="M11.2 10.8 20 2M16 6l3 3M13.5 8.5l2.5 2.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** The public repo: the code, the data sources and the credits. */
+const REPO_URL = "https://github.com/ngoldbla/cv-meta-hackathon-2026";
+
+function GitHubIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
     </svg>
   );
 }
@@ -370,6 +405,108 @@ interface SheetState {
   model: string;
 }
 
+/** One open listing sheet (task 041): the turn, the car, the unit. */
+interface ListingState {
+  turn: string;
+  model: string;
+  url: string;
+}
+
+/** The last search, remembered for the next visit (task 041). */
+function persistLastSearch(s: SavedSearch) {
+  try {
+    window.localStorage.setItem(LAST_SEARCH_KEY, serializeLastSearch(s));
+  } catch {
+    // Best-effort only.
+  }
+}
+
+function forgetLastSearch() {
+  try {
+    window.localStorage.removeItem(LAST_SEARCH_KEY);
+  } catch {
+    // Best-effort only.
+  }
+}
+
+function loadLastSearch(): string | null {
+  try {
+    return window.localStorage.getItem(LAST_SEARCH_KEY);
+  } catch {
+    return null;
+  }
+}
+
+/** The search a finished turn ran: its category and the ZIP searched. */
+function searchOfParts(parts: Part[]): SavedSearch | null {
+  let type: SavedSearch["type"] | null = null;
+  let zip: string | null = null;
+  for (const part of parts) {
+    if (part.state !== "output-available") continue;
+    if (part.type === "tool-rank_category") {
+      type = typeFromCategory((part.output as { category?: string } | undefined)?.category);
+    }
+    if (part.type === "tool-local_units" && !zip) {
+      const z = (part.output as { zip?: string } | undefined)?.zip;
+      if (z && /^\d{5}$/.test(z)) zip = z;
+    }
+  }
+  return type && zip ? { zip, type } : null;
+}
+
+/**
+ * The open listing sheet (task 041). Builds the unit's spec from the
+ * turn's tool results and runs the number guard; a failure closes
+ * nothing but shows the plain dealer link instead of the figures.
+ */
+function ListingFromEntries({
+  entries,
+  listing,
+  wide,
+  resultsUrl,
+  onClose,
+}: {
+  entries: Map<string, SpecEntry[]>;
+  listing: ListingState;
+  wide: boolean;
+  resultsUrl: string;
+  onClose: () => void;
+}) {
+  const entry = (entries.get(listing.turn) ?? []).find(
+    (e) => e.pick.model === listing.model,
+  );
+  if (!entry) return null;
+  const spec = buildListingSpec(entry, listing.url);
+  const ok = Boolean(
+    spec && isCatalogValid(spec) && checkListingSpec(spec, entry).ok,
+  );
+  if (spec && !ok) logGuardDrop("listing");
+  const unit = (entry.local?.units ?? []).find((u) => u.url === listing.url);
+  const props = (ok && spec ? spec.elements[spec.root]?.props : null) as
+    | { title: string; dealer: string; miles: number }
+    | null;
+  const title = props?.title ?? `${entry.pick.make} ${entry.pick.model}`;
+  const subtitle = unit
+    ? `${unit.dealer} · ${Math.round(unit.distanceMiles)} mi away`
+    : "";
+  return (
+    <ListingSheet title={title} subtitle={subtitle} wide={wide} onClose={onClose}>
+      {ok && spec ? (
+        <RenderSpec spec={spec} resultsUrl={resultsUrl} />
+      ) : (
+        <a
+          href={listing.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block min-h-11 py-3 underline"
+        >
+          Open dealer&apos;s listing (opens the dealer&apos;s site)
+        </a>
+      )}
+    </ListingSheet>
+  );
+}
+
 function loadStoredArea(): SearchArea | null {
   try {
     return parseStoredArea(window.localStorage.getItem(AREA_STORAGE_KEY));
@@ -431,6 +568,17 @@ export default function HomeClient({
   const [sort, setSort] = useState<SortKey>(DEFAULT_SORT);
   const [sheet, setSheet] = useState<SheetState | null>(null);
   const [returnSheet, setReturnSheet] = useState<SheetState | null>(null);
+  // Listing sheet (task 041) and the car sheet to return to after it.
+  const [listing, setListing] = useState<ListingState | null>(null);
+  const [listingReturn, setListingReturn] = useState<SheetState | null>(null);
+  // Resumable results (task 041): the search on screen, and the
+  // search restored from a link or the last visit.
+  const [current, setCurrent] = useState<SavedSearch | null>(null);
+  const [resumed, setResumed] = useState<SavedSearch | null>(null);
+  // The remembered search, offered on the resume card until tapped.
+  const [resumeOffer, setResumeOffer] = useState<SavedSearch | null>(null);
+  const [origin, setOrigin] = useState("");
+  const restoredRef = useRef(false);
   const [bodyPick, setBodyPick] = useState<string[]>([]);
   const [isNarrow, setIsNarrow] = useState(false);
   const [area, setArea] = useState<SearchArea | null>(initialArea);
@@ -474,6 +622,67 @@ export default function HomeClient({
   function chooseSort(key: SortKey) {
     setSort(key);
     persistSort(key);
+  }
+
+  /** Run a saved search fresh, under "Your SUVs near 60614". */
+  function runSaved(search: SavedSearch) {
+    setResumeOffer(null);
+    setResumed(search);
+    setCurrent(search);
+    setArea((a) =>
+      a && a.zip === search.zip ? a : { zip: search.zip, city: null, state: null },
+    );
+    setZipOpen(false);
+    setBodyPick([typeLabel(search.type)]);
+    void sendMessage({ text: searchMessage(search) });
+  }
+
+  // Task 041: a search in the URL (a shared or reopened link) runs on
+  // open. The remembered last search waits for one tap on the resume
+  // card, so a return visit spends nothing until asked. Numbers are
+  // never restored from storage; the fast path always runs again.
+  useEffect(() => {
+    setOrigin(window.location.origin);
+    if (restoredRef.current) return;
+    restoredRef.current = true;
+    const init = initialSearch(window.location.search, loadLastSearch());
+    if (!init) return;
+    if (init.sort) chooseSort(init.sort);
+    if (restoreAction(init) === "run") runSaved(init.search);
+    else setResumeOffer(init.search);
+    // Runs once on open; sendMessage is stable for the session.
+  }, []);
+
+  function forgetSaved() {
+    forgetLastSearch();
+    setResumeOffer(null);
+  }
+
+  // When a turn finishes, the URL and the remembered search follow it.
+  useEffect(() => {
+    if (status !== "ready") return;
+    const last = [...messages].reverse().find((m) => m.role === "assistant");
+    const ran = last ? searchOfParts((last.parts ?? []) as Part[]) : null;
+    if (!ran) return;
+    setCurrent(ran);
+    persistLastSearch(ran);
+  }, [status, messages]);
+
+  useEffect(() => {
+    if (!current) return;
+    try {
+      window.history.replaceState(null, "", searchQuery(current, sort));
+    } catch {
+      // Some embedded views refuse history changes; the search still works.
+    }
+  }, [current, sort]);
+
+  function closeListing() {
+    setListing(null);
+    if (listingReturn) {
+      setSheet(listingReturn);
+      setListingReturn(null);
+    }
   }
 
   function closeWalk() {
@@ -580,6 +789,10 @@ export default function HomeClient({
     setWalk(null);
     setSheet(null);
     setReturnSheet(null);
+    setListing(null);
+    setListingReturn(null);
+    setResumed(null);
+    setResumeOffer(null);
     void sendMessage({ text });
   }
 
@@ -695,6 +908,9 @@ export default function HomeClient({
   // Each turn's cards in chooser order, filled while rendering the
   // messages below and read by the sheet after them (task 040).
   const decks = new Map<string, SheetCar[]>();
+  // Each turn's spec entries, read by the listing sheet (task 041).
+  const turnEntries = new Map<string, SpecEntry[]>();
+  const shareUrl = current && origin ? resultsLink(origin, current, sort) : origin;
 
   return (
     <MotionConfig reducedMotion="user">
@@ -704,6 +920,16 @@ export default function HomeClient({
           <KeyIcon />
           <span>Low Key</span>
         </div>
+        <a
+          href={REPO_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Low Key's code and credits on GitHub (opens in a new tab)"
+          title="Code and credits on GitHub"
+          className="grid size-11 place-items-center rounded-full text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <GitHubIcon />
+        </a>
       </header>
 
       <div className="messages">
@@ -740,7 +966,12 @@ export default function HomeClient({
           />
         ) : (
           <>
-            {messages.length === 0 ? (
+            {resumed ? (
+              <Typography variant="paragraph-md" className="font-medium">
+                {resumeHeading(resumed)}
+              </Typography>
+            ) : null}
+            {messages.length === 0 && !resumed ? (
               <div className="rounded-xl border border-border bg-card p-5">
                 <RevealText
                   as="h1"
@@ -751,6 +982,42 @@ export default function HomeClient({
                   We help you buy for value and quality: the signal, not the noise.
                 </Typography>
               </div>
+            ) : null}
+            {messages.length === 0 && resumeOffer ? (
+              <section
+                aria-label="Pick up where you left off"
+                className="mt-3 flex flex-col gap-3 rounded-xl border border-border bg-card p-5"
+              >
+                <div className="flex flex-col gap-1">
+                  <Typography variant="paragraph-sm" className="text-muted-foreground">
+                    Pick up where you left off
+                  </Typography>
+                  <Typography variant="paragraph-md" className="font-medium">
+                    {resumeHeading(resumeOffer)}
+                  </Typography>
+                  <Typography variant="paragraph-sm" className="text-muted-foreground">
+                    Prices and stock are checked again when you tap.
+                  </Typography>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => runSaved(resumeOffer)}
+                    className="min-h-11"
+                  >
+                    Show them again
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={forgetSaved}
+                    className="min-h-11 text-muted-foreground"
+                  >
+                    Start fresh
+                  </Button>
+                </div>
+              </section>
             ) : null}
 
             <MessageGroup>
@@ -832,7 +1099,15 @@ export default function HomeClient({
                             ),
                           }),
                         );
+                        turnEntries.set(turnKey, specEntries);
                         const labels = turnLabels(specEntries);
+                        const openListing = (model: string, url: string) => {
+                          if (sheet) {
+                            setListingReturn(sheet);
+                            setSheet(null);
+                          }
+                          setListing({ turn: turnKey, model, url });
+                        };
                         const compareSpec =
                           serverCompare ??
                           buildCostCompareSpec(specEntries, rank.category);
@@ -883,6 +1158,8 @@ export default function HomeClient({
                                 );
                                 if (target) openWalk(target);
                               }}
+                              onListing={openListing}
+                              resultsUrl={shareUrl}
                             />
                           ) : (
                             <TextFallback
@@ -1176,7 +1453,17 @@ export default function HomeClient({
         )}
       </div>
 
-      {sheet && !walk ? (
+      {listing && !walk ? (
+        <ListingFromEntries
+          entries={turnEntries}
+          listing={listing}
+          wide={!isNarrow}
+          resultsUrl={shareUrl}
+          onClose={closeListing}
+        />
+      ) : null}
+
+      {sheet && !walk && !listing ? (
         <SheetFromDecks
           decks={decks}
           sheet={sheet}

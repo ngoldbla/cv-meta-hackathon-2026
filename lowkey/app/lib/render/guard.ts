@@ -1,6 +1,7 @@
 import type { Spec } from "@json-render/core";
 
 import { dealerUnitsFace, effectiveMonthlyCost } from "../costs";
+import { unitDeal } from "../deal";
 import {
   interestPerMonth,
   listingStats,
@@ -399,5 +400,55 @@ export function checkCostCompareSpec(spec: Spec, entries: SpecEntry[]): GuardRes
     if (row.total < prev) c.fail(spec.root, "row-order");
     prev = row.total;
   });
+  return c.finish();
+}
+
+/**
+ * Check one listing-sheet spec (task 041) against its entry: the
+ * unit is found by its URL in the tool results, its figures copy the
+ * listing exactly, and the deal figures recompute from the ownership
+ * output's assumptions (whole dollars, within $1).
+ */
+export function checkListingSpec(spec: Spec, entry: SpecEntry): GuardResult {
+  const c = new Checker(spec);
+  const props = propsOf(spec, spec.root);
+  const id = spec.root;
+  if (!props || spec.elements[id]?.type !== "ListingDetail") {
+    c.fail(id, "root-type");
+    return c.finish();
+  }
+  const unit = (entry.local?.units ?? []).find((u) => u.url === props.url);
+  const inputs = entry.ownership?.dealInputs;
+  if (!unit || !inputs || props.modelKey !== entry.pick.model) {
+    c.fail(id, "unknown-unit");
+    return c.finish();
+  }
+  const base = `elements.${id}.props`;
+  if ((props.vin ?? null) !== (unit.vin ?? null)) c.fail(id, "vin");
+  if (props.dealer !== unit.dealer) c.fail(id, "dealer");
+  c.exact(id, `${base}.miles`, props.miles, unit.distanceMiles);
+  c.exact(id, `${base}.daysOnLot`, props.daysOnLot, unit.daysOnLot ?? null);
+  c.exact(id, `${base}.price`, props.price, unit.price);
+  const gas = entry.local?.fuel?.perMonth ?? null;
+  const deal = unitDeal(inputs, unit.price, gas);
+  const maybeDollar = (key: string, raw: number | null) => {
+    if (raw === null) c.exact(id, `${base}.${key}`, props[key], null);
+    else c.dollar(id, `${base}.${key}`, props[key], raw);
+  };
+  maybeDollar("tax", deal.tax);
+  maybeDollar("outTheDoor", deal.outTheDoor);
+  maybeDollar("gas", gas);
+  c.dollar(id, `${base}.down`, props.down, deal.down);
+  c.dollar(id, `${base}.loan`, props.loan, deal.loan);
+  c.dollar(id, `${base}.bills`, props.bills, deal.bills);
+  c.exact(
+    id,
+    `${base}.downShare`,
+    props.downShare,
+    inputs.downRule.kind === "share" ? inputs.downRule.share : null,
+  );
+  c.exact(id, `${base}.aprPercent`, props.aprPercent, inputs.aprPercent);
+  c.exact(id, `${base}.termMonths`, props.termMonths, inputs.termMonths);
+  c.exact(id, `${base}.positiveEquityMonth`, props.positiveEquityMonth, deal.positiveEquityMonth);
   return c.finish();
 }

@@ -3,7 +3,7 @@ on:
   push:
   pull_request:
 jobs:
-  test:
+  python:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,17 +16,27 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install torch --index-url https://download.pytorch.org/whl/cpu
-          pip install -e ".[dev,model,hf,mcp,ems]" peft
+          pip install -e ".[dev,model,hf]"
       - name: Lint
         run: ruff check .
       - name: Name guard (vendor neutrality)
         run: python scripts/name_guard.py
-      - name: Frozen paths
-        if: github.event_name == 'pull_request'
-        run: |
-          git diff --name-only origin/${{ github.base_ref }}...HEAD > changed.txt
-          python scripts/guard_paths.py $(cat changed.txt) || (echo "frozen paths changed" && exit 1)
-      - name: Ledger chain
-        run: python -c "from loopkit.ledger import Ledger; assert Ledger().verify()"
+      - name: Secret guard
+        run: python scripts/secret_guard.py --all
       - name: Tests
         run: pytest -q
+  app:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lowkey/app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: lowkey/app/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npx tsc --noEmit -p .
