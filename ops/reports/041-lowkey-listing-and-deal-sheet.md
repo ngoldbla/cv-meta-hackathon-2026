@@ -107,3 +107,25 @@ My Low Key results: http://localhost:3100/?zip=60614&type=suv
 1. **Attribution (licence section 11):** the provider "may require reasonable attribution" as described in its public docs. We currently don't name the provider anywhere in the app (your rule). Should I check their docs for an attribution requirement before the public demo? This applies to all listing data, not just the VIN.
 2. **Sierra gas:** the GMC Sierra 1500 shows no gas cost ("$625 loan" with no gas, in the chooser as well as the sheet), because the table has no MPG for it (the Maverick has 25 and the Colorado 19). That predates this task, and it flatters the Sierra's real cost and its "Cheapest to own" label. Should I fix it in 042, which adds per-unit MPG?
 3. **Auto-rerun on return:** returning visitors re-run their last search automatically, as the task asks. Each rerun uses provider calls, though the listings are cached for 6 hours. Keep it, or show a "Show my SUVs near 60614 again" button instead?
+
+## Follow-ups after Dylan's answers (branch `task/041b-followups`)
+1. **Attribution:**
+   - Dylan: the provider can be credited in the repo, and the app links to the repo with a GitHub icon.
+   - `CREDITS.md` and `README.md` now name and link the provider. `scripts/name_guard.py` allows the name in those files and the setup files only; the app, branch names and commit messages stay blocked.
+   - The header has a GitHub icon that opens the repo in a new tab.
+2. **Sierra gas:**
+   - No second source was needed. The EPA dataset has the Sierra, but under "Sierra", while the provider says "Sierra 1500", so the name lookup missed it.
+   - It's now mapped like its twin, the Silverado 1500: base 2.7L 4WD, EPA id 49401, 18 MPG combined. A new pipeline test covers it.
+   - A rebuild from cache (0 provider requests) changes only that MPG.
+   - In a local run with that table near 30097:
+     - the Sierra's real cost went from $378 to $577/mo and its "You pay" from $625 to $824/mo;
+     - "Cheapest to own" moved to the Ford Maverick.
+   - **The Blob table is not uploaded yet**, because production reads it. Upload it when the PR is merged.
+   - `LOWKEY_TABLE_FILE` lets a local server read a built table before upload; it is ignored on Vercel.
+3. **Repository cleanup:**
+   - The branch now holds Low Key and `headless-glimmer/` (decapitate, decision and train, with 8 passing tests and the 324 KB mini dataset).
+   - The emergency-logistics research tree is removed. It stays at tag `ems-archive-2026-11-02` and branch `archive/ems-surge-2026-11`.
+   - Low Key's source audits moved to `lowkey/docs/claims.yaml`.
+   - README, AGENTS, CREDITS, the ops README, the inbox skill, pyproject, the hook installer and CI were rewritten for the new layout.
+   - `main` itself changes only when `low-key` is merged into it.
+4. **Saving progress:** an open design question for Dylan (options are in the PR).
