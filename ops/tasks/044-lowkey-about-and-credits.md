@@ -1,7 +1,7 @@
 ---
 id: "044"
 title: "Low Key: About page, README, credits, and a roll-your-own guide for the hackathon entry"
-status: open
+status: done
 created: 2026-11-03
 revised: 2026-11-04
 report: ops/reports/044-lowkey-about-and-credits.md
