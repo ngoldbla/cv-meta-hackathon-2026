@@ -283,7 +283,18 @@ export function QuoteCheck({
         const sheet = read.vin;
         setQuotes((all) =>
           all.map((x, i) =>
-            i === index ? { ...read, dealerName: x.dealerName, car: x.car, vin: barcodeVin ?? sheet ?? x.vin } : x,
+            i === index
+              ? {
+                  ...read,
+                  dealerName: x.dealerName,
+                  // The VIN lookup may have landed first: keep the car it filled in.
+                  car: x.car,
+                  year: read.year ?? x.year,
+                  vehicle: read.vehicle ?? x.vehicle,
+                  mileage: read.mileage ?? x.mileage,
+                  vin: barcodeVin ?? sheet ?? x.vin,
+                }
+              : x,
           ),
         );
         if (sheet) setSheetVin((s) => ({ ...s, [index]: sheet }));
