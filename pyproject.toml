@@ -31,6 +31,6 @@ select = ["E", "F", "W", "I", "B", "UP"]
 ignore = ["E501", "B905"]
 
 [tool.pytest.ini_options]
-testpaths = ["lowkey/pipeline", "lowkey/preflight", "headless-glimmer/tests"]
+testpaths = ["lowkey/pipeline", "lowkey/preflight", "headless-glimmer/tests", "cloud/quote_reader/tests"]
 pythonpath = ["headless-glimmer"]
 addopts = "--import-mode=importlib"

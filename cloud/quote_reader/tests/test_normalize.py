@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "cloud" / "quote_reader"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from normalize import normalize, parse_money, vin_check_ok  # noqa: E402
 
