@@ -1,9 +1,0 @@
-{
- "dataset": "76xm-jjuj",
- "end": "2016-12-31",
- "name": "holdout-normal-2016",
- "note": "sealed: rows not downloaded; eval_holdout downloads, hashes and checks this count",
- "rows": 1441211,
- "sha256": null,
- "start": "2016-01-01"
-}

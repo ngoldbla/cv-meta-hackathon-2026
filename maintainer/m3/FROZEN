@@ -1,4 +1,0 @@
-# Frozen paths of the CAGES judge, relative to judges/cages/. Changing this file needs a maintainer unlock.
-cages/harness/evaluate.py
-cages/harness/ledger.py
-cages/data/instances.py

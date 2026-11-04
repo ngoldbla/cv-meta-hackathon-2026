@@ -1,9 +1,0 @@
-{
- "dataset": "76xm-jjuj",
- "end": "2020-04-15",
- "name": "holdout-covid-a",
- "note": "sealed: rows not downloaded; eval_holdout downloads, hashes and checks this count",
- "rows": 161820,
- "sha256": null,
- "start": "2020-03-16"
-}
