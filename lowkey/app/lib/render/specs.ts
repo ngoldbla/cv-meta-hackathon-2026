@@ -253,6 +253,14 @@ export function nearestMilesOf(local: SpecLocal | undefined): number | null {
   return Math.min(...units.map((u) => u.distanceMiles));
 }
 
+/**
+ * The distance a car's row shows and sorts by (task 055): the chosen
+ * unit's when the shopper chose one, else the nearest local unit's.
+ */
+export function rowMilesOf(entry: SpecEntry): number | null {
+  return entry.chosen ? entry.chosen.unit.distanceMiles : nearestMilesOf(entry.local);
+}
+
 /** Chooser facts (task 040) for every entry with an ownership result. */
 export function chooserFactsOf(entries: SpecEntry[]): ChooserFacts[] {
   const facts: ChooserFacts[] = [];
@@ -265,7 +273,7 @@ export function chooserFactsOf(entries: SpecEntry[]): ChooserFacts[] {
       retention: entry.pick.retention5y,
       total: costs.real,
       bills: costs.bills,
-      nearestMiles: nearestMilesOf(entry.local),
+      nearestMiles: rowMilesOf(entry),
       lifespanYears: entry.pick.lifespanYears ?? null,
     });
   }
@@ -431,7 +439,7 @@ export function buildCostCompareSpec(entries: SpecEntry[], category: string): Sp
         tax: costs.tax,
         total: costs.real,
         bills: costs.bills,
-        nearestMiles: nearestMilesOf(entry.local),
+        nearestMiles: rowMilesOf(entry),
         lifespanYears: entry.pick.lifespanYears ?? null,
         price: stats ? stats.price : null,
         listingTotal: stats ? stats.total : null,

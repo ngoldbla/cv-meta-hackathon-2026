@@ -419,7 +419,13 @@ export function checkCostCompareSpec(spec: Spec, entries: SpecEntry[]): GuardRes
     // Task 040: the sort figures copy or round the tool figures, and
     // the best-at labels are recomputed from them.
     c.dollar(spec.root, `${base}.rows.${idx}.bills`, row.bills, entry.ownership.monthlyPayment + gasRaw);
-    c.exact(spec.root, `${base}.rows.${idx}.nearestMiles`, row.nearestMiles, nearestMilesOf(entry.local));
+    // Task 055: the chosen unit's distance when one is chosen, else the nearest local unit's.
+    c.exact(
+      spec.root,
+      `${base}.rows.${idx}.nearestMiles`,
+      row.nearestMiles,
+      entry.chosen ? entry.chosen.unit.distanceMiles : nearestMilesOf(entry.local),
+    );
     c.exact(spec.root, `${base}.rows.${idx}.lifespanYears`, row.lifespanYears, entry.pick.lifespanYears ?? null);
     const expectedLabels = labels.get(entry.pick.model) ?? [];
     if (JSON.stringify(row.labels ?? []) !== JSON.stringify(expectedLabels)) {
