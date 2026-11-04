@@ -37,6 +37,31 @@ export interface Priced {
   positiveEquityMonth: number | null;
 }
 
+/** The APR (percent) at which `principal` over `termMonths` costs `payment` a month. */
+export function impliedApr(principal: number, payment: number, termMonths: number): number | null {
+  if (!(principal > 0) || !(payment > 0) || !(termMonths > 0)) return null;
+  if (payment * termMonths < principal) return null; // below zero interest: not a loan on these numbers
+  let lo = 0;
+  let hi = 60;
+  if (monthlyPayment(principal, hi, termMonths) < payment) return null;
+  for (let i = 0; i < 80; i += 1) {
+    const mid = (lo + hi) / 2;
+    if (monthlyPayment(principal, mid, termMonths) < payment) lo = mid;
+    else hi = mid;
+  }
+  return Math.round(((lo + hi) / 2) * 100) / 100;
+}
+
+export interface PaymentEstimate {
+  down: number;
+  termMonths: number;
+  low: number;
+  high: number;
+  financed: number;
+  aprLow: number | null;
+  aprHigh: number | null;
+}
+
 export interface QuoteAnalysis {
   /** Vehicle price before fees (the resale basis). */
   price: number;
@@ -51,6 +76,10 @@ export interface QuoteAnalysis {
   asQuoted: Priced | null;
   /** stated payment − recomputed payment, when it is off by more than $5. */
   paymentGap: number | null;
+  /** stated amount financed − the lines' amount financed, when they differ. */
+  financedGap: number | null;
+  /** The sheet's payment estimates (for this down payment) and the APR each implies. */
+  estimates: PaymentEstimate[];
   sameTerms: Priced;
   retentionSource: "model" | "typical";
   /** Short, calm questions to take back to the dealer. */
@@ -158,12 +187,36 @@ export function analyzeQuote(
     retention5y,
   });
 
+  const financedFromLines = Math.max(0, outTheDoor - cashIn);
+  const financedGap =
+    q.amountFinanced !== null && Math.abs(q.amountFinanced - financedFromLines) > TOTAL_TOLERANCE
+      ? round2(q.amountFinanced - financedFromLines)
+      : null;
+
+  // A payment grid: the APR each estimate implies, from the sheet's own lines.
+  const rows = q.paymentOptions.filter((o) => q.down === null || o.down === null || o.down === q.down);
+  const estimates: PaymentEstimate[] = rows.map((o) => {
+    const financed = Math.max(0, outTheDoor - (o.down ?? q.down ?? 0) - (q.tradeIn ?? 0));
+    return {
+      down: o.down ?? q.down ?? 0,
+      termMonths: o.termMonths,
+      low: o.low,
+      high: o.high,
+      financed: round2(financed),
+      aprLow: impliedApr(financed, o.low, o.termMonths),
+      aprHigh: impliedApr(financed, o.high, o.termMonths),
+    };
+  });
+
   const questions: string[] = [];
   if (feesByKind.addon > 0) questions.push("Can the add-ons come off?");
   for (const f of q.fees) if (f.kind === "unknown") questions.push(`What is “${f.label}” for, and is it optional?`);
   if (paymentGap !== null) questions.push("The payment doesn't match the other numbers. How was it worked out?");
   if (totalGap !== null) questions.push("The total doesn't match the lines. What is the difference for?");
-  if (q.outTheDoor === null) questions.push("Is this the out-the-door price with every fee and tax?");
+  if (estimates.length && q.apr === null) questions.push("What APR are these payment estimates based on? Ask for it in writing.");
+  if (financedGap !== null) questions.push("The amount financed doesn't match the lines. What is the difference for?");
+  if (q.priceIsSticker) questions.push("What is your selling price for this car, out the door?");
+  else if (q.outTheDoor === null) questions.push("Is this the out-the-door price with every fee and tax?");
 
   return {
     ok: true,
@@ -182,6 +235,8 @@ export function analyzeQuote(
       totalGap,
       asQuoted,
       paymentGap,
+      financedGap,
+      estimates,
       sameTerms,
       retentionSource,
       questions,

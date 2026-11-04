@@ -41,6 +41,13 @@ Warm read latency in that run: 9–14 s (12 reads plus a cold start in 137 s tot
 - Local `next start` at 390 px, light and dark: photo → highlighted fields → "These match my paper" → analysis → heads-up; no page errors. Screenshots in `~/.cache/low-key/screens/046/`.
 - Tests: `tests/test_quote_normalize.py` (VIN check digit, year/vehicle line, money only from printed pairs, APR/term/MPG, fee filtering, add-on override, down payment never the monthly); app `lib/quote/*.test.ts`; full suites green.
 
+## Real paperwork (Dylan, 2026-11-04)
+Two real documents from Dylan, kept only under `~/.cache/low-key/real/` (they carry a name, phone and VIN; nothing from them is in git, and the tests use invented values in the same layouts).
+- **A dealer's buyer's worksheet** (2025 Corolla): the first pass exposed four normalizer bugs, now fixed: "Total Savings + Rebate" (the gap to a market average, already inside the selling price) was taken as a rebate and would have understated the total by $4,227; "Total Taxes" was dropped by the not-a-fee filter; "Amount Financed" wasn't captured; and a 60/72-month grid was read as a 60-month term. Now: price, doc fee, filing fee and taxes, cash down, amount financed (which matches the lines to the cent), no APR or term (the sheet prints none), and the 6-cell payment grid. Code then works out what the grid implies: **an APR of about 9.2–11.3% at 60 months**, against a 7.54% national average, and asks for the APR in writing.
+- **A window sticker** (2012 Lexus CT 200h): the first read failed because a full sticker transcript runs past the 1,500-token output cap; the cap is now 6,000 (a sticker used about 2,200). Now: VIN (check digit valid), year, model, make from the VIN's manufacturer code (the sticker prints it only in the logo), MSRP from the TOTAL line ($37,763, not the $31,750 base), EPA combined 42 MPG from the labelled pair (the small print's "range from 10 to 60 MPG" had won before), and no fees (options and destination are inside the total). The app treats the sticker total as the price, says it isn't a selling price, and asks for one.
+- One label varies between runs: the model tagged the electronic filing fee as dealer once and government once. It is in the total either way; the shopper can change the tag.
+- Regression after these changes: the 12 fixtures still score 12/12 on every field (amount financed added to the scored fields).
+
 ## Infrastructure and cost
 - `cloud/quote_reader/stage.py`: CPU-only prestaging into Volume `lowkey-quote-models` (Glimmer 59.6 GB, SAM 3.1 3.5 GB staged for task 048).
 - `cloud/quote_reader/serve.py`, app `lowkey-quote-reader`: GPU class (H100, `min_containers=0`, `max_containers=2`, 2-minute scale-down, CPU memory snapshot of imports, vLLM compile cache on Volume `lowkey-quote-vllm-cache`, CUDA graphs captured for batch 1/2/4 only) behind a CPU FastAPI front: bearer token (Modal secret `lowkey-quote-auth`, mirrored as `LOWKEY_QUOTE_TOKEN` in Vercel preview and production, never printed), submit/poll, 6 MB image limit, 300 reads/day ceiling (`modal.Dict`). The Next.js routes add a per-address limit (12/hour) and never log or keep the image.
@@ -54,6 +61,6 @@ Warm read latency in that run: 9–14 s (12 reads plus a cold start in 137 s tot
 - The test set is 12 invented documents in one clean template style each; real paperwork is messier.
 
 ## Blocked / questions
-- **Real paperwork:** three photos of your own buyer's order or a window sticker (kept out of git under `~/.cache/low-key/`) would test real layouts.
+- **More real paperwork:** two real documents are now covered (above); a buyer's order with a stated APR and a used-car sheet would cover the remaining layouts.
 - **VIN lookup (P25):** call the provider for year/make/model/trim and the listed price for comparison? It is billed per call and the licence question on showing VIN fields is open.
 - **Credits:** the About page (044) can now truthfully say Muse Glimmer reads quote photos at runtime, once #12 merges.

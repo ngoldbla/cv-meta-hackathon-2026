@@ -57,6 +57,7 @@ const FIELD_LABELS: Record<MoneyField, string> = {
   statedMonthly: "Their monthly payment",
   apr: "APR (%)",
   termMonths: "Term (months)",
+  amountFinanced: "Amount financed",
 };
 const FIELD_ORDER: MoneyField[] = [
   "sellingPrice",
@@ -67,6 +68,7 @@ const FIELD_ORDER: MoneyField[] = [
   "termMonths",
   "statedMonthly",
   "outTheDoor",
+  "amountFinanced",
   "msrp",
 ];
 const KIND_LABEL: Record<FeeKind, string> = {
@@ -257,7 +259,7 @@ export function QuoteCheck({
   const numberField = (f: MoneyField) => (
     <label key={f} className="flex flex-col gap-1">
       <Typography variant="paragraph-xs" className="text-muted-foreground">
-        {FIELD_LABELS[f]}
+        {f === "sellingPrice" && q.priceIsSticker ? "Sticker price (MSRP)" : FIELD_LABELS[f]}
         {unconfirmed.has(f) ? " · read from your photo, please check" : ""}
       </Typography>
       <Input
@@ -503,6 +505,34 @@ export function QuoteCheck({
               {analysis.analysis.paymentGap !== null ? (
                 <Typography variant="paragraph-md">
                   Their payment is {signed(analysis.analysis.paymentGap, "/mo")} from what their own numbers give.
+                </Typography>
+              ) : null}
+              {analysis.analysis.estimates.length ? (
+                <div className="flex flex-col gap-1">
+                  {analysis.analysis.estimates.map((e) => (
+                    <Typography key={`${e.down}-${e.termMonths}`} variant="paragraph-md">
+                      Their estimate of {fmtUsd(e.low)}–{fmtUsd(e.high)}/mo over {e.termMonths} months on{" "}
+                      {fmtUsd(e.financed)} financed
+                      {e.aprLow !== null && e.aprHigh !== null
+                        ? ` implies an APR of about ${e.aprLow.toFixed(1)}%–${e.aprHigh.toFixed(1)}%.`
+                        : "."}
+                    </Typography>
+                  ))}
+                  {q.apr === null ? (
+                    <Typography variant="paragraph-xs" className="text-muted-foreground">
+                      For comparison, {aprText}. A pre-approval from a bank or credit union gives you a rate to compare.
+                    </Typography>
+                  ) : null}
+                </div>
+              ) : null}
+              {analysis.analysis.financedGap !== null ? (
+                <Typography variant="paragraph-md">
+                  Their amount financed is {signed(analysis.analysis.financedGap)} from what the lines add up to.
+                </Typography>
+              ) : null}
+              {q.priceIsSticker ? (
+                <Typography variant="paragraph-sm" className="text-muted-foreground">
+                  This is the window sticker&apos;s total, not a selling price. Dealers can sell above or below it.
                 </Typography>
               ) : null}
               {analysis.analysis.totalGap !== null ? (

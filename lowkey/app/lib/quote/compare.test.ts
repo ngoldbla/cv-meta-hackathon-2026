@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { monthlyPayment } from "../ownership";
-import { analyzeQuote, headsUp, PAYMENT_TOLERANCE, type PickDeal, type SameTerms } from "./compare";
+import { analyzeQuote, headsUp, impliedApr, PAYMENT_TOLERANCE, type PickDeal, type SameTerms } from "./compare";
 import { emptyQuote, quoteFromRead, vinCheckOk, type Quote } from "./schema";
 
 const TERMS: SameTerms = { downRule: { kind: "share", share: 0.1 }, aprPercent: 7, termMonths: 60 };
@@ -165,5 +165,77 @@ describe("quoteFromRead", () => {
   it("checks VINs the same way the reader does", () => {
     expect(vinCheckOk("1HGCV2FA9SB601815")).toBe(true);
     expect(vinCheckOk("1HGCV2FA9SB60181O")).toBe(false);
+  });
+});
+
+describe("a real dealer worksheet (task 047, numbers only)", () => {
+  // Price, fees, down payment, amount financed and the payment grid from a
+  // real buyer's worksheet; no names, VIN or contact details.
+  const sheet: Quote = {
+    ...emptyQuote(),
+    sellingPrice: 22995,
+    down: 2000,
+    amountFinanced: 23993.51,
+    fees: [
+      { label: "Doc Fee", amount: 999, kind: "dealer" },
+      { label: "Electronic Filing Fee", amount: 299, kind: "dealer" },
+      { label: "Total Taxes", amount: 1700.51, kind: "government" },
+    ],
+    paymentOptions: [
+      { down: 2000, termMonths: 60, low: 500, high: 525 },
+      { down: 2000, termMonths: 72, low: 434, high: 459 },
+      { down: 4000, termMonths: 60, low: 458, high: 483 },
+    ],
+  };
+
+  it("agrees with the sheet's amount financed", () => {
+    const r = analyzeQuote(sheet, TERMS);
+    if (!r.ok) throw new Error("expected ok");
+    expect(r.analysis.outTheDoor).toBeCloseTo(25993.51, 2);
+    expect(r.analysis.financedGap).toBeNull();
+  });
+
+  it("works out the APR the payment estimates imply, for this down payment only", () => {
+    const r = analyzeQuote(sheet, TERMS);
+    if (!r.ok) throw new Error("expected ok");
+    expect(r.analysis.estimates.map((e) => e.termMonths)).toEqual([60, 72]);
+    const [e60, e72] = r.analysis.estimates;
+    expect(e60.financed).toBeCloseTo(23993.51, 2);
+    expect(e60.aprLow).toBeCloseTo(9.17, 1);
+    expect(e60.aprHigh).toBeCloseTo(11.28, 1);
+    expect(e72.aprLow).toBeCloseTo(9.13, 1);
+    expect(r.analysis.questions.join(" ")).toMatch(/What APR/);
+  });
+
+  it("flags an amount financed that doesn't match the lines", () => {
+    const r = analyzeQuote({ ...sheet, amountFinanced: 24493.51 }, TERMS);
+    if (!r.ok) throw new Error("expected ok");
+    expect(r.analysis.financedGap).toBeCloseTo(500, 2);
+  });
+});
+
+describe("impliedApr", () => {
+  it("inverts the payment formula", () => {
+    const p = monthlyPayment(20000, 6.5, 60);
+    expect(impliedApr(20000, p, 60)).toBeCloseTo(6.5, 2);
+    expect(impliedApr(20000, 300, 60)).toBeNull(); // below zero interest
+  });
+});
+
+describe("a window sticker", () => {
+  it("uses the sticker total as the price, adds the make from the VIN, and asks for a selling price", () => {
+    const q = quoteFromRead({
+      doc_type: "window_sticker",
+      vin: "1HGCV2FA9SB601815",
+      make_from_vin: "Honda",
+      vehicle_text: "Zenith Sport",
+      msrp: 37763,
+    });
+    expect(q.sellingPrice).toBe(37763);
+    expect(q.priceIsSticker).toBe(true);
+    expect(q.vehicle).toBe("Honda Zenith Sport");
+    const r = analyzeQuote({ ...q, unconfirmed: [] }, TERMS);
+    if (!r.ok) throw new Error("expected ok");
+    expect(r.analysis.questions).toContain("What is your selling price for this car, out the door?");
   });
 });

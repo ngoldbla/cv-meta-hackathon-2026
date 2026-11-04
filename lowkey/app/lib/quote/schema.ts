@@ -38,6 +38,21 @@ export const quoteSchema = z.object({
   statedMonthly: money,
   apr: z.number().min(0).max(40).nullable(),
   termMonths: z.number().int().min(6).max(120).nullable(),
+  /** The amount the sheet says is financed, used as a check on the lines. */
+  amountFinanced: money,
+  /** A dealer's payment grid: an estimate range per down payment and term. */
+  paymentOptions: z
+    .array(
+      z.object({
+        down: z.number().nonnegative().nullable(),
+        termMonths: z.number().int().min(6).max(120),
+        low: z.number().nonnegative(),
+        high: z.number().nonnegative(),
+      }),
+    )
+    .max(24),
+  /** True when the price came from a window sticker's total (MSRP), not a selling price. */
+  priceIsSticker: z.boolean(),
   fees: z.array(feeSchema).max(30),
   /** Fields read from a photo that the shopper has not yet confirmed. */
   unconfirmed: z.array(z.string()),
@@ -55,6 +70,7 @@ export const MONEY_FIELDS = [
   "statedMonthly",
   "apr",
   "termMonths",
+  "amountFinanced",
 ] as const;
 export type MoneyField = (typeof MONEY_FIELDS)[number];
 
@@ -76,6 +92,9 @@ export function emptyQuote(): Quote {
     statedMonthly: null,
     apr: null,
     termMonths: null,
+    amountFinanced: null,
+    paymentOptions: [],
+    priceIsSticker: false,
     fees: [],
     unconfirmed: [],
   };
@@ -97,6 +116,18 @@ export const readSchema = z.object({
   trade_in: z.number().nullable().optional(),
   apr: z.number().nullable().optional(),
   term_months: z.number().nullable().optional(),
+  amount_financed: z.number().nullable().optional(),
+  make_from_vin: z.string().nullable().optional(),
+  payment_options: z
+    .array(
+      z.object({
+        down: z.number().nullable(),
+        term_months: z.number(),
+        low: z.number(),
+        high: z.number(),
+      }),
+    )
+    .optional(),
   fees: z
     .array(
       z.object({
@@ -146,7 +177,12 @@ export function quoteFromRead(read: ReadResult): Quote {
   const vin = read.vin?.trim().toUpperCase() ?? null;
   q.vin = vin && vinCheckOk(vin) ? vin : null;
   q.year = read.year && read.year >= 1980 && read.year <= 2100 ? Math.round(read.year) : null;
-  q.vehicle = read.vehicle_text?.slice(0, 120) ?? null;
+  const make = q.vin ? (read.make_from_vin ?? null) : null;
+  const text = read.vehicle_text?.trim() || null;
+  // A sticker often prints the model but carries the make only in its logo.
+  q.vehicle =
+    (make && text && !text.toLowerCase().includes(make.toLowerCase()) ? `${make} ${text}` : (text ?? make))?.slice(0, 120) ??
+    null;
   q.sellingPrice = num(read.selling_price);
   q.msrp = num(read.msrp);
   q.down = num(read.down);
@@ -159,6 +195,16 @@ export function quoteFromRead(read: ReadResult): Quote {
     typeof read.term_months === "number" && read.term_months >= 6 && read.term_months <= 120
       ? Math.round(read.term_months)
       : null;
+  q.amountFinanced = num(read.amount_financed);
+  q.paymentOptions = (read.payment_options ?? [])
+    .filter((o) => o.term_months >= 6 && o.term_months <= 120 && o.low > 0 && o.high >= o.low)
+    .slice(0, 24)
+    .map((o) => ({ down: num(o.down), termMonths: Math.round(o.term_months), low: o.low, high: o.high }));
+  // A window sticker has no selling price: its total is the sticker price.
+  if (read.doc_type === "window_sticker" && q.sellingPrice === null && q.msrp !== null) {
+    q.sellingPrice = q.msrp;
+    q.priceIsSticker = true;
+  }
   q.fees = (read.fees ?? []).slice(0, 30).map((f) => ({
     label: f.label.slice(0, 120),
     amount: num(f.amount),
@@ -168,6 +214,7 @@ export function quoteFromRead(read: ReadResult): Quote {
   for (const k of MONEY_FIELDS) if (q[k] !== null) filled.push(k);
   if (q.vin) filled.push("vin");
   if (q.fees.length) filled.push("fees");
+  if (q.paymentOptions.length) filled.push("paymentOptions");
   q.unconfirmed = filled;
   return q;
 }

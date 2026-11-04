@@ -90,3 +90,92 @@ def test_down_payment_is_never_the_monthly_payment():
     assert n["down"] == 5000.0 and n["stated_monthly"] is None
     n2 = normalize(raw(pairs=[*pairs, {"label": "YOUR PAYMENT", "value": "$639.18 / mo"}]))
     assert n2["stated_monthly"] == 639.18
+
+
+# Layouts seen on real paperwork (2026-11-04); values invented.
+WORKSHEET = [
+    "2025 Brightwater Zenith, Body Type: 4dr Car",
+    "VIN:1HGCV2FA9SB601815",
+    "Purchase",
+    "60 Months",
+    "72 Months",
+    "$ Down",
+    "$2,000",
+    "$500 - $525",
+    "$434 - $459",
+    "$4,000",
+    "$458 - $483",
+    "$398 - $423",
+]
+WORKSHEET_PAIRS = [
+    {"label": "Average Price In Market", "value": "$27,222.00"},
+    {"label": "Our Selling Price", "value": "$22,995.00"},
+    {"label": "Total Savings + Rebate", "value": "$4,227.00"},
+    {"label": "Doc Fee", "value": "$999.00"},
+    {"label": "Total Taxes", "value": "$1,700.51"},
+    {"label": "Electronic Filing Fee", "value": "$299.00"},
+    {"label": "Cash Down", "value": "$2,000.00"},
+    {"label": "Amount Financed", "value": "$23,993.51"},
+]
+
+
+def test_worksheet_savings_line_is_not_a_rebate_and_taxes_are_a_fee():
+    n = normalize(
+        raw(
+            transcript=WORKSHEET,
+            pairs=WORKSHEET_PAIRS,
+            fees=[{"label": "Doc Fee", "amount": 999, "kind": "dealer"}],
+        )
+    )
+    assert n["selling_price"] == 22995.0 and n["rebates"] is None
+    assert n["amount_financed"] == 23993.51 and n["down"] == 2000.0
+    kinds = {f["label"]: f["kind"] for f in n["fees"]}
+    assert kinds == {"Doc Fee": "dealer", "Total Taxes": "government", "Electronic Filing Fee": "dealer"}
+    assert n["vehicle_text"] == "Brightwater Zenith" and n["year"] == 2025
+
+
+def test_worksheet_grid_is_options_not_a_term():
+    n = normalize(raw(transcript=WORKSHEET, pairs=WORKSHEET_PAIRS))
+    assert n["term_months"] is None
+    assert n["payment_options"][:2] == [
+        {"down": 2000.0, "term_months": 60, "low": 500.0, "high": 525.0},
+        {"down": 2000.0, "term_months": 72, "low": 434.0, "high": 459.0},
+    ]
+    assert len(n["payment_options"]) == 4
+
+
+STICKER = [
+    "DESCRIPTION 2012 / 9900G CT 200h PREMIUM",
+    "VIN 1HGCV2FA9SB601815",
+    "Compacts range from 10 to 60 MPG",
+    "42",
+    "MPG",
+    "combined city/hwy",
+]
+STICKER_PAIRS = [
+    {"label": "MANUFACTURER'S SUGGESTED RETAIL PRICE", "value": "$ 31,750.00"},
+    {"label": "Premium Audio Package Includes:", "value": "1,100.00"},
+    {"label": "SUB-TOTAL", "value": "$ 36,888.00"},
+    {"label": "DELIVERY, PROCESSING AND HANDLING FEE", "value": "875.00"},
+    {"label": "TOTAL", "value": "$ 37,763.00"},
+    {"label": "Fuel Economy", "value": "42 MPG"},
+]
+
+
+def test_sticker_total_is_the_msrp_and_nothing_is_a_fee():
+    fees = [{"label": "DELIVERY, PROCESSING AND HANDLING FEE", "amount": 875, "kind": "dealer"}]
+    n = normalize(raw(doc_type="window_sticker", transcript=STICKER, pairs=STICKER_PAIRS, fees=fees))
+    assert n["msrp"] == 37763.0 and n["fees"] == []
+    assert n["year"] == 2012 and n["vehicle_text"] == "CT 200h PREMIUM"
+
+
+def test_mpg_comes_from_the_labelled_pair_not_the_small_print():
+    n = normalize(raw(doc_type="window_sticker", transcript=STICKER, pairs=STICKER_PAIRS))
+    assert n["epa_combined_mpg"] == 42
+    n2 = normalize(raw(doc_type="window_sticker", transcript=STICKER, pairs=[]))
+    assert n2["epa_combined_mpg"] == 42  # text fallback skips the "range from" line
+
+
+def test_make_from_vin_only_with_a_valid_vin():
+    assert normalize(raw(transcript=[f"VIN {GOOD_VIN}"]))["make_from_vin"] == "Honda"
+    assert normalize(raw(transcript=["VIN 1HGCV2FA0SB601815"]))["make_from_vin"] is None

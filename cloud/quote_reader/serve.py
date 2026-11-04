@@ -87,7 +87,7 @@ class Reader:
 
         params = SamplingParams(
             temperature=0.0,
-            max_tokens=1500,
+            max_tokens=6000,  # a full window sticker transcript runs past 1,500 tokens
             structured_outputs=StructuredOutputsParams(json=RawRead.model_json_schema()),
         )
         messages = [
@@ -99,7 +99,10 @@ class Reader:
                 ],
             }
         ]
-        out = self.llm.chat(messages, params)[0].outputs[0].text
+        gen = self.llm.chat(messages, params)[0].outputs[0]
+        out = gen.text
+        # Length and stop reason only; never the page's content.
+        print(f"read: {len(gen.token_ids)} tokens, finish={gen.finish_reason}")
         # Valid by construction; validate anyway and never trust blindly.
         raw = json.loads(RawRead.model_validate_json(out).model_dump_json())
         return normalize(raw)

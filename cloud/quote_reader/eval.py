@@ -27,6 +27,7 @@ KEYS = [
     "term_months",
     "stated_monthly",
     "epa_combined_mpg",
+    "amount_financed",
 ]
 
 

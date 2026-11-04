@@ -38,7 +38,7 @@ def call(method, path, body=None):
             time.sleep(2 * (attempt + 1))
 
 
-def main(path):
+def main(path, out=None):
     mime = "image/png" if path.endswith(".png") else "image/jpeg"
     t = time.time()
     _, started = call(
@@ -49,9 +49,12 @@ def main(path):
         if status == 200:
             break
         time.sleep(2)
+    if out:
+        with open(out, "w") as fh:
+            json.dump(body, fh, indent=1)
     print(json.dumps(body, indent=1)[:1500])
     print(f"wall clock {time.time() - t:.1f}s")
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(*sys.argv[1:3])
