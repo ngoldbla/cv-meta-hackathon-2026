@@ -41,6 +41,7 @@ export function PickCardView({
   category,
   modelKey,
   hasWalkAway,
+  chosenNote = null,
   children,
 }: {
   labels: string[];
@@ -51,6 +52,8 @@ export function PickCardView({
   category: string;
   modelKey: string;
   hasWalkAway: boolean;
+  /** Task 054: "Priced on the car you're going for, at …". */
+  chosenNote?: string | null;
   children?: ReactNode;
 }) {
   const { onWalkAway } = useContext(WalkAwayContext);
@@ -63,7 +66,7 @@ export function PickCardView({
             {labels.map((l) => (
               <Badge
                 key={l}
-                color={l === "Cheapest to own" ? "amber" : "gray"}
+                color={l === "Cheapest to own" ? "brass" : "gray"}
                 shimmer={false}
               >
                 {l}
@@ -89,6 +92,9 @@ export function PickCardView({
         </div>
       </CardHeader>
       <CardContent>
+        {chosenNote ? (
+          <p className="mb-3 rounded-[10px] bg-muted px-3 py-2 text-sm leading-relaxed">{chosenNote}</p>
+        ) : null}
         {trimLine ? (
           <p className="mb-3 text-sm leading-relaxed text-foreground/80">{trimLine}</p>
         ) : null}

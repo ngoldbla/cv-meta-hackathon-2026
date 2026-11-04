@@ -12,6 +12,8 @@ export const ListingContext = createContext<{
   onListing?: (modelKey: string, url: string) => void;
   /** The shareable results link (`?zip=&type=`), for the deal sheet. */
   resultsUrl?: string;
+  /** Task 054: choose a unit (by VIN) as the one the shopper is going for, or clear it with null. */
+  onChoose?: (modelKey: string, vin: string | null) => void;
 }>({});
 
 /** The card a DealerLine sits in, so its units know their model. */

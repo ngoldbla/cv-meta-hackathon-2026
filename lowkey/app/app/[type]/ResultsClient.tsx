@@ -7,6 +7,7 @@ import { useEffect, useMemo } from "react";
 import { RenderSpec } from "@/components/render/registry";
 import { TextFallback } from "@/components/render/TextFallback";
 import { AppBar } from "@/components/screens/Chrome";
+import { YearsToggle } from "@/components/screens/PriceContext";
 import { SourcesNote } from "@/components/screens/SourcesNote";
 import { TermsScreen } from "@/components/screens/TermsScreen";
 import { useSearch } from "@/components/screens/useSearch";
@@ -25,6 +26,7 @@ import {
   searchApiQuery,
   termsPath,
   termsSummary,
+  withYears,
   type View,
 } from "@/lib/routes";
 import { LAST_SEARCH_KEY, resumeHeading, serializeLastSearch, typeLabel, type SearchType } from "@/lib/search";
@@ -128,6 +130,8 @@ export default function ResultsClient({ type }: { type: SearchType }) {
           Change
         </Button>
       </div>
+
+      <YearsToggle allYears={v.years === "all"} onToggle={(all) => router.replace(resultsPath(type, withYears(v, all)), { scroll: false })} />
 
       <section aria-label={resumeHeading({ type, zip: v.zip })} aria-busy={state.status === "loading"} className="mt-1">
         {state.status === "loading" ? (

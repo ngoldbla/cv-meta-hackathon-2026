@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 
 const REPO_URL = "https://github.com/ngoldbla/cv-meta-hackathon-2026";
 const GUIDE_URL = `${REPO_URL}/blob/main/lowkey/docs/roll-your-own.md`;
+const WHY_URL = `${REPO_URL}/blob/main/lowkey/docs/why-low-key.md`;
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -63,8 +64,12 @@ export default function AboutPage() {
         <P>
           Pick a type of car and your ZIP, and set your own down payment, term and rate if you like. Low Key shows the new cars that hold their value best near you, what each
           really costs a month (the loan, fuel and sales tax), what it would cost to change your mind, and the lowest
-          listed prices nearby. Bring a dealer&apos;s quote or a window sticker, and it checks the numbers and puts them
-          next to its picks on the same terms. No account, no ads, and no money from dealers.
+          listed prices nearby, with where each price sits among the others listed near you and nationally. Bring a
+          dealer&apos;s quote or a window sticker, and it checks the numbers and puts them next to its picks on the same
+          terms. No account, no ads, and no money from dealers.
+        </P>
+        <P>
+          Why it works this way, and why there are no photos: <A href={WHY_URL}>why Low Key works the way it does</A>.
         </P>
       </header>
 

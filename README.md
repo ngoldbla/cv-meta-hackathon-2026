@@ -11,8 +11,11 @@ Built for the Meta hackathon hosted by Cerebral Valley, Fall 2026.
 - **Shows the real cost.** Each car's monthly cost splits into value lost, interest, gas and sales tax, next to what you actually pay each month.
 - **Lets you choose the order.** Sort by real cost, monthly payment, distance or lifespan. There are no rank numbers.
 - **Finds the car.** The cheapest new unit nearby, its estimated out-the-door price, and a short deal sheet to take to the dealer.
+- **Puts the price in context.** Where the unit's listed price sits among the same model, trim and year listed nearby and nationally, next to the MSRP, plus any unit farther away that costs meaningfully less. Mark any unit as the one you're going for, and every figure re-prices on it.
 - **Plans for a change of mind.** "If I change my mind" shows what selling early would cost, month by month.
 - **Checks a quote.** Type a dealer's quote or photograph the sheet or window sticker: Muse Glimmer reads it (hosted on Hugging Face Inference Providers, with a scale-to-zero Modal GPU as backup), you confirm the numbers, and code shows the out-the-door price, add-ons, whether their payment matches their own numbers (or the APR their estimates imply), and the quote next to Low Key's picks on the same terms.
+
+Why it works this way (calm by design, no photos, no ads): [`lowkey/docs/why-low-key.md`](lowkey/docs/why-low-key.md).
 
 Every number comes from code, never from a language model. A number guard checks each figure on screen against the tool result that produced it.
 
