@@ -58,6 +58,18 @@ export const quoteSchema = z.object({
   unconfirmed: z.array(z.string()),
   /** Task 057: "terms" when the photo read copied only the money terms (fees then show as one lump). */
   readMode: z.enum(["full", "terms"]).optional(),
+  /** Task 057: the car from its VIN lookup; null or absent when typed. */
+  car: z
+    .object({
+      year: z.number().int().nullable(),
+      make: z.string().max(60).nullable(),
+      model: z.string().max(80).nullable(),
+      trim: z.string().max(80).nullable(),
+      miles: z.number().int().nonnegative().nullable(),
+      status: z.enum(["active", "sold", "missing"]),
+    })
+    .nullable()
+    .optional(),
 });
 export type Quote = z.infer<typeof quoteSchema>;
 
@@ -105,6 +117,10 @@ export function emptyQuote(): Quote {
 /** What the photo reader returns (snake case, from cloud/quote_reader/normalize.py). */
 export const readSchema = z.object({
   doc_type: z.string(),
+  /** Task 057: "terms" for the small read (no transcript, no fee lines). */
+  mode: z.enum(["full", "terms"]).optional(),
+  mileage: z.number().nullable().optional(),
+  price_basis: z.enum(["selling", "msrp"]).nullable().optional(),
   vin: z.string().nullable().optional(),
   vin_check_ok: z.boolean().optional(),
   year: z.number().nullable().optional(),
@@ -207,6 +223,16 @@ export function quoteFromRead(read: ReadResult): Quote {
     q.sellingPrice = q.msrp;
     q.priceIsSticker = true;
   }
+  if (read.mode === "terms") {
+    q.readMode = "terms";
+    if (q.sellingPrice === null && q.msrp !== null && read.price_basis === "msrp") {
+      q.sellingPrice = q.msrp;
+      q.priceIsSticker = true;
+    }
+    const miles = read.mileage;
+    q.mileage =
+      typeof miles === "number" && Number.isFinite(miles) && miles >= 0 && miles < 1_000_000 ? Math.round(miles) : null;
+  }
   q.fees = (read.fees ?? []).slice(0, 30).map((f) => ({
     label: f.label.slice(0, 120),
     amount: num(f.amount),
@@ -215,6 +241,7 @@ export function quoteFromRead(read: ReadResult): Quote {
   const filled: string[] = [];
   for (const k of MONEY_FIELDS) if (q[k] !== null) filled.push(k);
   if (q.vin) filled.push("vin");
+  if (q.mileage !== null) filled.push("mileage");
   if (q.fees.length) filled.push("fees");
   if (q.paymentOptions.length) filled.push("paymentOptions");
   q.unconfirmed = filled;
