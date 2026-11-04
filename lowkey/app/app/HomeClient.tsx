@@ -950,10 +950,16 @@ export default function HomeClient({
           </span>
         </div>
         <div className="flex items-center gap-1">
+        <a
+          href="/about"
+          className="min-h-11 content-center rounded-full px-2 text-sm text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
+        >
+          About
+        </a>
         <Button
           type="button"
           variant="ghost"
-          className="min-h-11 text-sm"
+          className="min-h-11 px-2 text-sm"
           onClick={() => setQuoteOpen({ pickKey: null })}
         >
           Check a quote
@@ -1664,6 +1670,9 @@ export default function HomeClient({
               </div>
             </PopoverContent>
           </Popover>
+          <a href="/about" className="inline-flex min-h-11 items-center text-xs underline underline-offset-2">
+            About
+          </a>
         </div>
       </div>
     </main>

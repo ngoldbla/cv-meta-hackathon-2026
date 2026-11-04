@@ -16,7 +16,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Low Key — which car, what it costs, what leaving costs",
   description:
-    "A chat that tells you which new car to buy nearby, what it costs per month, and what walking away would cost. No ads, no sign-up.",
+    "A calm way to buy a car: the new cars that hold their value near you, what each really costs a month, what changing your mind would cost, and a check of any dealer quote. No ads, no sign-up.",
 };
 
 const THEME_SCRIPT = `(function(){try{var m=window.matchMedia("(prefers-color-scheme: dark)");var apply=function(){document.documentElement.classList.toggle("dark",m.matches)};apply();if(m.addEventListener){m.addEventListener("change",apply)}}catch(e){}})();`;
