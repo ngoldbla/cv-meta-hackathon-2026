@@ -361,7 +361,7 @@ export function QuoteCheck({
           </div>
           <Typography variant="paragraph-xs" className="text-muted-foreground" aria-live="polite">
             {readState === "reading"
-              ? `Reading… ${elapsed} s. This usually takes 10 to 40 seconds. You can keep typing meanwhile.`
+              ? `Reading… ${elapsed} s. This usually takes 5 to 20 seconds. You can keep typing meanwhile.`
               : readState === "failed"
                 ? "Couldn't read that one. You can type it in."
                 : readState === "unsupported"

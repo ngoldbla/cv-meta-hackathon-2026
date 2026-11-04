@@ -198,3 +198,35 @@ def test_paired_addons_are_backfilled_even_without_the_word_fee():
         ("Nitrogen tire fill", 199, "addon"),
         ("Paint and fabric protection", 995, "addon"),
     }
+
+
+def test_vin_split_into_groups_is_joined_only_when_the_check_digit_holds():
+    n = normalize(raw(transcript=["VIN JTD LM5RC1TB212233", "MSRP $31,200"]))
+    assert n["vin"] == "JTDLM5RC1TB212233" and n["vin_check_ok"]
+    n = normalize(raw(transcript=["1HGCV2 FA9SB6 01815 MSRP"]))
+    assert n["vin"] == GOOD_VIN and n["vin_check_ok"]
+    # 17 characters of ordinary words never become a VIN: the check digit fails.
+    n = normalize(raw(transcript=["BASE PRICE 28450 DESTINATION 1095"]))
+    assert n["vin"] is None
+
+
+def test_worksheet_grid_copied_row_by_row_gives_the_same_options():
+    rows = [
+        "Purchase 60 Months 72 Months",
+        "$ Down Est. $/Monthly Est. $/Monthly",
+        "$2,000 $500 - $525 $434 - $459",
+        "$4,000 $458 - $483 $398 - $423",
+        "Our Selling Price $22,995.00",
+    ]
+    opts = normalize(raw(transcript=rows))["payment_options"]
+    assert opts == [
+        {"down": 2000.0, "term_months": 60, "low": 500.0, "high": 525.0},
+        {"down": 2000.0, "term_months": 72, "low": 434.0, "high": 459.0},
+        {"down": 4000.0, "term_months": 60, "low": 458.0, "high": 483.0},
+        {"down": 4000.0, "term_months": 72, "low": 398.0, "high": 423.0},
+    ]
+
+
+def test_a_doc_fee_is_a_dealer_fee_even_if_tagged_addon():
+    fees = normalize(raw(fees=[{"label": "Documentary fee", "amount": 599, "kind": "addon"}]))["fees"]
+    assert fees == [{"label": "Documentary fee", "amount": 599, "kind": "dealer"}]
