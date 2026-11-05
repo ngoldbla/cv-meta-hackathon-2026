@@ -1,9 +1,19 @@
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
+import type { Metadata } from "next";
+
 import { isSearchType } from "@/lib/routes";
+import { cardPath } from "@/lib/seo";
 
 import ListingClient from "./ListingClient";
+
+/** Listing pages are not indexed (task 060). */
+export const metadata: Metadata = {
+  title: "A local listing",
+  robots: { index: false, follow: true },
+  openGraph: { images: [cardPath()] },
+};
 
 /** `/sedan/honda-civic-sedan/listing/1?zip=30263` (task 049). */
 export default async function ListingPage({ params }: { params: Promise<{ type: string; car: string; n: string }> }) {
