@@ -1,7 +1,7 @@
 ---
 id: "060"
 title: "Low Key: SEO, social graph and AI access"
-status: in_progress
+status: blocked
 created: 2026-11-05
 report: ops/reports/060-lowkey-seo-brand-assets.md
 ---

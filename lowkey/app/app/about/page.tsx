@@ -4,13 +4,16 @@ import type { ReactNode } from "react";
 
 import { Typography } from "@/components/ui/typography";
 import licenses from "@/lib/licenses.json";
+import { ABOUT_DESCRIPTION, cardPath, pageMetadata } from "@/lib/seo";
 
 import { CopyEmail } from "./CopyEmail";
 
-export const metadata: Metadata = {
-  title: "About · lowkey.autos",
-  description: "Low Key is a calm way to buy a car. How it works, how AI is used, and where the data comes from.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "About",
+  description: ABOUT_DESCRIPTION,
+  path: "/about",
+  image: cardPath(),
+});
 
 const REPO_URL = "https://github.com/ngoldbla/cv-meta-hackathon-2026";
 const GUIDE_URL = `${REPO_URL}/blob/main/lowkey/docs/roll-your-own.md`;
