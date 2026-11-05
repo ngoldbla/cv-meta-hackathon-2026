@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/b-button";
+import { BRAND, KEY_PATHS } from "@/lib/brand";
 
 /** Screens visited in this tab since it opened (client navigation only). */
 let visited = 0;
@@ -20,13 +21,13 @@ export function NavTracker() {
 }
 
 /** The public repo: the code, the data sources and the credits. */
-const REPO_URL = "https://github.com/ngoldbla/cv-meta-hackathon-2026";
+const REPO_URL = BRAND.repoUrl;
 
 export function KeyIcon() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="8" cy="14" r="4.5" stroke="currentColor" strokeWidth="2" />
-      <path d="M11.2 10.8 20 2M16 6l3 3M13.5 8.5l2.5 2.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <circle cx={KEY_PATHS.circle.cx} cy={KEY_PATHS.circle.cy} r={KEY_PATHS.circle.r} stroke="currentColor" strokeWidth="2" />
+      <path d={KEY_PATHS.d} stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
