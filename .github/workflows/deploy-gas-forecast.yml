@@ -1,0 +1,56 @@
+name: deploy-gas-forecast
+
+# Deploys the Modal gas-forecast service (cloud/gas_forecast/serve.py).
+# Merging to main does not redeploy Modal by itself; this workflow does,
+# when files under cloud/gas_forecast change, or on demand.
+#
+# Needs two repository secrets (Settings > Secrets and variables > Actions):
+#   MODAL_TOKEN_ID, MODAL_TOKEN_SECRET
+# Create the token at https://modal.com/settings/tokens. The app's own
+# secrets (EIA_API_KEY, GAS_TOKEN) live in the Modal secret `lowkey-gas`.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "cloud/gas_forecast/**"
+      - ".github/workflows/deploy-gas-forecast.yml"
+  workflow_dispatch:
+    inputs:
+      force_refresh:
+        description: "After deploying, force one refresh (EIA fetch; uses the GPU only if EIA has a newer week)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-gas-forecast
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check Modal credentials are set
+        run: |
+          if [ -z "$MODAL_TOKEN_ID" ] || [ -z "$MODAL_TOKEN_SECRET" ]; then
+            echo "MODAL_TOKEN_ID / MODAL_TOKEN_SECRET repository secrets are missing" >&2
+            exit 1
+          fi
+      - name: Install Modal client
+        run: pip install modal
+      - name: Deploy
+        run: modal deploy cloud/gas_forecast/serve.py
+      - name: Force one refresh
+        if: github.event_name == 'workflow_dispatch' && inputs.force_refresh
+        run: modal run cloud/gas_forecast/serve.py
