@@ -110,7 +110,14 @@ def refresh(force: bool = False) -> dict:
     return {"status": "updated", "eiaAsOf": newest, "series": len(series)}
 
 
-@app.function(image=cpu_image, schedule=modal.Cron("0 5 * * 2", timezone="America/New_York"))
+# weekly() blocks on refresh() (timeout 900), which can wait on a cold GPU start
+# (timeout 600). Modal's default function timeout is 300 s, which cancelled the
+# cron mid-run, so this must outlast the calls it waits on.
+@app.function(
+    image=cpu_image,
+    schedule=modal.Cron("0 5 * * 2", timezone="America/New_York"),
+    timeout=1200,
+)
 def weekly():
     print(refresh.remote(force=True))
 
