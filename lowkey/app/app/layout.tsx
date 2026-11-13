@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
 
 import { Providers } from "@/components/screens/Providers";
+import { SiteFooter } from "@/components/screens/SiteFooter";
 import { ROOT_METADATA, ROOT_VIEWPORT } from "@/lib/seo";
 
 import "./globals.css";
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <Providers>{children}</Providers>
+        <SiteFooter />
         <Analytics />
       </body>
     </html>

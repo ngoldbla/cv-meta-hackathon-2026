@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import StartClient from "./StartClient";
 import { BRAND } from "@/lib/brand";
-import { HOME_DESCRIPTION } from "@/lib/seo";
+import { HOME_DESCRIPTION, organizationJsonLd } from "@/lib/seo";
 import { parseVercelArea } from "@/lib/geo";
 import { parseSearchQuery } from "@/lib/search";
 
@@ -27,9 +27,9 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   }
   const initialArea = parseVercelArea(await headers());
   const jsonLd = [
-    { "@context": "https://schema.org", "@type": "Organization", name: BRAND.name, url: BRAND.url, slogan: BRAND.slogan, logo: `${BRAND.url}${BRAND.icon.png512}` },
-    { "@context": "https://schema.org", "@type": "WebSite", name: BRAND.name, url: BRAND.url, description: HOME_DESCRIPTION },
-    { "@context": "https://schema.org", "@type": "WebApplication", name: BRAND.name, url: BRAND.url, applicationCategory: "FinanceApplication", operatingSystem: "Any", description: HOME_DESCRIPTION },
+    organizationJsonLd(),
+    { "@context": "https://schema.org", "@type": "WebSite", "@id": `${BRAND.url}/#website`, name: BRAND.name, alternateName: [...BRAND.alternateNames], url: BRAND.url, description: HOME_DESCRIPTION, inLanguage: "en-US", publisher: { "@id": `${BRAND.url}/#organization` } },
+    { "@context": "https://schema.org", "@type": "WebApplication", name: BRAND.name, url: BRAND.url, applicationCategory: "FinanceApplication", operatingSystem: "Any", description: HOME_DESCRIPTION, isAccessibleForFree: true, publisher: { "@id": `${BRAND.url}/#organization` } },
   ];
   return (
     <>
