@@ -20,6 +20,9 @@ export const metadata: Metadata = pageMetadata({
  * location sent to the Census geocoder (api/geo), the photo reader's
  * pass-through and per-address limit (api/quote, lib/quote/reader), and
  * Vercel Web Analytics (app/layout).
+ *
+ * Forks: this describes the lowkey.autos deployment. Change it to match
+ * yours (host, analytics, photo reader, contact) before you deploy.
  */
 export default function PrivacyPage() {
   return (

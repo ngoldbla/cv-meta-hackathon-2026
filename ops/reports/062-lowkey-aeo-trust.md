@@ -25,6 +25,9 @@ Requested by Dylan directly in a session on 2026-11-13, with a third-party visib
 - `name_guard.py`: fails only on two ref names from the session's working branch (it carries an assistant vendor's name and was created by the environment, not this work). Files and commits pass.
 - `pytest -q`: cannot collect in this container (`torch` and `numpy` missing for `headless-glimmer` and `cloud/gas_forecast`); untouched by this change.
 
+## Open source
+The new identity, contact and privacy details name this deployment and its owner. For forks: `lib/brand.ts` and `app/privacy/page.tsx` carry a comment to change them, and `lowkey/docs/roll-your-own.md` step 1.5 says what to change before deploying.
+
 ## Open
 - **Lists Google shows (action 3):** outreach to the sites that write "best car-buying sites" lists; not a code change.
 - **Social profiles:** `sameAs` holds only the GitHub repo. Add any real profiles that use the exact name "Low Key" when they exist; using the same name everywhere is what fixes the branded-search confusion.
