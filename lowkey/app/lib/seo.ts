@@ -20,7 +20,40 @@ export const HOME_TITLE = `${BRAND.name}: Buy a car without regret`;
 export const HOME_DESCRIPTION =
   "A calm way to buy a car. See the new cars that hold their value near you, what each costs a month, and what changing your mind would cost. No ads, no sign-up.";
 export const ABOUT_DESCRIPTION =
-  "How Low Key works, how AI is used, and where the data comes from.";
+  "Low Key (lowkey.autos) is a free, independent car-buying guide for the United States. How it works, who runs it, how AI is used, and where the data comes from.";
+export const CONTACT_DESCRIPTION = "How to reach Low Key (lowkey.autos): email, and where to report a problem with the site.";
+export const PRIVACY_DESCRIPTION =
+  "What Low Key (lowkey.autos) keeps about you, which is very little: no account, no ads, no selling of data. What stays on your device and what is sent to whom.";
+
+/** The one Organization record: home, About and Contact all use it, so the brand is described the same way everywhere. */
+export function organizationJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${BRAND.url}/#organization`,
+    name: BRAND.name,
+    alternateName: [...BRAND.alternateNames],
+    url: BRAND.url,
+    slogan: BRAND.slogan,
+    description: BRAND.identity,
+    logo: `${BRAND.url}${BRAND.icon.png512}`,
+    email: BRAND.email,
+    areaServed: { "@type": "Country", name: "United States" },
+    founder: { "@type": "Person", name: BRAND.founder.name, url: BRAND.founder.url },
+    sameAs: [BRAND.repoUrl],
+    contactPoint: { "@type": "ContactPoint", contactType: "customer support", email: BRAND.email, url: `${BRAND.url}/contact`, availableLanguage: "English", areaServed: BRAND.areaServed },
+  };
+}
+
+/** A breadcrumb trail from the home page: [name, path] pairs after "Low Key". */
+export function breadcrumbJsonLd(trail: [string, string][]) {
+  const items: [string, string][] = [[BRAND.name, "/"], ...trail];
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map(([name, path], i) => ({ "@type": "ListItem", position: i + 1, name, item: canonicalFor(path) })),
+  };
+}
 
 export function typeDescription(type: SearchType): string {
   return `${TYPE_TITLE[type]}: the picks side by side, what each costs a month, and what leaving would cost. No ads, no sign-up.`;

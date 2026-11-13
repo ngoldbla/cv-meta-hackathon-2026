@@ -18,6 +18,8 @@ Low Key is open source so you can shop with your own preferences: a luxury list,
 
 FRED, the Census geocoder and fueleconomy.gov need no key.
 
+5. **Make it yours before you deploy.** Your fork must not speak as Low Key. In `lowkey/app/lib/brand.ts` change the name, domain, URL, slogan, `email`, `alternateNames`, `identity` (the one sentence saying who you are, what you do and where) and `founder`; these feed the header, footer, Contact and About pages, the share card, `llms.txt` and the Organization markup that search engines and AI tools read. Then reread `lowkey/app/app/privacy/page.tsx` and change anything your deployment does differently (host, analytics, photo reader), and replace the Author section of `lowkey/app/app/about/page.tsx`. A privacy page is a public promise: keep it true for your fork.
+
 ## 2. Deploy the gas forecast service
 Required for the weekly table. Forecasts gas prices on a serverless Modal GPU that scales to zero, weekly and on demand. Follow "Gas forecast service" in `lowkey/docs/deploy.md`, then set `LOWKEY_GAS_URL` and `LOWKEY_GAS_TOKEN`.
 

@@ -4,7 +4,9 @@ import type { ReactNode } from "react";
 
 import { Typography } from "@/components/ui/typography";
 import licenses from "@/lib/licenses.json";
-import { ABOUT_DESCRIPTION, cardPath, pageMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { BRAND } from "@/lib/brand";
+import { ABOUT_DESCRIPTION, breadcrumbJsonLd, cardPath, organizationJsonLd, pageMetadata } from "@/lib/seo";
 
 import { CopyEmail } from "./CopyEmail";
 
@@ -56,10 +58,21 @@ export default function AboutPage() {
         </Link>
       </div>
 
+      <JsonLd
+        data={[
+          { "@context": "https://schema.org", "@type": "AboutPage", name: "About Low Key", url: `${BRAND.url}/about`, about: { "@id": `${BRAND.url}/#organization` } },
+          organizationJsonLd(),
+          breadcrumbJsonLd([["About", "/about"]]),
+        ]}
+      />
       <header className="flex flex-col gap-3">
         <Typography as="h1" variant="h3">
           About Low Key
         </Typography>
+        <P>
+          {BRAND.identity} It is run by {BRAND.founder.name}, is not a dealer or a marketplace, and is not paid by dealers,
+          makers or lenders.
+        </P>
         <P>
           Low Key is a calm way to buy a car. Don&apos;t get over-invested in the decision, and be confident you made a
           good one.
@@ -214,10 +227,20 @@ export default function AboutPage() {
       </Section>
 
       <Section title="Author">
-        <P>Dylan Goldblatt</P>
-        <CopyEmail email="ndgold@me.com" />
+        <P>{BRAND.founder.name}</P>
         <P>
-          <A href="https://www.ndgold.com">www.ndgold.com</A>
+          <a href={`mailto:${BRAND.email}`} className="underline underline-offset-2">
+            {BRAND.email}
+          </a>
+        </P>
+        <CopyEmail email={BRAND.email} />
+        <P>
+          <A href={BRAND.founder.url}>www.ndgold.com</A>
+        </P>
+        <P>
+          <Link href="/contact" className="underline underline-offset-2">Contact</Link> ·{" "}
+          <Link href="/privacy" className="underline underline-offset-2">Privacy</Link> ·{" "}
+          <Link href="/buy-a-car-online" className="underline underline-offset-2">How to buy a car online</Link>
         </P>
       </Section>
 

@@ -24,6 +24,18 @@ export const BRAND = {
     maskable512: "/icons/icon-maskable-512.png",
   },
   repoUrl: "https://github.com/ngoldbla/cv-meta-hackathon-2026",
+  // Forks: everything below names this deployment and its owner. Change it
+  // before you deploy (lowkey/docs/roll-your-own.md, step 1.5), along with
+  // app/privacy/page.tsx and the Author section of app/about/page.tsx.
+  /** Who answers mail (shown on /contact, /about and in the Organization markup). */
+  email: "ndgold@me.com",
+  /** The other names the brand goes by, so search and AI tools tie them to this site. */
+  alternateNames: ["lowkey.autos", "Low Key Autos"],
+  /** One plain sentence: who we are, what we do, where. Used on /about, /contact and in JSON-LD. */
+  identity:
+    "Low Key (lowkey.autos) is a free, independent website that helps people in the United States choose and price a new car before they buy it from a dealer.",
+  areaServed: "US",
+  founder: { name: "Dylan Goldblatt", url: "https://www.ndgold.com" },
 } as const;
 
 /** The key's drawing, shared by the header icon and the generated files. */

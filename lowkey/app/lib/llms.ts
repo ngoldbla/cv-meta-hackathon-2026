@@ -4,20 +4,24 @@
  * No figures (no digits outside URLs) and no listings provider name: the
  * sources are on /about.
  */
+import { ANSWERS } from "./answers";
 import { BRAND } from "./brand";
 
 const u = (path: string) => `${BRAND.url}${path}`;
 
 export const LLMS_TXT = `# ${BRAND.name} (${BRAND.domain})
 
-> ${BRAND.slogan} A calm way to buy a car: the new cars that hold their value near you, what each really costs a month, and what changing your mind would cost. No ads, no sign-up, no money from dealers.
+> ${BRAND.slogan} ${BRAND.identity} A calm way to buy a car: the new cars that hold their value near you, what each really costs a month, and what changing your mind would cost. No ads, no sign-up, no money from dealers.
 
 Every figure on the site is computed by code and never written by a language model.
 
 ## Pages
 - [Start](${u("/")}): choose your area and a type of car.
 - [Sedans that hold their value](${u("/sedan")}): one of five type pages (sedan, suv, pickup, minivan, hybrid).
-- [About](${u("/about")}): how it works, how AI is used, and where the data comes from.
+- [How to buy a car online in the United States](${u("/buy-a-car-online")}): plain answers to what shoppers ask: where to buy, which cars hold their value, what a car costs a month.
+- [About](${u("/about")}): who runs Low Key, how it works, how AI is used, and where the data comes from.
+- [Contact](${u("/contact")}): how to reach us.
+- [Privacy](${u("/privacy")}): what is kept and what is sent, and to whom.
 - [Got the VIN?](${u("/quote")}): check a dealer quote or window sticker against the numbers.
 
 ## Full text
@@ -27,6 +31,8 @@ Every figure on the site is computed by code and never written by a language mod
 export const LLMS_FULL_TXT = `# ${BRAND.name} (${BRAND.domain})
 
 ${BRAND.slogan}
+
+${BRAND.identity}
 
 Low Key is a calm way to buy a car. It does not try to fix the dealership. It makes the decision simple: a few good choices, side by side. There is no account, no phone number, no advertising, and no money from dealers. Dealers do not know you are looking until you contact them.
 
@@ -48,9 +54,15 @@ No ads. No sign-up. Not paid by dealers. No photos, colours or sales gimmicks un
 ## Where the data comes from
 The sources, credits and licences are listed on the About page: ${u("/about")}. The code is public at ${BRAND.repoUrl}.
 
+## Common questions
+${ANSWERS.map((x) => `### ${x.q}\n${x.a.join(" ")}`).join("\n\n")}
+
 ## Pages
 - ${u("/")}
+- ${u("/buy-a-car-online")}
 - ${u("/about")}
+- ${u("/contact")}
+- ${u("/privacy")}
 - ${u("/quote")}
 `;
 
