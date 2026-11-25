@@ -33,6 +33,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   ];
   return (
     <>
+      {/* React hoists this into <head>. */}
+      <link rel="me" href="https://square.pov.town/s/j2bxjk" />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <StartClient initialArea={initialArea} />
     </>
